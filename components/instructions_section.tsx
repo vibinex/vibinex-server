@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React, { ReactNode } from 'react'
 
 export interface InstructionSectionProps {
@@ -16,7 +17,7 @@ export default function InstructionsSection({ heading, instructions }: Instructi
 				{
 					instructions.map(({ symbol, instruction }, index) => (
 						<li key={index}>
-							{(symbol) ? <img src={symbol} alt={symbol} /> : null}
+							{(symbol) ? <Image src={symbol} alt={symbol} /> : null}
 							{instruction}
 						</li>
 					))
