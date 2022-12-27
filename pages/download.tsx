@@ -20,7 +20,7 @@ export default function Download() {
 						<td><a href="#">{"dev-profiler (bin)"}</a></td>
 					</tr>
 					<tr>
-						<td>Linux (Debian) 64-bit"</td>
+						<td>Linux (Debian) 64-bit</td>
 						<td><a href="#">{"dev-profiler (bin)"}</a></td>
 					</tr>
 				</tbody>
