@@ -1,5 +1,6 @@
 import { NextPage } from "next"
 import Head from "next/head";
+import Link from "next/link";
 
 const LoginPage: NextPage = () => {
 	return (
@@ -8,7 +9,7 @@ const LoginPage: NextPage = () => {
 				<title>Login: DevProfile</title>
 			</Head>
 			<h1 className="text-3xl text-center">
-				<a href="/">DevProfile.Tech</a>
+				<Link href="/">DevProfile.Tech</Link>
 			</h1>
 			<form method="post" action="#" className="mx-auto p-4 my-8 rounded border-solid border-black border-2 max-w-xs flex flex-col space-y-2 bg-gray-100">
 				<h3 className="font-semibold text-2xl">Login</h3>
