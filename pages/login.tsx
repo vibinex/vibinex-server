@@ -9,11 +9,11 @@ import { getURLWithParams } from '../utils/url_utils';
 
 const LoginPage: NextPage = () => {
 	const router = useRouter();
+	const [name, setName] = useState("");
+	const [profilePic, setProfilePic] = useState("");
 	if ((Object.keys(router.query).length != 0) &&
 		('state' in router.query) && ('code' in router.query) &&
 		(router.query.state === process.env.NEXT_PUBLIC_LINKEDIN_STATE)) {
-		const [name, setName] = useState("");
-		const [profilePic, setProfilePic] = useState("");
 		axios.get("https://api.linkedin.com/v2/me").then((res) => {
 			// save the id and the code
 			// update the name and the profile picture
