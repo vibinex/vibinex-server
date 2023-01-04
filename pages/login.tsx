@@ -1,26 +1,54 @@
+import axios from "axios";
 import { NextPage } from "next"
 import Head from "next/head";
-import Button from '../components/Button'
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { getURLWithParams } from '../utils/url_utils';
 
 const LoginPage: NextPage = () => {
-	return (
-		<div className="container mx-auto mt-4">
-			<Head>
-				<title>Login: DevProfile</title>
-			</Head>
-			<h1 className="text-3xl text-center">
-				<Link href="/">DevProfile.Tech</Link>
-			</h1>
-			<form method="post" action="#" className="mx-auto p-4 my-8 rounded border-solid border-black border-2 max-w-xs flex flex-col space-y-2 bg-gray-100">
-				<h3 className="font-semibold text-2xl">Login</h3>
-				<input type={'text'} placeholder="Email" name="email" className="rounded" />
-				<input type={'password'} placeholder="Password" name="password" className="rounded" />
-				<input type={'submit'} value="Sign in" className="hover:cursor-pointer py-2 bg-green-300 rounded" />
-				<Button variant="contained" className="py-3 w-full">Login with Linkedin</Button>
-			</form>
-		</div>
-	)
+	const router = useRouter();
+	if ((Object.keys(router.query).length != 0) &&
+		('state' in router.query) && ('code' in router.query) &&
+		(router.query.state === process.env.NEXT_PUBLIC_LINKEDIN_STATE)) {
+		const [name, setName] = useState("");
+		const [profilePic, setProfilePic] = useState("");
+		axios.get("https://api.linkedin.com/v2/me").then((res) => {
+			// save the id and the code
+			// update the name and the profile picture
+			setName(res.data.firstName + " " + res.data.lastName);
+			setProfilePic(res.data.profilePicture);
+		})
+		return (
+			<div>
+				<Image src={profilePic} alt="Display picture" />
+				Welcome {name}!
+			</div>
+		)
+	} else {
+		const linkedinLoginURL = getURLWithParams("https://www.linkedin.com/oauth/v2/authorization", {
+			response_type: "code",
+			client_id: process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID,
+			redirect_uri: process.env.NEXT_PUBLIC_LINKEDIN_REDIRECT_URI,
+			state: process.env.NEXT_PUBLIC_LINKEDIN_STATE,
+			scope: "r_emailaddress r_liteprofile"
+		})
+
+		return (
+			<div className="container mx-auto mt-4">
+				<Head>
+					<title>Login: DevProfile</title>
+				</Head>
+				<h1 className="text-3xl text-center">
+					<Link href="/">DevProfile.Tech</Link>
+				</h1>
+				<Link href={linkedinLoginURL} >
+					<Image src={'/../public/signin_with_linkedin-buttons/Retina/Sign-In-Large---Default.png'} alt="Linkedin Login" width={430} height={80} className="w-full" />
+				</Link>
+			</div>
+		)
+	}
 }
 
 export default LoginPage;
