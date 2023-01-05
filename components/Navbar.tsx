@@ -57,10 +57,7 @@ const Navbar = (props: PropsWithChildren<{
           {/* Mobile Button */}
           <div onClick={changeNavbar}
             className={
-              scrollDown ?
-                'block sm:hidden z-10 text-secondary-dark'
-                :
-                'block sm:hidden z-10 text-primary-light'
+                'block sm:hidden z-10' + (scrollDown ? ' text-secondary-dark' : ' text-primary-light')
             }
           >
             {showNavbar ? (
