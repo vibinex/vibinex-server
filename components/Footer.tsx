@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { BsFacebook, BsLinkedin, BsInstagram, BsTwitter } from 'react-icons/bs'
 
 const legal = [
-	{ name: 'Privacy Policy', link: '/policy' },
+	{ name: 'Privacy Policy', link: '/privacy' },
 	{ name: 'Terms & Conditions', link: '/terms' },
 ]
 
