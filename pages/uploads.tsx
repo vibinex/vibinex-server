@@ -8,7 +8,6 @@ import DropZone from '../components/DropZone'
 const uploads = () => {
 
     const cardStyle = 'm-5 p-4 border-2 rounded-lg shadow-lg'
-
     
     // reducer function to handle state changes
     const reducer = (state, action) => {
@@ -32,7 +31,7 @@ const uploads = () => {
         <div className='h-screen p-4'>
 
             <h1 className="sm:text-4xl text-3xl text-center font-semibold mt-10 mb-10 ">
-             <Link href={'/'}>⬅️</Link>Getting started in just<span className="text-blue-500"> 3 </span>Steps
+             Getting started in just<span className="text-blue-500"> 3 </span>Steps
             </h1>
             <div className='flex justify-center'>
                 {/* Writing down the steps */}
