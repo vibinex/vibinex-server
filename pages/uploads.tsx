@@ -1,4 +1,4 @@
-import React, { useReducer,useEffect } from 'react'
+import React, { useReducer, useEffect, useState } from 'react'
 import Image from 'next/image'
 import demo from '../public/howToRun.gif'
 import Link from 'next/link'
@@ -8,7 +8,7 @@ import DropZone from '../components/DropZone'
 const uploads = () => {
 
     const cardStyle = 'm-5 p-4 border-2 rounded-lg shadow-lg'
-    
+
     // reducer function to handle state changes
     const reducer = (state, action) => {
         switch (action.type) {
@@ -26,12 +26,34 @@ const uploads = () => {
         inDropZone: false,
         fileList: [],
     });
-    
+
+    const[os,setOs] = useState('')
+
+    // detecting client os 
+    useEffect(() => {
+        let os = navigator.userAgent;
+        console.log(navigator.userAgent.search)
+        let finalOs = "";
+        if (os.search('Windows') !== -1) {
+            finalOs = "Windows";
+        }
+        else if (os.search('Mac') !== -1) {
+            finalOs = "MacOS";
+        }
+        else if (os.search('X11') !== -1 && !(os.search('Linux') !== -1)) {
+            finalOs = "UNIX";
+        }
+        else if (os.search('Linux') !== -1 && os.search('X11') !== -1) {
+            finalOs = "Linux"
+        }
+        setOs(finalOs)
+    }, [])
+
     return (
         <div className='h-screen p-4'>
 
             <h1 className="sm:text-4xl text-3xl text-center font-semibold mt-10 mb-10 ">
-             Getting started in just<span className="text-blue-500"> 3 </span>Steps
+                Getting started in just<span className="text-blue-500"> 3 </span>Steps
             </h1>
             <div className='flex justify-center'>
                 {/* Writing down the steps */}
@@ -40,6 +62,7 @@ const uploads = () => {
                         <h2 className='font-semibold text-[20px] mb-3'>Download the CLI</h2>
                         <ul>
                             <li>➡️ Click <Link href={'/'}><span className='text-blue-500'>here</span> </Link>to download the supported versions of cli</li>
+                            <li>for your <span className='font-semibold'>{os} </span>operating system</li>
                             <li>➡️ Or visit our download page for installation</li>
                             <button id="button">Download</button>
                         </ul>
