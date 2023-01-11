@@ -8,5 +8,7 @@ export const getURLWithParams = (url: string, params: { [key: string]: any }) =>
 }
 
 export const getFieldsFromURN = (urn: string) => {
-	//
+	// urn:{namespace}:{entityType}:{id}
+	const [_, namespace, entityType, id] = urn.split(':');
+	return { namespace, entityType, id }
 }
