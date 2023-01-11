@@ -8,4 +8,43 @@ export async function rudderstack_initialize() {
 	window.rudderanalytics.ready(() => {
 		console.log("we are all set!!!");
 	});
+
+	let rudderstackClientSideEvents = {
+		identify: (userId, name, email, anonymousId) => {
+			console.log("identify");
+			client.identify({
+				userId: userId,
+				anonymousId: anonymousId,
+				traits: {
+					name: name,
+					email: email,
+				}
+			},  function(err) {
+					if(err) {
+						console.log("Error message: ", err)
+					}
+				}
+			);
+		},
+		/**
+		 * @param {*} properties properties should be a dictionary of properties of the event. It must contain an "eventStatusFlag" which will define the status of a single event. If the flag is 1, event is successful and if it is 0, event is failed.
+		 */
+		track: (userId, event, properties, anonymousId) => {
+			console.log("track");
+			client.track({
+				userId: userId,
+				anonymousId: anonymousId,
+				event: event,
+				properties: properties,
+				timestamp: new Date(),
+			}, function(err) {
+					if(err) {
+						console.log("Error message: ", err)
+					}
+				}
+			);
+		},
+	}
+
+	return rudderstackClientSideEvents;
 }

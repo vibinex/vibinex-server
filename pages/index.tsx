@@ -11,7 +11,9 @@ export default function Home() {
 
 	let anonymousId = uuidv4();
 	React.useEffect(() => {
-		rudderstack_initialize();
+		const handleEvents = async () => {
+			const rudderstackClient = await rudderstack_initialize()
+		};
 		localStorage.setItem('AnonymousId', anonymousId);
 	  }, []);
   return (
