@@ -4,9 +4,8 @@ import React, { useState } from 'react'
 // the selected or dropped files. 
 
 const ShowFile = ({ fileData }) => {
-    // const [data, setData] = useState(fileData);
+    const [data, setData] = useState(fileData);
 
-    console.log(fileData)
     // only 1 file is allowed to upload 
     if (fileData.fileList.length === 1) {
         return (

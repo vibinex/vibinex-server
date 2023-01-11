@@ -5,6 +5,42 @@ import Link from 'next/link'
 import DropZone from '../components/DropZone'
 import wowMan from '../public/wowMan v1.png'
 
+// Windows Instructions Gifs
+import windowsStep2 from '../public/windows Instructions/step2.gif';
+import windowsStep3 from '../public/windows Instructions/step3.gif';
+import windowsStep4 from '../public/windows Instructions/step4.gif';
+import windowsStep5 from '../public/windows Instructions/step5.gif';
+import windowsStep6 from '../public/windows Instructions/step6.gif';
+import windowsStep7 from '../public/windows Instructions/step7.gif';
+
+// Linux Instructions Gifs
+import linuxStep2 from '../public/linux Instructions/step2.gif';
+import linuxStep3 from '../public/linux Instructions/step3.gif';
+import linuxStep4 from '../public/linux Instructions/step4.gif';
+import linuxStep5 from '../public/linux Instructions/step5.gif';
+import linuxStep6 from '../public/linux Instructions/step6.gif';
+import linuxStep7 from '../public/linux Instructions/step7.gif';
+import linuxStep8 from '../public/linux Instructions/step8.gif';
+
+const windowsInstructions = [
+    { image: windowsStep2, step: 'Unzip the downloaded .gz file (Softwares like 7-zip (https://www.7-zip.org/) can be used)' },
+    { image: windowsStep3, step: 'Run the extracted .exe file by double clicking on it' },
+    { image: windowsStep4, step: 'Enter path of the directory where your git repositories reside' },
+    { image: windowsStep5, step: 'Select the desired repos from the list of existing repos and scan them' },
+    { image: windowsStep6, step: 'Select your aliases from the list of all aliases found in the scanned repositories' },
+    { image: windowsStep7, step: 'After the program finishes, you should see a file named `devprofile.jsonl.gz` in the directory containing devprofiler. ' },
+]
+
+const linuxInstructions = [
+    { image: linuxStep2, step: 'Unzip the binary using gunzip - `gunzip filename.deb.gz`' },
+    { image: linuxStep3, step: 'Install the binary - `sudo apt install ./filename.deb`' },
+    { image: linuxStep4, step: 'Run the application - `devprofiler`' },
+    { image: linuxStep5, step: 'Enter path of the directory where your git repositories reside' },
+    { image: linuxStep6, step: 'Select the desired repos from the list of existing repos and scan them' },
+    { image: linuxStep7, step: 'Select your aliases from the list of all aliases found in the scanned repositories' },
+    { image: linuxStep8, step: 'After the program finishes, you should see a file named `devprofile.jsonl.gz` in your directory. Upload it below' },
+]
+
 const upload = () => {
 
     const cardStyle = 'm-5 p-4 border-2 rounded-lg shadow-lg'
@@ -27,6 +63,7 @@ const upload = () => {
         fileList: [],
     });
     const [os, setOs] = useState('Mobile Device')
+    const [instructions, setInstructions] = useState(windowsInstructions)
 
     // detecting client os 
     useEffect(() => {
@@ -44,6 +81,7 @@ const upload = () => {
         }
         else if (os.search('Linux') !== -1 && os.search('X11') !== -1) {
             finalOs = "Linux"
+            setInstructions(prev => prev = linuxInstructions)
         }
         setOs(finalOs)
     }, [])
@@ -74,22 +112,24 @@ const upload = () => {
                         <div className={cardStyle}>
                             <h2 className='font-semibold text-[20px] mb-3'>Download the CLI</h2>
                             <ul>
-                                <li>➡️ Click <Link href={'/'}><span className='text-blue-500'>here</span> </Link>to download the supported versions of cli</li>
+                                <li>➡️ Click <Link href={'/'}><span className='text-primary-main'>here</span> </Link>to download the supported versions of cli</li>
                                 <li>for your <span className='font-semibold'>{os} </span>operating system</li>
-                                <li>➡️ Or visit our download page for installation</li>
-                                <button id="button">Download</button>
+                                <li>➡️ Or visit our <Link href={'/download'}><span className='text-primary-main'> download </span></Link>page for installation</li>
                             </ul>
                         </div>
 
                         <div className={cardStyle}>
                             <h2 className='font-semibold text-[20px] mb-3'>Create your dev-contribution report completely offline</h2>
-                            <Image src={demo} alt='demo gif' className='rounded-lg mb-4 h-[26rem]' />
-                            <div>
-                                <h4>➡️ run <span className='bg-gray-200 p-0.5 pl-1 pr-1 rounded-lg'>dev-profiler --find-repo</span> into devprofile cli</h4>
-                                <h4 className='mb-3'>it will find all github rep and scans them</h4>
-                                <h4>➡️ then run <span className='bg-gray-200  p-0.5 pl-1 pr-1 rounded-lg'>dev-profiler --find-repo</span> into devprofile cli</h4>
-                                <h4>it will generate the report from scanned file</h4>
-                            </div>
+                            {instructions.map((item, index) => {
+                                    return (
+                                        <div key={index}>
+                                            <hr />
+                                            <h4 className='mb-3'>➡️ {index + 1}. {item.step}</h4>
+                                            <Image src={item.image} alt='demo gif' className='rounded-lg mb-4 h-[26rem]' />
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
 
                         <div className={cardStyle}>
