@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 
 const Navbar = () => {
+  // TODO: This component has a very specific use. It should be inside the views folder
   const [showNavbar, setShowNavbar] = useState(false);
   const [scrollDown, setScrollDown] = useState(false);
   const changeNavbar = () => {

@@ -1,6 +1,11 @@
+import { useRouter } from "next/router";
+import MainAppBar from "../views/MainAppBar";
 import InstructionsSection, { InstructionSectionProps } from "../components/instructions_section"
+import { useEffect, useState } from "react";
 
 export default function Upload() {
+	const router = useRouter();
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const upload_instructions: InstructionSectionProps = {
 		heading: "How to create your DevProfile?",
 		instructions: [
@@ -24,8 +29,22 @@ export default function Upload() {
 			},
 		]
 	}
+
+	useEffect(() => {
+		if ((Object.keys(router.query).length != 0) && ('name' in router.query)) {
+			if (router.query.name && typeof router.query.name === "string") {
+				localStorage.setItem('name', router.query.name);
+			}
+			if (router.query.profilePic && typeof router.query.profilePic === "string") {
+				localStorage.setItem('displayPic', router.query.profilePic);
+			}
+			setIsLoggedIn(true);
+		}
+	}, [router]);
+
 	return (
 		<>
+			<MainAppBar isLoggedIn={isLoggedIn} />
 			<InstructionsSection {...upload_instructions} />
 			<form action="u" method="post">
 				<input type="file" name="report" id="dev-profile-report" />

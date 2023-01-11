@@ -2,33 +2,18 @@ import { NextPage } from "next"
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getURLWithParams } from '../utils/url_utils';
 import standingMan from '../public/standingMan.png'
 
 const LoginPage: NextPage = () => {
-	const router = useRouter();
-	const [name, setName] = useState("User");
-	const [profilePic, setProfilePic] = useState("/../public/dummy-profile-pic-female-300n300.jpeg");
-	if (localStorage.getItem("name") && localStorage.getItem('displayPic')) {
-		const name_var = localStorage.getItem("name");
-		const profilePic_var = localStorage.getItem('displayPic');
-		setName(name_var != null ? name_var : name);
-		setProfilePic(profilePic_var ? profilePic_var : profilePic);
-	}
 	useEffect(() => {
-		if ((Object.keys(router.query).length != 0) && ('name' in router.query)) {
-			if (router.query.name && typeof router.query.name === "string") {
-				localStorage.setItem('name', router.query.name);
-				setName(router.query.name);
-			}
-			if (router.query.profilePic && typeof router.query.profilePic === "string") {
-				localStorage.setItem('displayPic', router.query.profilePic);
-				setProfilePic(router.query.profilePic);
-			}
+		// check if already logged in
+		const isLoggedIn = (localStorage.getItem("name") != null) && (localStorage.getItem('displayPic') != null);
+		if (isLoggedIn) {
+			window.location.href = "/upload";
 		}
-	}, [router]);
+	}, []);
 	// step 2: request an authorization code
 	const linkedinLoginURL = getURLWithParams("https://www.linkedin.com/oauth/v2/authorization", {
 		response_type: "code",
@@ -37,12 +22,8 @@ const LoginPage: NextPage = () => {
 		state: process.env.NEXT_PUBLIC_LINKEDIN_STATE,
 		scope: "r_emailaddress r_liteprofile"
 	})
-	return ((name !== "User") ?
-		<div>
-			<Image src={profilePic} alt="Display picture" width={300} height={300} />
-			Welcome {name}!
-		</div> :
 
+	return (
 		<div className="h-screen  p-4 pt-10">
 			<Head>
 				<title>Login: DevProfile</title>
