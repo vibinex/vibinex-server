@@ -12,7 +12,7 @@ export async function rudderstack_initialize() {
 	let rudderstackClientSideEvents = {
 		identify: (userId, name, email, anonymousId) => {
 			console.log("identify");
-			client.identify({
+			window.rudderanalytics.identify({
 				userId: userId,
 				anonymousId: anonymousId,
 				traits: {
@@ -31,7 +31,7 @@ export async function rudderstack_initialize() {
 		 */
 		track: (userId, event, properties, anonymousId) => {
 			console.log("track");
-			client.track({
+			window.rudderanalytics.track({
 				userId: userId,
 				anonymousId: anonymousId,
 				event: event,
@@ -44,6 +44,18 @@ export async function rudderstack_initialize() {
 				}
 			);
 		},
+		page: (type, pageName, properties) => {
+			console.log("page");
+			window.rudderanalytics.page({
+				type: type,
+				name: pageName,
+				properties: properties
+			}, function(err) {
+				if(err) {
+					console.log("Error message: ", err)
+				}
+			})
+		}
 	}
 
 	return rudderstackClientSideEvents;
