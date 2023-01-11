@@ -26,7 +26,6 @@ const uploads = () => {
         inDropZone: false,
         fileList: [],
     });
-
     const [os, setOs] = useState('Mobile Device')
 
     // detecting client os 
