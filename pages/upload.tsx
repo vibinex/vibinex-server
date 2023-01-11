@@ -1,6 +1,5 @@
 import React, { useReducer, useEffect, useState } from 'react'
 import Image from 'next/image'
-import demo from '../public/howToRun.gif'
 import Link from 'next/link'
 import DropZone from '../components/DropZone'
 import wowMan from '../public/wowMan v1.png'
@@ -29,6 +28,15 @@ const windowsInstructions = [
     { image: windowsStep5, step: 'Select the desired repos from the list of existing repos and scan them' },
     { image: windowsStep6, step: 'Select your aliases from the list of all aliases found in the scanned repositories' },
     { image: windowsStep7, step: 'After the program finishes, you should see a file named `devprofile.jsonl.gz` in the directory containing devprofiler. ' },
+]
+
+const macInstructions = [
+    { image: linuxStep2, step: 'Install the application using `brew install devprofiler`' },
+    { image: linuxStep3, step: 'Run the application using `devprofiler` in a terminal' },
+    { image: linuxStep4, step: 'Enter path of the directory where your git repositories reside' },
+    { image: linuxStep5, step: 'Select the desired repos from the list of existing repos and scan them' },
+    { image: linuxStep6, step: 'Select your aliases from the list of all aliases found in the scanned repositories'},
+    { image: linuxStep7, step: 'After the program finishes, you should see a file named `devprofile.jsonl.gz` in your directory. Upload it here below' },
 ]
 
 const linuxInstructions = [
@@ -75,6 +83,7 @@ const upload = () => {
         }
         else if (os.search('Mac') !== -1) {
             finalOs = "MacOS";
+            setInstructions(prev=>prev = macInstructions)
         }
         else if (os.search('X11') !== -1 && !(os.search('Linux') !== -1)) {
             finalOs = "UNIX";
@@ -125,7 +134,7 @@ const upload = () => {
                                         <div key={index}>
                                             <hr />
                                             <h4 className='mb-3'>➡️ {index + 1}. {item.step}</h4>
-                                            <Image src={item.image} alt='demo gif' className='rounded-lg mb-4 h-[26rem]' />
+                                            <Image src={item.image} alt='demo gif' className='rounded-lg mb-4' />
                                         </div>
                                     )
                                 })
