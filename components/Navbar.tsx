@@ -80,7 +80,7 @@ const Navbar = () => {
               <Link href='/download'>Download</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl  hover:text-secondary-light'>
-              <Link href='/signup'>Signup</Link>
+              <Link href='/login'>Signup</Link>
             </li>
           </ul>
         </div>
