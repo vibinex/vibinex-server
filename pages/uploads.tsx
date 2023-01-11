@@ -3,7 +3,7 @@ import Image from 'next/image'
 import demo from '../public/howToRun.gif'
 import Link from 'next/link'
 import DropZone from '../components/DropZone'
-
+import wowMan from '../public/wowMan v1.png'
 
 const uploads = () => {
 
@@ -27,7 +27,7 @@ const uploads = () => {
         fileList: [],
     });
 
-    const[os,setOs] = useState('')
+    const [os, setOs] = useState('Mobile Device')
 
     // detecting client os 
     useEffect(() => {
@@ -51,37 +51,47 @@ const uploads = () => {
 
     return (
         <div className='h-screen p-4'>
-
-            <h1 className="sm:text-4xl text-3xl text-center font-semibold mt-10 mb-10 ">
-                Getting started in just<span className="text-blue-500"> 3 </span>Steps
-            </h1>
-            <div className='flex justify-center'>
-                {/* Writing down the steps */}
-                <div className='sm:w-[60%]'>
-                    <div className={cardStyle}>
-                        <h2 className='font-semibold text-[20px] mb-3'>Download the CLI</h2>
-                        <ul>
-                            <li>➡️ Click <Link href={'/'}><span className='text-blue-500'>here</span> </Link>to download the supported versions of cli</li>
-                            <li>for your <span className='font-semibold'>{os} </span>operating system</li>
-                            <li>➡️ Or visit our download page for installation</li>
-                            <button id="button">Download</button>
-                        </ul>
-                    </div>
-
-                    <div className={cardStyle}>
-                        <h2 className='font-semibold text-[20px] mb-3'>Create your dev-contribution report completely offline</h2>
-                        <Image src={demo} alt='demo gif' className='rounded-lg mb-4 h-[26rem]' />
-                        <div>
-                            <h4>➡️ run <span className='bg-gray-200 p-0.5 pl-1 pr-1 rounded-lg'>dev-profiler --find-repo</span> into devprofile cli</h4>
-                            <h4 className='mb-3'>it will find all github rep and scans them</h4>
-                            <h4>➡️ then run <span className='bg-gray-200  p-0.5 pl-1 pr-1 rounded-lg'>dev-profiler --find-repo</span> into devprofile cli</h4>
-                            <h4>it will generate the report from scanned file</h4>
+            <div className='sm:hidden block w-[90%] m-auto mt-[25%]'>
+                <Image src={wowMan} alt='Standing Man Image' className='w-[50%] m-auto'/>
+                <div className='p-3 border rounded-lg'>
+                <h2 className='font-semibold text-[1.2rem] mb-2'>Not Supported in Mobile Devices</h2>
+                <p>
+                    devProfile is not available for mobile devices. You can see the complete list of executables <Link href='/download' className='text-primary-main'>here</Link>.
+                </p>
+                </div>
+            </div>
+            <div className='sm:block hidden md:w-[80%] lg:w-[60%] m-auto'>
+                <h1 className="sm:text-4xl text-3xl text-center font-semibold mt-10 mb-10 ">
+                    Getting started in just<span className="text-blue-500"> 3 </span>Steps
+                </h1>
+                <div className='flex justify-center'>
+                    {/* Writing down the steps */}
+                    <div>
+                        <div className={cardStyle}>
+                            <h2 className='font-semibold text-[20px] mb-3'>Download the CLI</h2>
+                            <ul>
+                                <li>➡️ Click <Link href={'/'}><span className='text-blue-500'>here</span> </Link>to download the supported versions of cli</li>
+                                <li>for your <span className='font-semibold'>{os} </span>operating system</li>
+                                <li>➡️ Or visit our download page for installation</li>
+                                <button id="button">Download</button>
+                            </ul>
                         </div>
-                    </div>
 
-                    <div className={cardStyle}>
-                        <h2 className='font-semibold text-[20px] mb-3'>Upload your report</h2>
-                        <DropZone data={data} dispatch={dispatch} />
+                        <div className={cardStyle}>
+                            <h2 className='font-semibold text-[20px] mb-3'>Create your dev-contribution report completely offline</h2>
+                            <Image src={demo} alt='demo gif' className='rounded-lg mb-4 h-[26rem]' />
+                            <div>
+                                <h4>➡️ run <span className='bg-gray-200 p-0.5 pl-1 pr-1 rounded-lg'>dev-profiler --find-repo</span> into devprofile cli</h4>
+                                <h4 className='mb-3'>it will find all github rep and scans them</h4>
+                                <h4>➡️ then run <span className='bg-gray-200  p-0.5 pl-1 pr-1 rounded-lg'>dev-profiler --find-repo</span> into devprofile cli</h4>
+                                <h4>it will generate the report from scanned file</h4>
+                            </div>
+                        </div>
+
+                        <div className={cardStyle}>
+                            <h2 className='font-semibold text-[20px] mb-3'>Upload your report</h2>
+                            <DropZone data={data} dispatch={dispatch} />
+                        </div>
                     </div>
                 </div>
             </div>
