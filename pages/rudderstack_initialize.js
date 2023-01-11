@@ -44,7 +44,7 @@ export async function rudderstack_initialize() {
 				}
 			);
 		},
-		page: (type, pageName, properties) => {
+		page: (type, pageName, properties) => { //TODO: Rudderstack doesn't take `userId` or `anonymousId` as arguments to page method but then does it makes sense to use this method? Figure out.
 			console.log("page");
 			window.rudderanalytics.page({
 				type: type,
