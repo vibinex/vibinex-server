@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-// ShowFile will be used ot display the selected files. 
-// the fileData object contains a fileList array. This will be 
-// the selected or dropped files. 
 
 const ShowFile = ({ fileData }) => {
     const [data, setData] = useState(fileData);
