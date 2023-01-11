@@ -1,7 +1,9 @@
 import React, { useReducer, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import DropZone, { DropZoneData, DropZoneAction } from '../components/DropZone'
+import DropZone from '../components/DropZone'
+import DropZoneData from '../components/DropZone/DropZoneData';
+import DropZoneAction from '../components/DropZone/DropZoneAction';
 import wowMan from '../public/wowMan v1.png'
 import MainAppBar from "../views/MainAppBar";
 
@@ -55,7 +57,7 @@ const Upload = () => {
 	const cardStyle = 'm-5 p-4 border-2 rounded-lg shadow-lg'
 
 	// reducer function to handle state changes
-	const reducer = (state: DropZoneData, action: DropZoneAction) => {
+	const reducer: React.Reducer<DropZoneData, DropZoneAction> = (state: DropZoneData, action: DropZoneAction) => {
 		switch (action.type) {
 			case "setDropZone":
 				return { ...state, inDropZone: action.inDropZone };
@@ -78,7 +80,6 @@ const Upload = () => {
 	// detecting client os
 	useEffect(() => {
 		let os = navigator.userAgent;
-		console.log(navigator.userAgent.search)
 		let finalOs = "";
 		if (os.search('Windows') !== -1) {
 			finalOs = "Windows";
