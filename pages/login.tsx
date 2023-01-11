@@ -11,7 +11,7 @@ const LoginPage: NextPage = () => {
 		// check if already logged in
 		const isLoggedIn = (localStorage.getItem("name") != null) && (localStorage.getItem('displayPic') != null);
 		if (isLoggedIn) {
-			window.location.href = "/upload";
+			window.location.href = "/u";
 		}
 	}, []);
 	// step 2: request an authorization code
@@ -26,7 +26,7 @@ const LoginPage: NextPage = () => {
 	return (
 		<div className="h-screen  p-4 pt-10">
 			<Head>
-				<title>Login: DevProfile</title>
+				<title>Login: devProfile</title>
 			</Head>
 			<div className="sm:mt-20 sm:border-y-2 border-primary-text rounded p-5 sm:w-[50%] m-auto">
 				<div className="sm:flex justify-center">

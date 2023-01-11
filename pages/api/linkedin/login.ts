@@ -40,7 +40,7 @@ export default function handler(
 							const preferred_key = `${name_obj.preferredLocale.language}_${name_obj.preferredLocale.country}`;
 							return name_obj.localized[preferred_key];
 						}
-						const url = getURLWithParams('/upload', {
+						const url = getURLWithParams('/u', {
 							name: getName(get_response.data.firstName) + " " + getName(get_response.data.lastName),
 							profilePic: get_response.data.profilePicture['displayImage~'].elements[0].identifiers[0].identifier,
 						})
