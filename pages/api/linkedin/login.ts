@@ -21,15 +21,15 @@ export default function handler(
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
 				}).then(post_response => {
-					// store the access token, the ttl and the scope in live-db
+					// TODO: store the access token, the ttl and the scope in live-db (firebase)
 					axios.defaults.headers.common = {
 						Authorization: `Bearer ${post_response.data.access_token}`,
 						"Access-Control-Allow-Origin": "*",
 					};
 					const profilePictureURL = "https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))"
 					axios.get(profilePictureURL).then((get_response) => {
-						// save the id and the access token
-						// update the name and the profile picture
+						// TODO: save the id and the access token
+						// TODO: update the name and the profile picture
 						function getName(name_obj: {
 							localized: { [key: string]: string },
 							preferredLocale: {

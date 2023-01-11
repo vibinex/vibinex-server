@@ -11,10 +11,20 @@ const LoginPage: NextPage = () => {
 	const router = useRouter();
 	const [name, setName] = useState("User");
 	const [profilePic, setProfilePic] = useState("/../public/dummy-profile-pic-female-300n300.jpeg");
+	if (localStorage.getItem("name") && localStorage.getItem('displayPic')) {
+		const name_var = localStorage.getItem("name");
+		const profilePic_var = localStorage.getItem('displayPic');
+		setName(name_var != null ? name_var : name);
+		setProfilePic(profilePic_var ? profilePic_var : profilePic);
+	}
 	useEffect(() => {
 		if ((Object.keys(router.query).length != 0) && ('name' in router.query)) {
-			if (router.query.name && typeof router.query.name === "string") setName(router.query.name);
+			if (router.query.name && typeof router.query.name === "string") {
+				localStorage.setItem('name', router.query.name);
+				setName(router.query.name);
+			}
 			if (router.query.profilePic && typeof router.query.profilePic === "string") {
+				localStorage.setItem('displayPic', router.query.profilePic);
 				setProfilePic(router.query.profilePic);
 			}
 		}
