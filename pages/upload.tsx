@@ -5,7 +5,7 @@ import Link from 'next/link'
 import DropZone from '../components/DropZone'
 import wowMan from '../public/wowMan v1.png'
 
-const uploads = () => {
+const upload = () => {
 
     const cardStyle = 'm-5 p-4 border-2 rounded-lg shadow-lg'
 
@@ -51,12 +51,17 @@ const uploads = () => {
     return (
         <div className='h-screen p-4'>
             <div className='sm:hidden block w-[90%] m-auto mt-[25%]'>
-                <Image src={wowMan} alt='Standing Man Image' className='w-[50%] m-auto'/>
+                <Image src={wowMan} alt='Standing Man Image' className='w-[50%] m-auto' />
                 <div className='p-3 border rounded-lg'>
-                <h2 className='font-semibold text-[1.2rem] mb-2'>Not Supported in Mobile Devices</h2>
-                <p>
-                    devProfile is not available for mobile devices. You can see the complete list of executables <Link href='/download' className='text-primary-main'>here</Link>.
-                </p>
+                    <h2 className='font-semibold text-[1.2rem] mb-2'>Not Supported in Mobile Devices</h2>
+                    <p>
+                        devProfile is not available for mobile devices. You can see the complete list of executables here.
+                    </p>
+                    <Link href={'/download'}>
+                        <h2 className='font-bold bg-primary-main text-center p-2 text-primary-light rounded-lg mt-3'>
+                            Download
+                        </h2>
+                    </Link>
                 </div>
             </div>
             <div className='sm:block hidden md:w-[80%] lg:w-[60%] m-auto'>
@@ -98,4 +103,4 @@ const uploads = () => {
     )
 }
 
-export default uploads
+export default upload
