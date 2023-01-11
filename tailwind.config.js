@@ -13,8 +13,7 @@ module.exports = {
           main: '#2196F3',
           dark: '#1e1e1f',
           text: '#9E9E9E',
-          darktext: '#000000',
-          warning:' #F44336'
+          darktext: '#000000'
         },
         secondary: {
           main: '#f3f4f6',
