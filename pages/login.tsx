@@ -12,11 +12,11 @@ const LoginPage: NextPage = () => {
 	const [name, setName] = useState("User");
 	const [profilePic, setProfilePic] = useState("/../public/dummy-profile-pic-female-300n300.jpeg");
 	useEffect(() => {
-		console.log(router.query.name);
 		if ((Object.keys(router.query).length != 0) && ('name' in router.query)) {
 			if (router.query.name && typeof router.query.name === "string") setName(router.query.name);
-			console.log(router.query.profilePic);
-			// if (router.query.profilePic && typeof router.query.profilePic === "string") setProfilePic(router.query.profilePic);
+			if (router.query.profilePic && typeof router.query.profilePic === "string") {
+				setProfilePic(router.query.profilePic);
+			}
 		}
 	}, [router]);
 	// step 2: request an authorization code

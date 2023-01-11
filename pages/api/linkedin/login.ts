@@ -26,8 +26,9 @@ export default function handler(
 						Authorization: `Bearer ${post_response.data.access_token}`,
 						"Access-Control-Allow-Origin": "*",
 					};
-					axios.get("https://api.linkedin.com/v2/me").then((get_response) => {
-						// save the id and the code
+					const profilePictureURL = "https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))"
+					axios.get(profilePictureURL).then((get_response) => {
+						// save the id and the access token
 						// update the name and the profile picture
 						function getName(name_obj: {
 							localized: { [key: string]: string },
@@ -41,9 +42,14 @@ export default function handler(
 						}
 						const url = getURLWithParams('/login', {
 							name: getName(get_response.data.firstName) + " " + getName(get_response.data.lastName),
-							profilePic: get_response.data.profilePicture.displayImage,
+							profilePic: get_response.data.profilePicture['displayImage~'].elements[0].identifiers[0].identifier,
 						})
 						res.status(200).send(`<script>window.location.href = "${url}"; </script>Redirecting...`);
+					}).catch(err => {
+						console.error(err.message);
+						res.status(500).json({
+							error: err,
+						})
 					})
 				}).catch(err => {
 					console.error(err.message);

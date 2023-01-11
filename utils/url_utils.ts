@@ -6,9 +6,3 @@ export const getURLWithParams = (url: string, params: { [key: string]: any }) =>
 	final_URL += (ret.length > 0) ? "?" + ret.join('&') : "";
 	return final_URL;
 }
-
-export const getFieldsFromURN = (urn: string) => {
-	// urn:{namespace}:{entityType}:{id}
-	const [_, namespace, entityType, id] = urn.split(':');
-	return { namespace, entityType, id }
-}
