@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
+import DropZoneData from './DropZoneData'
 
-const ShowFile = ({ fileData }) => {
-    const [data, setData] = useState(fileData);
-
-    // only 1 file is allowed to upload 
+const ShowFile = ({ fileData }: { fileData: DropZoneData }) => {
+    // only 1 file is allowed to upload
     if (fileData.fileList.length === 1) {
         return (
             <div className='mt-3'>
@@ -11,10 +10,16 @@ const ShowFile = ({ fileData }) => {
             </div>
         )
     }
-    else if(fileData.fileList.length>1) { 
+    else if (fileData.fileList.length > 1) {
         return (
             <div className='mt-3'>
                 <h1 className='font-semibold text-primary-warning'>Please upload only 1 file.</h1>
+            </div>
+        )
+    } else {
+        return (
+            <div className='mt-3'>
+                <h1 className='font-semibold text-primary-warning'>Please upload a file.</h1>
             </div>
         )
     }

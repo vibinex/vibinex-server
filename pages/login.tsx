@@ -1,12 +1,33 @@
 import { NextPage } from "next"
+import Head from "next/head";
 import Link from "next/link";
-import standingMan from '../public/standingMan.png'
 import Image from "next/image";
+import { useEffect } from "react";
+import { getURLWithParams } from '../utils/url_utils';
+import standingMan from '../public/standingMan.png'
 
 const LoginPage: NextPage = () => {
-	return (
+	useEffect(() => {
+		// check if already logged in
+		const isLoggedIn = (localStorage.getItem("name") != null) && (localStorage.getItem('displayPic') != null);
+		if (isLoggedIn) {
+			window.location.href = "/u";
+		}
+	}, []);
+	// step 2: request an authorization code
+	const linkedinLoginURL = getURLWithParams("https://www.linkedin.com/oauth/v2/authorization", {
+		response_type: "code",
+		client_id: process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID,
+		redirect_uri: process.env.NEXT_PUBLIC_LINKEDIN_REDIRECT_URI,
+		state: process.env.NEXT_PUBLIC_LINKEDIN_STATE,
+		scope: "r_emailaddress r_liteprofile"
+	})
 
+	return (
 		<div className="h-screen  p-4 pt-10">
+			<Head>
+				<title>Login: devProfile</title>
+			</Head>
 			<div className="sm:mt-20 sm:border-y-2 border-primary-text rounded p-5 sm:w-[50%] m-auto">
 				<div className="sm:flex justify-center">
 
@@ -14,19 +35,11 @@ const LoginPage: NextPage = () => {
 
 					<div className="p-4 pl-10 text-center">
 						<h2 className="font-bold text-[30px]  underline underline-offset-2 m-5">Sign up</h2>
-						<p className="mb-10">Easy Signup with LinkedIn. So, you do not need to write about yourself again while building devProfile.</p>
+						<p className="mb-10">Sign up with LinkedIn. So, you don&apos;t need to write about yourself again.</p>
 
-						<Link href={'/'} className=''>
-							<div className="flex bg-primary-main p-4 font-bold text-primary-light rounded justify-center">
-								<h2 className="ml-2 text-[18px]  mt-0.2">Continue with LinkedIn</h2>
-							</div>
-						</Link>
-
-						<Link href={'/'} className=''>
-							<div className="flex bg-black p-4 font-bold text-primary-light rounded justify-center align-bottom mt-10">
-
-								<h2 className="ml-2 text-[18px] mt-0.2">Go to Home</h2>
-							</div>
+						<Link href={linkedinLoginURL}>
+							{/* TODO: We need to change the image based on screen size and pseudo-classes like hover and active */}
+							<Image src={'/../public/signin_with_linkedin-buttons/Retina/Sign-In-Large---Default.png'} alt="Linkedin Login" width={430} height={80} className="w-full" />
 						</Link>
 
 						<div className="mt-10 text-primary-text text-[15px]">
@@ -37,7 +50,7 @@ const LoginPage: NextPage = () => {
 				</div>
 			</div>
 		</div>
-	)
+	);
 }
 
 export default LoginPage;
