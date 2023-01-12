@@ -24,12 +24,16 @@ export default async function handler(
             let file_objs: File| File[] = files['file'];
             if ((file_objs as File).filepath != undefined) {
                 let fobj = file_objs as File;
-                await uploadGCS(fobj.filepath, fobj.originalFilename);
+                if (fobj.originalFilename) {
+                    uploadGCS(fobj.filepath, fobj.originalFilename);
+                }
             }
             else {
                 let file_arr = file_objs as File[];
                 file_arr.forEach(async f => {
-                    await uploadGCS(f.filepath, f.originalFilename);
+                if (f.originalFilename) {
+                    uploadGCS(f.filepath, f.originalFilename);
+                }
                 });
             }        
         });
@@ -39,7 +43,7 @@ export default async function handler(
     }
 }
 
-function uploadGCS(filepath, filename) {
+function uploadGCS(filepath: string, filename: string) {
     // TODO before release - https://cloud.google.com/docs/authentication/application-default-credentials#GAC
     const storage = new Storage();
     console.log("Storage object created");
@@ -63,7 +67,7 @@ function uploadGCS(filepath, filename) {
     }
 }
 
-function triggerCloudRun(filename) {
+function triggerCloudRun(filename: string) {
     axios.post("https://gcscruncsql-k7jns52mtq-el.a.run.app/insert", {
         bucketname: "devprofiles",
         filename: filename,
