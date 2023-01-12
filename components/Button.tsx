@@ -22,7 +22,7 @@ const Button = (props: PropsWithChildren<{
 		(props.variant === 'contained') ? "bg-primary-main text-primary-text disabled:bg-action-disabled disabled:hover:bg-transparent hover:bg-primary-dark " : "";
 
 	return (
-		<button onClick={clickBehaviour} disabled={props.disabled} className={'inline-flex items-center justify-center relative cursor-pointer align-middle disabled:cursor-default box-border min-w-max w-16 py-1 px-4  rounded-md  transition-all ' + variantClasses + props.className}>
+		<button onClick={clickBehaviour} disabled={props.disabled} className={'inline-flex items-center justify-center relative cursor-pointer align-middle disabled:cursor-default box-border min-w-max py-1 px-4 rounded-md transition-all ' + variantClasses + props.className}>
 			<span className="w-full font-semibold">
 				{props.children}
 			</span>

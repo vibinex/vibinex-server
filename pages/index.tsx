@@ -19,10 +19,10 @@ export default function Home() {
   return (
     <div>
       <Navbar />
-      <Hero/>
+      <Hero />
       <WhyUs />
       <Steps />
-      <Footer />  
+      <Footer />
     </div>
   )
 }
