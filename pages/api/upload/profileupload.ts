@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import {Storage} from '@google-cloud/storage';
 import formidable, { File, PersistentFile } from 'formidable';
+import axios from 'axios';
 
 type ProcessedFiles = Array<[string, File]>;
 
@@ -38,7 +39,7 @@ export default async function handler(
     }
 }
 
-async function uploadGCS(filepath, filename) {
+function uploadGCS(filepath, filename) {
     // TODO before release - https://cloud.google.com/docs/authentication/application-default-credentials#GAC
     const storage = new Storage();
     console.log("Storage object created");
@@ -49,7 +50,11 @@ async function uploadGCS(filepath, filename) {
         preconditionOpts: {ifGenerationMatch: 0},
     }
     try {
-        await storage.bucket(bucketname).upload(filepath, options);
+        storage.bucket(bucketname).upload(filepath, options)
+        .then(res => {
+            console.log(res);
+            triggerCloudRun(filename);
+        });
         console.log(`${filepath} uploaded to ${bucketname}`);
     }
     catch(e) {
@@ -58,28 +63,17 @@ async function uploadGCS(filepath, filename) {
     }
 }
 
-// if ((Object.keys(req.query).length != 0)) {
-//     console.log("request good");
-//     console.log(req);
-//     const files = await new Promise<ProcessedFiles | undefined>((resolve, reject) => {
-//         const form = new formidable.IncomingForm();
-//         const files: ProcessedFiles = [];
-//         form.on('file', function (field, file) {
-//             files.push([field, file]);
-//         })
-//         form.on('end', () => resolve(files));
-//         form.on('error', err => reject(err));
-//     }).catch(e => {
-//         console.log(e);
-//         // TODO - handle error and set response
-//     });
-//     if (files?.length) {
-//         console.log(files);
-//         for (const file of files) {
-//             await uploadGCS(file);
-//         }
-//     }
-// }
-// else {
-//     res.status(400).send("Bad Request: Unexpected query parameters");
-// }
+function triggerCloudRun(filename) {
+    axios.post("https://gcscruncsql-k7jns52mtq-el.a.run.app/insert", {
+        bucketname: "devprofiles",
+        filename: filename,
+    }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => {
+        console.log(res);
+    }).catch(err => {
+        console.log(err);
+    });
+}
