@@ -94,64 +94,74 @@ const Upload = () => {
 		else if (os.search('Linux') !== -1 && os.search('X11') !== -1) {
 			finalOs = "Linux"
 			setInstructions(prev => prev = linuxInstructions)
+		} else if (/android/i.test(os) || /iPad|iPhone|iPod/.test(os)) {
+			finalOs = "mobile";
 		}
 		setOs(finalOs)
 	}, [])
 
 	return (
 		<div className='h-screen p-4'>
-			<MainAppBar />
-			<div className='sm:hidden block w-[90%] m-auto mt-[25%]'>
-				<Image src={wowMan} alt='Standing Man Image' className='w-[50%] m-auto' />
-				<div className='p-3 border rounded-lg'>
-					<h2 className='font-semibold text-[1.2rem] mb-2'>Not Supported in Mobile Devices</h2>
-					<p>
-						devProfile is not available for mobile devices. You can see the complete list of executables here.
-					</p>
-					<Link href={'/download'}>
-						<h2 className='font-bold bg-primary-main text-center p-2 text-primary-light rounded-lg mt-3'>
-							Download
-						</h2>
-					</Link>
-				</div>
-			</div>
-			<div className='sm:block hidden md:w-[80%] lg:w-[60%] m-auto'>
-				<h1 className="sm:text-4xl text-3xl text-center font-semibold mt-10 mb-10 ">
-					Getting started in just<span className="text-blue-500"> 3 </span>Steps
-				</h1>
-				<div className='flex justify-center'>
-					{/* Writing down the steps */}
-					<div>
-						<div className={cardStyle}>
-							<h2 className='font-semibold text-[20px] mb-3'>Download the CLI</h2>
-							<ul>
-								<li>➡️ Click <Link href={'/'}><span className='text-primary-main'>here</span> </Link>to download the supported versions of cli</li>
-								<li>for your <span className='font-semibold'>{os} </span>operating system</li>
-								<li>➡️ Or visit our <Link href={'/download'}><span className='text-primary-main'> download </span></Link>page for installation</li>
-							</ul>
+			{
+				os === 'mobile' ?
+					(
+						<div className='w-[90%] m-auto mt-[25%]' >
+							<Image src={wowMan} alt='Standing Man Image' className='w-[50%] m-auto' />
+							<div className='p-3 border rounded-lg'>
+								<h2 className='font-semibold text-[1.2rem] mb-2'>Not Supported in Mobile Devices</h2>
+								<p>
+									devProfile is not available for mobile devices. You can see the complete list of executables here.
+								</p>
+								<Link href={'/download'}>
+									<h2 className='font-bold bg-primary-main text-center p-2 text-primary-light rounded-lg mt-3'>
+										Download
+									</h2>
+								</Link>
+							</div>
 						</div>
-
-						<div className={cardStyle}>
-							<h2 className='font-semibold text-[20px] mb-3'>Create your dev-contribution report completely offline</h2>
-							{instructions.map((item, index) => {
-								return (
-									<div key={index}>
-										<hr />
-										<h4 className='mb-3'>➡️ {index + 1}. {item.step}</h4>
-										<Image src={item.image} alt='demo gif' className='rounded-lg mb-4' />
+					)
+					:
+					(
+						<>
+							<MainAppBar />
+							<div className='md:w-[80%] lg:w-[60%] m-auto'>
+								<h1 className="sm:text-4xl text-3xl text-center font-semibold mt-10 mb-10 ">
+									Getting started in just<span className="text-blue-500"> 3 </span>Steps
+								</h1>
+								<div className='flex justify-center'>
+									{/* Writing down the steps */}
+									<div>
+										<div className={cardStyle}>
+											<h2 className='font-semibold text-[20px] mb-3'>Download the CLI</h2>
+											<ul>
+												<li>➡️ Click <Link href={'/'}><span className='text-primary-main'>here</span> </Link>to download the supported versions of cli</li>
+												<li>for your <span className='font-semibold'>{os} </span>operating system</li>
+												<li>➡️ Or visit our <Link href={'/download'}><span className='text-primary-main'> download </span></Link>page for installation</li>
+											</ul>
+										</div>
+										<div className={cardStyle}>
+											<h2 className='font-semibold text-[20px] mb-3'>Create your dev-contribution report completely offline</h2>
+											{instructions.map((item, index) => {
+												return (
+													<div key={index}>
+														<hr />
+														<h4 className='mb-3'>➡️ {index + 1}. {item.step}</h4>
+														<Image src={item.image} alt='demo gif' className='rounded-lg mb-4' />
+													</div>
+												)
+											})
+											}
+										</div>
+										<div className={cardStyle}>
+											<h2 className='font-semibold text-[20px] mb-3'>Upload your report</h2>
+											<DropZone data={data} dispatch={dispatch} />
+										</div>
 									</div>
-								)
-							})
-							}
-						</div>
-
-						<div className={cardStyle}>
-							<h2 className='font-semibold text-[20px] mb-3'>Upload your report</h2>
-							<DropZone data={data} dispatch={dispatch} />
-						</div>
-					</div>
-				</div>
-			</div>
+								</div>
+							</div>
+						</>
+					)
+			}
 		</div>
 	)
 }
