@@ -8,21 +8,30 @@ import wowMan from '../public/wowMan v1.png'
 import MainAppBar from "../views/MainAppBar";
 
 // Windows Instructions Gifs
-import windowsStep2 from '../public/windows Instructions/step2.gif';
-import windowsStep3 from '../public/windows Instructions/step3.gif';
-import windowsStep4 from '../public/windows Instructions/step4.gif';
-import windowsStep5 from '../public/windows Instructions/step5.gif';
-import windowsStep6 from '../public/windows Instructions/step6.gif';
-import windowsStep7 from '../public/windows Instructions/step7.gif';
+import windowsStep2 from '../public/windows Instructions/wstep2.gif';
+import windowsStep3 from '../public/windows Instructions/wstep3.gif';
+import windowsStep4 from '../public/windows Instructions/wstep4.gif';
+import windowsStep5 from '../public/windows Instructions/wstep5.gif';
+import windowsStep6 from '../public/windows Instructions/wstep6.gif';
+import windowsStep7 from '../public/windows Instructions/wstep7.gif';
 
 // Linux Instructions Gifs
-import linuxStep2 from '../public/linux Instructions/step2.gif';
-import linuxStep3 from '../public/linux Instructions/step3.gif';
-import linuxStep4 from '../public/linux Instructions/step4.gif';
-import linuxStep5 from '../public/linux Instructions/step5.gif';
-import linuxStep6 from '../public/linux Instructions/step6.gif';
-import linuxStep7 from '../public/linux Instructions/step7.gif';
-import linuxStep8 from '../public/linux Instructions/step8.gif';
+import linuxStep2 from '../public/linux Instructions/lstep2.gif';
+import linuxStep3 from '../public/linux Instructions/lstep3.gif';
+import linuxStep4 from '../public/linux Instructions/lstep4.gif';
+import linuxStep5 from '../public/linux Instructions/lstep5.gif';
+import linuxStep6 from '../public/linux Instructions/lstep6.gif';
+import linuxStep7 from '../public/linux Instructions/lstep7.gif';
+import linuxStep8 from '../public/linux Instructions/lstep8.gif';
+
+// windows Instructions Gifs
+import macStep1 from '../public/mac Instructions/mstep1.gif';
+import macStep2 from '../public/mac Instructions/mstep2.gif';
+import macStep3 from '../public/mac Instructions/mstep3.gif';
+import macStep4 from '../public/mac Instructions/mstep4.gif';
+import macStep5 from '../public/mac Instructions/mstep5.gif';
+import macStep6 from '../public/mac Instructions/mstep6.gif';
+import macStep7 from '../public/mac Instructions/mstep7.gif';
 
 const windowsInstructions = [
 	{ image: windowsStep2, step: 'Unzip the downloaded .gz file (Softwares like 7-zip (https://www.7-zip.org/) can be used)' },
@@ -34,12 +43,13 @@ const windowsInstructions = [
 ]
 
 const macInstructions = [
-	{ image: linuxStep2, step: 'Install the application using `brew install devprofiler`' },
-	{ image: linuxStep3, step: 'Run the application using `devprofiler` in a terminal' },
-	{ image: linuxStep4, step: 'Enter path of the directory where your git repositories reside' },
-	{ image: linuxStep5, step: 'Select the desired repos from the list of existing repos and scan them' },
-	{ image: linuxStep6, step: 'Select your aliases from the list of all aliases found in the scanned repositories' },
-	{ image: linuxStep7, step: 'After the program finishes, you should see a file named `devprofile.jsonl.gz` in your directory. Upload it here below' },
+    { image: macStep1, step: 'Tap repo in brew on terminal by running `brew tap Alokit-Innovations/tap`' },
+    { image: macStep2, step: 'Install the application using `brew install devprofiler`' },
+    { image: macStep3, step: 'Run the application using `devprofiler` in a terminal' },
+    { image: macStep4, step: 'Enter path of the directory where your git repositories reside' },
+    { image: macStep5, step: 'Select the desired repos from the list of existing repos and scan them'},
+    { image: macStep6, step: 'Select your aliases from the list of all aliases found in the scanned repositories' },
+    { image: macStep7, step: 'After the program finishes, you should see a file named `devprofile.json.gz` in your directory. Upload it below' },
 ]
 
 const linuxInstructions = [
