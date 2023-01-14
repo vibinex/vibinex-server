@@ -48,14 +48,23 @@ export default function handler(
 						})
 						console.log(`profile_res = ${profile_response.data.id}`);
 						// TODO - upload profile pic to gcs and save link in firestore
-						const existing_user = get_user(profile_response.data.id);
-						if (!existing_user) {
-							create_user({
-								"linkedin_id": profile_response.data.id,
-								"firstname": getName(profile_response.data.firstName),
-								"lastname": getName(profile_response.data.lastName),
-							});
-						}
+						get_user(profile_response.data.id).then(existing_user => {
+							if (!existing_user) {
+								console.log("No existing user, trying to create new user");
+								create_user({
+									"linkedin_id": profile_response.data.id,
+									"firstname": getName(profile_response.data.firstName),
+									"lastname": getName(profile_response.data.lastName),
+								}).catch(err => {
+									// TODO - implement error handling
+									console.error(`Couldn't find user in db, error = ${err}`);
+								});
+							}
+						})
+						.catch(err => {
+							// TODO - implement err handling
+							console.error(`Couldn't add user to db, error = ${err}`);
+						});
 						res.status(200).send(`<script>window.location.href = "${url}"; </script>Redirecting...`);
 					}).catch(err => {
 						console.error(err.message);
