@@ -22,6 +22,7 @@ export default function handler(
 					}
 				}).then(post_response => {
 					// TODO: store the access token, the ttl and the scope in live-db (firebase)
+					console.log(`post_response data = ${post_response.data}`);
 					axios.defaults.headers.common = {
 						Authorization: `Bearer ${post_response.data.access_token}`,
 						"Access-Control-Allow-Origin": "*",
