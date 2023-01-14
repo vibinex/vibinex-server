@@ -2,6 +2,7 @@
 import axios from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getURLWithParams } from '../../../utils/url_utils';
+import { get_user, create_user } from '../../../utils/firebase/firestore_utils';
 
 export default function handler(
 	req: NextApiRequest,
@@ -45,6 +46,16 @@ export default function handler(
 							name: getName(profile_response.data.firstName) + " " + getName(profile_response.data.lastName),
 							profilePic: profile_response.data.profilePicture['displayImage~'].elements[0].identifiers[0].identifier,
 						})
+						console.log(`profile_res = ${profile_response.data.id}`);
+						// TODO - upload profile pic to gcs and save link in firestore
+						const existing_user = get_user(profile_response.data.id);
+						if (!existing_user) {
+							create_user({
+								"linkedin_id": profile_response.data.id,
+								"firstname": getName(profile_response.data.firstName),
+								"lastname": getName(profile_response.data.lastName),
+							});
+						}
 						res.status(200).send(`<script>window.location.href = "${url}"; </script>Redirecting...`);
 					}).catch(err => {
 						console.error(err.message);
