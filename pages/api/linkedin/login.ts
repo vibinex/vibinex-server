@@ -23,7 +23,6 @@ export default function handler(
 					}
 				}).then(post_response => {
 					// TODO: store the access token, the ttl and the scope in live-db (firebase)
-					console.log(`post_response data = ${post_response.data}`);
 					axios.defaults.headers.common = {
 						Authorization: `Bearer ${post_response.data.access_token}`,
 						"Access-Control-Allow-Origin": "*",
@@ -46,11 +45,9 @@ export default function handler(
 							name: getName(profile_response.data.firstName) + " " + getName(profile_response.data.lastName),
 							profilePic: profile_response.data.profilePicture['displayImage~'].elements[0].identifiers[0].identifier,
 						})
-						console.log(`profile_res = ${profile_response.data.id}`);
 						// TODO - upload profile pic to gcs and save link in firestore
 						get_user(profile_response.data.id).then(existing_user => {
 							if (!existing_user) {
-								console.log("No existing user, trying to create new user");
 								create_user({
 									"linkedin_id": profile_response.data.id,
 									"firstname": getName(profile_response.data.firstName),

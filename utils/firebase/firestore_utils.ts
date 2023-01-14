@@ -9,15 +9,11 @@ import { collection, query, where, getDocs, addDoc, DocumentData } from "firebas
 export async function get_user(linkedin_id: string) {
     const db = FIRESTORE_DB;
     const q = query(collection(db, "users"), where("linkedin_id", "==", linkedin_id));
-    console.log("Query formed");
     const querySnapshot = await getDocs(q);
-    console.log("Querysnapshot formed");
     if (!querySnapshot || querySnapshot.size != 1) {
-        console.log("snapshot invalid");
         return undefined;
     }
     let result: DocumentData = querySnapshot.docs[0].data();
-    console.log("Doc recieved");
     return result;
 }
 
