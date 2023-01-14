@@ -21,16 +21,16 @@ const Steps = () => {
 	return (
 		<div id='steps' className='h-[120%] mb-12'>
 			<h2 className='font-bold text-[2rem] text-center'>Just <span className='sm:text-[60px] text-[40px] text-primary-main'>3</span> steps for <span className='text-[2rem] text-primary-main font-bold'>devProfile</span></h2>
-			<div className='sm:flex justify-center p-10'>
-				<div className='p-3 w-[65%] mr-3'>
+			<div className='md:flex  w-[80%] m-auto justify-center p-10'>
+				<div>
+					<Image src={devProfile} className="border-2 drop-shadow-md rounded-md sm:block hidden" alt='devProfile image' />
+				</div>
+				<div>
 					{
 						steps.map((item, index) => {
 							return <StepCard key={index} step={item.step} description={item.description} />
 						})
 					}
-				</div>
-				<div>
-					<Image src={devProfile} className="border-2 drop-shadow-md rounded-md md:block hidden" alt='devProfile image' />
 				</div>
 			</div>
 		</div>

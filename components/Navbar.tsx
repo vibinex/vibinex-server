@@ -9,7 +9,6 @@ const Navbar = () => {
   const changeNavbar = () => {
     setShowNavbar(!showNavbar);
   };
-
   useEffect(() => {
     const changeColor = () => {
       if (window.scrollY >= 90) {
@@ -89,5 +88,4 @@ const Navbar = () => {
     </div>
   );
 };
-
 export default Navbar;
