@@ -2,11 +2,16 @@ import { NextPage } from "next"
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getURLWithParams } from '../utils/url_utils';
-import standingMan from '../public/standingMan.png'
+import standingMan from '../public/standingMan.png';
+
+import activeImage from '../public/buttonImage/Retina/signInLargeActive.png'
+import hoverImage from '../public/buttonImage/Retina/signInLargeHover.png'
+import defaultImage from '../public/buttonImage/Retina/signInLargeActive.png'
 
 const LoginPage: NextPage = () => {
+	const [linkedlnImage, setLinkedlnImage] = useState(defaultImage);
 	useEffect(() => {
 		// check if already logged in
 		const isLoggedIn = (localStorage.getItem("name") != null) && (localStorage.getItem('displayPic') != null);
@@ -37,9 +42,12 @@ const LoginPage: NextPage = () => {
 						<h2 className="font-bold text-[30px]  underline underline-offset-2 m-5">Sign up</h2>
 						<p className="mb-10">Sign up with LinkedIn. So, you don&apos;t need to write about yourself again.</p>
 
-						<Link href={linkedinLoginURL}>
-							{/* TODO: We need to change the image based on screen size and pseudo-classes like hover and active */}
-							<Image src={'/../public/signin_with_linkedin-buttons/Retina/Sign-In-Large---Default.png'} alt="Linkedin Login" width={430} height={80} className="w-full" />
+						{/* changing linkedln image based on hover and click */}
+						<Link href={linkedinLoginURL}
+							onMouseOver={() => setLinkedlnImage(prev => prev = hoverImage)}
+							onMouseOut={() => setLinkedlnImage(prev => prev = defaultImage)}
+							onFocus={() => setLinkedlnImage(prev => prev = activeImage)}>
+							<Image src={linkedlnImage} alt="Linkedin Login" className="w-full"/>
 						</Link>
 
 						<div className="mt-10 text-primary-text text-[15px]">
