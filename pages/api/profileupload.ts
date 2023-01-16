@@ -22,64 +22,85 @@ export default async function handler(
                 res.status(400).send(`Bad Request: Error in parsing body -${err}`);
                 return;
             }
-            let file_objs: File| File[] = files['file'];
-            if ((file_objs as File).filepath != undefined) {
-                let fobj = file_objs as File;
-                if (fobj.originalFilename) {
-                    uploadGCS(fobj.filepath, fobj.originalFilename, res);
-                }
+            let file_arr: File[];
+            let file_obj: File| File[] = files['file'];
+            if ((file_obj as File).filepath != undefined) {
+                file_arr = [file_obj as File];
             }
             else {
-                let file_arr = file_objs as File[];
-                file_arr.forEach(async f => {
-                if (f.originalFilename) {
-                    uploadGCS(f.filepath, f.originalFilename, res);
+                file_arr = file_obj as File[];
+            }
+            file_arr.forEach(async f => {
+                if (f.originalFilename && f.filepath) {
+                    uploadGCS(f.filepath, f.originalFilename)
+                    .then(res_gcs => {
+                        console.log(res_gcs);
+                        triggerCloudRun(f.originalFilename!).then(res_crun => {
+                            console.log(res_crun);
+                            res.status(200).send('File successfully uploaded');
+                        }).catch(err => {
+                            console.log(err);
+                            res.status(500).send(`Unable to upload to db - ${err}`);
+                        });
+                        console.debug(`${f.originalFilename} uploaded`);
+                    }).catch(err => {
+                        console.error(`Unable to upload - ${err}`);
+                        res.status(500).send(`Unable to upload to bucket - ${err}`)
+                    });
                 }
-                });
-            }        
+                });        
         });
-        res.status(200).send('File successfully uploaded');
     } else {
         res.status(400).send("Bad Request: Unexpected HTTP method");
     }
 }
 
-function uploadGCS(filepath: string, filename: string, res: NextApiResponse<any>) {
+function processenvExist() {
+    return (process.env.PROJECT_ID != undefined 
+        || process.env.PRIVATE_KEY_ID != undefined 
+        || process.env.PRIVATE_KEY != undefined
+        || process.env.CLIENT_EMAIL != undefined
+        || process.env.CLIENT_ID != undefined
+        || process.env.AUTH_URI != undefined
+        || process.env.TOKEN_URI != undefined
+        || process.env.AUTH_PROVIDER_X509_CERT_URL != undefined
+        || process.env.CLIENT_X509_CERT_URL != undefined)
+}
+
+function uploadGCS(filepath: string, filename: string) {
     // TODO before release - https://cloud.google.com/docs/authentication/application-default-credentials#GAC
-    const storage = new Storage();
-    console.log("Storage object created");
+    const storage = new Storage({
+        credentials: {
+            type: 'service_account',
+            // project_id: process.env.PROJECT_ID,
+            // private_key_id: process.env.PRIVATE_KEY_ID,
+            private_key: process.env.PRIVATE_KEY,
+            client_email: process.env.CLIENT_EMAIL,
+            client_id: process.env.CLIENT_ID,
+            // auth_uri: process.env.AUTH_URI,
+            // token_uri: process.env.TOKEN_URI,
+            // auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
+            // client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
+        },
+        projectId: process.env.PROJECT_ID,
+    });
+    console.log(`Storage object created = ${storage}`);
     const bucketname = "devprofiles";
     const options = {
         destination: filename,
         // preconditionOpts avoids race condition while writing to bucket
         preconditionOpts: {ifGenerationMatch: 0},
-    }
-    try {
-        storage.bucket(bucketname).upload(filepath, options)
-        .then(res_gcs => {
-            console.log(res_gcs);
-            triggerCloudRun(filename, res);
-        });
-        console.log(`${filepath} uploaded to ${bucketname}`);
-    }
-    catch(e) {
-        console.log(e);
-        res.status(500).send(`Unable to upload to storage - ${e}`);
-    }
+    } 
+    return storage.bucket(bucketname).upload(filepath, options);
 }
 
-function triggerCloudRun(filename: string, res: NextApiResponse<any>) {
-    axios.post("https://gcscruncsql-k7jns52mtq-el.a.run.app/insert", {
+function triggerCloudRun(filename: string) {
+    return axios.post("https://gcscruncsql-k7jns52mtq-el.a.run.app/insert", {
         bucketname: "devprofiles",
         filename: filename,
     }, {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(res => {
-        console.log(res);
-    }).catch(err => {
-        console.log(err);
-        res.status(500).send(`Unable to upload to db - ${err}`);
     });
 }
