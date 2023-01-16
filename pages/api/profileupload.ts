@@ -5,11 +5,13 @@ import axios from 'axios';
 
 type ProcessedFiles = Array<[string, File]>;
 
-export const config = {
+const config = {
     api: {
         bodyParser: false,
     }
 };
+
+const bucketname = "devprofiles";
 
 export default async function handler(
 	req: NextApiRequest,
@@ -34,12 +36,10 @@ export default async function handler(
                 if (f.originalFilename && f.filepath) {
                     uploadGCS(f.filepath, f.originalFilename)
                     .then(res_gcs => {
-                        console.log(res_gcs);
                         triggerCloudRun(f.originalFilename!).then(res_crun => {
-                            console.log(res_crun);
                             res.status(200).send('File successfully uploaded');
                         }).catch(err => {
-                            console.log(err);
+                            console.error(err);
                             res.status(500).send(`Unable to upload to db - ${err}`);
                         });
                         console.debug(`${f.originalFilename} uploaded`);
@@ -84,8 +84,6 @@ function uploadGCS(filepath: string, filename: string) {
         },
         projectId: process.env.PROJECT_ID,
     });
-    console.log(`Storage object created = ${storage}`);
-    const bucketname = "devprofiles";
     const options = {
         destination: filename,
         // preconditionOpts avoids race condition while writing to bucket
@@ -96,7 +94,7 @@ function uploadGCS(filepath: string, filename: string) {
 
 function triggerCloudRun(filename: string) {
     return axios.post("https://gcscruncsql-k7jns52mtq-el.a.run.app/insert", {
-        bucketname: "devprofiles",
+        bucketname: bucketname,
         filename: filename,
     }, {
         headers: {
