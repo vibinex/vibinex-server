@@ -13,7 +13,7 @@ const config = {
 
 const bucketname = "devprofiles";
 
-export default async function handler(
+export default function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
@@ -32,23 +32,24 @@ export default async function handler(
             else {
                 file_arr = file_obj as File[];
             }
-            file_arr.forEach(async f => {
+            let failed = [];
+            for (const f of file_arr) {
                 if (f.originalFilename && f.filepath) {
-                    uploadGCS(f.filepath, f.originalFilename)
-                    .then(res_gcs => {
-                        triggerCloudRun(f.originalFilename!).then(res_crun => {
-                            res.status(200).send('File successfully uploaded');
-                        }).catch(err => {
-                            console.error(err);
-                            res.status(500).send(`Unable to upload to db - ${err}`);
-                        });
-                        console.debug(`${f.originalFilename} uploaded`);
-                    }).catch(err => {
-                        console.error(`Unable to upload - ${err}`);
-                        res.status(500).send(`Unable to upload to bucket - ${err}`)
-                    });
-                }
-                });        
+                    try {
+                        const res_gcs = await uploadGCS(f.filepath, f.originalFilename);
+                        const res_crun = await triggerCloudRun(f.originalFilename!);
+                    } catch (error) {
+                        failed.push(f.originalFilename);
+                        console.error(err);
+                    }
+                }      
+            }
+            if (failed.length == 0) {
+                res.status(200).send('File successfully uploaded');
+            }
+            else{
+                res.status(200).json({"failed": failed});
+            }
         });
     } else {
         res.status(400).send("Bad Request: Unexpected HTTP method");
