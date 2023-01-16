@@ -16,23 +16,24 @@ export default async function handler(
 	res: NextApiResponse
 ) {
     if (req.method === 'POST') {
-        console.log('File recieved');
         const form  = new formidable.IncomingForm();
         form.parse(req, async function (err, fields, files) {
-            if (err) return console.log(err);
-            console.log(fields);
+            if (err) {
+                res.status(400).send(`Bad Request: Error in parsing body -${err}`);
+                return;
+            }
             let file_objs: File| File[] = files['file'];
             if ((file_objs as File).filepath != undefined) {
                 let fobj = file_objs as File;
                 if (fobj.originalFilename) {
-                    uploadGCS(fobj.filepath, fobj.originalFilename);
+                    uploadGCS(fobj.filepath, fobj.originalFilename, res);
                 }
             }
             else {
                 let file_arr = file_objs as File[];
                 file_arr.forEach(async f => {
                 if (f.originalFilename) {
-                    uploadGCS(f.filepath, f.originalFilename);
+                    uploadGCS(f.filepath, f.originalFilename, res);
                 }
                 });
             }        
@@ -43,7 +44,7 @@ export default async function handler(
     }
 }
 
-function uploadGCS(filepath: string, filename: string) {
+function uploadGCS(filepath: string, filename: string, res: NextApiResponse<any>) {
     // TODO before release - https://cloud.google.com/docs/authentication/application-default-credentials#GAC
     const storage = new Storage();
     console.log("Storage object created");
@@ -55,19 +56,19 @@ function uploadGCS(filepath: string, filename: string) {
     }
     try {
         storage.bucket(bucketname).upload(filepath, options)
-        .then(res => {
-            console.log(res);
-            triggerCloudRun(filename);
+        .then(res_gcs => {
+            console.log(res_gcs);
+            triggerCloudRun(filename, res);
         });
         console.log(`${filepath} uploaded to ${bucketname}`);
     }
     catch(e) {
         console.log(e);
-        // TODO - catch error
+        res.status(500).send(`Unable to upload to storage - ${e}`);
     }
 }
 
-function triggerCloudRun(filename: string) {
+function triggerCloudRun(filename: string, res: NextApiResponse<any>) {
     axios.post("https://gcscruncsql-k7jns52mtq-el.a.run.app/insert", {
         bucketname: "devprofiles",
         filename: filename,
@@ -79,5 +80,6 @@ function triggerCloudRun(filename: string) {
         console.log(res);
     }).catch(err => {
         console.log(err);
+        res.status(500).send(`Unable to upload to db - ${err}`);
     });
 }
