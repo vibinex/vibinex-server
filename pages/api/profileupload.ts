@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import {Storage} from '@google-cloud/storage';
+import { Storage } from '@google-cloud/storage';
 import formidable, { File, PersistentFile } from 'formidable';
 import axios from 'axios';
 
@@ -14,18 +14,19 @@ const config = {
 const bucketname = "devprofiles";
 
 export default function handler(
-	req: NextApiRequest,
-	res: NextApiResponse
+    req: NextApiRequest,
+    res: NextApiResponse
 ) {
     if (req.method === 'POST') {
-        const form  = new formidable.IncomingForm();
+        const form = new formidable.IncomingForm();
         form.parse(req, async function (err, fields, files) {
             if (err) {
                 res.status(400).send(`Bad Request: Error in parsing body -${err}`);
+                console.error(err);
                 return;
             }
             let file_arr: File[];
-            let file_obj: File| File[] = files['file'];
+            let file_obj: File | File[] = files['file'];
             if ((file_obj as File).filepath != undefined) {
                 file_arr = [file_obj as File];
             }
@@ -42,13 +43,14 @@ export default function handler(
                         failed.push(f.originalFilename);
                         console.error(err);
                     }
-                }      
+                }
             }
             if (failed.length == 0) {
                 res.status(200).send('File successfully uploaded');
             }
-            else{
-                res.status(200).json({"failed": failed});
+            else {
+                console.info("File upload failed");
+                res.status(200).json({ "failed": failed });
             }
         });
     } else {
@@ -57,8 +59,8 @@ export default function handler(
 }
 
 function processenvExist() {
-    return (process.env.PROJECT_ID != undefined 
-        || process.env.PRIVATE_KEY_ID != undefined 
+    return (process.env.PROJECT_ID != undefined
+        || process.env.PRIVATE_KEY_ID != undefined
         || process.env.PRIVATE_KEY != undefined
         || process.env.CLIENT_EMAIL != undefined
         || process.env.CLIENT_ID != undefined
@@ -88,8 +90,8 @@ function uploadGCS(filepath: string, filename: string) {
     const options = {
         destination: filename,
         // preconditionOpts avoids race condition while writing to bucket
-        preconditionOpts: {ifGenerationMatch: 0},
-    } 
+        preconditionOpts: { ifGenerationMatch: 0 },
+    }
     return storage.bucket(bucketname).upload(filepath, options);
 }
 
