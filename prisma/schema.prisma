@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model devraw {
+  commit_id    String?
+  author_email String?
+  commit_json  Json?     @db.Json
+  ts_raw       BigInt?
+  ts           DateTime? @db.Timestamp(6)
+  langs        String[]
+
+  @@ignore
+}
+
+model temp_devraw {
+  commit_id    String
+  author_email String
+  commit_json  Json?  @db.Json
+
+  @@id([commit_id, author_email])
+}
