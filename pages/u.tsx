@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import MainAppBar from "../views/MainAppBar";
 import conn from '../utils/db';
 import { NextPageContext } from "next";
+import { QueryResult } from "pg";
 
 export default function Profile(data: { repo_data: any }) {
 	const router = useRouter();
@@ -77,13 +78,13 @@ Profile.getInitialProps = async (ctx: NextPageContext) => {
 	for (let i = 0; i < author_info.length; i++) {
 		const author = author_info[i];
 		if (responses[i].status === "fulfilled") {
-			const vec = responses[i].value.rows;
+			const vec = (responses[i] as PromiseFulfilledResult<QueryResult<any>>).value.rows;
 			author_vec.push({
 				...author,
 				commits: vec,
 			})
 		} else {
-			console.error(responses[i].reason);
+			console.error((responses[i] as PromiseRejectedResult | undefined)?.reason);
 		}
 	}
 
