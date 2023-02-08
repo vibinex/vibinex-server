@@ -2,17 +2,17 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import MainAppBar from "../views/MainAppBar";
 import conn from '../utils/db';
-import { NextPageContext } from "next";
+import { NextPage } from "next";
 import { QueryResult } from "pg";
+import { countArrayElements } from "../utils/data";
 
-export default function Profile(data: { repo_data: any }) {
+const Profile: NextPage<{ repo_data: Array<AuthorVector> }> = ({ repo_data }) => {
 	const router = useRouter();
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	useEffect(() => {
 		// check if devProfile already exists. Redirect to upload page if it doesn't
 		if (false)
 			window.location.href = "/upload";
-		console.log(data.repo_data);
 	}, [])
 	useEffect(() => {
 		// Setting user information in localStorage immediately after login
@@ -26,18 +26,24 @@ export default function Profile(data: { repo_data: any }) {
 			setIsLoggedIn(true);
 		}
 	}, [router]);
+	useEffect(() => {
+		for (let auth of repo_data) {
+			auth.first_commit_ts = new Date(auth.first_commit_ts);
+			auth.last_commit_ts = new Date(auth.last_commit_ts);
+		}
+	}, [repo_data]);
 	return (
 		<>
 			<MainAppBar isLoggedIn={isLoggedIn} />
 			<p>This is the developer profile</p>
-			<p>{JSON.stringify(data)}</p>
+			<p>{JSON.stringify(repo_data)}</p>
 		</>
 	)
 }
 
-Profile.getInitialProps = async (ctx: NextPageContext) => {
+Profile.getInitialProps = async () => {
 	/* FIXME: to be removed : placeholder values */
-	const repo_name = "mentorship-website";
+	const repo_name = "mentorship-website"; // this should come from the context's
 
 	const user_agg_commits_q = `SELECT 
 		author_email, 
@@ -69,7 +75,12 @@ Profile.getInitialProps = async (ctx: NextPageContext) => {
 		WHERE (commit_json ->> 'repo_name')='${repo_name}' AND author_email='${author.author_email}'
 		`;
 
-		author_info.push(author);
+		author_info.push({
+			author_email: author.author_email,
+			num_commits: parseInt(author.num_commits),
+			first_commit_ts: new Date(author.first_commit_ts),
+			last_commit_ts: new Date(author.last_commit_ts),
+		});
 		author_vec_promises.push(conn.query(author_vec_q));
 	}
 
@@ -79,6 +90,12 @@ Profile.getInitialProps = async (ctx: NextPageContext) => {
 		const author = author_info[i];
 		if (responses[i].status === "fulfilled") {
 			const vec = (responses[i] as PromiseFulfilledResult<QueryResult<any>>).value.rows;
+
+			for (let row of vec) {
+				row.langs = countArrayElements(row.langs);
+				row.parents = row.parents.length;
+				delete row.diff_file_info;
+			}
 			author_vec.push({
 				...author,
 				commits: vec,
@@ -93,17 +110,20 @@ Profile.getInitialProps = async (ctx: NextPageContext) => {
 	}
 }
 
+// TODO: create a separate file that handles the types of the objects that we want from postgres
 type AuthorAggregates = {
 	author_email: string,
 	num_commits: number,
-	first_commit_ts: number,
-	last_commit_ts: number,
+	first_commit_ts: Date,
+	last_commit_ts: Date,
 }
 
 type AuthorVector = {
 	author_email: string,
 	num_commits: number,
-	first_commit_ts: number,
-	last_commit_ts: number,
+	first_commit_ts: Date,
+	last_commit_ts: Date,
 	commits: Array<object>,
 }
+
+export default Profile;
