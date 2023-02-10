@@ -4,7 +4,7 @@ import MainAppBar from "../views/MainAppBar";
 import conn from '../utils/db';
 import { NextPage } from "next";
 import { QueryResult } from "pg";
-import { centralLimit, countArrayElements } from "../utils/data";
+import { centralLimit, countArrayElements, renderObjAsTable } from "../utils/data";
 import { ResponsiveVoronoi, VoronoiDatum } from '@nivo/voronoi'
 
 const Profile: NextPage<{ repo_data: Array<AuthorVector> }> = ({ repo_data }) => {
@@ -50,7 +50,7 @@ const Profile: NextPage<{ repo_data: Array<AuthorVector> }> = ({ repo_data }) =>
 					margin={{ top: 1, right: 1, bottom: 1, left: 1 }}
 				/>
 			</div>
-			<p>{JSON.stringify(repo_data)}</p>
+			<div dangerouslySetInnerHTML={{ __html: renderObjAsTable(repo_data) }}></div>
 		</>
 	)
 }
@@ -112,11 +112,11 @@ Profile.getInitialProps = async () => {
 			}
 
 			const commit_summary = {
-				parents: centralLimit('avg', vec.map(row => parseInt(row.parents))),
-				diff_insertions: centralLimit('avg', vec.map(row => parseInt(row.diff_insertions))),
-				diff_deletions: centralLimit('avg', vec.map(row => parseInt(row.diff_deletions))),
-				diff_files_changed: centralLimit('avg', vec.map(row => parseInt(row.diff_files_changed))),
-				langs: centralLimit('avg', vec.map(row => (row.langs.javascript) ? row.langs.javascript : null)),
+				parents: centralLimit('avg', vec.map(row => parseInt(row.parents)))!,
+				diff_insertions: centralLimit('avg', vec.map(row => parseInt(row.diff_insertions)))!,
+				diff_deletions: centralLimit('avg', vec.map(row => parseInt(row.diff_deletions)))!,
+				diff_files_changed: centralLimit('avg', vec.map(row => parseInt(row.diff_files_changed)))!,
+				langs: centralLimit('avg', vec.map(row => (row.langs.javascript) ? row.langs.javascript : null))!,
 			}
 			author_vec.push({
 				...author,
@@ -145,7 +145,13 @@ type AuthorVector = {
 	num_commits: number,
 	first_commit_ts: number,
 	last_commit_ts: number,
-	commits: object,
+	commits: {
+		parents: number,
+		diff_insertions: number,
+		diff_deletions: number,
+		diff_files_changed: number,
+		langs: number,
+	},
 }
 
 export default Profile;

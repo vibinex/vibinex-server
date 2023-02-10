@@ -49,4 +49,36 @@ const centralLimit = (type: 'avg' | 'median' | 'mode' | 'decay_avg' = 'avg', arr
 	}
 }
 
-export { countArrayElements, centralLimit };
+const normalize = (type: 'minmax' | 'gaussian', arr: Array<number>): Array<number> => {
+	return arr;
+}
+
+/**
+ * returns an HTML table with columns based on the first element.
+ * @param data Array on objects that has to be displayed
+ */
+const renderObjAsTable = (data: Array<{ [k: string]: any }>) => {
+	let output: string = "<table>";
+	const headings = Object.keys(data[0]);
+
+	// heading row
+	output += "<thead>"
+	for (const h of headings) {
+		output += `<th>${h}</th>`
+	}
+	output += "</thead>"
+
+	// adding all the data
+	for (const row of data) {
+		output += "<tr>";
+		for (const h of headings) {
+			output += `<td>${(typeof row[h] === "object") ? JSON.stringify(row[h]) : row[h]}</td>`
+		}
+		output += "</tr>";
+	}
+	output += "</table>"
+
+	return output;
+}
+
+export { countArrayElements, centralLimit, renderObjAsTable };
