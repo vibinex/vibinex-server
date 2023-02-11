@@ -2,12 +2,12 @@ import MainAppBar from "../views/MainAppBar";
 import conn from '../utils/db';
 import { NextPage } from "next";
 import { renderObjAsTable } from "../utils/data";
-import { ContributorVector } from "../types/contributor";
+import { VoronoiDatum } from '@nivo/voronoi';
 import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
 
 const RepoProfile: NextPage<{
 	repo_name: string,
-	contributor_2d_data: Array<ContributorVector>
+	contributor_2d_data: Array<VoronoiDatum>
 }> = ({ repo_name, contributor_2d_data }) => {
 	return (
 		<>
@@ -30,7 +30,7 @@ RepoProfile.getInitialProps = async ({ query }) => {
 		}
 	}
 	const repo_name = Array.isArray(query.repo_name) ? query.repo_name[0] : query.repo_name;
-	const auth_vector: Array<ContributorVector> = await getContri2DProps(conn, repo_name);
+	const auth_vector: Array<VoronoiDatum> = await getContri2DProps(conn, repo_name);
 	return {
 		repo_name: repo_name,
 		contributor_2d_data: auth_vector

@@ -4,20 +4,12 @@ import { ContributorVector, ContributorAggregates } from '../../types/contributo
 import { centralLimit, countArrayElements } from "../../utils/data";
 import { Pool, QueryResult } from 'pg';
 
-const Contributors2DView = (props: { repo_data: Array<ContributorVector> }) => {
-	const [data, setData] = useState<Array<VoronoiDatum>>([]);
-
-	useEffect(() => {
-		const formatted_data = props.repo_data.map(c => ({ id: c.author_email, x: c.num_commits, y: c.commits.diff_files_changed }));
-		console.log(formatted_data);
-		setData(formatted_data);
-	}, [props]);
-
+const Contributors2DView = (props: { repo_data: Array<VoronoiDatum> }) => {
 	return (
 		<ResponsiveVoronoi
-			data={data}
-			xDomain={[0, 320]}
-			yDomain={[0, 13]}
+			data={props.repo_data}
+			xDomain={[-60_000_000_000, 42_000_000_000]}
+			yDomain={[-20_000_000_000, 42_000_000_000]}
 			enableLinks={true}
 			linkLineColor="#cccccc"
 			cellLineColor="#c6432d"
@@ -68,7 +60,7 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 		author_vec_promises.push(conn.query(author_vec_q));
 	}
 
-	const author_vec: Array<ContributorVector> = []
+	const contri_data: Array<ContributorVector> = []
 	const responses = await Promise.allSettled(author_vec_promises)
 	for (let i = 0; i < author_info.length; i++) {
 		const author = author_info[i];
@@ -88,7 +80,7 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 				diff_files_changed: centralLimit('avg', vec.map(row => parseInt(row.diff_files_changed)))!,
 				langs: centralLimit('avg', vec.map(row => (row.langs.javascript) ? row.langs.javascript : null))!,
 			}
-			author_vec.push({
+			contri_data.push({
 				...author,
 				commits: commit_summary,
 			})
@@ -97,7 +89,27 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 		}
 	}
 
-	return author_vec;
+	const contri_vec: { [key: string]: Array<number> } = {};
+	for (const contri of contri_data) {
+		const { author_email, commits, ...others } = contri;
+		contri_vec[author_email] = [...Object.values(others), ...Object.values(commits)];
+	}
+
+	const PCA = await import('pca-js');
+	let vectors = PCA.getEigenVectors(Object.values(contri_vec));
+
+	var topTwo = PCA.computePercentageExplained(vectors, vectors[0], vectors[1])
+	console.log(topTwo);
+
+	const adData = PCA.computeAdjustedData(Object.values(contri_vec), vectors[0], vectors[1]);
+	const chart_data: Array<VoronoiDatum> = Object.keys(contri_vec).map((contri_email, i) => ({
+		id: contri_email,
+		x: adData.formattedAdjustedData[0][i],
+		y: adData.formattedAdjustedData[1][i],
+	}))
+
+	console.log(chart_data);
+	return chart_data;
 }
 
 export default Contributors2DView;
