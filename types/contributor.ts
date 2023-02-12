@@ -1,11 +1,4 @@
 // TODO: create a separate file that handles the types of the objects that we want from postgres
-export type ContributorAggregates = {
-	author_email: string,
-	num_commits: number,
-	first_commit_ts: number,
-	last_commit_ts: number,
-}
-
 export type ContributorVector = {
 	author_email: string,
 	num_commits: number,
