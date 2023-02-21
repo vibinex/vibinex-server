@@ -1,18 +1,22 @@
 export async function rudderstack_initialize() {
-	window.rudderanalytics = await require("rudder-sdk-js");
+	let rudderAnalytics = await import("rudder-sdk-js");
 
-	window.rudderanalytics.load(process.env.NEXT_PUBLIC_RUDDERSTACK_WRITE_KEY, process.env.NEXT_PUBLIC_RUDDERSTACK_DATA_PLANE_URL, {
+	rudderAnalytics.load(process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_WRITE_KEY, process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATA_PLANE_URL, {
 		integrations: { All: true }, // load call options
 	});
 
-	window.rudderanalytics.ready(() => {
+	rudderAnalytics.ready(() => {
 		console.log("we are all set!!!");
 	});
+	return rudderAnalytics;
+}
 
+export async function rudderEventMethods() {
+	let rudderAnalytics = await rudderstack_initialize();
 	let rudderstackClientSideEvents = {
 		identify: (userId, name, email, anonymousId) => {
 			console.log("identify");
-			window.rudderanalytics.identify({
+			rudderAnalytics.identify({
 				userId: userId,
 				anonymousId: anonymousId,
 				traits: {
@@ -31,7 +35,7 @@ export async function rudderstack_initialize() {
 		 */
 		track: (userId, event, properties, anonymousId) => {
 			console.log("track");
-			window.rudderanalytics.track({
+			window.rudderAnalytics.track({
 				userId: userId,
 				anonymousId: anonymousId,
 				event: event,
@@ -46,7 +50,7 @@ export async function rudderstack_initialize() {
 		},
 		page: (type, pageName, properties) => { //TODO: Rudderstack doesn't take `userId` or `anonymousId` as arguments to page method but then does it makes sense to use this method? Figure out.
 			console.log("page");
-			window.rudderanalytics.page({
+			rudderAnalytics.page({
 				type: type,
 				name: pageName,
 				properties: properties
@@ -57,6 +61,5 @@ export async function rudderstack_initialize() {
 			})
 		}
 	}
-
 	return rudderstackClientSideEvents;
 }

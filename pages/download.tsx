@@ -1,4 +1,11 @@
+import React from 'react'
+import { rudderstack_initialize } from "./rudderstack_initialize";
+
 export default function Download() {
+	React.useEffect(() => {
+			rudderstack_initialize();
+	  }, []);
+
 	return (
 		<>
 			<h1>{"Downloads"}</h1>
