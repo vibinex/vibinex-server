@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Typewriter from 'typewriter-effect';
 
 const Hero = () => {
   return (
@@ -8,15 +9,26 @@ const Hero = () => {
     >
       {/*Overlay*/}
       <div className='absolute top-0 right-0 bottom-0 left-0 bg-black/70 z-[2]' />
-      <section className='p-5 text-primary-light z-[2] '>
-        <h1 className='sm:text-[80px] text-[50px] font-bold'>Become the Ultimate</h1>
-        <h1 className='text-primary-main font-bold mt-[-20px] sm:text-[80px] text-[50px]'>Developer</h1>
-
-        <article className='sm:text-[30px] text-[25px] mt-6 mb-6 text-gray-300'>
-          <p>Build your <span className="text-primary-main">devProfile</span> and let your work introduce you.</p>
+      <section className='p-5 text-primary-light z-[2] m-auto'>
+        
+        <article className="m-auto w-[60%]">
+        <h1 className='sm:text-[80px] text-[50px] font-bold'>Boost your</h1>
+        <h1 className='text-primary-main font-bold mt-[-20px] sm:text-[80px] text-[50px]'>
+        <Typewriter
+            options={{
+              strings: ['development','PR review','team productivity'],
+              autoStart: true,
+              loop: true,
+            }}
+          />
+        </h1>
         </article>
 
-        <Link href='/login' className='bg-primary-main block text-center m-auto w-[100%] sm:p-5 p-3 pl-20 pr-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Build devProfile</Link>
+        <article className='sm:text-[25px] text-[25px] w-[60%] m-auto mt-6 mb-6 text-gray-300'>
+          <p className="mt-20 mb-10">like never before. With <span className="text-primary-main"> Vibinex </span> you can see data points for your team contributions to increase your business KPIs. </p>
+        </article>
+
+        <Link href='/login' className='bg-primary-main block text-center m-auto w-[60%] sm:p-5 p-3 pl-20 pr-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Link>
       </section>
 
     </div>

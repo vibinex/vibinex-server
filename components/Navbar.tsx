@@ -32,7 +32,7 @@ const Navbar = () => {
       }>
         <Link href='/'>
           <h1 className='font-bold text-4xl'>
-            devProfile
+            Vibinex
           </h1>
         </Link>
         <ul className='hidden sm:flex'>
