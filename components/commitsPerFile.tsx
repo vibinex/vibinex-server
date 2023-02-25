@@ -3,28 +3,28 @@ import { ResponsiveBar } from '@nivo/bar'
 
 const barData = [
     {
-        "filename": "main.js",
-        "numCommits": 172,
+        "fileName": "main.js",
+        "commits": 172,
     },
     {
-        "filename": "index.ts",
-        "numCommits": 151,
+        "fileName": "index.ts",
+        "commits": 151,
     },
     {
-        "filename": "Heros.ts",
-        "numCommits": 145,
+        "fileName": "Heros.ts",
+        "commits": 145,
     },
     {
-        "filename": "profile.ts ",
-        "numCommits": 187,
+        "fileName": "profile.ts ",
+        "commits": 187,
     },
     {
-        "filename": "setting.ts",
-        "numCommits": 165,
+        "fileName": "setting.ts",
+        "commits": 165,
     },
     {
-        "filename": "login.ts",
-        "numCommits": 116,
+        "fileName": "login.ts",
+        "commits": 116,
     }
 ]
 
@@ -61,7 +61,7 @@ const CommitsPerFile = () => {
                 fill={[
                     {
                         match: {
-                            id: 'numCommits'
+                            id: 'commits'
                         },
                         id: 'lines'
                     }
