@@ -3,45 +3,34 @@ import { ResponsiveBar } from '@nivo/bar'
 
 const barData = [
     {
-        "country": "main.js",
-        "fries": 172,
-        "friesColor": "hsl(20, 70%, 50%)",
+        "filename": "main.js",
+        "numCommits": 172,
     },
     {
-        "country": "index.ts",
-        "hot dog": 151,
-        "hot dogColor": "hsl(193, 70%, 50%)",
+        "filename": "index.ts",
+        "numCommits": 151,
     },
     {
-        "country": "Heros.ts",
-        "donut": 145,
-        "donutColor": "hsl(39, 70%, 50%)"
+        "filename": "Heros.ts",
+        "numCommits": 145,
     },
     {
-        "country": "profile.ts ",
-        "kebab": 187,
-        "kebabColor": "hsl(163, 70%, 50%)",
+        "filename": "profile.ts ",
+        "numCommits": 187,
     },
     {
-        "country": "setting.ts",
-        "fries": 165,
-        "friesColor": "hsl(285, 70%, 50%)",
+        "filename": "setting.ts",
+        "numCommits": 165,
     },
     {
-        "country": "login.ts",
-        "hot dog": 116,
-        "hot dogColor": "hsl(112, 70%, 50%)",
+        "filename": "login.ts",
+        "numCommits": 116,
     }
 ]
 
-const MyResponsiveRadar = () => {
+const CommitsPerFile = () => {
     return (
         <div className='h-[50rem] w-[90%] m-auto'>
-            <div className='border-2 mt-10 p-2 rounded-md border-blue-200 text-[20px]'>
-            <h3> <span>Repo Name : </span>Repo Profile Overview</h3>
-            <h1><span>Own by : </span>Vibinex</h1>
-            </div>
-
             <div className='h-[35rem] w-[100%] m-auto border-2 mt-5 p-2 pb-12 rounded-md border-blue-200'>
                 <div className='ml-5 mt-5 mb-[-10px]'>
                 <h3>Metric : File Contribution</h3>
@@ -50,29 +39,15 @@ const MyResponsiveRadar = () => {
             <ResponsiveBar
                 data={barData}
                 keys={[
-                    'hot dog',
-                    'burger',
-                    'sandwich',
-                    'kebab',
-                    'fries',
-                    'donut'
+                    'numCommits',
                 ]}
-                indexBy="country"
+                indexBy="filename"
                 margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
                 padding={0.3}
                 valueScale={{ type: 'linear' }}
                 indexScale={{ type: 'band', round: true }}
                 colors={{ scheme: 'nivo' }}
                 defs={[
-                    {
-                        id: 'dots',
-                        type: 'patternDots',
-                        background: 'inherit',
-                        color: '#38bcb2',
-                        size: 4,
-                        padding: 1,
-                        stagger: true
-                    },
                     {
                         id: 'lines',
                         type: 'patternLines',
@@ -86,13 +61,7 @@ const MyResponsiveRadar = () => {
                 fill={[
                     {
                         match: {
-                            id: 'fries'
-                        },
-                        id: 'dots'
-                    },
-                    {
-                        match: {
-                            id: 'sandwich'
+                            id: 'numCommits'
                         },
                         id: 'lines'
                     }
@@ -135,36 +104,12 @@ const MyResponsiveRadar = () => {
                         ]
                     ]
                 }}
-                legends={[
-                    {
-                        dataFrom: 'keys',
-                        anchor: 'bottom-right',
-                        direction: 'column',
-                        justify: false,
-                        translateX: 120,
-                        translateY: 0,
-                        itemsSpacing: 2,
-                        itemWidth: 100,
-                        itemHeight: 20,
-                        itemDirection: 'left-to-right',
-                        itemOpacity: 0.85,
-                        symbolSize: 20,
-                        effects: [
-                            {
-                                on: 'hover',
-                                style: {
-                                    itemOpacity: 1
-                                }
-                            } 
-                        ]
-                    }
-                ]}
                 role="application"
                 ariaLabel="Nivo bar chart demo"
-                barAriaLabel={function (e) { return e.id + ": " + e.formattedValue + " in country: " + e.indexValue }}
+                barAriaLabel={function (e) { return e.id + ": " + e.formattedValue + " in file: " + e.indexValue }}
             />
 </div>
         </div>
     )
 }
-export default MyResponsiveRadar;
+export default CommitsPerFile;
