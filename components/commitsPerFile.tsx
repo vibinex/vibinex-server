@@ -34,14 +34,14 @@ const CommitsPerFile = () => {
             <div className='h-[35rem] w-[100%] m-auto border-2 mt-5 p-2 pb-12 rounded-md border-blue-200'>
                 <div className='ml-5 mt-5 mb-[-10px]'>
                 <h3>Metric : File Contribution</h3>
-                <h4 className='text-gray-500'>About : Used to find out the total number of files used in repo. You can see language used, code chunk, and much more details of each file.</h4>
+                <h4 className='text-gray-500'>About : Used to find out the total number of commits in each file.</h4>
                 </div>
             <ResponsiveBar
                 data={barData}
                 keys={[
-                    'numCommits',
+                    'commits',
                 ]}
-                indexBy="filename"
+                indexBy="fileName"
                 margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
                 padding={0.3}
                 valueScale={{ type: 'linear' }}
@@ -89,7 +89,7 @@ const CommitsPerFile = () => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: 'Number of lines',
+                    legend: 'Number of commits',
                     legendPosition: 'middle',
                     legendOffset: -40
                 }}
@@ -108,7 +108,7 @@ const CommitsPerFile = () => {
                 ariaLabel="Nivo bar chart demo"
                 barAriaLabel={function (e) { return e.id + ": " + e.formattedValue + " in file: " + e.indexValue }}
             />
-</div>
+            </div>
         </div>
     )
 }
