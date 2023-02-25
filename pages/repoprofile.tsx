@@ -3,34 +3,34 @@ import { ResponsiveBar } from '@nivo/bar'
 
 const barData = [
     {
-        "country": "main.js",
-        "fries": 172,
-        "friesColor": "hsl(20, 70%, 50%)",
+        "country": "main.ts",
+        "profile.ts": 172,
+        "profile.tsColor": "hsl(20, 70%, 50%)",
     },
     {
         "country": "index.ts",
-        "hot dog": 151,
-        "hot dogColor": "hsl(193, 70%, 50%)",
+        "main.ts": 151,
+        "main.tsColor": "hsl(193, 70%, 50%)",
     },
     {
         "country": "Heros.ts",
-        "donut": 145,
-        "donutColor": "hsl(39, 70%, 50%)"
+        "index.ts": 145,
+        "index.tsColor": "hsl(39, 70%, 50%)"
     },
     {
         "country": "profile.ts ",
-        "kebab": 187,
-        "kebabColor": "hsl(163, 70%, 50%)",
+        "login.ts": 187,
+        "login.tsColor": "hsl(163, 70%, 50%)",
     },
     {
         "country": "setting.ts",
-        "fries": 165,
-        "friesColor": "hsl(285, 70%, 50%)",
+        "profile.ts": 165,
+        "profile.tsColor": "hsl(285, 70%, 50%)",
     },
     {
         "country": "login.ts",
-        "hot dog": 116,
-        "hot dogColor": "hsl(112, 70%, 50%)",
+        "main.ts": 116,
+        "main.tsColor": "hsl(112, 70%, 50%)",
     }
 ]
 
@@ -50,12 +50,10 @@ const MyResponsiveRadar = () => {
             <ResponsiveBar
                 data={barData}
                 keys={[
-                    'hot dog',
-                    'burger',
-                    'sandwich',
-                    'kebab',
-                    'fries',
-                    'donut'
+                    'main.ts',
+                    'login.ts',
+                    'profile.ts',
+                    'index.ts'
                 ]}
                 indexBy="country"
                 margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
@@ -86,7 +84,7 @@ const MyResponsiveRadar = () => {
                 fill={[
                     {
                         match: {
-                            id: 'fries'
+                            id: 'profile.ts'
                         },
                         id: 'dots'
                     },
