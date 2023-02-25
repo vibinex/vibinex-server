@@ -30,8 +30,7 @@ const barData = [
 
 const CommitsPerFile = () => {
     return (
-        <div className='h-[50rem] w-[90%] m-auto'>
-            <div className='h-[35rem] w-[100%] m-auto border-2 mt-5 p-2 pb-12 rounded-md border-blue-200'>
+            <div className='h-[35rem] w-[100%] m-auto border-2 my-5 p-2 pb-12 rounded-md border-blue-200'>
                 <div className='ml-5 mt-5 mb-[-10px]'>
                 <h3>Metric : File Contribution</h3>
                 <h4 className='text-gray-500'>About : Used to find out the total number of commits in each file.</h4>
@@ -109,7 +108,6 @@ const CommitsPerFile = () => {
                 barAriaLabel={function (e) { return e.id + ": " + e.formattedValue + " in file: " + e.indexValue }}
             />
             </div>
-        </div>
     )
 }
 export default CommitsPerFile;
