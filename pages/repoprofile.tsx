@@ -3,33 +3,33 @@ import { ResponsiveBar } from '@nivo/bar'
 
 const barData = [
     {
-        "country": "main.ts",
-        "profile.ts": 172,
+        "fileName": "main.ts",
+        "commits": 172,
         "profile.tsColor": "hsl(20, 70%, 50%)",
     },
     {
-        "country": "index.ts",
-        "main.ts": 151,
+        "fileName": "index.ts",
+        "commits": 151,
         "main.tsColor": "hsl(193, 70%, 50%)",
     },
     {
-        "country": "Heros.ts",
-        "index.ts": 145,
+        "fileName": "Heros.ts",
+        "commits": 145,
         "index.tsColor": "hsl(39, 70%, 50%)"
     },
     {
-        "country": "profile.ts ",
-        "login.ts": 187,
+        "fileName": "profile.ts ",
+        "commits": 187,
         "login.tsColor": "hsl(163, 70%, 50%)",
     },
     {
-        "country": "setting.ts",
-        "profile.ts": 165,
+        "fileName": "setting.ts",
+        "commits": 165,
         "profile.tsColor": "hsl(285, 70%, 50%)",
     },
     {
-        "country": "login.ts",
-        "main.ts": 116,
+        "fileName": "login.ts",
+        "commits": 116,
         "main.tsColor": "hsl(112, 70%, 50%)",
     }
 ]
@@ -50,12 +50,9 @@ const MyResponsiveRadar = () => {
             <ResponsiveBar
                 data={barData}
                 keys={[
-                    'main.ts',
-                    'login.ts',
-                    'profile.ts',
-                    'index.ts'
+                    'commits',
                 ]}
-                indexBy="country"
+                indexBy="fileName"
                 margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
                 padding={0.3}
                 valueScale={{ type: 'linear' }}
@@ -159,7 +156,7 @@ const MyResponsiveRadar = () => {
                 ]}
                 role="application"
                 ariaLabel="Nivo bar chart demo"
-                barAriaLabel={function (e) { return e.id + ": " + e.formattedValue + " in country: " + e.indexValue }}
+                barAriaLabel={function (e) { return e.id + ": " + e.formattedValue + " in fileName: " + e.indexValue }}
             />
 </div>
         </div>
