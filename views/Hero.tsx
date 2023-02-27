@@ -8,11 +8,11 @@ const Hero = () => {
 		>
 			{/*Overlay*/}
 			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/70 z-[2]' />
-			<section className='p-5 text-primary-light z-[2] m-auto'>
+			<section className='p-5 text-primary-light z-[2]'>
 
-				<article className="m-auto text-center">
-					<h1 className='sm:text-[80px] text-[50px] font-bold'>{'Get context for'}
-						<span className='text-primary-main font-bold mt-[-20px] sm:text-[80px] text-[50px] block'>
+				<article className="text-center">
+					<h1 className='sm:text-[80px] text-[40px] font-bold'>{'Get context for'}
+						<span className='text-primary-main font-bold block'>
 							Pull Requests
 						</span>
 					</h1>
