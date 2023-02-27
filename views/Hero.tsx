@@ -10,18 +10,19 @@ const Hero = () => {
 			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/70 z-[2]' />
 			<section className='p-5 text-primary-light z-[2] m-auto'>
 
-				<article className="m-auto w-[60%]">
-					<h1 className='sm:text-[80px] text-[50px] font-bold'>Get context for</h1>
-					<h1 className='text-primary-main font-bold mt-[-20px] sm:text-[80px] text-[50px]'>
-						Pull Requests
+				<article className="m-auto text-center">
+					<h1 className='sm:text-[80px] text-[50px] font-bold'>{'Get context for'}
+						<span className='text-primary-main font-bold mt-[-20px] sm:text-[80px] text-[50px] block'>
+							Pull Requests
+						</span>
 					</h1>
+
+					<p className="text-[25px] mt-20 mb-10 text-gray-300">
+						With <span className="text-primary-main">Vibinex</span> you can quickly know which code-changes need your attention
+					</p>
 				</article>
 
-				<article className='sm:text-[25px] text-[25px] w-[60%] m-auto mt-6 mb-6 text-gray-300'>
-					<p className="mt-20 mb-10">like never before! With <span className="text-primary-main">Vibinex</span> you can quickly know which code-changes need your attention</p>
-				</article>
-
-				<Link href='/login' className='bg-primary-main block text-center m-auto w-[60%] sm:p-5 p-3 pl-20 pr-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Link>
+				<Link href='/login' className='bg-primary-main block text-center m-auto w-full sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Link>
 			</section>
 
 		</div>
