@@ -1,19 +1,20 @@
 import * as rudderAnalytics from "rudder-sdk-js";
 
 export async function rudderstack_initialize(): Promise<typeof rudderAnalytics> {
-  rudderAnalytics.load(
-    process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_WRITE_KEY!,
-    process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATA_PLANE_URL!,
-    {
-      integrations: { All: true }, // load call options
-    }
-  );
+		
+	rudderAnalytics.load(
+		process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_WRITE_KEY!,
+		process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATA_PLANE_URL!,
+		{
+		integrations: { All: true }, // load call options
+		}
+	);
 
-  rudderAnalytics.ready(() => {
-    console.log("we are all set!!!");
-  });
+	rudderAnalytics.ready(() => {
+		console.log("we are all set!!!");
+	});
 
-  return rudderAnalytics;
+	return rudderAnalytics;
 }
 
 interface RudderstackClientSideEvents {
@@ -24,10 +25,10 @@ interface RudderstackClientSideEvents {
     anonymousId: string
   ) => void;
   track: (
-    userId: string,
-    event: string,
-    properties: { [key: string]: any },
-    anonymousId: string
+	userId: string,
+	event: string,
+	properties: { [key: string]: any },
+	anonymousId: string
   ) => void;
   page: (
     type: string,

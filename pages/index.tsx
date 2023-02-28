@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar'
 import Steps from '../views/Steps'
 import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
-import { rudderstack_initialize, rudderEventMethods } from "./rudderstack_initialize";
+import { rudderEventMethods } from "./rudderstack_initialize";
 import { v4 as uuidv4} from 'uuid';
 
 export default function Home() {
