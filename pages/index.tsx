@@ -11,7 +11,6 @@ export default function Home() {
 
 	let anonymousId = uuidv4();
 	React.useEffect(() => {
-		rudderstack_initialize();
 		rudderEventMethods().then((response) => {
 			response.identify("", "", "", anonymousId);
 		});
