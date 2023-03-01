@@ -1,9 +1,11 @@
 import React from 'react'
-import { rudderstack_initialize } from "./rudderstack_initialize";
+import { rudderEventMethods } from "./rudderstack_initialize";
 
 export default function Download() {
 	React.useEffect(() => {
-			rudderstack_initialize();
+			rudderEventMethods().then((response) => {
+				response?.track("", "download page call", {eventStatusFlag: 1}, "anonymous")
+			});
 	  }, []);
 
 	return (
