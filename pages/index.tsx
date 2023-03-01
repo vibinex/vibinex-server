@@ -4,16 +4,16 @@ import Navbar from '../components/Navbar'
 import Steps from '../views/Steps'
 import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
-import { rudderEventMethods } from "./rudderstack_initialize";
+// import { rudderEventMethods } from "./rudderstack_initialize";
 import { v4 as uuidv4} from 'uuid';
 
 export default function Home() {
 
 	let anonymousId = uuidv4();
 	React.useEffect(() => {
-		rudderEventMethods().then((response) => {
-			response.identify("", "", "", anonymousId);
-		});
+		// rudderEventMethods().then((response) => {
+		// 	response.identify("", "", "", anonymousId);
+		// });
 		localStorage.setItem('AnonymousId', anonymousId);
 	  }, []);
   return (

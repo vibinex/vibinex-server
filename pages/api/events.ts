@@ -7,7 +7,7 @@ const DATA_PLANE_URL = "https://gmailaviksslp.dataplane.rudderstack.com";
 // we need the batch endpoint of the Rudder server you are running
 const client = new Analytics(WRITE_KEY,  { dataPlaneUrl: DATA_PLANE_URL });
 
-exports.rudderStackEvents = {
+const rudderStackEvents = {
     identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => {
         console.log("identify");
         client.identify({
@@ -37,3 +37,5 @@ exports.rudderStackEvents = {
         );
     }
 }
+
+export default rudderStackEvents;
