@@ -47,7 +47,7 @@ const LoginPage: NextPage = () => {
 							onMouseOver={() => setLinkedlnImage(prev => prev = hoverImage)}
 							onMouseOut={() => setLinkedlnImage(prev => prev = defaultImage)}
 							onFocus={() => setLinkedlnImage(prev => prev = activeImage)}>
-							<Image src={linkedlnImage} alt="Linkedin Login" className="w-full"/>
+							<Image src={linkedlnImage} alt="Linkedin Login" className="w-full" />
 						</Link>
 
 						<div className="mt-10 text-primary-text text-[15px]">

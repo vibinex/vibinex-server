@@ -1,5 +1,6 @@
-import Link from "next/link";
 import React from "react";
+import { signIn } from "next-auth/react";
+import Button from "../components/Button";
 
 const Hero = () => {
   return (
@@ -16,7 +17,7 @@ const Hero = () => {
           <p>Build your <span className="text-primary-main">devProfile</span> and let your work introduce you.</p>
         </article>
 
-        <Link href='/login' className='bg-primary-main block text-center m-auto w-[100%] sm:p-5 p-3 pl-20 pr-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Build devProfile</Link>
+        <Button variant="text" onClick={() => signIn()} className='bg-primary-main block text-center m-auto w-[100%] sm:p-5 p-3 pl-20 pr-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Build devProfile</Button>
       </section>
 
     </div>
