@@ -1,7 +1,7 @@
 import Analytics from "@rudderstack/rudder-sdk-node";
 import { apiObject } from "rudder-sdk-js";
 //TODO: Move these credentials to either .env or a more secure location. best way would be to store these credentials in a file.
-const WRITE_KEY = "1uJFicTY48cFtZPIKyLqILECDt1";
+const WRITE_KEY = "2MP2JEcO1okqEMsbstFXpOWcdSl";
 const DATA_PLANE_URL = "https://gmailaviksslp.dataplane.rudderstack.com";
 
 // we need the batch endpoint of the Rudder server you are running
