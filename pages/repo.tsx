@@ -4,6 +4,7 @@ import { NextPage } from "next";
 import { renderObjAsTable } from "../utils/data";
 import { ContributorVector } from "../types/contributor";
 import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
+import CommitsPerFile from "../components/commitsPerFile";
 import RepoList, { getRepoList } from "../views/RepoList";
 
 const RepoProfile: NextPage<{
@@ -12,10 +13,14 @@ const RepoProfile: NextPage<{
 	contributor_2d_data?: Array<ContributorVector>
 }> = ({ repo_list, repo_name, contributor_2d_data }) => {
 	return (
-		<>
+		<div className='h-[50rem] w-[90%] m-auto'>
 			<MainAppBar isLoggedIn={true} />
 			{(repo_name && contributor_2d_data) ? (<>
-				<p>Repository: {repo_name}</p>
+				<div className='border-2 mt-10 p-2 rounded-md border-blue-200 text-[20px]'>
+					<h3> <span>Repo Name : </span>{repo_name}</h3>
+					<h1><span>Owned by : </span>Vibinex</h1>
+				</div>
+				<CommitsPerFile />
 				<div className="block w-96 h-96 mx-auto">
 					<Contributors2DView repo_data={contributor_2d_data} />
 				</div>
@@ -25,7 +30,7 @@ const RepoProfile: NextPage<{
 					<RepoList repo_list={repo_list} />
 				</div>
 			) : (<p>Something went wrong</p>)}
-		</>
+		</div>
 	)
 }
 

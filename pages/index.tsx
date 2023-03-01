@@ -1,6 +1,5 @@
 import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
-import Steps from '../views/Steps'
 import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
 import { useSession } from "next-auth/react"
@@ -15,7 +14,6 @@ export default function Home() {
       <Navbar />
       <Hero />
       <WhyUs />
-      <Steps />
       <Footer />
     </div>
   )
