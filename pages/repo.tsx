@@ -4,7 +4,7 @@ import { NextPage } from "next";
 import { renderObjAsTable } from "../utils/data";
 import { ContributorVector } from "../types/contributor";
 import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
-import CommitsPerFile from "../components/commitsPerFile";
+import CommitsPerFile from "../views/Dashboard/commitsPerFile";
 import RepoList, { getRepoList } from "../views/RepoList";
 
 const RepoProfile: NextPage<{
