@@ -42,8 +42,8 @@ export async function rudderEventMethods(): Promise<RudderstackClientSideEvents 
 
   if (rudderAnalytics) {
     const rudderstackClientSideEvents: RudderstackClientSideEvents = {
-      identify: (userId, name, email, anonymousId) => {
-        console.log("identify");
+      identify: (userId, name, email, anonymousId) => {  // Anonymous Id is set in local storage as soon as a user lands on the webiste.
+        console.log("identify"); 
         rudderAnalytics.identify(
           userId,
           { name: name, email: email },

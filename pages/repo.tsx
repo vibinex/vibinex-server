@@ -1,17 +1,24 @@
 import MainAppBar from "../views/MainAppBar";
 import conn from '../utils/db';
 import { NextPage } from "next";
+import React from "react";
 import { renderObjAsTable } from "../utils/data";
 import { ContributorVector } from "../types/contributor";
 import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
 import CommitsPerFile from "../components/commitsPerFile";
 import RepoList, { getRepoList } from "../views/RepoList";
+import { rudderEventMethods } from "../utils/rudderstack_initialize";
 
 const RepoProfile: NextPage<{
 	repo_list?: string[],
 	repo_name?: string,
 	contributor_2d_data?: Array<ContributorVector>
 }> = ({ repo_list, repo_name, contributor_2d_data }) => {
+	React.useEffect(() => {
+		rudderEventMethods().then((response) => {
+			response?.page("", "Repo Profile Page", { anonymousId: localStorage.getItem("AnonymousId") });
+		});
+	  });
 	return (
 		<div className='h-[50rem] w-[90%] m-auto'>
 			<MainAppBar isLoggedIn={true} />

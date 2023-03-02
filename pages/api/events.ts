@@ -8,7 +8,7 @@ const DATA_PLANE_URL = "https://gmailaviksslp.dataplane.rudderstack.com";
 const client = new Analytics(WRITE_KEY,  { dataPlaneUrl: DATA_PLANE_URL });
 
 const rudderStackEvents = {
-    identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => {
+    identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => { // Anonymous Id is set in local storage as soon as a user lands on the webiste.
         console.log("identify");
         client.identify({
             userId: userId,
