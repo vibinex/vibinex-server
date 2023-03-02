@@ -1,11 +1,7 @@
 import Analytics from "@rudderstack/rudder-sdk-node";
 import { apiObject } from "rudder-sdk-js";
-//TODO: Move these credentials to either .env or a more secure location. best way would be to store these credentials in a file.
-const WRITE_KEY = "2MP2JEcO1okqEMsbstFXpOWcdSl";
-const DATA_PLANE_URL = "https://gmailaviksslp.dataplane.rudderstack.com";
-
 // we need the batch endpoint of the Rudder server you are running
-const client = new Analytics(WRITE_KEY,  { dataPlaneUrl: DATA_PLANE_URL });
+const client = new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!,  { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
 
 const rudderStackEvents = {
     identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => { // Anonymous Id is set in local storage as soon as a user lands on the webiste.
