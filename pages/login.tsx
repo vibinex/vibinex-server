@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getURLWithParams } from '../utils/url_utils';
+import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import standingMan from '../public/standingMan.png';
 
 import activeImage from '../public/buttonImage/Retina/signInLargeActive.png'
@@ -13,6 +14,9 @@ import defaultImage from '../public/buttonImage/Retina/signInLargeActive.png'
 const LoginPage: NextPage = () => {
 	const [linkedlnImage, setLinkedlnImage] = useState(defaultImage);
 	useEffect(() => {
+		rudderEventMethods().then((response) => {
+			response?.page("", "Login Page", {anonymousId: localStorage.getItem("AnonymousId")})
+		})
 		// check if already logged in
 		const isLoggedIn = (localStorage.getItem("name") != null) && (localStorage.getItem('displayPic') != null);
 		if (isLoggedIn) {
