@@ -1,6 +1,6 @@
 import NextAuth, { Account, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import { getUserByAlias, getUserByProvider, DbUser } from "../../../utils/db/users";
+import { getUserByAlias, getUserByProvider, DbUser, createUser } from "../../../utils/db/users";
 
 type signInParam = {
 	user: User,
@@ -33,7 +33,26 @@ export const authOptions = {
 				}
 			}
 			if (!db_user) {
-				console.log("New user");
+				if (user && account) {
+					const user_obj: DbUser = {
+						name: user.name!,
+						profile_url: user.image!,
+						aliases: [user.email!],
+						auth_info: {
+							[account.provider]: {
+								id: account.providerAccountId,
+							}
+						},
+						id: undefined,
+						org: undefined,
+						code_url: undefined,
+						social_url: null,
+						repos: null
+					}
+					createUser(user_obj).catch(err => {
+						console.error("[signIn] Could not create user", err)
+					})
+				}
 			}
 			return true;
 		}
