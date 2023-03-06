@@ -1,4 +1,13 @@
+import React from 'react'
+import { rudderEventMethods } from "../utils/rudderstack_initialize";
+
 export default function Download() {
+	React.useEffect(() => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "download page call", {eventStatusFlag: 1}, "anonymous") //Anonymous Id is set in loca storage as soon as the user lands on the webiste.
+			});
+	  }, []);
+
 	return (
 		<>
 			<h1>{"Downloads"}</h1>
