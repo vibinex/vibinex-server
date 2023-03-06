@@ -7,7 +7,7 @@ export const convert = (value: any): string => {
 		case 'Boolean':
 			return `${value}`
 		case 'Array':
-			return `ARRAY [${value.map((x: string | number) => convert(x)).join(', ')}]`
+			return `ARRAY [${value.map((x: string | number | object) => convert(x)).join(', ')}]`
 		case 'Object':
 			return `'${JSON.stringify(value)}'`
 		default:

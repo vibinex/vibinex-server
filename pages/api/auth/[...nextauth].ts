@@ -1,8 +1,8 @@
 import NextAuth, { Account, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import { getUserByAlias, getUserByProvider, DbUser, createUser } from "../../../utils/db/users";
+import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 
-type signInParam = {
+interface signInParam {
 	user: User,
 	account: Account | null,
 }
@@ -19,10 +19,11 @@ export const authOptions = {
 	callbacks: {
 		async signIn({ user, account }: signInParam) {
 			// search for the user in the users table
-			// first search based on auth_info
 			let db_user: DbUser | undefined;
-			if (account)
+			if (account) {
+				// first search based on auth_info
 				db_user = await getUserByProvider(account.provider, account.providerAccountId);
+			}
 			if (!db_user && user.email) {
 				// then search based on aliases: ask if they want to merge accounts
 				const alias_users = await getUserByAlias(user.email);
@@ -32,31 +33,48 @@ export const authOptions = {
 					db_user = alias_users[0];
 				}
 			}
+
 			if (!db_user) {
-				if (user && account) {
-					const user_obj: DbUser = {
-						name: user.name!,
-						profile_url: user.image!,
-						aliases: [user.email!],
-						auth_info: {
-							[account.provider]: {
-								id: account.providerAccountId,
-							}
-						},
-						id: undefined,
-						org: undefined,
-						code_url: undefined,
-						social_url: null,
-						repos: null
-					}
-					createUser(user_obj).catch(err => {
-						console.error("[signIn] Could not create user", err)
-					})
-				}
+				// finally, if user is not found, create a new account
+				db_user = createUserUpdateObj(user, account);
+				await createUser(db_user).catch(err => {
+					console.error("[signIn] Could not create user", err);
+				})
+			} else {
+				// if user is found, update the db entry
+				const updateObj: DbUser = createUserUpdateObj(user, account, db_user);
+				await updateUser(db_user.id!, updateObj).catch(err => {
+					console.error("[signIn] Count not update user in database", err);
+				})
 			}
 			return true;
 		}
 	},
+}
+
+const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUser) => {
+	const updateObj: DbUser = {}
+	if (account) {
+		updateObj.auth_info = {
+			[account.provider]: {
+				[account.providerAccountId]: {
+					type: account.type,
+					scope: account.scope,
+					access_token: account.access_token,
+					expires_at: account.expires_at,
+				}
+			}
+		}
+	}
+	if (user.name && user.name != db_user?.name) updateObj.name = user.name;
+	if (user.image && user.image != db_user?.profile_url) updateObj.profile_url = user.image;
+	if (user.email && !db_user?.aliases?.includes(user.email)) {
+		if (db_user?.aliases)
+			updateObj.aliases = [...db_user.aliases, user.email]
+		else
+			updateObj.aliases = [user.email]
+	}
+	return updateObj;
 }
 
 export default NextAuth(authOptions)
