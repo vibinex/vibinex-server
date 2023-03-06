@@ -23,7 +23,7 @@ async function loadRudderAnalytics(): Promise<typeof import("rudder-sdk-js") | n
     const rudderAnalytics = await import("rudder-sdk-js");
     rudderAnalytics.load(
       process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_WRITE_KEY!,
-      process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATA_PLANE_URL!,
+      process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATAPLANE_URL!,
       {
         integrations: { All: true }, // load call options
       }
