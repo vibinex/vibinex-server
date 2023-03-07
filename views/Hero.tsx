@@ -1,5 +1,6 @@
-import Link from "next/link";
 import React from "react";
+import { signIn } from "next-auth/react";
+import Button from "../components/Button";
 
 const Hero = () => {
 	return (
@@ -16,13 +17,12 @@ const Hero = () => {
 							Pull Requests
 						</span>
 					</h1>
-
 					<p className="text-[25px] mt-20 mb-10 text-gray-300">
 						With <span className="text-primary-main">Vibinex</span> you can quickly know which code-changes need your attention
 					</p>
 				</article>
 
-				<Link href='/login' className='bg-primary-main block text-center m-auto w-full sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Link>
+				<Button variant="text" onClick={() => signIn()} className='bg-primary-main block text-center m-auto w-full sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Button>
 			</section>
 
 		</div>
