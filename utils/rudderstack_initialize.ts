@@ -23,7 +23,7 @@ async function loadRudderAnalytics(): Promise<typeof import("rudder-sdk-js") | n
     const rudderAnalytics = await import("rudder-sdk-js");
     rudderAnalytics.load(
       process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_WRITE_KEY!,
-      process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATA_PLANE_URL!,
+      process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATAPLANE_URL!,
       {
         integrations: { All: true }, // load call options
       }
@@ -43,7 +43,7 @@ export async function rudderEventMethods(): Promise<RudderstackClientSideEvents 
   if (rudderAnalytics) {
     const rudderstackClientSideEvents: RudderstackClientSideEvents = {
       identify: (userId, name, email, anonymousId) => {  // Anonymous Id is set in local storage as soon as a user lands on the webiste.
-        console.log("identify"); 
+        console.log("identify");
         rudderAnalytics.identify(
           userId,
           { name: name, email: email },
