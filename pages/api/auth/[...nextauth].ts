@@ -50,6 +50,7 @@ export const authOptions = {
 			return true;
 		}
 	},
+	secret: process.env.NEXTAUTH_SECRET,
 }
 
 const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUser) => {
