@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react"
 
 export default function MainAppBar({ isLoggedIn }: { isLoggedIn?: boolean }) {
 	const [name, setName] = useState('');
-	const [profilePic, setProfilePic] = useState("/../public/dummy-profile-pic-female-300n300.jpeg");
+	const [profilePic, setProfilePic] = useState("/dummy-profile-pic-female-300n300.jpeg");
 
 	useEffect(() => {
 		if (localStorage.getItem("name") && localStorage.getItem('displayPic')) {

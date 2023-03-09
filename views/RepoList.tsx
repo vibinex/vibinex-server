@@ -5,7 +5,7 @@ const RepoList = (props: { repo_list: string[] }) => {
 	return (<>
 		<h2>All repositories in the database:</h2>
 		{props.repo_list.map(repo_name => (
-			<Button variant="outlined" href={`/repo?repo_name=${repo_name}`} className="m-2">
+			<Button variant="outlined" href={`/repo?repo_name=${repo_name}`} className="m-2" key={repo_name}>
 				{repo_name}
 			</Button>
 		))}
