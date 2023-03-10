@@ -11,6 +11,8 @@ export default function Home() {
   const { data: session } = useSession();
   if (session) {
     window.location.href = "/repo";
+    localStorage.setItem("name", session.user?.name ? session.user?.name : "User");
+    localStorage.setItem("displayPic", session.user?.image ? session.user?.image : "/dummy-profile-pic-female-300n300.jpeg");
   }
 
   let anonymousId = uuidv4();
