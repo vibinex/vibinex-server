@@ -2,7 +2,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { signOut } from "next-auth/react"
 import Link from 'next/link';
-import Avatar from '../public/avatar/icon2.jpg';
+import Avatar from '../public/dummy-profile-pic-female-300n300.jpeg';
 
 export default function MainAppBar({ isLoggedIn }: { isLoggedIn?: boolean }) {
 
