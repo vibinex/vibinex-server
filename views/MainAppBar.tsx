@@ -32,11 +32,11 @@ export default function MainAppBar({ isLoggedIn }: { isLoggedIn?: boolean }) {
 			<Image src={profilePic} onClick={() => setShowPop(prev=>!prev)} alt="Display picture" title={name} width={300} height={300} className="h-full w-auto hover:cursor-pointer rounded-xl cursor-pointer" />
 			{/* Log out Pop up  */}
 			{showPop ?
-				<section className='w-[40%] sm:w-[15%] p-3 rounded-md absolute  right-5 sm:right-10 top-16 border-2 bg-primary-light'>
-					<article className='bg-primary-main p-2 text-center rounded-md cursor-pointer' onClick={() => signOut()}>
+				<ol className='w-[40%] sm:w-[15%] p-3 rounded-md absolute  right-5 sm:right-10 top-16 border-2 bg-primary-light'>
+					<li className='bg-primary-main p-2 text-center rounded-md cursor-pointer' onClick={() => signOut()}>
 						<h2 className='text-primary-light'>Logout</h2>
-					</article>
-				</section>
+					</li>
+				</ol>
 				:
 				null
 			}
