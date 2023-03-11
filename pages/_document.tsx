@@ -4,8 +4,6 @@ export default function Document() {
 	return (
 		<Html className='scroll-smooth font-custom'>
 			<Head>
-				<title>DevProfile: The Ultimate Developer Profile</title>
-				<meta name="description" content="Build your developer profile directly from your code's version history" />
 				<link rel="icon" href="/favicon.ico" />
 				<link rel='preconnect' href='https://fonts.googleapis.com' />
 				<link
