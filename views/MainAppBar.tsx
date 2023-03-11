@@ -6,7 +6,8 @@ import { signOut } from "next-auth/react"
 
 export default function MainAppBar({ isLoggedIn }: { isLoggedIn?: boolean }) {
 	const [name, setName] = useState('');
-	const [profilePic, setProfilePic] = useState("/dummy-profile-pic-female-300n300.jpeg");
+	const [profilePic, setProfilePic] = useState("/../public/dummy-profile-pic-female-300n300.jpeg");
+	const [showMenu,setShowMenu] = useState(false);
 
 	useEffect(() => {
 		if (localStorage.getItem("name") && localStorage.getItem('displayPic')) {
@@ -21,13 +22,24 @@ export default function MainAppBar({ isLoggedIn }: { isLoggedIn?: boolean }) {
 	}, [isLoggedIn]);
 
 	return (
-		<AppBar position='fixed' className='w-full flex flex-row'>
+		<AppBar position='fixed' className='w-full py-2 px-10 flex flex-row bg-primary-light border-b-2 border-b-secondary-dark'>
 			<a href="/" className="mr-16 h-full overflow-clip flex flex-row items-center">
-				<img src="/black-logo.svg" alt="Dev Profile Logo" className="h-full w-auto mr-2" />
+				<h1 className='font-bold text-3xl sm:text-4xl'>
+					Vibinex
+				</h1>
 			</a>
 			<span className='flex-grow'></span>
-			<Button variant='text' href='https://github.com/Alokit-Innovations/dev-profile-website' target='_blank' className='text-white'>Contribute</Button>
-			<Image src={profilePic} onClick={() => signOut()} alt="Display picture" title={name} width={300} height={300} className="h-full w-auto hover:cursor-pointer" />
+			<Image src={profilePic} onClick={() => setShowMenu(prev=>!prev)} alt="Display picture" title={name} width={300} height={300} className="h-full w-auto hover:cursor-pointer rounded-xl cursor-pointer" />
+			{/* Log out Pop up  */}
+			{showMenu ?
+				<ol className='w-[40%] sm:w-[15%] p-3 rounded-md absolute  right-5 sm:right-10 top-16 border-2 bg-primary-light'>
+					<li className='bg-primary-main p-2 text-center rounded-md cursor-pointer' onClick={() => signOut()}>
+						<h2 className='text-primary-light'>Logout</h2>
+					</li>
+				</ol>
+				:
+				null
+			}
 		</AppBar>
 	)
-}
+};
