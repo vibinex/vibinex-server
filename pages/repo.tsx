@@ -1,6 +1,6 @@
 import MainAppBar from "../views/MainAppBar";
 import conn from '../utils/db';
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import React from "react";
 import { renderObjAsTable } from "../utils/data";
 import { ContributorVector } from "../types/contributor";
@@ -14,12 +14,14 @@ import { useSession } from "next-auth/react";
 import { Session } from "next-auth/core/types";
 import { getAuthUserName } from "../utils/auth";
 
-const RepoProfile: NextPage<{
+type RepoProfileData = {
 	session: Session | null,
 	repo_list?: string[],
 	repo_name?: string,
 	contributor_2d_data?: Array<ContributorVector>
-}> = ({ repo_list, repo_name, contributor_2d_data }) => {
+}
+
+const RepoProfile: NextPage<RepoProfileData> = ({ repo_list, repo_name, contributor_2d_data }) => {
 	const { data: session } = useSession();
 	React.useEffect(() => {
 		const properties = (session) ? {
@@ -33,7 +35,7 @@ const RepoProfile: NextPage<{
 		if (!session) {
 			window.location.href = "/";
 		}
-	}, []);
+	}, [session]);
 	return (
 		<div className='h-[50rem] w-[90%] m-auto'>
 			<MainAppBar />
@@ -61,9 +63,12 @@ const RepoProfile: NextPage<{
 	)
 }
 
-RepoProfile.getInitialProps = async ({ req, res, query }) => {
+export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ req, res, query }) => {
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);
+	if (!session) {
+		return { props: { session } };
+	}
 
 	// if info is requested for a specific repository
 	if (query.repo_name) {
@@ -71,9 +76,11 @@ RepoProfile.getInitialProps = async ({ req, res, query }) => {
 		const contributor_vector: Array<ContributorVector> = await getContri2DProps(conn, repo_name);
 		if (contributor_vector.length > 0)
 			return {
-				session: session,
-				repo_name: repo_name,
-				contributor_2d_data: contributor_vector
+				props: {
+					session: session,
+					repo_name: repo_name,
+					contributor_2d_data: contributor_vector
+				}
 			}
 		else
 			console.warn(`No data found for repository named ${repo_name}`);
@@ -84,8 +91,10 @@ RepoProfile.getInitialProps = async ({ req, res, query }) => {
 	// by default, show the list of repositories of the user
 	const repo_list = await getRepoList(conn);
 	return {
-		session: session,
-		repo_list: repo_list
+		props: {
+			session: session,
+			repo_list: repo_list
+		}
 	}
 }
 

@@ -14,7 +14,7 @@ export default function Home() {
       response?.identify("", "", "", anonymousId);
     });
     localStorage.setItem('AnonymousId', anonymousId);
-  }, []);
+  }, [anonymousId]);
 
   return (
     <div>
