@@ -1,6 +1,6 @@
 import React from "react";
-import { signIn } from "next-auth/react";
 import Button from "../components/Button";
+import { login } from "../utils/auth";
 
 const Hero = () => {
 	return (
@@ -22,7 +22,7 @@ const Hero = () => {
 					</p>
 				</article>
 
-				<Button variant="text" onClick={() => signIn()} className='bg-primary-main block text-center m-auto w-full sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Button>
+				<Button variant="text" onClick={() => login()} className='bg-primary-main block text-center m-auto w-full sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Button>
 			</section>
 
 		</div>

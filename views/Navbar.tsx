@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
-import { signIn } from "next-auth/react"
 import Button from '../components/Button';
+import { login } from '../utils/auth';
 
 const Navbar = () => {
   // TODO: This component has a very specific use. It should be inside the views folder
@@ -48,7 +48,7 @@ const Navbar = () => {
             <Link href='#steps'>Steps</Link>
           </li>
           <li className='p-4'>
-            <Button variant='text' onClick={() => signIn()}>Signup</Button>
+            <Button variant='text' onClick={() => login()}>Signup</Button>
           </li>
         </ul>
 
@@ -82,7 +82,7 @@ const Navbar = () => {
               <Link href='/download'>Download</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl  hover:text-secondary-light'>
-              <Button variant='text' onClick={() => signIn()}>Signup</Button>
+              <Button variant='text' onClick={() => login()}>Signup</Button>
             </li>
           </ul>
         </div>

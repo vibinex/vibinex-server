@@ -48,6 +48,15 @@ export const authOptions = {
 				})
 			}
 			return true;
+		},
+		async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
+			let path: string;
+			if (url.startsWith("/")) path = url;
+			else if (new URL(url).origin === baseUrl) path = new URL(url).pathname;
+			else path = "/";
+
+			if (path = "/") return `${baseUrl}/repo`;
+			return baseUrl
 		}
 	},
 	secret: process.env.NEXTAUTH_SECRET,

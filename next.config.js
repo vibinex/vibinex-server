@@ -9,6 +9,11 @@ const nextConfig = {
         hostname: 'media.licdn.com',
         pathname: '/dms/image/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
   },
   webpack: (config) => {
