@@ -1,15 +1,16 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import LoadingOverlay from "../components/LoadingOverlay";
 import MainAppBar from "../views/MainAppBar";
 
 const Profile = () => {
 	const { data: session, status } = useSession();
 
 	if (status === "loading") {
-		return (<p>Loading...</p>)
+		return (<LoadingOverlay />)
 	} else if (status === 'unauthenticated') {
 		window.location.href = "/";
-		return (<p>You are not authenticated. Redirecting...</p>)
+		return (<LoadingOverlay text="You are not authenticated. Redirecting..." />)
 	}
 
 	return (

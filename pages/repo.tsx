@@ -13,6 +13,7 @@ import { authOptions } from "./api/auth/[...nextauth]";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth/core/types";
 import { getAuthUserName } from "../utils/auth";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 type RepoProfileData = {
 	session: Session | null,
@@ -56,7 +57,7 @@ const RepoProfile: NextPage<RepoProfileData> = ({ repo_list, repo_name, contribu
 			) : (session) ? (
 				<p>Something went wrong</p>
 			) : (<>
-				<p>You are not authenticated. Redirecting...</p>
+				<LoadingOverlay text="You are not authenticated. Redirecting..." />
 			</>)
 			}
 		</div >
