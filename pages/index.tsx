@@ -3,7 +3,6 @@ import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
 import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
-import { useSession } from "next-auth/react"
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { v4 as uuidv4 } from 'uuid';
 

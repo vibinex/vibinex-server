@@ -9,6 +9,7 @@ const Profile = () => {
 		return (<p>Loading...</p>)
 	} else if (status === 'unauthenticated') {
 		window.location.href = "/";
+		return (<p>You are not authenticated. Redirecting...</p>)
 	}
 
 	return (
