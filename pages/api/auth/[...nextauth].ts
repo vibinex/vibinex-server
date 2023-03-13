@@ -1,6 +1,7 @@
 import NextAuth, { Account, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
+import rudderStackEvents from "../events";
 
 interface signInParam {
 	user: User,
@@ -40,12 +41,16 @@ export const authOptions = {
 				await createUser(db_user).catch(err => {
 					console.error("[signIn] Could not create user", err);
 				})
+				// FIXME: There is no way for us to get user id (because createUser doesn't return it)
+				// or anonymous id (because this runs on the server-side). Solution: use Prisma ORM. It returns the user object
+				rudderStackEvents.track("", "", "signup", { ...db_user });
 			} else {
 				// if user is found, update the db entry
 				const updateObj: DbUser = createUserUpdateObj(user, account, db_user);
 				await updateUser(db_user.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
+				rudderStackEvents.track(db_user.id!.toString(), "", "login", { ...updateObj });
 			}
 			return true;
 		},
