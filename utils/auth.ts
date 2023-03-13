@@ -2,8 +2,8 @@ import { signIn, signOut } from 'next-auth/react';
 import { Session } from 'next-auth/core/types';
 
 export const login = () => {
-	signIn().then((val) => {
-		console.log("[signIn]", val);
+	signIn().catch((err) => {
+		console.error("[signIn] Authentication failed.", err);
 	})
 }
 
@@ -11,6 +11,9 @@ export const logout = () => {
 	signOut().then(_ => {
 		window.location.href = "/";
 	})
+		.catch(err => {
+			console.error("[signOut] Signout failed", err);
+		})
 }
 
 export const getAuthUserName = (session: Session | null) => session?.user?.name ? session?.user?.name : "User";
