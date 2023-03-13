@@ -54,7 +54,6 @@ export const authOptions = {
 			if (url.startsWith("/")) path = url;
 			else if (new URL(url).origin === baseUrl) path = new URL(url).pathname;
 			else path = "/";
-			console.log("redirect", path);
 
 			if (path = "/") return `${baseUrl}/repo`;
 			return baseUrl
