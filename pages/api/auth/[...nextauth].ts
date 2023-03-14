@@ -67,7 +67,7 @@ export const authOptions = {
 			else if (new URL(url).origin === baseUrl) path = new URL(url).pathname;
 			else path = "/";
 
-			if (path = "/") return `${baseUrl}/repo`;
+			if (path = "/") return `${baseUrl}/u`;
 			return baseUrl
 		}
 	},

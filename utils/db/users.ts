@@ -35,7 +35,7 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 	return undefined;
 }
 
-export const getUserByAlias = async (alias_email: string) => {
+export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | undefined> => {
 	const user_alias_search_q = `SELECT *
 		FROM users
 		WHERE '${alias_email}' = ANY(aliases)`;

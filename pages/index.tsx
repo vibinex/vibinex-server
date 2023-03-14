@@ -12,7 +12,7 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   if (status === "authenticated") {
-    window.location.href = "/repo";
+    window.location.href = "/u";
   }
 
   React.useEffect(() => {
