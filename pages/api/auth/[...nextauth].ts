@@ -1,5 +1,6 @@
 import NextAuth, { Account, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import GithubProvider from "next-auth/providers/github"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
 
@@ -14,6 +15,10 @@ export const authOptions = {
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID!,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+		}),
+		GithubProvider({
+			clientId: process.env.GITHUB_CLIENT_ID!,
+			clientSecret: process.env.GITHUB_CLIENT_SECRET!
 		})
 		// ...add more providers here
 	],
@@ -31,7 +36,8 @@ export const authOptions = {
 				if (alias_users?.length == 1) db_user = alias_users[0];
 				else if (alias_users && alias_users?.length > 1) {
 					// FIXME: show user the list of accounts and let them choose
-					db_user = alias_users[0];
+					// Not allowing sign in when this happens
+					return false;
 				}
 			}
 
@@ -43,14 +49,15 @@ export const authOptions = {
 				})
 				// FIXME: There is no way for us to get user id (because createUser doesn't return it)
 				// or anonymous id (because this runs on the server-side). Solution: use Prisma ORM. It returns the user object
-				rudderStackEvents.track("", "", "signup", { ...db_user });
+				rudderStackEvents.track("", "anonymous", "signup", { ...db_user });
 			} else {
+				const existingAuth = (account) ? Object.keys(db_user.auth_info!).includes(account.provider) && Object.keys(db_user.auth_info![account.provider]).includes(account.providerAccountId) : false;
 				// if user is found, update the db entry
 				const updateObj: DbUser = createUserUpdateObj(user, account, db_user);
 				await updateUser(db_user.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
-				rudderStackEvents.track(db_user.id!.toString(), "", "login", { ...updateObj });
+				rudderStackEvents.track(db_user.id!.toString(), "", "login", { ...updateObj, newAuth: !existingAuth });
 			}
 			return true;
 		},
