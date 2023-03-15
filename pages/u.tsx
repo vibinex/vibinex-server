@@ -52,6 +52,7 @@ export const getServerSideProps: GetServerSideProps<{ session: Session | null }>
 		if (userWithAlias.length > 1) {
 			console.warn(`[Profile] Multiple users found with this email: ${session.user.email}. Names: `,
 				userWithAlias.map(u => u.name).join(", "));
+			// TODO: send props for UI to ask user if they want to merge the other accounts with this one
 			return { props: { session } };
 		}
 		const user = userWithAlias[0];
@@ -69,9 +70,11 @@ export const getServerSideProps: GetServerSideProps<{ session: Session | null }>
 						console.error(`[Profile] Could not update aliases for user (userId: ${user.id})`, err)
 					})
 				})
+				.catch(err => {
+					console.error(`[Profile] Error occurred while getting user emails from Github API. userId: ${user.id}, name: ${user.name}`, err);
+				})
 		} else {
 			console.warn("Github provider not present");
-			return { props: { session } };
 		}
 	}
 	return { props: { session } }
