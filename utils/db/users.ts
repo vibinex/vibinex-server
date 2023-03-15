@@ -35,7 +35,7 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 	return undefined;
 }
 
-export const getUserByAlias = async (alias_email: string) => {
+export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | undefined> => {
 	const user_alias_search_q = `SELECT *
 		FROM users
 		WHERE '${alias_email}' = ANY(aliases)`;
@@ -143,8 +143,8 @@ export const updateUser = async (userId: number, user: DbUser) => {
 	const diffObj = await createUpdateUserObj(userId, user);
 	if (!diffObj || Object.keys(diffObj).length == 0) return;
 	const update_user_q = `UPDATE users 
-		SET ${Object.entries(diffObj).reduce((prev, [key, value]) => (prev + ` ${key} = ${convert(value)}`), "")} 
-		WHERE id=${userId}`;
+		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")} 
+		WHERE id = ${userId} `;
 	conn.query(update_user_q)
 		.then(update_user_result => {
 			if (update_user_result.rowCount == 1) {
