@@ -1,27 +1,40 @@
 import { GetServerSideProps } from "next";
 import { getServerSession, Session } from "next-auth";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
-import LoadingOverlay from "../components/LoadingOverlay";
 import MainAppBar from "../views/MainAppBar";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { getUserByAlias, updateUser } from "../utils/db/users";
 import axios from "axios";
+import { useEffect } from "react";
+import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import { getAuthUserImage, getAuthUserName } from "../utils/auth";
 
-const Profile = () => {
-	const { data: session, status } = useSession();
+type ProfileProps = {
+	sessionObj: Session,
+	userId?: number
+}
 
-	if (status === "loading") {
-		return (<LoadingOverlay />)
-	} else if (status === 'unauthenticated') {
-		window.location.href = "/";
-		return (<LoadingOverlay text="You are not authenticated. Redirecting..." />)
-	}
+const Profile = ({ sessionObj: session, userId }: ProfileProps) => {
+	useEffect(() => {
+		// updating the user-id in the chrome extension
+		window.postMessage({
+			message: 'refreshSession',
+			userId: userId,
+			userName: getAuthUserName(session),
+			userImage: getAuthUserImage(session)
+		})
+		rudderEventMethods().then((response) => {
+			response?.page("", "Repo Profile Page", {
+				userId: userId,
+				name: getAuthUserName(session)
+			});
+		});
+	}, [session, userId])
 
 	return (
 		<>
 			<MainAppBar />
-			<p>Hi {session?.user?.name}, This is your developer profile</p>
+			<p>Hi {getAuthUserName(session)}, This is your developer profile</p>
 			<p>
 				To add metadata for more repositories, visit the
 				<Link href={"/upload"} className="text-primary-main"> upload page</Link>
@@ -37,23 +50,28 @@ type GithubEmailObj = {
 	visibility: string | null
 }
 
-export const getServerSideProps: GetServerSideProps<{ session: Session | null }> = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
-		return { props: { session } };
+		return {
+			redirect: {
+				destination: '/',
+				permanent: false
+			}
+		};
 	}
 	if (session.user && session.user.email) {
 		const userWithAlias = await getUserByAlias(session.user.email)
 		if (!userWithAlias || userWithAlias.length < 1) {
 			console.warn(`[Profile] No user found with this email: ${session.user.email}`);
-			return { props: { session } };
+			return { props: { sessionObj: session } };
 		}
 		if (userWithAlias.length > 1) {
 			console.warn(`[Profile] Multiple users found with this email: ${session.user.email}. Names: `,
 				userWithAlias.map(u => u.name).join(", "));
 			// TODO: send props for UI to ask user if they want to merge the other accounts with this one
-			return { props: { session } };
+			return { props: { sessionObj: session } };
 		}
 		const user = userWithAlias[0];
 		if (Object.keys(user.auth_info!).includes("github")) {
@@ -76,8 +94,9 @@ export const getServerSideProps: GetServerSideProps<{ session: Session | null }>
 		} else {
 			console.warn("Github provider not present");
 		}
+		return { props: { sessionObj: session, userId: user.id } };
 	}
-	return { props: { session } }
+	return { props: { sessionObj: session } }
 }
 
 export default Profile;
