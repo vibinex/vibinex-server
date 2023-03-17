@@ -10,37 +10,28 @@ import RepoList, { getRepoList } from "../views/RepoList";
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { useSession } from "next-auth/react";
 import { Session } from "next-auth/core/types";
 import { getAuthUserName } from "../utils/auth";
-import LoadingOverlay from "../components/LoadingOverlay";
 
 type RepoProfileData = {
-	session: Session | null,
+	sessionObj: Session,
 	repo_list?: string[],
 	repo_name?: string,
 	contributor_2d_data?: Array<ContributorVector>
 }
 
-const RepoProfile: NextPage<RepoProfileData> = ({ repo_list, repo_name, contributor_2d_data }) => {
-	const { data: session } = useSession();
+const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list, repo_name, contributor_2d_data }) => {
 	React.useEffect(() => {
-		const properties = (session) ? {
-			name: getAuthUserName(session)
-		} : {
-			anonymousId: localStorage.getItem("AnonymousId")
-		};
 		rudderEventMethods().then((response) => {
-			response?.page("", "Repo Profile Page", properties);
+			response?.page("", "Repo Profile Page", {
+				name: getAuthUserName(session)
+			});
 		});
-		if (!session) {
-			window.location.href = "/";
-		}
 	}, [session]);
 	return (
 		<div className='h-[50rem] w-[90%] m-auto'>
 			<MainAppBar />
-			{(session && repo_name && contributor_2d_data) ? (<>
+			{(repo_name && contributor_2d_data) ? (<>
 				<div className='border-2 mt-10 p-2 rounded-md border-blue-200 text-[20px]'>
 					<h3> <span>Repo Name : </span>{repo_name}</h3>
 					<h1><span>Owned by : </span>Vibinex</h1>
@@ -50,15 +41,13 @@ const RepoProfile: NextPage<RepoProfileData> = ({ repo_list, repo_name, contribu
 					<Contributors2DView repo_data={contributor_2d_data} />
 				</div>
 				<div dangerouslySetInnerHTML={{ __html: renderObjAsTable(contributor_2d_data) }}></div>
-			</>) : (session && repo_list) ? (
+			</>) : (repo_list) ? (
 				<div className="max-w-[80%] mx-auto">
 					<RepoList repo_list={repo_list} />
 				</div>
-			) : (session) ? (
+			) : (
 				<p>Something went wrong</p>
-			) : (<>
-				<LoadingOverlay text="You are not authenticated. Redirecting..." />
-			</>)
+			)
 			}
 		</div >
 	)
@@ -68,7 +57,12 @@ export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ 
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
-		return { props: { session } };
+		return {
+			redirect: {
+				destination: '/',
+				permanent: false
+			}
+		};
 	}
 
 	// if info is requested for a specific repository
@@ -78,7 +72,7 @@ export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ 
 		if (contributor_vector.length > 0)
 			return {
 				props: {
-					session: session,
+					sessionObj: session,
 					repo_name: repo_name,
 					contributor_2d_data: contributor_vector
 				}
@@ -93,7 +87,7 @@ export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ 
 	const repo_list = await getRepoList(conn);
 	return {
 		props: {
-			session: session,
+			sessionObj: session,
 			repo_list: repo_list
 		}
 	}
