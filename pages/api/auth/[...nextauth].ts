@@ -5,6 +5,7 @@ import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/b
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
 import axios from "axios"
+import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
 
 interface signInParam {
 	user: User,
@@ -22,61 +23,10 @@ export const authOptions = {
 			clientId: process.env.GITHUB_CLIENT_ID!,
 			clientSecret: process.env.GITHUB_CLIENT_SECRET!
 		}),
-		// Bitbucket provider
-		{
-			id: "bitbucket",
-			name: "Bitbucket",
-			type: 'oauth',
-			authorization: {
-				url: `https://bitbucket.org/site/oauth2/authorize`,
-				params: {
-					scope: "email account",
-					response_type: "code",
-				},
-			},
-			token: `https://bitbucket.org/site/oauth2/access_token`,
-			userinfo: {
-				request: ({ tokens }: { tokens: TokenSet }) =>
-					axios
-						.get("https://api.bitbucket.org/2.0/user", {
-							headers: {
-								Authorization: `Bearer ${tokens.access_token}`,
-								Accept: "application/json",
-							},
-						})
-						.then((r) => r.data),
-			},
-			async profile(profile: BitbucketProfile, tokens: TokenSet) {
-				const email = await axios
-					.get<BitbucketEmailsResponse>(
-						"https://api.bitbucket.org/2.0/user/emails",
-						{
-							headers: {
-								Authorization: `Bearer ${tokens.access_token}`,
-								Accept: "application/json",
-							},
-						}
-					)
-					.then(
-						(r) =>
-							// find the primary email, or the first available email
-							(r.data.values.find((value) => value.is_primary) || r.data.values[0])
-								.email
-					);
-
-				return {
-					...profile,
-					id: profile.account_id,
-					email,
-					image: profile.links.avatar.href,
-					name: profile.display_name,
-				};
-			},
-			options: {
-				clientId: process.env.BITBUCKET_CLIENT_ID,
-				clientSecret: process.env.BITBUCKET_CLIENT_SECRET,
-			},
-		}
+		BitbucketProvider({
+			clientId: process.env.BITBUCKET_CLIENT_ID!,
+			clientSecret: process.env.BITBUCKET_CLIENT_SECRET!,
+		})
 		// ...add more providers here
 	],
 	callbacks: {
@@ -154,6 +104,60 @@ const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUs
 			updateObj.aliases = [user.email]
 	}
 	return updateObj;
+}
+
+function BitbucketProvider<P extends BitbucketProfile>(options: OAuthUserConfig<P>): OAuthConfig<P> {
+	return {
+		id: "bitbucket",
+		name: "Bitbucket",
+		type: "oauth",
+		authorization: {
+			url: `https://bitbucket.org/site/oauth2/authorize`,
+			params: {
+				scope: "email account",
+				response_type: "code",
+			},
+		},
+		token: `https://bitbucket.org/site/oauth2/access_token`,
+		userinfo: {
+			request: ({ tokens }: { tokens: TokenSet }) =>
+				axios
+					.get("https://api.bitbucket.org/2.0/user", {
+						headers: {
+							Authorization: `Bearer ${tokens.access_token}`,
+							Accept: "application/json",
+						},
+					})
+					.then((r) => r.data),
+		},
+		async profile(profile: BitbucketProfile, tokens: TokenSet) {
+			const email = await axios
+				.get<BitbucketEmailsResponse>(
+					"https://api.bitbucket.org/2.0/user/emails",
+					{
+						headers: {
+							Authorization: `Bearer ${tokens.access_token}`,
+							Accept: "application/json",
+						},
+					}
+				)
+				.then(
+					(r) =>
+						// find the primary email, or the first available email
+						(r.data.values.find((value) => value.is_primary) || r.data.values[0])
+							.email
+				);
+
+			return {
+				...profile,
+				id: profile.account_id,
+				email,
+				image: profile.links.avatar.href,
+				name: profile.display_name,
+			};
+		},
+		options,
+	}
 }
 
 export default NextAuth(authOptions)
