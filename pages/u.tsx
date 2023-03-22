@@ -50,6 +50,14 @@ type GithubEmailObj = {
 	visibility: string | null
 }
 
+type BitbucketEmailObj = {
+	type: "email",
+	links: object,
+	email: string,
+	is_primary: boolean,
+	is_confirmed: boolean,
+}
+
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);
@@ -93,6 +101,26 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 				})
 		} else {
 			console.warn("Github provider not present");
+		}
+
+		if (Object.keys(user.auth_info!).includes("bitbucket")) {
+			const access_key: string = Object.values(user.auth_info!["bitbucket"])[0]['access_token'];
+			axios.get("https://api.bitbucket.org/2.0/user/emails", {
+				headers: {
+					'Authorization': `Bearer ${access_key}`
+				}
+			})
+				.then((response: { data: { values: BitbucketEmailObj[] } }) => {
+					const aliases = response.data.values.map((emailObj: BitbucketEmailObj) => emailObj.email);
+					updateUser(user.id!, { aliases: aliases }).catch(err => {
+						console.error(`[Profile] Could not update aliases for user (userId: ${user.id})`, err)
+					})
+				})
+				.catch(err => {
+					console.error(`[Profile] Error occurred while getting user emails from Bitbucket API. userId: ${user.id}, name: ${user.name}`, err);
+				})
+		} else {
+			console.warn("Bitbucket provider not present");
 		}
 		return { props: { sessionObj: session, userId: user.id } };
 	}
