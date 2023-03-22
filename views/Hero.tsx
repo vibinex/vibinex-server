@@ -27,8 +27,8 @@ const Hero = () => {
 			</section>
 
 			<section className='mt-[20%] h-screen items-center sm:block hidden z-[2]'>
-				<Image alt='before using vibinex' src={highlightFile} className='sm:w-[95%] w-[90%]  sm:h-[50%] z-10 border-2' />
-				<Image alt='after using vibinex' src={highlightPR} className='sm:w-[95%] w-[90%] sm:h-[50%]  mt-[-30%] border-2 border-r-2 ml-4 border-primary-light' />
+				<Image alt='see your relevant files in the PR highlighted' src={highlightFile} className='sm:w-[95%] w-[90%]  sm:h-[50%] z-10 border-2' />
+				<Image alt='see your relevant PRs highlighted' src={highlightPR} className='sm:w-[95%] w-[90%] sm:h-[50%]  mt-[-30%] border-2 border-r-2 ml-4 border-primary-light' />
 			</section>
 		</div>
 	)
