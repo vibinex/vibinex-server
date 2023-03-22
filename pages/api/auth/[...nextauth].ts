@@ -106,6 +106,7 @@ const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUs
 	return updateObj;
 }
 
+// Solution found here: https://github.com/nextauthjs/next-auth/pull/3076#issuecomment-1180218158
 function BitbucketProvider<P extends BitbucketProfile>(options: OAuthUserConfig<P>): OAuthConfig<P> {
 	return {
 		id: "bitbucket",
@@ -155,6 +156,14 @@ function BitbucketProvider<P extends BitbucketProfile>(options: OAuthUserConfig<
 				image: profile.links.avatar.href,
 				name: profile.display_name,
 			};
+		},
+		style: {
+			logo: "../../bitbucket-dark.svg",
+			logoDark: "../../bitbucket.svg",
+			bg: "#fff",
+			text: "#0052cc",
+			bgDark: "#0052cc",
+			textDark: "#fff",
 		},
 		options,
 	}
