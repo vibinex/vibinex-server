@@ -7,7 +7,11 @@ import highlightFile from '../public/highlightFile.png'
 
 const Hero = () => {
 	return (
-		<div className="bg-primary-dark h-screen sm:flex justify-cente items-center">
+		<div className='flex items-center justify-center h-screen mb-12 bg-fixed bg-center bg-cover'
+			style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503252947848-7338d3f92f31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80')" }}
+		>
+			{/*Overlay*/}
+			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/70 z-[2]' />
 			<section className='p-5 text-primary-light z-[2] sm:mt-[10%] sm:pt-1 pt-24 sm:w-[50%]'>
 				<article className="text-center">
 					<h1 className='sm:text-[60px] text-[35px] font-bold'>{'Get context for'}
@@ -22,7 +26,7 @@ const Hero = () => {
 				</article>
 			</section>
 
-			<section className='mt-[20%] h-screen items-center sm:block hidden'>
+			<section className='mt-[20%] h-screen items-center sm:block hidden z-[2]'>
 				<Image alt='before using vibinex' src={highlightFile} className='sm:w-[95%] w-[90%]  sm:h-[50%] z-10 border-2' />
 				<Image alt='after using vibinex' src={highlightPR} className='sm:w-[95%] w-[90%] sm:h-[50%]  mt-[-30%] border-2 border-r-2 ml-4 border-primary-light' />
 			</section>
