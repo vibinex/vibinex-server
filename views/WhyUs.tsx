@@ -1,11 +1,10 @@
 import React from 'react'
-import { BiCodeBlock, BiWindowOpen } from 'react-icons/bi'
-import { BsShieldLock } from 'react-icons/bs'
-
+import {GoSettings} from 'react-icons/go'
+import {AiOutlineFileSearch,AiOutlineApartment} from 'react-icons/ai'
 const data = [
-  { icon: <BiCodeBlock size={40} />, heading: 'Easy to setup', content: 'Get started with GitHub Actions/Bitbucket Pipes in less than 10 minutes' },
-  { icon: <BsShieldLock size={40} />, heading: 'Data privacy at peak', content: 'Your code never leaves the machines you control.' },
-  { icon: <BiWindowOpen size={40} />, heading: 'Free & open source', content: 'We deliver what we promise. Check it by yourself. Feel free to add suggestions or contributions.' },
+  { icon: <AiOutlineApartment size={40} />, heading: 'Quality Control', content: 'Always stay inform if someone overwrites your code.' },
+  { icon: <AiOutlineFileSearch size={40} />, heading: 'KYC : Know your code', content: 'You should reivew every PR. But do you? Now you can !' },
+  { icon: <GoSettings size={40} />, heading: 'Reduce noise', content: 'Not everything needs your attention, focus on what makes the most.' },
 ]
 
 const WhyUs = () => {
