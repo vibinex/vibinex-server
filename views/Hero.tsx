@@ -12,23 +12,23 @@ const Hero = () => {
 		>
 			{/*Overlay*/}
 			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/70 z-[2]' />
-			<section className='p-5 text-primary-light z-[2] sm:mt-[10%] sm:pt-1 pt-24 sm:w-[50%]'>
+			<section className='p-5 text-primary-light z-[2] sm:mt-[10%] pt-1 sm:w-[50%]'>
 				<article className="text-center">
-					<h1 className='sm:text-[60px] text-[35px] font-bold'>{'Get context for'}
+					<h1 className='sm:text-[60px] text-[35px] font-bold'>{'Prioritization for'}
 						<span className='text-primary-main font-bold block'>
 							Pull Requests
 						</span>
 					</h1>
 					<p className="text-[25px] mt-20 mb-10 text-gray-300">
-						With <span className="text-primary-main">Vibinex</span> you can quickly know which code-changes need your attention
+						Know which code-changes need your <span className="text-primary-main">attention</span> while also maximizing <span className="text-primary-main">code-review coverage</span>
 					</p>
 					<Button variant="text" onClick={() => login()} className='bg-primary-main block text-center m-auto w-[90%] sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>Get Started</Button>
 				</article>
 			</section>
 
 			<section className='mt-[20%] h-screen items-center sm:block hidden z-[2]'>
-				<Image alt='see your relevant files in the PR highlighted' src={highlightFile} className='sm:w-[95%] w-[90%]  sm:h-[50%] z-10 border-2' />
-				<Image alt='see your relevant PRs highlighted' src={highlightPR} className='sm:w-[95%] w-[90%] sm:h-[50%]  mt-[-30%] border-2 border-r-2 ml-4 border-primary-light' />
+				<Image alt='see your relevant files in the PR highlighted' src={highlightFile} className='w-[80%] sm:h-[50%] border-2 border-primary-light' />
+				<Image alt='see your relevant PRs highlighted' src={highlightPR} className='w-[80%] sm:h-[50%] mt-[-30%] ml-24 outline outline-2 outline-primary-light' />
 			</section>
 		</div>
 	)
