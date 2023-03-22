@@ -1,8 +1,10 @@
-import NextAuth, { Account, User } from "next-auth"
+import NextAuth, { Account, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider from "next-auth/providers/github"
+import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
+import axios from "axios"
 
 interface signInParam {
 	user: User,
@@ -19,7 +21,62 @@ export const authOptions = {
 		GithubProvider({
 			clientId: process.env.GITHUB_CLIENT_ID!,
 			clientSecret: process.env.GITHUB_CLIENT_SECRET!
-		})
+		}),
+		// Bitbucket provider
+		{
+			id: "bitbucket",
+			name: "Bitbucket",
+			type: 'oauth',
+			authorization: {
+				url: `https://bitbucket.org/site/oauth2/authorize`,
+				params: {
+					scope: "email account",
+					response_type: "code",
+				},
+			},
+			token: `https://bitbucket.org/site/oauth2/access_token`,
+			userinfo: {
+				request: ({ tokens }: { tokens: TokenSet }) =>
+					axios
+						.get("https://api.bitbucket.org/2.0/user", {
+							headers: {
+								Authorization: `Bearer ${tokens.access_token}`,
+								Accept: "application/json",
+							},
+						})
+						.then((r) => r.data),
+			},
+			async profile(profile: BitbucketProfile, tokens: TokenSet) {
+				const email = await axios
+					.get<BitbucketEmailsResponse>(
+						"https://api.bitbucket.org/2.0/user/emails",
+						{
+							headers: {
+								Authorization: `Bearer ${tokens.access_token}`,
+								Accept: "application/json",
+							},
+						}
+					)
+					.then(
+						(r) =>
+							// find the primary email, or the first available email
+							(r.data.values.find((value) => value.is_primary) || r.data.values[0])
+								.email
+					);
+
+				return {
+					...profile,
+					id: profile.account_id,
+					email,
+					image: profile.links.avatar.href,
+					name: profile.display_name,
+				};
+			},
+			options: {
+				clientId: process.env.BITBUCKET_CLIENT_ID,
+				clientSecret: process.env.BITBUCKET_CLIENT_SECRET,
+			},
+		}
 		// ...add more providers here
 	],
 	callbacks: {
