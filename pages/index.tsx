@@ -3,6 +3,7 @@ import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
 import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
+import Features from '../views/Features'
 import TrustUs from '../views/TrustUs'
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { v4 as uuidv4 } from 'uuid';
@@ -38,6 +39,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <WhyUs />
+      <Features />
       <TrustUs />
       <Footer />
       {(status !== "unauthenticated") ? (
