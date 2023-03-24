@@ -34,7 +34,7 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 		count(*) as num_commits,
 		min(ts) as first_commit_ts,
 		max(ts) as last_commit_ts
-		FROM devraw 
+		FROM commits 
 		WHERE (commit_json ->> 'repo_name')='${repo_name}'
 		GROUP BY author_email
 		ORDER BY last_commit_ts DESC`;
@@ -48,7 +48,7 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 			((commit_json -> 'diff_info') ->> 'files_changed') as diff_files_changed,
 			((commit_json -> 'diff_info') -> 'file_info') as diff_file_info,
 			author_email
-		FROM devraw
+		FROM commits
 		WHERE (commit_json ->> 'repo_name')='${repo_name}'`;
 	const author_vec_result = await conn.query(author_vec_q);
 

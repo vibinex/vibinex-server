@@ -15,7 +15,7 @@ const RepoList = (props: { repo_list: string[] }) => {
 export async function getRepoList(conn: Pool) {
 	const repo_list_q = `SELECT
 		distinct(commit_json ->> 'repo_name') as repo_name
-		FROM devraw `;
+		FROM commits `;
 	const result = await conn.query(repo_list_q);
 	return result.rows.map(row => row.repo_name);
 }
