@@ -10,20 +10,18 @@ const FeatureList = [
 
 const Features = () => {
 	return (
-		<div id='features' className='w-full bg-primary-light text-center py-12'>
+		<div id='features' className='w-full bg-secondary-main text-center py-12'>
 			<h2 className='font-bold text-[2rem]'>Vibinex  <span className='text-[2rem] text-primary-main font-bold'>Features</span></h2>
-
 			<div className='sm:flex sm:w-[95%] w-[100%] m-auto'>
 				{FeatureList.map((item, index) => {
 					return (
 						<div className='sm:w-[50%] w-[100%] mt-8  rounded-md ml-6'>
-							<Image  src={item.src} alt='PR priortization' className='w-[95%] h-[80%] rounded-md' />
+							<Image  src={item.src} alt={item.text} className='rounded-md'/>
 							<h3 className='font-bold text-[1.3rem] mt-4'>{item.text}</h3>
 						</div>
 					)
 				})}
 			</div>
-
 		</div>
 	)
 }
