@@ -1,6 +1,8 @@
 import React, { useReducer, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react';
+import LoadingOverlay from '../components/LoadingOverlay';
 import DropZone from '../components/DropZone'
 import DropZoneData from '../components/DropZone/DropZoneData';
 import DropZoneAction from '../components/DropZone/DropZoneAction';
@@ -63,6 +65,10 @@ const linuxInstructions = [
 ]
 
 const Upload = () => {
+	const { data: session, status } = useSession();
+	if (status === 'unauthenticated') {
+		window && window.location.assign("/");
+	}
 
 	const cardStyle = 'm-5 p-4 border-2 rounded-lg shadow-lg'
 
@@ -112,6 +118,9 @@ const Upload = () => {
 
 	return (
 		<div className='h-screen p-4'>
+			{(status === 'loading') ? (<LoadingOverlay />)
+				: (status === 'unauthenticated') ? (<LoadingOverlay text="You are not authenticated. Redirecting..." />)
+					: null}
 			<MainAppBar />
 			{
 				os === 'mobile' ?
