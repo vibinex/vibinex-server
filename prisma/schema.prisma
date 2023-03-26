@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model commits {
+  commit_id    String
+  author_email String
+  commit_json  Json?  @db.Json
+
+  @@id([commit_id, author_email])
+}
+
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model devraw {
   commit_id    String?
@@ -19,10 +27,45 @@ model devraw {
   @@ignore
 }
 
+model repos {
+  id            Int       @id @default(autoincrement())
+  repo_name     String?
+  auth_info     Json?     @db.Json
+  aliases       String[]
+  org           String?
+  git_url       String[]
+  metadata      Json?     @db.Json
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  repo_provider String?
+  repo_owner    String?
+
+  @@unique([repo_name, repo_owner, repo_provider], map: "uniquerepo")
+}
+
 model temp_devraw {
   commit_id    String
   author_email String
   commit_json  Json?  @db.Json
 
   @@id([commit_id, author_email])
+}
+
+model tokens {
+  id         Int       @id @default(autoincrement())
+  auth_info  Json?     @db.Json
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  repo       String[]
+}
+
+model users {
+  id          Int      @id @default(autoincrement())
+  name        String?
+  profile_url String?
+  role        String?
+  auth_info   Json?    @db.Json
+  aliases     String[]
+  org         String?
+  code_url    String[]
+  social_url  String[]
+  repos       Int[]
 }
