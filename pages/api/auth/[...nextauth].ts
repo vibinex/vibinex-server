@@ -1,4 +1,4 @@
-import NextAuth, { Account, TokenSet, User } from "next-auth"
+import NextAuth, { Account, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider from "next-auth/providers/github"
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
@@ -76,6 +76,17 @@ export const authOptions = {
 
 			if (path = "/") return `${baseUrl}/u`;
 			return baseUrl
+		},
+		async session({ session }: { session: Session }) {
+			if (session) {
+				const dbUsers = await getUserByAlias(session.user?.email!);
+				if (dbUsers && dbUsers.length == 1) {
+					session.user!.id = dbUsers[0].id;
+				} else {
+					console.warn(`[session callback] Something went wrong. Session exists, but user not found (user-email: ${session.user.email})`);
+				}
+			}
+			return session;
 		}
 	},
 	secret: process.env.NEXTAUTH_SECRET,
