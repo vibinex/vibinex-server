@@ -78,12 +78,19 @@ export const authOptions = {
 			return baseUrl
 		},
 		async session({ session }: { session: Session }) {
-			if (session) {
-				const dbUsers = await getUserByAlias(session.user?.email!);
-				if (dbUsers && dbUsers.length == 1) {
-					session.user!.id = dbUsers[0].id;
+			if (session && session.user) {
+				const usersWithAlias = await getUserByAlias(session.user.email!)
+				if (!usersWithAlias || usersWithAlias.length < 1) {
+					console.warn(`[session callback] No user found with this email: ${session.user.email}`);
+				}
+				else if (usersWithAlias.length > 1) {
+					console.warn(`[session callback] Multiple users found with this email: ${session.user.email}. Names: `,
+						usersWithAlias.map(u => u.name).join(", "));
+					// TODO: send UI to ask user if they want to merge the other accounts with this one
 				} else {
-					console.warn(`[session callback] Something went wrong. Session exists, but user not found (user-email: ${session.user.email})`);
+					const dbUser = usersWithAlias[0];
+					session.user.id = dbUser.id;
+					session.user.auth_info = dbUser.auth_info;
 				}
 			}
 			return session;
