@@ -3,30 +3,47 @@ import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
 import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
-import { useSession } from "next-auth/react"
+import TrustUs from '../views/TrustUs'
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { v4 as uuidv4 } from 'uuid';
+import { useSession } from 'next-auth/react'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 export default function Home() {
-  const { data: session } = useSession();
-  if (session) {
-    window.location.href = "/repo";
+  const { data: session, status } = useSession();
+
+  if (status === "authenticated") {
+    window.location.assign("/u");
+  } else if (status === "unauthenticated") {
+    window.postMessage({
+      message: 'refreshSession',
+      userId: null,
+      userName: null,
+      userImage: null
+    })
   }
 
-  let anonymousId = uuidv4();
   React.useEffect(() => {
+    const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+    const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+
     rudderEventMethods().then((response) => {
       response?.identify("", "", "", anonymousId);
     });
     localStorage.setItem('AnonymousId', anonymousId);
-  });
+  }, []);
 
   return (
     <div>
       <Navbar />
       <Hero />
       <WhyUs />
+      <TrustUs />
       <Footer />
+      {(status !== "unauthenticated") ? (
+        <LoadingOverlay text={(status === "authenticated") ? "Redirecting..." : undefined} />
+      ) : null
+      }
     </div>
   )
 }

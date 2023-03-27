@@ -1,6 +1,6 @@
 import MainAppBar from "../views/MainAppBar";
 import conn from '../utils/db';
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import React from "react";
 import { renderObjAsTable } from "../utils/data";
 import { ContributorVector } from "../types/contributor";
@@ -8,20 +8,29 @@ import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_
 import CommitsPerFile from "../views/Dashboard/commitsPerFile";
 import RepoList, { getRepoList } from "../views/RepoList";
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "./api/auth/[...nextauth]";
+import { Session } from "next-auth/core/types";
+import { getAuthUserName } from "../utils/auth";
 
-const RepoProfile: NextPage<{
+type RepoProfileData = {
+	sessionObj: Session,
 	repo_list?: string[],
 	repo_name?: string,
 	contributor_2d_data?: Array<ContributorVector>
-}> = ({ repo_list, repo_name, contributor_2d_data }) => {
+}
+
+const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list, repo_name, contributor_2d_data }) => {
 	React.useEffect(() => {
 		rudderEventMethods().then((response) => {
-			response?.page("", "Repo Profile Page", { anonymousId: localStorage.getItem("AnonymousId") });
+			response?.page("", "Repo Profile Page", {
+				name: getAuthUserName(session)
+			});
 		});
-	  });
+	}, [session]);
 	return (
 		<div className='h-[50rem] w-[90%] m-auto'>
-			<MainAppBar isLoggedIn={true} />
+			<MainAppBar />
 			{(repo_name && contributor_2d_data) ? (<>
 				<div className='border-2 mt-10 p-2 rounded-md border-blue-200 text-[20px]'>
 					<h3> <span>Repo Name : </span>{repo_name}</h3>
@@ -36,28 +45,51 @@ const RepoProfile: NextPage<{
 				<div className="max-w-[80%] mx-auto">
 					<RepoList repo_list={repo_list} />
 				</div>
-			) : (<p>Something went wrong</p>)}
-		</div>
+			) : (
+				<p>Something went wrong</p>
+			)
+			}
+		</div >
 	)
 }
 
-RepoProfile.getInitialProps = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ req, res, query }) => {
+	// check if user is logged in
+	const session = await getServerSession(req, res, authOptions);
+	if (!session) {
+		return {
+			redirect: {
+				destination: '/',
+				permanent: false
+			}
+		};
+	}
+
+	// if info is requested for a specific repository
 	if (query.repo_name) {
 		const repo_name = Array.isArray(query.repo_name) ? query.repo_name[0] : query.repo_name;
 		const contributor_vector: Array<ContributorVector> = await getContri2DProps(conn, repo_name);
 		if (contributor_vector.length > 0)
 			return {
-				repo_name: repo_name,
-				contributor_2d_data: contributor_vector
+				props: {
+					sessionObj: session,
+					repo_name: repo_name,
+					contributor_2d_data: contributor_vector
+				}
 			}
 		else
 			console.warn(`No data found for repository named ${repo_name}`);
 	} else {
 		console.debug("No repo name received");
 	}
+
+	// by default, show the list of repositories of the user
 	const repo_list = await getRepoList(conn);
 	return {
-		repo_list: repo_list
+		props: {
+			sessionObj: session,
+			repo_list: repo_list
+		}
 	}
 }
 
