@@ -16,5 +16,6 @@ export const logout = () => {
 		})
 }
 
+export const getAuthUserId = (session: Session | null) => session?.user.id ? session.user.id : 0;
 export const getAuthUserName = (session: Session | null) => session?.user?.name ? session?.user?.name : "User";
 export const getAuthUserImage = (session: Session | null) => session?.user?.image ? session?.user?.image : "/dummy-profile-pic-female-300n300.jpeg";

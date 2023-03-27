@@ -1,19 +1,12 @@
 import conn from '.';
+import AuthInfo from '../../types/AuthInfo';
 import { convert } from './converter';
 
 export interface DbUser {
 	id?: number,
 	name?: string,
 	profile_url?: string,
-	auth_info?: {
-		[provider: string]: {
-			[id: string]: {
-				type?: string,
-				expires_at?: number,
-				[key: string]: any
-			}
-		}
-	},
+	auth_info?: AuthInfo,
 	aliases?: Array<string>,
 	org?: string,
 	code_url?: Array<string>,
