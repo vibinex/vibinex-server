@@ -15,8 +15,8 @@ const Features = () => {
 			<div className='sm:flex sm:w-[95%] w-[100%] m-auto'>
 				{FeatureList.map((item, index) => {
 					return (
-						<div className='sm:w-[50%] w-[100%] mt-8  rounded-md ml-6'>
-							<Image  src={item.src} alt={item.text} className='rounded-md'/>
+						<div className='sm:w-[50%] w-[100%] mt-8 rounded-md ml-6'>
+							<Image src={item.src} alt={item.text} className='rounded-md object-left-bottom object-cover w-full px-8 h-screen-1/2' />
 							<h3 className='font-bold text-[1.3rem] mt-4'>{item.text}</h3>
 						</div>
 					)

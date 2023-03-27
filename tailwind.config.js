@@ -27,6 +27,9 @@ module.exports = {
       },
       fontFamily: {
         custom: ['Raleway', 'Roboto', 'sans-serif']
+      },
+      spacing: {
+        'screen-1/2': "50vh"
       }
     },
   },
