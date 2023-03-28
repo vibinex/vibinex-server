@@ -12,7 +12,7 @@ const Steps = () => {
 	]
 	const bitBucket = [
 		{ step: "1. Downald Chrome Extension", icon: <BiDownload size={40} /> },
-		{ step: "2. Install the app", icon: <GrInstall size={40} /> },
+		{ step: "2. Install Github app", icon: <GrInstall size={40} /> },
 		{ step: "3. Setup bitbucket pipeline", icon: <BiIntersect size={40} /> },
 	]
 
@@ -24,10 +24,10 @@ const Steps = () => {
 	]
 
 	return (
-		<div id='whyus' className='w-full text-center py-12'>
+		<div id='whyus' className='w-full text-center py-12  bg-secondary-main'>
 			<h2 className='font-bold text-[2rem]'>Steps to<span className='text-[2rem] text-primary-main font-bold'> Download</span></h2>
 
-			<div className='flex bg-cyan-300 m-auto w-[40%] justify-center rounded-md border-2 border-primary-dark mt-4'>
+			<div className='flex bg-cyan-300 m-auto sm:w-[40%] w:[60%] justify-center rounded-md border-2 border-primary-dark mt-4'>
 				{heading.map((item, index) => {
 					return (
 						<div
