@@ -8,8 +8,15 @@ import axios from "axios";
 import { useEffect } from "react";
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
+import RepoList, { getRepoList } from "../views/RepoList";
+import conn from "../utils/db";
 
-const Profile = ({ sessionObj: session }: { sessionObj: Session }) => {
+type ProfileProps = {
+	sessionObj: Session,
+	repo_list: string[],
+}
+
+const Profile = ({ sessionObj: session, repo_list }: ProfileProps) => {
 	useEffect(() => {
 		rudderEventMethods().then((response) => {
 			response?.page("", "Repo Profile Page", {
@@ -22,11 +29,14 @@ const Profile = ({ sessionObj: session }: { sessionObj: Session }) => {
 	return (
 		<>
 			<MainAppBar />
-			<p>Hi {getAuthUserName(session)}, This is your developer profile</p>
-			<p>
-				To add metadata for more repositories, visit the
-				<Link href={"/upload"} className="text-primary-main"> upload page</Link>
-			</p>
+			<div className="max-w-[80%] mx-auto">
+				<p>Hi {getAuthUserName(session)},</p>
+				<RepoList repo_list={repo_list} />
+				<p>
+					To add metadata for more repositories, visit the
+					<Link href={"/instruction_to_setup"} className="text-primary-main"> instructions page</Link>
+				</p>
+			</div>
 		</>
 	)
 }
@@ -46,7 +56,7 @@ type BitbucketEmailObj = {
 	is_confirmed: boolean,
 }
 
-export const getServerSideProps: GetServerSideProps<{ sessionObj: Session }> = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
@@ -102,7 +112,16 @@ export const getServerSideProps: GetServerSideProps<{ sessionObj: Session }> = a
 	} else {
 		console.warn("Bitbucket provider not present");
 	}
-	return { props: { sessionObj: session } }
+
+	// get the list of repositories of the user
+	const repo_list = await getRepoList(conn, session.user.id);
+
+	return {
+		props: {
+			sessionObj: session,
+			repo_list
+		}
+	}
 }
 
 export default Profile;
