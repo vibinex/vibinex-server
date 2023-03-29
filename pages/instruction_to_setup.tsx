@@ -1,10 +1,9 @@
 import Link from "next/link";
 import Button from "../components/Button";
 
-export default function Auth() {
+export default function SetupInstructions() {
 
   const handleAuthorize = () => {
-    // Construct the URL to the Bitbucket authorization page
     const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
     const redirectUri = 'https://gcscruncsql-k7jns52mtq-el.a.run.app/authorise_bitbucket_consumer'; // Change this to the orginal redirecturi
     const scopes = 'repository';
