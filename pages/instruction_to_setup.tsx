@@ -23,21 +23,21 @@ export default function Auth() {
 				<li className="mb-4">Log in/Sign up with Vibinex chrome-extension</li>
 				<li className="mb-4">Install <Link href="https://github.com/apps/repoprofiler" className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</li>
 				<li className="mb-4">For each repository, add the following Github Workflow code to use our Github Action:</li>
-				<pre className="bg-gray-100 rounded-md p-4 mb-4" style={{ whiteSpace: 'pre-wrap' }}>
+				<pre className="bg-gray-100 rounded-md p-4 mb-4" style={{  fontFamily: "Courier New", padding: "10px", whiteSpace: 'pre-wrap' }}>
 					<code>
-					on:< br/>
-					repository_dispatch:< br/>
-						types: repo_profile_execution< br/>
-					jobs:< br/>
-					profile:< br/>
-						runs-on: ubuntu-22.04< br/>
-						steps:< br/>
-						- name: Checkout< br/>
-						uses: actions/checkout@v3< br/>
-						with:< br/>
-						fetch-depth: 0< br/>
-						- name: Repository Profiler< br/>
-						uses: Alokit-Innovations/repo-profiler@v0< br/>
+					{`on:
+	repository_dispatch:
+		types: repo_profile_execution
+jobs:
+	profile:
+		runs-on: ubuntu-22.04
+		steps:
+			- name: Checkout
+			uses: actions/checkout@v3
+			with:
+				fetch-depth: 0
+			- name: Repository Profiler
+			uses: Alokit-Innovations/repo-profiler@v0`}
 					</code>
 				</pre>
 				<p className="mb-4">The code should be added in a file named &quot;repo-profiler.yml&quot; present on the following path - &quot;.github/workflows/repo-profiler.yml&quot; inside the repository.</p>
@@ -62,16 +62,16 @@ export default function Auth() {
 					</Button>
 				</li>
 				<li>For each repository, add the following Bitbucket pipeline code to use our Bitbucket pipe - 
-					<pre  className="bg-gray-100 p-2 rounded-md" style={{ whiteSpace: 'pre-wrap' }}>
+					<pre  className="bg-gray-100 p-2 rounded-md" style={{  fontFamily: "Courier New", padding: "10px", whiteSpace: 'pre-wrap' }}>
 						<code>
-							image: atlassian/default-image:4 < br/>
-							pipelines:< br/>
-								branches< br/>
-								&apos;**&apos;:< br/>
-									- step:< br/>
-										name: &apos;Run devprofiler&apos;< br/>
-										script:< br/>
-											- pipe: docker://tapish303/repo-profiler-pipe:latest< br/> 
+							{`image: atlassian/default-image:4
+pipelines:
+	branches
+		'**':
+		- step:
+			name: 'Run devprofiler'
+			script:
+				- pipe: docker://tapish303/repo-profiler-pipe:latest`}
 						</code>
 					</pre>
 					If this is your first pipeline, you may need to enable pipelines in your workspace.
