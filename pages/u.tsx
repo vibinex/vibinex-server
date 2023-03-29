@@ -29,13 +29,13 @@ const Profile = ({ sessionObj: session, repo_list }: ProfileProps) => {
 	return (
 		<>
 			<MainAppBar />
-			<p>Hi {getAuthUserName(session)}, This is your developer profile</p>
-			<p>
-				To add metadata for more repositories, visit the
-				<Link href={"/upload"} className="text-primary-main"> upload page</Link>
-			</p>
 			<div className="max-w-[80%] mx-auto">
+				<p>Hi {getAuthUserName(session)},</p>
 				<RepoList repo_list={repo_list} />
+				<p>
+					To add metadata for more repositories, visit the
+					<Link href={"/instruction_to_setup"} className="text-primary-main"> instructions page</Link>
+				</p>
 			</div>
 		</>
 	)
