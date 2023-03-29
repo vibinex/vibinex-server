@@ -10,7 +10,7 @@ export default function SetupInstructions({ bitbucket_auth_url }: { bitbucket_au
 					<li className="mb-4">Log in/Sign up with Vibinex chrome-extension</li>
 					<li className="mb-4">Install <Link href="https://github.com/apps/repoprofiler" className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</li>
 					<li className="mb-4">For each repository, add the following Github Workflow code to use our Github Action:</li>
-					<pre className="bg-gray-100 rounded-md p-4 mb-4" style={{ fontFamily: "Courier New", padding: "10px", whiteSpace: 'pre-wrap' }}>
+					<pre className="bg-gray-100 rounded-md p-3 mb-4 font-mono whitespace-pre-wrap">
 						<code>
 							{`on:
 	repository_dispatch:
@@ -48,7 +48,7 @@ jobs:
 						</Button>
 					</li>
 					<li>For each repository, add the following Bitbucket pipeline code to use our Bitbucket pipe -
-						<pre className="bg-gray-100 p-2 rounded-md" style={{ fontFamily: "Courier New", padding: "10px", whiteSpace: 'pre-wrap' }}>
+						<pre className="bg-gray-100 p-3 rounded-md font-mono whitespace-pre-wrap" >
 							<code>
 								{`image: atlassian/default-image:4
 pipelines:
