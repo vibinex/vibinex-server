@@ -8,12 +8,12 @@ const Steps = () => {
 	const gitHubSteps = [
 		{ step: "1. Download Chrome Extension", icon: <BiDownload size={40} /> },
 		{ step: "2. Install Github app", icon: <GrInstall size={40} /> },
-		{ step: "3. Setup Github app", icon: <BiIntersect size={40} /> },
+		{ step: "3. Setup Github Action", icon: <BiIntersect size={40} /> },
 	]
 	const bitBucket = [
-		{ step: "1. Downald Chrome Extension", icon: <BiDownload size={40} /> },
-		{ step: "2. Install Github app", icon: <GrInstall size={40} /> },
-		{ step: "3. Setup bitbucket pipeline", icon: <BiIntersect size={40} /> },
+		{ step: "1. Download Chrome Extension", icon: <BiDownload size={40} /> },
+		{ step: "2. Create Bitbucket OAuth consumer", icon: <GrInstall size={40} /> },
+		{ step: "3. Setup Bitbucket pipeline", icon: <BiIntersect size={40} /> },
 	]
 
 	let steps = github ? gitHubSteps : bitBucket;
@@ -24,15 +24,15 @@ const Steps = () => {
 	]
 
 	return (
-		<div id='whyus' className='w-full text-center py-12  bg-secondary-main'>
-			<h2 className='font-bold text-[2rem]'>Steps to<span className='text-[2rem] text-primary-main font-bold'> Download</span></h2>
+		<div id='steps' className='w-full text-center py-12  bg-secondary-main'>
+			<h2 className='font-bold text-[2rem]'>Get started in<span className='text-[2rem] text-primary-main font-bold'> 3 steps</span></h2>
 
 			<div className='flex bg-cyan-300 m-auto sm:w-[40%] w:[60%] justify-center rounded-md border-2 border-primary-dark mt-4'>
 				{heading.map((item, index) => {
 					return (
 						<div
 							key={index}
-							onClick={() => item.name == 'Github' ? setGithub(prev => prev = true) : setGithub(prev => prev = false)}
+							onClick={() => item.name == 'Github' ? setGithub(true) : setGithub(false)}
 							className='p-4 w-[100%] bg-primary-light cursor-pointer'
 							style={{ backgroundColor: item.flag ? "rgb(33 150 243)" : "white" }}>
 							<h2 className='text-[1.3rem] font-bold'
