@@ -20,7 +20,7 @@ type RepoProfileData = {
 	contributor_2d_data?: Array<ContributorVector>
 }
 
-const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list, repo_name, contributor_2d_data }) => {
+const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list, repo_name: repo_addr, contributor_2d_data }) => {
 	React.useEffect(() => {
 		rudderEventMethods().then((response) => {
 			response?.page("", "Repo Profile Page", {
@@ -28,13 +28,16 @@ const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list
 			});
 		});
 	}, [session]);
+
+	const [repo_host, repo_owner, repo_name] = repo_addr ? repo_addr.split("/") : ["", "", ""];
 	return (
 		<div className='h-[50rem] w-[90%] m-auto'>
 			<MainAppBar />
 			{(repo_name && contributor_2d_data) ? (<>
 				<div className='border-2 mt-10 p-2 rounded-md border-blue-200 text-[20px]'>
-					<h3> <span>Repo Name : </span>{repo_name}</h3>
-					<h1><span>Owned by : </span>Vibinex</h1>
+					<h3><span>Repo Name: </span>{repo_name}</h3>
+					<h2><span>Owned by: </span>{repo_owner}</h2>
+					<h2><span>Hosted on: </span>{repo_host}</h2>
 				</div>
 				<CommitsPerFile />
 				<div className="block w-96 h-96 mx-auto">
