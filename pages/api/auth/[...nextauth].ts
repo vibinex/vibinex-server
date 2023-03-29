@@ -1,4 +1,4 @@
-import NextAuth, { Account, TokenSet, User } from "next-auth"
+import NextAuth, { Account, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider from "next-auth/providers/github"
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
@@ -76,6 +76,24 @@ export const authOptions = {
 
 			if (path = "/") return `${baseUrl}/u`;
 			return baseUrl
+		},
+		async session({ session }: { session: Session }) {
+			if (session && session.user) {
+				const usersWithAlias = await getUserByAlias(session.user.email!)
+				if (!usersWithAlias || usersWithAlias.length < 1) {
+					console.warn(`[session callback] No user found with this email: ${session.user.email}`);
+				}
+				else if (usersWithAlias.length > 1) {
+					console.warn(`[session callback] Multiple users found with this email: ${session.user.email}. Names: `,
+						usersWithAlias.map(u => u.name).join(", "));
+					// TODO: send UI to ask user if they want to merge the other accounts with this one
+				} else {
+					const dbUser = usersWithAlias[0];
+					session.user.id = dbUser.id;
+					session.user.auth_info = dbUser.auth_info;
+				}
+			}
+			return session;
 		}
 	},
 	secret: process.env.NEXTAUTH_SECRET,
