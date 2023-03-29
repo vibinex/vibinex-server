@@ -54,9 +54,13 @@ export const authOptions = {
 				await createUser(db_user).catch(err => {
 					console.error("[signIn] Could not create user", err);
 				})
-				// FIXME: There is no way for us to get user id (because createUser doesn't return it)
-				// or anonymous id (because this runs on the server-side). Solution: use Prisma ORM. It returns the user object
-				rudderStackEvents.track("", "anonymous", "signup", { ...db_user });
+
+				// signup event
+				account && getUserByProvider(account.provider, account.providerAccountId).then(db_user => {
+					rudderStackEvents.track(db_user.id.toString(), "", "signup", { ...db_user, eventStatusFlag: 1 });
+				}).catch(err => {
+					console.error("[signup] Rudderstack event failed: Could not get user id", db_user, err);
+				});
 			} else {
 				const existingAuth = (account) ? Object.keys(db_user.auth_info!).includes(account.provider) && Object.keys(db_user.auth_info![account.provider]).includes(account.providerAccountId) : false;
 				// if user is found, update the db entry
