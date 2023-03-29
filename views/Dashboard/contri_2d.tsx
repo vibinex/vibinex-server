@@ -32,23 +32,22 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 	const user_agg_commits_q = `SELECT
 		author_email,
 		count(*) as num_commits,
-		min(ts) as first_commit_ts,
-		max(ts) as last_commit_ts
-		FROM devraw 
+		min(commit_json ->> 'ts_secs') as first_commit_ts,
+		max(commit_json ->> 'ts_secs') as last_commit_ts
+		FROM commits 
 		WHERE (commit_json ->> 'repo_name')='${repo_name}'
 		GROUP BY author_email
 		ORDER BY last_commit_ts DESC`;
 	const result = await conn.query(user_agg_commits_q);
 
 	const author_vec_q = `SELECT
-			langs,
 			(commit_json -> 'parents') as parents,
 			((commit_json -> 'diff_info') ->> 'insertions') as diff_insertions,
 			((commit_json -> 'diff_info') ->> 'deletions') as diff_deletions,
 			((commit_json -> 'diff_info') ->> 'files_changed') as diff_files_changed,
 			((commit_json -> 'diff_info') -> 'file_info') as diff_file_info,
 			author_email
-		FROM devraw
+		FROM commits
 		WHERE (commit_json ->> 'repo_name')='${repo_name}'`;
 	const author_vec_result = await conn.query(author_vec_q);
 
@@ -58,7 +57,7 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 			continue;
 		const vec = author_vec_result.rows.filter((row) => row.author_email === author.author_email);
 		for (let row of vec) {
-			row.langs = countArrayElements(row.langs);
+			row.langs = countArrayElements(row.diff_file_info.map((fi: { v_language: string, path_hash: string, filename: string }) => fi.v_language));
 			row.parents = row.parents.length;
 			delete row.diff_file_info;
 		}
@@ -72,8 +71,8 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 		author_vec.push({
 			author_email: author.author_email,
 			num_commits: parseInt(author.num_commits),
-			first_commit_ts: new Date(author.first_commit_ts).getTime(),
-			last_commit_ts: new Date(author.last_commit_ts).getTime(),
+			first_commit_ts: parseInt(author.first_commit_ts),
+			last_commit_ts: parseInt(author.last_commit_ts),
 			commits: commit_summary,
 		})
 	}
