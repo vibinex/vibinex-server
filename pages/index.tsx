@@ -13,6 +13,7 @@ import Steps from '../views/Steps'
 
 export default function Home() {
   const { data: session, status } = useSession();
+  const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 
   if (status === "authenticated") {
     window.location.assign("/u");
@@ -37,8 +38,8 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar />
-      <Hero />
+      <Navbar ctaLink={chromeExtensionLink} />
+      <Hero ctaLink={chromeExtensionLink} />
       <WhyUs />
       <Features />
       <Steps />

@@ -19,7 +19,7 @@ const Button = (props: PropsWithChildren<{
 		}
 	}
 	const variantClasses =
-		(props.variant === 'contained') ? "bg-primary-main text-primary-text disabled:bg-action-disabled disabled:hover:bg-transparent hover:bg-primary-dark "
+		(props.variant === 'contained') ? "bg-primary-main text-secondary-main disabled:bg-action-disabled disabled:hover:bg-transparent hover:bg-primary-dark "
 			: (props.variant === 'outlined') ? "border-secondary-main border-2 rounded "
 				: "";
 

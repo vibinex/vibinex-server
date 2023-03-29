@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import Button from '../components/Button';
-import { login } from '../utils/auth';
+import chromeLogo from '../public/chrome-logo.png'
+import Image from 'next/image';
 
-const Navbar = () => {
+const Navbar = (props: { ctaLink: string }) => {
   // TODO: This component has a very specific use. It should be inside the views folder
   const [showNavbar, setShowNavbar] = useState(false);
   const [scrollDown, setScrollDown] = useState(false);
@@ -42,13 +43,22 @@ const Navbar = () => {
             <Link href='/'>Home</Link>
           </li>
           <li className='p-4'>
-            <Link href='#whyus'>WhyUs?</Link>
+            <Link href='#whyus'>Why Us?</Link>
+          </li>
+          <li className='p-4'>
+            <Link href='#features'>Features</Link>
           </li>
           <li className='p-4'>
             <Link href='#steps'>Steps</Link>
           </li>
           <li className='p-4'>
-            <Button variant='text' onClick={() => login()}>Signup</Button>
+            <Link href='#trust'>Trust Us</Link>
+          </li>
+          <li className='p-4'>
+            <Link href={props.ctaLink} target="_blank" className="rounded bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+              Download
+              <Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
+            </Link>
           </li>
         </ul>
 
@@ -72,17 +82,23 @@ const Navbar = () => {
           }
         >
           <ul>
-            <li onClick={changeNavbar} className='p-4 text-4xl hover:text-secondary-light'>
+            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
               <Link href='/'>Home</Link>
             </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl  hover:text-secondary-light'>
-              <Link href='#whyus'>WhyUs?</Link>
+            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+              <Link href='#whyus'>Why Us?</Link>
             </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl  hover:text-secondary-light'>
-              <Link href='/download'>Download</Link>
+            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+              <Link href='#features'>Features</Link>
             </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl  hover:text-secondary-light'>
-              <Button variant='text' onClick={() => login()}>Signup</Button>
+            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+              <Link href='#steps'>Steps</Link>
+            </li>
+            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+              <Link href='#trust'>Trust Us</Link>
+            </li>
+            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+              <Button variant='text' href={props.ctaLink} target="_blank">Download Now!</Button>
             </li>
           </ul>
         </div>
