@@ -75,7 +75,7 @@ SetupInstructions.getInitialProps = async () => {
 	const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
 	const redirectUri = 'https://gcscruncsql-k7jns52mtq-el.a.run.app/authorise_bitbucket_consumer';
 	const scopes = 'repository';
-	const clientId = process.env.BITBUCKET_CLIENT_ID;
+	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
 
 	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
 	return {
