@@ -18,10 +18,10 @@ const contactUs = [
 	{ name: '85115 57566', icon: BsWhatsapp, link: 'https://wa.me/918511557566' },
 ]
 
-const Footer = () => {
+const Footer = (props: { className?: string }) => {
 	return (
-		<div className='sm:h-[20rem] h-[45rem] bg-secondary-main p-10'>
-			<div className='sm:flex gap-40 mt-10'>
+		<footer className={'bg-secondary-main p-10 w-full mt-20 ' + props.className}>
+			<div className='flex gap-x-40 gap-y-5 my-10 flex-wrap'>
 				{/* Social  */}
 				<div>
 					<div className='flex gap-6 hover:cursor-pointer'>
@@ -87,8 +87,7 @@ const Footer = () => {
 			<div className='sm:mt-0 mt-7'>
 				<h2>&copy; Alokit&trade; Innovations Private Limited 2023</h2>
 			</div>
-
-		</div>
+		</footer>
 	)
 }
 
