@@ -34,7 +34,7 @@ const Profile = ({ sessionObj: session, repo_list }: ProfileProps) => {
 				<RepoList repo_list={repo_list} />
 				<p>
 					To add metadata for more repositories, visit the
-					<Link href={"/instruction_to_setup"} className="text-primary-main"> instructions page</Link>
+					<Link href={"/docs/setup"} className="text-primary-main"> instructions page</Link>
 				</p>
 			</div>
 		</>

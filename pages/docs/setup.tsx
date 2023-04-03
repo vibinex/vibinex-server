@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Button from "../components/Button";
+import Button from "../../components/Button";
 
 export default function SetupInstructions({ bitbucket_auth_url }: { bitbucket_auth_url: string }) {
 	return (
