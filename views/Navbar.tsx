@@ -6,7 +6,6 @@ import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
 
 const Navbar = (props: { ctaLink: string }) => {
-  // TODO: This component has a very specific use. It should be inside the views folder
   const [showNavbar, setShowNavbar] = useState(false);
   const [scrollDown, setScrollDown] = useState(false);
   const changeNavbar = () => {

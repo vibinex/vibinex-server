@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
-import { BsFacebook, BsLinkedin, BsInstagram, BsTwitter } from 'react-icons/bs'
+import { BsFacebook, BsLinkedin, BsInstagram, BsTwitter, BsWhatsapp } from 'react-icons/bs'
+import { FiMail } from "react-icons/fi";
 
 const legal = [
 	{ name: 'Privacy Policy', link: '/privacy' },
@@ -9,26 +10,25 @@ const legal = [
 
 const quickLinks = [
 	{ name: "Home", link: '/' },
-	{ name: "Steps", link: '#steps' },
-	{ name: "Signup", link: '/login' },
+	{ name: "Docs", link: '/docs/setup' },
 ]
 
 const contactUs = [
-	{ name: 'Email: contact@vibinex.com', link: 'mailto:contact@vibinex.com' },
-	{ name: 'Phone No: 7o218 o31o9', link: 'https://wa.me/917021803109' },
+	{ name: 'contact@vibinex.com', icon: FiMail, link: 'mailto:contact@vibinex.com' },
+	{ name: '85115 57566', icon: BsWhatsapp, link: 'https://wa.me/918511557566' },
 ]
 
-const Footer = () => {
+const Footer = (props: { className?: string }) => {
 	return (
-		<div className='sm:h-[20rem] h-[45rem] bg-secondary-main p-10'>
-			<div className='sm:flex gap-40 mt-10'>
+		<footer className={'bg-secondary-main p-10 w-full mt-20 ' + props.className}>
+			<div className='flex gap-x-40 gap-y-5 my-10 flex-wrap'>
 				{/* Social  */}
 				<div>
 					<div className='flex gap-6 hover:cursor-pointer'>
-						<Link href={'/'}><BsFacebook size={35} /></Link>
-						<Link href={'https://www.linkedin.com/company/devprofile-tech/'}><BsLinkedin size={35} /></Link>
-						<Link href={'/'}><BsInstagram size={35} /></Link>
-						<Link href={'/'}><BsTwitter size={35} /></Link>
+						<Link href={'https://www.facebook.com/vibinex'}><BsFacebook size={35} /></Link>
+						<Link href={'https://www.linkedin.com/company/vibinex/'}><BsLinkedin size={35} /></Link>
+						<Link href={'https://www.instagram.com/vibinex/'}><BsInstagram size={35} /></Link>
+						<Link href={'https://twitter.com/Vibinex'}><BsTwitter size={35} /></Link>
 					</div>
 				</div>
 
@@ -73,9 +73,10 @@ const Footer = () => {
 						{
 							contactUs.map((item, index) => {
 								return (
-									<div key={index} className='mt-3 text-[18px]'>
-										<Link href={item.link}><h2>{item.name}</h2></Link>
-									</div>
+									<Link key={index} href={item.link} className='mt-3 text-[18px] block'>
+										<item.icon className='h-full inline mr-2' />
+										{item.name}
+									</Link>
 								)
 							})
 						}
@@ -86,8 +87,7 @@ const Footer = () => {
 			<div className='sm:mt-0 mt-7'>
 				<h2>&copy; Alokit&trade; Innovations Private Limited 2023</h2>
 			</div>
-
-		</div>
+		</footer>
 	)
 }
 

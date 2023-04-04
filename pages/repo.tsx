@@ -1,4 +1,5 @@
 import MainAppBar from "../views/MainAppBar";
+import Footer from "../components/Footer";
 import conn from '../utils/db';
 import { GetServerSideProps, NextPage } from "next";
 import React from "react";
@@ -31,28 +32,31 @@ const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list
 
 	const [repo_host, repo_owner, repo_name] = repo_addr ? repo_addr.split("/") : ["", "", ""];
 	return (
-		<div className='h-[50rem] w-[90%] m-auto'>
+		<>
 			<MainAppBar />
-			{(repo_name && contributor_2d_data) ? (<>
-				<div className='border-2 mt-10 p-2 rounded-md border-blue-200 text-[20px]'>
-					<h3><span>Repo Name: </span>{repo_name}</h3>
-					<h2><span>Owned by: </span>{repo_owner}</h2>
-					<h2><span>Hosted on: </span>{repo_host}</h2>
-				</div>
-				<CommitsPerFile />
-				<div className="block w-96 h-96 mx-auto">
-					<Contributors2DView repo_data={contributor_2d_data} />
-				</div>
-				<div dangerouslySetInnerHTML={{ __html: renderObjAsTable(contributor_2d_data) }}></div>
-			</>) : (repo_list) ? (
-				<div className="max-w-[80%] mx-auto">
-					<RepoList repo_list={repo_list} />
-				</div>
-			) : (
-				<p>Something went wrong</p>
-			)
-			}
-		</div >
+			<div className='min-h-[50rem] w-[90%] m-auto'>
+				{(repo_name && contributor_2d_data) ? (<>
+					<div className='border-2 mt-10 p-2 rounded-md border-blue-200 text-[20px]'>
+						<h3><span>Repo Name: </span>{repo_name}</h3>
+						<h2><span>Owned by: </span>{repo_owner}</h2>
+						<h2><span>Hosted on: </span>{repo_host}</h2>
+					</div>
+					<CommitsPerFile />
+					<div className="block w-96 h-96 mx-auto">
+						<Contributors2DView repo_data={contributor_2d_data} />
+					</div>
+					<div dangerouslySetInnerHTML={{ __html: renderObjAsTable(contributor_2d_data) }}></div>
+				</>) : (repo_list) ? (
+					<div className="max-w-[80%] mx-auto">
+						<RepoList repo_list={repo_list} />
+					</div>
+				) : (
+					<p>Something went wrong</p>
+				)
+				}
+			</div >
+			<Footer />
+		</>
 	)
 }
 

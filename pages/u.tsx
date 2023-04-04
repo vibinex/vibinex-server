@@ -10,6 +10,7 @@ import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
+import Footer from "../components/Footer";
 
 type ProfileProps = {
 	sessionObj: Session,
@@ -27,17 +28,18 @@ const Profile = ({ sessionObj: session, repo_list }: ProfileProps) => {
 	}, [session])
 
 	return (
-		<>
+		<div className="flex flex-col min-h-screen">
 			<MainAppBar />
-			<div className="max-w-[80%] mx-auto">
+			<div className="max-w-[80%] mx-auto flex-grow">
 				<p>Hi {getAuthUserName(session)},</p>
 				<RepoList repo_list={repo_list} />
 				<p>
 					To add metadata for more repositories, visit the
-					<Link href={"/instruction_to_setup"} className="text-primary-main"> instructions page</Link>
+					<Link href={"/docs/setup"} className="text-primary-main"> instructions page</Link>
 				</p>
 			</div>
-		</>
+			<Footer />
+		</div>
 	)
 }
 
