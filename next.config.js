@@ -6,11 +6,6 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'media.licdn.com', // LinkedIn profile images
-        pathname: '/dms/image/**',
-      },
-      {
-        protocol: 'https',
         hostname: 'lh3.googleusercontent.com', // Google profile images
         pathname: '/**',
       },
