@@ -1,4 +1,3 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -36,6 +35,20 @@ const nextConfig = {
     };
 
     return config;
+  },
+  async headers() {
+    return [
+      {
+        // Apply these headers to all static assets
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "max-age=86400, s-maxage=86400, stale-while-revalidate",
+          },
+        ],
+      },
+    ];
   },
 }
 
