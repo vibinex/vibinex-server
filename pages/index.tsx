@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useSession } from 'next-auth/react'
 import LoadingOverlay from '../components/LoadingOverlay'
 import Steps from '../views/Steps'
+import JoinSlack from '../views/JoinSlack'
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -44,6 +45,7 @@ export default function Home() {
       <Features />
       <Steps />
       <TrustUs />
+      <JoinSlack />
       <Footer />
       {(status !== "unauthenticated") ? (
         <LoadingOverlay text={(status === "authenticated") ? "Redirecting..." : undefined} />
