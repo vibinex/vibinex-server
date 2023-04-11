@@ -113,6 +113,7 @@ const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUs
 					scope: account.scope,
 					access_token: account.access_token,
 					expires_at: account.expires_at,
+					refresh_token: account.refresh_token,
 				}
 			}
 		}
