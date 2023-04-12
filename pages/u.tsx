@@ -11,6 +11,7 @@ import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
 import Footer from "../components/Footer";
+import { PrismaClient } from '@prisma/client'
 
 type ProfileProps = {
 	sessionObj: Session,
@@ -59,6 +60,37 @@ type BitbucketEmailObj = {
 }
 
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
+	// const my_repo = "mentorship-website";
+	const prisma = new PrismaClient();
+	async function main() {
+		// Prisma queries here
+		const allUsers = await prisma.users.findMany()
+		console.log(allUsers);
+	}
+
+	main()
+		.then(async () => {
+			await prisma.$disconnect();
+		})
+		.catch(async (e) => {
+			console.error("Prisma query failed", e);
+			await prisma.$disconnect();
+			process.exit(1);
+		})
+	// const result: object | null = await prisma.temp_devraw.groupBy({
+	// 	by: ['author_email'],
+	// 	_count: {
+	// 		commit_id: true,
+	// 	},
+	// 	where: {
+	// 		commit_json: {
+	// 			path: ['repo_name'],
+	// 			equals: my_repo,
+	// 		}
+	// 	}
+	// });
+	// console.log(result);
+
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
