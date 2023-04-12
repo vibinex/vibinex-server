@@ -1,4 +1,4 @@
-import NextAuth, { Account, TokenSet, User } from "next-auth"
+import NextAuth, { Account, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider from "next-auth/providers/github"
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
@@ -15,10 +15,10 @@ interface signInParam {
 export const authOptions = {
 	// Configure one or more authentication providers
 	providers: [
-		GoogleProvider({
-			clientId: process.env.GOOGLE_CLIENT_ID!,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-		}),
+		// GoogleProvider({
+		// 	clientId: process.env.GOOGLE_CLIENT_ID!,
+		// 	clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+		// }),
 		GithubProvider({
 			clientId: process.env.GITHUB_CLIENT_ID!,
 			clientSecret: process.env.GITHUB_CLIENT_SECRET!
@@ -54,9 +54,13 @@ export const authOptions = {
 				await createUser(db_user).catch(err => {
 					console.error("[signIn] Could not create user", err);
 				})
-				// FIXME: There is no way for us to get user id (because createUser doesn't return it)
-				// or anonymous id (because this runs on the server-side). Solution: use Prisma ORM. It returns the user object
-				rudderStackEvents.track("", "anonymous", "signup", { ...db_user });
+
+				// signup event
+				account && getUserByProvider(account.provider, account.providerAccountId).then(db_user => {
+					rudderStackEvents.track(db_user.id.toString(), "", "signup", { ...db_user, eventStatusFlag: 1 });
+				}).catch(err => {
+					console.error("[signup] Rudderstack event failed: Could not get user id", db_user, err);
+				});
 			} else {
 				const existingAuth = (account) ? Object.keys(db_user.auth_info!).includes(account.provider) && Object.keys(db_user.auth_info![account.provider]).includes(account.providerAccountId) : false;
 				// if user is found, update the db entry
@@ -76,6 +80,24 @@ export const authOptions = {
 
 			if (path = "/") return `${baseUrl}/u`;
 			return baseUrl
+		},
+		async session({ session }: { session: Session }) {
+			if (session && session.user) {
+				const usersWithAlias = await getUserByAlias(session.user.email!)
+				if (!usersWithAlias || usersWithAlias.length < 1) {
+					console.warn(`[session callback] No user found with this email: ${session.user.email}`);
+				}
+				else if (usersWithAlias.length > 1) {
+					console.warn(`[session callback] Multiple users found with this email: ${session.user.email}. Names: `,
+						usersWithAlias.map(u => u.name).join(", "));
+					// TODO: send UI to ask user if they want to merge the other accounts with this one
+				} else {
+					const dbUser = usersWithAlias[0];
+					session.user.id = dbUser.id;
+					session.user.auth_info = dbUser.auth_info;
+				}
+			}
+			return session;
 		}
 	},
 	secret: process.env.NEXTAUTH_SECRET,
@@ -91,6 +113,7 @@ const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUs
 					scope: account.scope,
 					access_token: account.access_token,
 					expires_at: account.expires_at,
+					refresh_token: account.refresh_token,
 				}
 			}
 		}

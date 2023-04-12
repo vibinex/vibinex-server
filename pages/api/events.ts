@@ -1,7 +1,7 @@
 import Analytics from "@rudderstack/rudder-sdk-node";
 import { apiObject } from "rudder-sdk-js";
 // we need the batch endpoint of the Rudder server you are running
-const client = new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!,  { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
+const client = new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!, { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
 
 const rudderStackEvents = {
     identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => { // Anonymous Id is set in local storage as soon as a user lands on the webiste.
@@ -15,7 +15,7 @@ const rudderStackEvents = {
                 githubId: githubId,
                 role: role
             }
-        },  () => { console.log("identify event successfully recorded") }
+        }, () => { console.log("identify event successfully recorded") }
         );
     },
     /**
