@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import Button from '../components/Button';
 import chromeLogo from '../public/chrome-logo.png'
@@ -54,10 +55,15 @@ const Navbar = (props: { ctaLink: string }) => {
             <Link href='#trust'>Trust Us</Link>
           </li>
           <li className='p-4'>
-            <Link href={props.ctaLink} target="_blank" className="rounded bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+            <Link href={props.ctaLink} target="_blank">
               Download
               <Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
             </Link>
+          </li>
+          <li className='p-4'>
+            <Button variant='contained' onClick={signIn} className="rounded bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+              Login/Signup
+            </Button>
           </li>
         </ul>
 
@@ -97,7 +103,7 @@ const Navbar = (props: { ctaLink: string }) => {
               <Link href='#trust'>Trust Us</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Button variant='text' href={props.ctaLink} target="_blank">Download Now!</Button>
+              <Button variant='text' onClick={signIn}>Login/Signup</Button>
             </li>
           </ul>
         </div>
