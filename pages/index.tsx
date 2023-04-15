@@ -18,13 +18,6 @@ export default function Home() {
 
   if (status === "authenticated") {
     window.location.assign("/u");
-  } else if (status === "unauthenticated") {
-    window.postMessage({
-      message: 'refreshSession',
-      userId: null,
-      userName: null,
-      userImage: null
-    })
   }
 
   React.useEffect(() => {
