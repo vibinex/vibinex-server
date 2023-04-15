@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
-import Button from '../components/Button';
+import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
 
@@ -61,9 +60,7 @@ const Navbar = (props: { ctaLink: string }) => {
             </Link>
           </li>
           <li className='p-4'>
-            <Button variant='contained' onClick={signIn} className="rounded bg-primary-main text-secondary-main py-2 px-4 font-semibold">
-              Login/Signup
-            </Button>
+            <LoginLogout />
           </li>
         </ul>
 
@@ -103,7 +100,7 @@ const Navbar = (props: { ctaLink: string }) => {
               <Link href='#trust'>Trust Us</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Button variant='text' onClick={signIn}>Login/Signup</Button>
+              <LoginLogout />
             </li>
           </ul>
         </div>
