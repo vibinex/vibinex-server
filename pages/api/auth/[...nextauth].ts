@@ -101,6 +101,10 @@ export const authOptions = {
 		}
 	},
 	secret: process.env.NEXTAUTH_SECRET,
+	theme: {
+		brandColor: "#2196F3",
+		logo: "https://vibinex.com/favicon.ico"
+	}
 }
 
 const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUser) => {
