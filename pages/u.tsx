@@ -11,13 +11,15 @@ import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
 import Footer from "../components/Footer";
+import { useSession } from "next-auth/react";
 
 type ProfileProps = {
-	sessionObj: Session,
+	session: Session,
 	repo_list: string[],
 }
 
-const Profile = ({ sessionObj: session, repo_list }: ProfileProps) => {
+const Profile = ({ repo_list }: ProfileProps) => {
+	const session: Session | null = useSession().data;
 	useEffect(() => {
 		rudderEventMethods().then((response) => {
 			response?.page("", "Repo Profile Page", {
@@ -59,6 +61,10 @@ type BitbucketEmailObj = {
 }
 
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
+	res.setHeader(
+		'Cache-Control',
+		'public, s-maxage=1, stale-while-revalidate=10'
+	)
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
@@ -120,7 +126,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 
 	return {
 		props: {
-			sessionObj: session,
+			session,
 			repo_list
 		}
 	}
