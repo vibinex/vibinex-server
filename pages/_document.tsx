@@ -16,7 +16,7 @@ export default function Document() {
 					rel='stylesheet'
 				/>
 			</Head>
-			<body>
+			<body id="__root__">
 				<Main />
 				<NextScript />
 			</body>

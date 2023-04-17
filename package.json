@@ -27,6 +27,7 @@
     "next-auth": "^4.22.0",
     "pg": "^8.9.0",
     "react": "18.2.0",
+    "react-calendly": "^4.1.1",
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
     "rudder-sdk-js": "^2.25.0",
