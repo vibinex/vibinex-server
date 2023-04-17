@@ -1,7 +1,14 @@
+import { useEffect, useState } from 'react';
 import AppBar from '../components/AppBar'
 import LoginLogout from '../components/LoginLogout';
+import { PopupButton } from "react-calendly";
 
 export default function MainAppBar() {
+	const [rootElement, setRootElement] = useState<HTMLElement>()
+	useEffect(() => {
+		setRootElement(document.getElementById('__root__')!);
+	}, [])
+
 	return (
 		<AppBar position='fixed' className='w-full py-2 px-10 flex flex-row bg-primary-light border-b-2 border-b-secondary-dark'>
 			<a href="/" className="mr-16 h-full overflow-clip flex flex-row items-center">
@@ -10,6 +17,13 @@ export default function MainAppBar() {
 				</h1>
 			</a>
 			<span className='flex-grow'></span>
+			{(rootElement) ?
+				<PopupButton
+					url='https://calendly.com/avikalp-gupta/30min'
+					text='Request Demo'
+					rootElement={rootElement}
+					className='mr-4 px-2 py-1 rounded-lg text-sm text-primary-main font-semibold'
+				/> : null}
 			<LoginLogout />
 		</AppBar>
 	)
