@@ -100,7 +100,7 @@ const Docs = () => {
 				<div className='mr-10 sm:border-r-2 p-4 sm:border-[gray] sm:block flex'>
 					{list.map((item, index) => {
 						return (
-							<>
+							<div key={index}>
 								<div onClick={() => {
 									setArticle(item.content);
 									setHeading(item.heading);
@@ -122,7 +122,7 @@ const Docs = () => {
 										)
 									})
 								) : null} */}
-							</>
+							</div>
 						)
 					})}
 				</div>
@@ -131,7 +131,7 @@ const Docs = () => {
 					<h1 className='text-2xl mb-2 font-bold'>Getting started with {heading}</h1>
 					{article.map((item, index) => {
 						return (
-							<div className='mt-4 font-sans'>
+							<div key={index} className='mt-4 font-sans'>
 								{index + 1}.  {item.article}
 							</div>
 						)
