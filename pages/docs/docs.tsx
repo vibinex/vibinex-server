@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from "../components/Button";
-import MainAppBar from '../views/MainAppBar';
+import Button from "../../components/Button";
+import MainAppBar from '../../views/MainAppBar';
 
 const docs = [
 	{
