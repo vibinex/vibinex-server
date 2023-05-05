@@ -1,10 +1,15 @@
 steps:
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://mybucket/env_vars.txt', '.env.local']
 - name: 'node'
   entrypoint: 'bash'
   args:
   - '-c'
-  - 'npm ci && npm run build'
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy']
+  - 'npm ci'
+-name: 'node'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - 'source .env.local && npm run build'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'bash'
+  args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy']
+timeout: '1600s'
