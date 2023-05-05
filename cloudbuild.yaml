@@ -38,6 +38,9 @@ steps:
   - 'NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATAPLANE_URL=${_NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATAPLANE_URL}'
   - 'RUDDERSTACK_SERVER_WRITE_KEY=${_RUDDERSTACK_SERVER_WRITE_KEY}'
   - 'RUDDERSTACK_SERVER_DATAPLANE_URL=${_RUDDERSTACK_SERVER_DATAPLANE_URL}'
+- name: node:18.13.0
+  entrypoint: npm
+  args: ["run", "build"]
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy']
