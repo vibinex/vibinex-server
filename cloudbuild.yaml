@@ -1,0 +1,8 @@
+steps:
+- name: 'node'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - 'npm ci && npm run build'
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy']
