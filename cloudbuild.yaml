@@ -4,7 +4,7 @@ steps:
   args:
   - '-c'
   - 'npm ci'
--name: 'node'
+- name: 'node'
   entrypoint: 'bash'
   args:
   - '-c'
