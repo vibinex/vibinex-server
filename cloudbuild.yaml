@@ -1,4 +1,6 @@
 steps:
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'gs://mybucket/env_vars.txt', '.env.local']
 - name: 'node'
   entrypoint: 'bash'
   args:
