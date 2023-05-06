@@ -1,5 +1,5 @@
 {
-  "name": "dev-profile-website",
+  "name": "vibinex-website",
   "version": "0.1.1",
   "private": true,
   "scripts": {
@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "create-env": "printenv > .env"
   },
   "dependencies": {
     "@google-cloud/storage": "^6.9.0",
