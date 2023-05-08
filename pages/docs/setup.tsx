@@ -28,7 +28,7 @@ jobs:
 			with:
 				fetch-depth: 0
 			- name: Repository Profiler
-			uses: Alokit-Innovations/repo-profiler@v0`}
+			uses: Alokit-Innovations/repo-profiler@main`}
 							</code>
 						</pre>
 						<p className="mb-4">The code should be added in a file named &quot;repo-profiler.yml&quot; present on the following path - &quot;.github/workflows/repo-profiler.yml&quot; inside the repository.</p>
