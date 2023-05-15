@@ -11,7 +11,6 @@ import Steps from '../views/Steps'
 import JoinSlack from '../views/JoinSlack'
 
 export default function Home() {
-  const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 
   React.useEffect(() => {
     const localStorageAnonymousId = localStorage.getItem('AnonymousId');
@@ -26,9 +25,7 @@ export default function Home() {
   return (
     <div>
       <Navbar ctaLink={chromeExtensionLink} />
-      <Hero ctaLink={chromeExtensionLink} />
-      <WhyUs />
-      <Features />
+      {/* removed some pages */}
       <Steps />
       <TrustUs />
       <JoinSlack />

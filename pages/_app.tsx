@@ -17,11 +17,11 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
   return (
     <SessionProvider session={session}>
       <Head>
-        <title>Vibinex: Context for code review</title>
+        {/* removed the title  */}
         <meta name="description" content="Prioritize & optimize pull request reviews to save time and maximize code-review coverage." />
         <meta name="keywords" content={keywords.join(", ")} />
       </Head>
-      <Component {...pageProps} />
+
     </SessionProvider>
   )
 }
