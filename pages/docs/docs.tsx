@@ -16,18 +16,19 @@ const docs = [
 						<pre className="bg-gray-100 rounded-md p-3 mb-4 font-mono whitespace-pre-wrap">
 							<code>
 								{`on:
-	repository_dispatch:
-		types: repo_profile_execution
+  repository_dispatch:
+    types: repo_profile_execution
 jobs:
-	profile:
-		runs-on: ubuntu-22.04
-		steps:
-			- name: Checkout
-			uses: actions/checkout@v3
-			with:
-				fetch-depth: 0
-			- name: Repository Profiler
-			uses: Alokit-Innovations/repo-profiler@v0`}
+  profile:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Repository Profiler
+        uses: Alokit-Innovations/repo-profiler@v0
+`}
 							</code>
 						</pre>
 						<p>The code should be added in a file named &quot;repo-profiler.yml&quot; present on the following path - &quot;.github/workflows/repo-profiler.yml&quot; inside the repository.</p>
