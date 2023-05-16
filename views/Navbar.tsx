@@ -38,21 +38,21 @@ const Navbar = (props: { ctaLink: string }) => {
           </h1>
         </Link>
         <ul className='hidden sm:flex'>
-          <li className='p-4'>
+          {/* <li className='p-4'>
             <Link href='/'>Home</Link>
+          </li> */}
+          <li className='p-4'>
+            <Link href='#steps'>How it works?</Link>
           </li>
           <li className='p-4'>
-            <Link href='#whyus'>Why Us?</Link>
+            <Link href='https://github.com/Alokit-Innovations' target='blank'>Contirbution</Link>
           </li>
           <li className='p-4'>
-            <Link href='#features'>Features</Link>
+            <Link href='#'>Pricing</Link>
           </li>
-          <li className='p-4'>
-            <Link href='#steps'>Steps</Link>
-          </li>
-          <li className='p-4'>
+          {/* <li className='p-4'>
             <Link href='#trust'>Trust Us</Link>
-          </li>
+          </li> */}
           <li className='p-4'>
             <Link href={props.ctaLink} target="_blank">
               Download

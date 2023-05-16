@@ -1,7 +1,8 @@
-import React from 'react'
+import { useEffect, useState } from 'react';
 import Link from 'next/link'
-import { BsFacebook, BsLinkedin, BsInstagram, BsTwitter, BsWhatsapp } from 'react-icons/bs'
+import { BsFacebook, BsLinkedin, BsInstagram, BsTwitter, BsWhatsapp, BsSlack, BsCalendarDate } from 'react-icons/bs'
 import { FiMail } from "react-icons/fi";
+import { PopupButton } from "react-calendly";
 
 const legal = [
 	{ name: 'Privacy Policy', link: '/privacy' },
@@ -9,16 +10,21 @@ const legal = [
 ]
 
 const quickLinks = [
-	{ name: "Home", link: '/' },
-	{ name: "Docs", link: '/docs/setup' },
+	{ name: "Pricing", link: '/' },
+	{ name: "Contribution", link: 'https://github.com/Alokit-Innovations' },
 ]
 
 const contactUs = [
 	{ name: 'contact@vibinex.com', icon: FiMail, link: 'mailto:contact@vibinex.com' },
 	{ name: '85115 57566', icon: BsWhatsapp, link: 'https://wa.me/918511557566' },
+	{ name: 'Join Slack', icon: BsSlack, link: 'https://join.slack.com/t/vibinex/shared_invite/zt-1sysjjso3-1ftC6deRcOgQXW9hD4ozWg' },
 ]
 
 const Footer = (props: { className?: string }) => {
+	const [rootElement, setRootElement] = useState<HTMLElement>()
+	useEffect(() => {
+		setRootElement(document.getElementById('__root__')!);
+	}, [])
 	return (
 		<footer className={'bg-secondary-main p-10 w-full mt-20 ' + props.className}>
 			<div className='flex gap-x-40 gap-y-5 my-10 flex-wrap'>
@@ -80,6 +86,16 @@ const Footer = (props: { className?: string }) => {
 								)
 							})
 						}
+					</div>
+					<div className='mt-3 flex'>
+						<BsCalendarDate />
+						{(rootElement) ?
+							<PopupButton
+								url='https://calendly.com/avikalp-gupta/30min'
+								text='Meet Us'
+								rootElement={rootElement}
+								className='rounded-lg text-md text-secodary-black ml-2 mt-[-3px]'
+							/> : null}
 					</div>
 				</div>
 			</div>

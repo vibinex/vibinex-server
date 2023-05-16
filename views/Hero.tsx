@@ -14,9 +14,9 @@ const Hero = (props: { ctaLink: string }) => {
 			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/70 z-[2]' />
 			<section className='p-5 text-primary-light z-[2] sm:mt-[10%] pt-1 sm:w-[50%]'>
 				<article className="text-center">
-					<h1 className='sm:text-[60px] text-[35px] font-bold'>{'Prioritization for'}
+					<h1 className='sm:text-[60px] text-[35px] font-bold'>{'Personalization for'}
 						<span className='text-primary-main font-bold block'>
-							Pull Requests
+							Code Reviews
 						</span>
 					</h1>
 					<p className="text-[25px] mt-20 mb-10 text-gray-300">
