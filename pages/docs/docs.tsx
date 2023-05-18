@@ -94,21 +94,21 @@ const Docs = () => {
 			<MainAppBar />
 
 			{/* Center content */}
-			<section className='sm:w-[75%]	w-[90%]  m-auto sm:mt-10 mb-10 sm:flex p-2'>
+			<section className='sm:w-[75%] w-[90%] m-auto sm:mt-10 mb-10 sm:flex p-2'>
 				<div className='mr-10 sm:border-r-2 p-4 sm:border-[gray] sm:block flex'>
 					{list.map((item, index) => {
 						return (
 							<div key={index}>
-								<div onClick={() => {
+								<h1 onClick={() => {
 									setArticle(item.content);
 									setHeading(item.heading);
 									let temp = list;
 									temp[index].flag = !item.flag;
 									setList([...temp]);
 								}}
-									className='cursor-pointer sm:mt-6  p-3 rounded-md sm:ml-0 ml-8 '>
-									<h1 className='text-1xl font-semibold'>{item.heading}</h1>
-								</div>
+									className={`cursor-pointer sm:mt-6 p-3 rounded-md sm:ml-0 ml-8 text-1xl font-semibold ${(heading === item.heading) ? "text-primary-main" : null}`}>
+									{item.heading}
+								</h1>
 
 								{/* Can also show subheading in tree structure if needed */}
 								{/* {item.flag ? (
