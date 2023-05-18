@@ -60,16 +60,17 @@ jobs:
 				subHeading: "Code for setup",
 				article:
 					<div>
+						For each repository, add the following Bitbucket pipeline code to use our Bitbucket pipe:
 						<pre className="bg-gray-100 p-3 rounded-md font-mono whitespace-pre-wrap" >
 							<code>
 								{`image: atlassian/default-image:4
 pipelines:
-branches
-'**':
-- step:
-name: 'Run devprofiler'
-script:
-- pipe: docker://tapish303/repo-profiler-pipe:latest`}
+  branches
+    '**':
+    - step:
+      name: 'Run devprofiler'
+      script:
+        - pipe: docker://tapish303/repo-profiler-pipe:latest`}
 							</code>
 						</pre>
 						<p>	If this is your first pipeline, you may need to enable pipelines in your workspace.</p>
