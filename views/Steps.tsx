@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { BiWindowOpen,BiDownload,BiIntersect} from 'react-icons/bi'
-import{GrInstall} from 'react-icons/gr'
+import { BiDownload, BiIntersect } from 'react-icons/bi'
+import { GrInstall } from 'react-icons/gr'
 
 const Steps = () => {
 
-	const [github, setGithub] = useState(false);
+	const [github, setGithub] = useState(true);
 	const gitHubSteps = [
 		{ step: "1. Download Chrome Extension", icon: <BiDownload size={40} /> },
 		{ step: "2. Install Github app", icon: <GrInstall size={40} /> },
@@ -12,7 +12,7 @@ const Steps = () => {
 	]
 	const bitBucket = [
 		{ step: "1. Download Chrome Extension", icon: <BiDownload size={40} /> },
-		{ step: "2. Create Bitbucket OAuth consumer", icon: <GrInstall size={40} /> },
+		{ step: "2. Authorize Bitbucket OAuth consumer", icon: <GrInstall size={40} /> },
 		{ step: "3. Setup Bitbucket pipeline", icon: <BiIntersect size={40} /> },
 	]
 
@@ -36,7 +36,7 @@ const Steps = () => {
 							className='p-4 w-[100%] bg-primary-light cursor-pointer'
 							style={{ backgroundColor: item.flag ? "rgb(33 150 243)" : "white" }}>
 							<h2 className='text-[1.3rem] font-bold'
-							style={{ color: item.flag ? "white" : "black" }}
+								style={{ color: item.flag ? "white" : "black" }}
 							>{item.name}</h2>
 						</div>
 					)
