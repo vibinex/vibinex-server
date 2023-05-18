@@ -8,15 +8,15 @@ const docs = [
 		heading: "Github",
 		flag: true,
 		content: [
-			{ subHeading: "Sign up with github", article: "Sign in using GitHub" },
+			{ subHeading: "Sign up with github", article: "Sign in on Vibinex using GitHub" },
 			{ subHeading: "Install GitHub App", article: <>Install <Link href="https://github.com/apps/repoprofiler" className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
 			{
 				subHeading: "Setup GitHub Action",
-				article:
-					<div>
-						<pre className="bg-gray-100 rounded-md p-3 mb-4 font-mono whitespace-pre-wrap">
-							<code>
-								{`on:
+				article: <>
+					Add this code in a file named &quot;repo-profiler.yml&quot; present on the following path - &quot;.github/workflows/repo-profiler.yml&quot; inside the repository.
+					<pre className="bg-gray-100 rounded-md p-3 mb-4 font-mono whitespace-pre-wrap">
+						<code>
+							{`on:
   repository_dispatch:
     types: repo_profile_execution
 jobs:
@@ -29,22 +29,18 @@ jobs:
           fetch-depth: 0
       - name: Repository Profiler
         uses: Alokit-Innovations/repo-profiler@main`}
-							</code>
-						</pre>
-						<p>The code should be added in a file named &quot;repo-profiler.yml&quot; present on the following path - &quot;.github/workflows/repo-profiler.yml&quot; inside the repository.</p>
-					</div>
+						</code>
+					</pre>
+				</>
 
 			},
-			{ subHeading: "Verify setup", article: "After installing Github app and adding Github Action to a repository, you should be able to see the Vibinex icon beside the name of the repository. This means your repository is all set up!" },
-			{ subHeading: "Start using PR highlights", article: "Go to the list of open Pull Requests in your repository. Relevant pull requests will be highlighted in yellow." },
-			{ subHeading: "Start using hunk highlights", article: "Go to the 'Files' tab in a pull request. Files relevant to you will be highlighted in yellow." }
 		]
 	},
 	{
 		heading: "Bitbucket",
 		flag: false,
 		content: [
-			{ subHeading: "Sign up with Bitbucket", article: "Sign in using Bitbucket" },
+			{ subHeading: "Sign up with Bitbucket", article: "Sign in on Vibinex using Bitbucket" },
 			{ subHeading: "Install OAuth consumer", article: "Install Vibinex OAuth Consumer in your personal/organization workspace. Make sure you have the permissions required to install oauth consumer." },
 			{
 				subHeading: "Add to Github", article: <>
@@ -58,12 +54,11 @@ jobs:
 			},
 			{
 				subHeading: "Code for setup",
-				article:
-					<div>
-						For each repository, add the following Bitbucket pipeline code to use our Bitbucket pipe:
-						<pre className="bg-gray-100 p-3 rounded-md font-mono whitespace-pre-wrap" >
-							<code>
-								{`image: atlassian/default-image:4
+				article: <>
+					For each repository, add this Bitbucket Pipeline code in: `bitbucket-pipelines.yml`:
+					<pre className="bg-gray-100 p-3 rounded-md font-mono whitespace-pre-wrap" >
+						<code>
+							{`image: atlassian/default-image:4
 pipelines:
   branches
     '**':
@@ -71,17 +66,19 @@ pipelines:
       name: 'Run devprofiler'
       script:
         - pipe: docker://tapish303/repo-profiler-pipe:latest`}
-							</code>
-						</pre>
-						<p>	If this is your first pipeline, you may need to enable pipelines in your workspace.</p>
-					</div>
+						</code>
+					</pre>
+					<p>Note: If this is your first pipeline, you may need to enable pipelines in your workspace.</p>
+				</>
 			},
-			{ subHeading: "Step 6", article: "Add this code in: `bitbucket-pipelines.yml`" },
-			{ subHeading: "Step 7", article: "Go to the list of open Pull Requests in your repository. Relevant pull requests will be highlighted in yellow." },
-			{ subHeading: "Step 8", article: "Within a pull request, files & code hunks relevant to you will be highlighted in yellow." },
 		]
 	},
+]
 
+const verifySetup = [
+	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
+	"When you view the list of pull requests, the relevant ones will get highlighted in yellow, with details that help you choose where to start",
+	"Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow."
 ]
 
 const Docs = () => {
@@ -128,15 +125,24 @@ const Docs = () => {
 
 				<div>
 					<h1 className='text-2xl mb-2 font-bold'>Getting started with {heading}</h1>
-					{article.map((item, index) => {
-						return (
-							<div key={index} className='mt-4 font-sans'>
-								{index + 1}.  {item.article}
-							</div>
-						)
-					})}
-				</div>
+					<ol>
+						{article.map((item, index) => {
+							return (
+								<li key={index} className='mt-4 font-sans'>
+									{index + 1}.  {item.article}
+								</li>
+							)
+						})}
+					</ol>
 
+					<h2 className='text-xl mt-4 mb-2 font-semibold'>Verify your setup</h2>
+					Once you have set up your repositories, installed the browser extension and signed in, you can verify if everything is correctly set up.
+					<ol>
+						{verifySetup.map((checkItem, index) => (<li key={index} className='mt-2 ml-1'>
+							{index + 1}. {checkItem}
+						</li>))}
+					</ol>
+				</div>
 			</section>
 		</div>
 	)
