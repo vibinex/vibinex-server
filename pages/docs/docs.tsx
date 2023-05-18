@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Button from "../../components/Button";
+import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
 
 const docs = [
@@ -7,10 +8,10 @@ const docs = [
 		heading: "Github",
 		flag: true,
 		content: [
-			{ subHeading: "Sign up with github", article: "Log in/Sign up with Vibinex chrome-extension" },
-			{ subHeading: "Downlaod Extension", article: "Install Repo Profiler Github App from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app." },
+			{ subHeading: "Sign up with github", article: "Sign in using GitHub" },
+			{ subHeading: "Install GitHub App", article: <>Install <Link href="https://github.com/apps/repoprofiler" className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
 			{
-				subHeading: "Add to Github",
+				subHeading: "Setup GitHub Action",
 				article:
 					<div>
 						<pre className="bg-gray-100 rounded-md p-3 mb-4 font-mono whitespace-pre-wrap">
@@ -34,28 +35,26 @@ jobs:
 					</div>
 
 			},
-			{ subHeading: "Start adding repo", article: "After installing Github app and adding Github Action to a repository, you should be able to see the Vibinex icon beside the name of the repository. This means your repository is all set up!" },
-			{ subHeading: "Start adding repo", article: "Go to the list of open Pull Requests in your repository. Relevant pull requests will be highlighted in yellow or red." },
+			{ subHeading: "Verify setup", article: "After installing Github app and adding Github Action to a repository, you should be able to see the Vibinex icon beside the name of the repository. This means your repository is all set up!" },
+			{ subHeading: "Start using PR highlights", article: "Go to the list of open Pull Requests in your repository. Relevant pull requests will be highlighted in yellow." },
+			{ subHeading: "Start using hunk highlights", article: "Go to the 'Files' tab in a pull request. Files relevant to you will be highlighted in yellow." }
 		]
 	},
 	{
 		heading: "Bitbucket",
 		flag: false,
 		content: [
-			{ subHeading: "Sign up with github", article: "Log in/Sign up with Vibinex chrome-extension" },
-			{ subHeading: "Downlaod Extension", article: "Install Vibinex OAuth Consumer in your personal/organization workspace. Make sure you have the permissions required to install oauth consumer." },
-			{ subHeading: "Add to Github", article: "Authorize Bitbucket OAuth Consumer:" },
+			{ subHeading: "Sign up with Bitbucket", article: "Sign in using Bitbucket" },
+			{ subHeading: "Install OAuth consumer", article: "Install Vibinex OAuth Consumer in your personal/organization workspace. Make sure you have the permissions required to install oauth consumer." },
 			{
-				subHeading: "Start adding repo",
-				article:
-					<>
-						<Button
-							variant="contained"
-							href={'https://www.vibinex.com'}
-						>
-							Authorize Bitbucket OAuth Consumer
-						</Button>
-					</>
+				subHeading: "Add to Github", article: <>
+					<Button
+						variant="contained"
+						href={'https://www.vibinex.com'}
+					>
+						Authorize Bitbucket OAuth Consumer
+					</Button>
+				</>
 			},
 			{
 				subHeading: "Code for setup",
@@ -76,9 +75,9 @@ script:
 						<p>	If this is your first pipeline, you may need to enable pipelines in your workspace.</p>
 					</div>
 			},
-			{ subHeading: "Step 6", article: "Add this code in : bitbucket- pipelines.yml" },
-			{ subHeading: "Step 7", article: "Go to the list of open Pull Requests in your repository. Relevant pull requests will be highlighted in yellowor red." },
-			{ subHeading: "Step 8", article: "Within a pull request, files relevant to you will be highlighted in yellow or red." },
+			{ subHeading: "Step 6", article: "Add this code in: `bitbucket-pipelines.yml`" },
+			{ subHeading: "Step 7", article: "Go to the list of open Pull Requests in your repository. Relevant pull requests will be highlighted in yellow." },
+			{ subHeading: "Step 8", article: "Within a pull request, files & code hunks relevant to you will be highlighted in yellow." },
 		]
 	},
 
@@ -87,7 +86,7 @@ script:
 const Docs = () => {
 	const [heading, setHeading] = useState('Github')
 	const [list, setList] = useState(docs);
-	const [sublist, setSublist] = useState(docs[0].content)
+	// const [sublist, setSublist] = useState(docs[0].content)
 	const [article, setArticle] = useState(docs[0].content);
 
 	return (
@@ -96,7 +95,6 @@ const Docs = () => {
 
 			{/* Center content */}
 			<section className='sm:w-[75%]	w-[90%]  m-auto sm:mt-10 mb-10 sm:flex p-2'>
-
 				<div className='mr-10 sm:border-r-2 p-4 sm:border-[gray] sm:block flex'>
 					{list.map((item, index) => {
 						return (

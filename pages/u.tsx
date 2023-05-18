@@ -37,7 +37,7 @@ const Profile = ({ repo_list }: ProfileProps) => {
 				<RepoList repo_list={repo_list} />
 				<p>
 					To add metadata for more repositories, visit the
-					<Link href={"/docs/setup"} className="text-primary-main"> instructions page</Link>
+					<Link href={"/docs"} className="text-primary-main"> instructions page</Link>
 				</p>
 			</div>
 			<Footer />
