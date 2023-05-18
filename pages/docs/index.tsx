@@ -47,10 +47,10 @@ jobs:
 			{ subHeading: "Sign up with Bitbucket", article: "Sign in using Bitbucket" },
 			{ subHeading: "Install OAuth consumer", article: "Install Vibinex OAuth Consumer in your personal/organization workspace. Make sure you have the permissions required to install oauth consumer." },
 			{
-				subHeading: "Add to Github", article: <>
+				subHeading: "Add to Bitbucket", article: <>
 					<Button
 						variant="contained"
-						href={'https://www.vibinex.com'}
+						href={'https://www.vibinex.com'} // I am talking about this href. This should be something like this: `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}` right?
 					>
 						Authorize Bitbucket OAuth Consumer
 					</Button>
