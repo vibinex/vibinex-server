@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from "../../components/Button";
 import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
+import Footer from '../../components/Footer';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -145,6 +146,8 @@ pipelines:
 					</ol>
 				</div>
 			</section>
+
+			<Footer />
 		</div>
 	)
 }

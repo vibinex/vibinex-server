@@ -39,7 +39,7 @@ const Navbar = (props: { ctaLink: string }) => {
         </Link>
         <ul className='hidden sm:flex'>
           <li className='p-4'>
-            <Link href='#steps'>How it works?</Link>
+            <Link href='/docs'>Docs</Link>
           </li>
           <li className='p-4'>
             <Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>

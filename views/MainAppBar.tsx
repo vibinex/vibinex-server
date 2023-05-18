@@ -20,7 +20,7 @@ export default function MainAppBar() {
 			{(rootElement) ?
 				<PopupButton
 					url='https://calendly.com/avikalp-gupta/30min'
-					text='Request Demo'
+					text='Book Demo'
 					rootElement={rootElement}
 					className='mr-4 px-2 py-1 rounded-lg text-sm text-primary-main font-semibold'
 				/> : null}

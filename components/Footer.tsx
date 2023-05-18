@@ -10,8 +10,9 @@ const legal = [
 ]
 
 const quickLinks = [
-	{ name: "Pricing", link: '/' },
+	{ name: "Documentation", link: '/docs' },
 	{ name: "Contribute", link: 'https://github.com/Alokit-Innovations' },
+	{ name: "Pricing", link: '/' },
 ]
 
 const contactUs = [
