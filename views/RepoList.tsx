@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const RepoList = (props: { repo_list: string[] }) => {
 	return (<>
-		<h2>All repositories in the database:</h2>
+		<h2 className="text-xl font-semibold my-2">Added Repositories</h2>
 		<table className="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr>
@@ -14,14 +14,14 @@ const RepoList = (props: { repo_list: string[] }) => {
 				</tr>
 			</thead>
 			<tbody className="bg-white divide-y divide-gray-200">
-				{props.repo_list.map(repo_path => {
-					const [provider, owner, repo_name] = repo_path.split("/");
+				{props.repo_list.map(repo_addr => {
+					const [provider, owner, repo_name] = repo_addr ? repo_addr.split("/") : ["", "", ""];
 					return (
-						<tr key={repo_path}>
+						<tr key={repo_addr}>
 							<td className="px-6 py-4 whitespace-nowrap">{repo_name}</td>
 							<td className="px-6 py-4 whitespace-nowrap">{owner}</td>
 							<td className="px-6 py-4 whitespace-nowrap">{provider}</td>
-							<td className="px-6 py-4 whitespace-nowrap text-primary-main"><Link href={`/repo?repo_name=${repo_path}`}>Link</Link></td>
+							<td className="px-6 py-4 whitespace-nowrap text-primary-main"><Link href={`/repo?repo_name=${repo_addr}`}>Link</Link></td>
 						</tr>
 					)
 				}
