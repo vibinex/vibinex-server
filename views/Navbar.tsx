@@ -5,9 +5,9 @@ import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
 
-const Navbar = (props: { ctaLink: string }) => {
+const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
   const [showNavbar, setShowNavbar] = useState(false);
-  const [scrollDown, setScrollDown] = useState(false);
+  const [scrollDown, setScrollDown] = useState(props.transparent);
   const changeNavbar = () => {
     setShowNavbar(!showNavbar);
   };
@@ -45,7 +45,7 @@ const Navbar = (props: { ctaLink: string }) => {
             <Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
           </li>
           <li className='p-4'>
-            <Link href='#'>Pricing</Link>
+            <Link href='/pricing'>Pricing</Link>
           </li>
           <li className='p-4'>
             <Link href={props.ctaLink} target="_blank">

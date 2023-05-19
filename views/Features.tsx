@@ -1,11 +1,11 @@
 import React from 'react'
 import Image from 'next/image'
 import PRprioritization from '../public/highlightPR.png'
-import CoverageAndTracking from '../public/CoverageOfPR.png'
+import HunkLevelHighlight from '../public/highlightFile.png'
 
 const FeatureList = [
 	{ src: PRprioritization, text: 'PR Prioritization' },
-	{ src: CoverageAndTracking, text: 'Review coverage and tracking' },
+	{ src: HunkLevelHighlight, text: 'Personalized Line Highlight' },
 ]
 
 const Features = () => {

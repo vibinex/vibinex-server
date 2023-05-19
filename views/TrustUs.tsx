@@ -9,7 +9,7 @@ const data = [
 
 const WhyUs = () => {
   return (
-    <div id='trust' className='w-full text-center py-12'>
+    <div id='trust' className='w-full text-center py-12 bg-secondary-main'>
       <h2 className='font-bold text-[2rem]'>Stay calm and get <span className='text-[2rem] text-primary-main font-bold'>Vibinex</span></h2>
       <div className='w-[100%] mt-3 p-4'>
         {
