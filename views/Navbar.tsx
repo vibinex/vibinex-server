@@ -79,21 +79,15 @@ const Navbar = (props: { ctaLink: string }) => {
         >
           <ul>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='/'>Home</Link>
+              <Link href='/docs'>Docs</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#whyus'>Why Us?</Link>
+              <Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#features'>Features</Link>
+              <Link href='#'>Pricing</Link>
             </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#steps'>Steps</Link>
-            </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#trust'>Trust Us</Link>
-            </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+            <li className='p-4 text-secondary-main hover:text-secondary-light'>
               <LoginLogout />
             </li>
           </ul>

@@ -8,12 +8,12 @@ import Link from "next/link";
 
 const Hero = (props: { ctaLink: string }) => {
 	return (
-		<div className='flex items-center justify-center h-screen bg-fixed bg-center bg-cover w-full'
+		<div className='flex items-center justify-center h-screen bg-fixed bg-center bg-cover'
 			style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503252947848-7338d3f92f31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80')" }}
 		>
 			{/*Overlay*/}
 			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/75 z-[2]' />
-			<section className='p-5 text-primary-light z-[2] md:mt-[5%] pt-1 md:w-[50%]'>
+			<section className='p-5 text-primary-light z-[2] my-auto lg:mt-[10%] pt-1 lg:w-[50%]'>
 				<article className="text-center">
 					<h1 className='text-[35px] sm:text-[48px] lg:text-[60px] font-bold'>{'Personalization for'}
 						<span className='text-primary-main font-bold block'>
