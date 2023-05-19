@@ -1,14 +1,33 @@
 import { Pool } from "pg";
-import Button from "../components/Button";
+import Link from "next/link";
 
 const RepoList = (props: { repo_list: string[] }) => {
 	return (<>
 		<h2>All repositories in the database:</h2>
-		{props.repo_list.map(repo_name => (
-			<Button variant="outlined" href={`/repo?repo_name=${repo_name}`} className="m-2" key={repo_name}>
-				{repo_name}
-			</Button>
-		))}
+		<table className="min-w-full divide-y divide-gray-200">
+			<thead>
+				<tr>
+					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repo Name</th>
+					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
+					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stats</th>
+				</tr>
+			</thead>
+			<tbody className="bg-white divide-y divide-gray-200">
+				{props.repo_list.map(repo_path => {
+					const [provider, owner, repo_name] = repo_path.split("/");
+					return (
+						<tr key={repo_path}>
+							<td className="px-6 py-4 whitespace-nowrap">{repo_name}</td>
+							<td className="px-6 py-4 whitespace-nowrap">{owner}</td>
+							<td className="px-6 py-4 whitespace-nowrap">{provider}</td>
+							<td className="px-6 py-4 whitespace-nowrap text-primary-main"><Link href={`/repo?repo_name=${repo_path}`}>Link</Link></td>
+						</tr>
+					)
+				}
+				)}
+			</tbody>
+		</table>
 	</>)
 }
 
