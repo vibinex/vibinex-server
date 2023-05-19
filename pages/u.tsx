@@ -12,6 +12,7 @@ import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
 import Footer from "../components/Footer";
 import { useSession } from "next-auth/react";
+import Button from "../components/Button";
 
 type ProfileProps = {
 	session: Session,
@@ -33,12 +34,8 @@ const Profile = ({ repo_list }: ProfileProps) => {
 		<div className="flex flex-col min-h-screen">
 			<MainAppBar />
 			<div className="max-w-[80%] mx-auto flex-grow">
-				<p>Hi {getAuthUserName(session)},</p>
 				<RepoList repo_list={repo_list} />
-				<p>
-					To add metadata for more repositories, visit the
-					<Link href={"/docs"} className="text-primary-main"> instructions page</Link>
-				</p>
+				<Button variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
 			</div>
 			<Footer />
 		</div>
