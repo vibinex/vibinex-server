@@ -5,9 +5,9 @@ import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
 
-const Navbar = (props: { ctaLink: string }) => {
+const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
   const [showNavbar, setShowNavbar] = useState(false);
-  const [scrollDown, setScrollDown] = useState(false);
+  const [scrollDown, setScrollDown] = useState(props.transparent);
   const changeNavbar = () => {
     setShowNavbar(!showNavbar);
   };
@@ -45,7 +45,7 @@ const Navbar = (props: { ctaLink: string }) => {
             <Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
           </li>
           <li className='p-4'>
-            <Link href='#'>Pricing</Link>
+            <Link href='/pricing'>Pricing</Link>
           </li>
           <li className='p-4'>
             <Link href={props.ctaLink} target="_blank">
@@ -79,19 +79,13 @@ const Navbar = (props: { ctaLink: string }) => {
         >
           <ul>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='/'>Home</Link>
+              <Link href='#steps'>How it works?</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#whyus'>Why Us?</Link>
+              <Link href='https://github.com/Alokit-Innovations'>Contribute</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#features'>Features</Link>
-            </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#steps'>Steps</Link>
-            </li>
-            <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-              <Link href='#trust'>Trust Us</Link>
+              <Link href='#pricing'>Pricing</Link>
             </li>
             <li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
               <LoginLogout />
