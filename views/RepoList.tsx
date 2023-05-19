@@ -1,16 +1,24 @@
 import { Pool } from "pg";
 import Link from "next/link";
+import { TableCell, TableHeaderCell } from "../components/Table";
+import Image from "next/image";
 
 const RepoList = (props: { repo_list: string[] }) => {
+	const providerToLogo = (provider: string) => (
+		(provider === "github") ? <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/github.svg" alt="github" className="mx-auto" />
+			: (provider === "bitbucket") ? <Image loading="lazy" height={24} width={24} src="/bitbucket-dark.svg" alt="bitbucket" className="mx-auto" />
+				: provider
+	)
+
 	return (<>
 		<h2 className="text-xl font-semibold my-2">Added Repositories</h2>
 		<table className="min-w-full divide-y divide-gray-200">
 			<thead>
 				<tr>
-					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repo Name</th>
-					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
-					<th className="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stats</th>
+					<TableHeaderCell>Repo Name</TableHeaderCell>
+					<TableHeaderCell>Owner</TableHeaderCell>
+					<TableHeaderCell>Provider</TableHeaderCell>
+					<TableHeaderCell>Stats</TableHeaderCell>
 				</tr>
 			</thead>
 			<tbody className="bg-white divide-y divide-gray-200">
@@ -18,10 +26,10 @@ const RepoList = (props: { repo_list: string[] }) => {
 					const [provider, owner, repo_name] = repo_addr ? repo_addr.split("/") : ["", "", ""];
 					return (
 						<tr key={repo_addr}>
-							<td className="px-6 py-4 whitespace-nowrap">{repo_name}</td>
-							<td className="px-6 py-4 whitespace-nowrap">{owner}</td>
-							<td className="px-6 py-4 whitespace-nowrap">{provider}</td>
-							<td className="px-6 py-4 whitespace-nowrap text-primary-main"><Link href={`/repo?repo_name=${repo_addr}`}>Link</Link></td>
+							<TableCell>{repo_name}</TableCell>
+							<TableCell>{owner}</TableCell>
+							<TableCell className="text-center">{providerToLogo(provider)}</TableCell>
+							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repo_addr}`}>Link</Link></TableCell>
 						</tr>
 					)
 				}
