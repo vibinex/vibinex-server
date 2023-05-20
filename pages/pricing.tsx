@@ -9,27 +9,27 @@ import Link from 'next/link';
 const pricingPlan = [
 	{
 		pricingName: 'Free',
-		duration: '.',
+		duration: '',
 		pricing: 'for open source projects',
 		features: ['Access of all features', 'Unlimited team size', 'For both Github and Bitbucket'],
 		buttonText: 'Add a Repo',
-		link: 'https://github.com/'
+		link: 'https://vibinex.com/api/auth/signin?callbackUrl=https%3A%2F%2Fvibinex.com%2F'
 
 	},
 	{
 		pricingName: 'Standard',
 		duration: 'per user/month',
 		pricing: '$100',
-		features: ['Access of all features', 'personal team support for setting up'],
+		features: ['Access of all features', 'Direct support through Slack'],
 		buttonText: 'Start your 30/day trial',
 		link: 'https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc' // temp. adding chrome extension link, need to remove it with payment link
 
 	},
 	{
 		pricingName: 'Enterprise',
-		duration: '.',
+		duration: '',
 		pricing: 'custom pricing',
-		features: ['Good for large teams', 'personal team support for setting up', 'upto 2 custom features'],
+		features: ['Good for large teams', 'Direct support through Slack & phone', 'Upto 2 custom features'],
 		buttonText: 'Contact Us',
 		link: 'https://api.whatsapp.com/send/?phone=918511557566&text&type=phone_number&app_absent=0'
 
@@ -52,13 +52,13 @@ const Pricing = () => {
 		let value = !priceDuration;
 		setPriceDuration(value);
 		if (value) {
-			let features = ['Access of all features', 'personal team support for setting up'];
+			let features = ['Good for large teams', 'Direct support through Slack & phone', 'Upto 2 custom features'];
 			let temp = pricePlans;
 			temp[1] = { ...temp[1], pricingName: 'Plus', pricing: '$85', features, };
 			console.log(temp);
 			setPricePlans(prev => prev = temp);
 		} else {
-			let features = ['Access of all features', 'personal team support for setting up'];
+			let features = ['Access of all features', 'Direct support through Slack'];
 			let temp = pricePlans;
 			temp[1] = { ...temp[1], pricingName: 'Standard', pricing: '$100', features, buttonText: 'Start your 30 day trial', };
 			setPricePlans(prev => prev = temp);
@@ -102,10 +102,10 @@ const Pricing = () => {
 									<div>
 										<div className='text-center'>
 											<p className='mt-4 font-semibold text-[1.3rem] text-primary-main'>{item.pricing}</p>
-											<p className='mt-2 text-[1.1rem]'>{item.duration}</p>
+											<p className='text-[1.1rem]'>{item.duration}</p>
 										</div>
 
-										<div className='ml-[2%] mt-10 h-28'>
+										<div className={`ml-[2%] ${item.duration ? 'mt-3.5' : 'mt-10'} h-28`}>
 											{item.features.map((items, index) => {
 												return (
 													<div key={index} className='flex align-'>
