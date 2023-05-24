@@ -25,13 +25,10 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
   return (
     <div
       className={
-        'fixed left-0 top-0 w-full z-10 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown ? ' bg-primary-light' : '')
+        'fixed left-0 top-0 w-full z-10 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown || props.transparent ? ' bg-primary-light text-secondary-dark' : ' text-primary-light')
       }
     >
-      <div className={
-        'max-w-[1240px] m-auto flex justify-between items-center p-4 ' +
-        (scrollDown ? ' text-secondary-dark' : ' text-primary-light')
-      }>
+      <div className='max-w-[1240px] m-auto flex justify-between items-center p-4 '>
         <Link href='/'>
           <h1 className='font-bold text-4xl'>
             Vibinex
@@ -61,7 +58,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
         {/* Mobile Button */}
         <div onClick={changeNavbar}
           className={
-            'block sm:hidden z-10' + (scrollDown ? ' text-secondary-dark' : ' text-primary-light')
+            'block sm:hidden z-10' + (scrollDown || props.transparent ? ' text-secondary-dark' : ' text-primary-light')
           }
         >
           {showNavbar ? (
