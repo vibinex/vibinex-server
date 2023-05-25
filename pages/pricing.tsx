@@ -104,7 +104,7 @@ const Pricing = () => {
 											)
 										})}
 									</ul>
-									<Button variant='contained' href={item.link} target='_blank' className='w-full mt-5'>
+									<Button variant='contained' href={item.link} target='_blank' className='w-full py-4 text-xl'>
 										{item.buttonText}
 									</Button>
 								</div>
