@@ -43,8 +43,8 @@ const Hero = (props: { ctaLink: string }) => {
 			</section>
 
 			<section className='mt-[20%] h-screen items-center lg:block hidden z-[2]'>
-				<Image priority alt='see your relevant files in the PR highlighted' src={highlightFile} className='w-[80%] sm:h-[50%] border-2 border-primary-light' />
-				<Image priority alt='see your relevant PRs highlighted' src={highlightPR} className='w-[80%] sm:h-[50%] mt-[-30%] ml-24 outline outline-2 outline-primary-light' />
+				<Image priority alt='see your relevant files in the PR highlighted' src={highlightPR} className='w-[80%] sm:h-[50%] border-2 border-primary-light' />
+				<Image priority alt='see your relevant PRs highlighted' src={highlightFile} className='w-[80%] sm:h-[50%] mt-[-30%] ml-24 outline outline-2 outline-primary-light' />
 			</section>
 		</div>
 	)

@@ -7,7 +7,7 @@ import Features from '../views/Features'
 import TrustUs from '../views/TrustUs'
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { v4 as uuidv4 } from 'uuid';
-import Steps from '../views/Steps'
+
 import JoinSlack from '../views/JoinSlack'
 
 export default function Home() {
@@ -25,11 +25,10 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar ctaLink={chromeExtensionLink} />
+      <Navbar ctaLink={chromeExtensionLink} transparent={false} />
       <Hero ctaLink={chromeExtensionLink} />
       <WhyUs />
       <Features />
-      <Steps />
       <TrustUs />
       <JoinSlack />
       <Footer />
