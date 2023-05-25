@@ -1,14 +1,41 @@
 import { Pool } from "pg";
-import Button from "../components/Button";
+import Link from "next/link";
+import { TableCell, TableHeaderCell } from "../components/Table";
+import Image from "next/image";
 
 const RepoList = (props: { repo_list: string[] }) => {
+	const providerToLogo = (provider: string) => (
+		(provider === "github") ? <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/github.svg" alt="github" className="mx-auto" />
+			: (provider === "bitbucket") ? <Image loading="lazy" height={24} width={24} src="/bitbucket-dark.svg" alt="bitbucket" className="mx-auto" />
+				: provider
+	)
+
 	return (<>
-		<h2>All repositories in the database:</h2>
-		{props.repo_list.map(repo_name => (
-			<Button variant="outlined" href={`/repo?repo_name=${repo_name}`} className="m-2" key={repo_name}>
-				{repo_name}
-			</Button>
-		))}
+		<h2 className="text-xl font-semibold my-2">Added Repositories</h2>
+		<table className="min-w-full divide-y divide-gray-200">
+			<thead>
+				<tr>
+					<TableHeaderCell>Repo Name</TableHeaderCell>
+					<TableHeaderCell>Owner</TableHeaderCell>
+					<TableHeaderCell>Provider</TableHeaderCell>
+					<TableHeaderCell>Stats</TableHeaderCell>
+				</tr>
+			</thead>
+			<tbody className="bg-white divide-y divide-gray-200">
+				{props.repo_list.map(repo_addr => {
+					const [provider, owner, repo_name] = repo_addr ? repo_addr.split("/") : ["", "", ""];
+					return (
+						<tr key={repo_addr}>
+							<TableCell>{repo_name}</TableCell>
+							<TableCell>{owner}</TableCell>
+							<TableCell className="text-center">{providerToLogo(provider)}</TableCell>
+							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repo_addr}`}>Link</Link></TableCell>
+						</tr>
+					)
+				}
+				)}
+			</tbody>
+		</table>
 	</>)
 }
 
