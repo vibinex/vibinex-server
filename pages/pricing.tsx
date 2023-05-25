@@ -14,7 +14,7 @@ const pricingPlan = [
 		pricing: 'for open source projects',
 		features: ['Access of all features', 'Unlimited team size', 'For both Github and Bitbucket'],
 		buttonText: 'Add a Repo',
-		link: 'https://vibinex.com/api/auth/signin?callbackUrl=https%3A%2F%2Fvibinex.com%2F'
+		link: '/docs'
 
 	},
 	{
@@ -23,7 +23,7 @@ const pricingPlan = [
 		pricing: undefined, // will be populated by formula
 		features: ['Access of all features', 'Direct support through Slack'],
 		buttonText: 'Start your 30 day trial',
-		link: 'https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc' // temp. adding chrome extension link, need to remove it with payment link
+		link: '/u' // temp. adding user profile page link, need to replace it with payment link
 
 	},
 	{
