@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import {
-	AiOutlineCheckCircle
-} from 'react-icons/ai'
+import { AiOutlineCheckCircle } from 'react-icons/ai'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import Link from 'next/link';
+import Button from '../components/Button';
+
+const monthlyBasePriceUSD = 10;
 
 const pricingPlan = [
 	{
@@ -19,9 +20,9 @@ const pricingPlan = [
 	{
 		pricingName: 'Standard',
 		duration: 'per user/month',
-		pricing: '$100',
+		pricing: undefined, // will be populated by formula
 		features: ['Access of all features', 'Direct support through Slack'],
-		buttonText: 'Start your 30/day trial',
+		buttonText: 'Start your 30 day trial',
 		link: 'https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc' // temp. adding chrome extension link, need to remove it with payment link
 
 	},
@@ -39,89 +40,73 @@ const pricingPlan = [
 
 
 const Pricing = () => {
-	const [priceDuration, setPriceDuration] = useState(false); // false for monthly and true for yearly
-	const [pricePlans, setPricePlans] = useState(pricingPlan);
+	const [isYearly, setIsYearly] = useState(false); // false for monthly
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 
 	let heading = [
-		{ name: "Monthly", flag: priceDuration },
-		{ name: "Yearly", flag: !priceDuration },
+		{ name: "Monthly", flag: isYearly },
+		{ name: "Yearly", flag: !isYearly },
 	]
 
-	function HandleDuration() {
-		let value = !priceDuration;
-		setPriceDuration(value);
-		if (value) {
-			let features = ['Good for large teams', 'Direct support through Slack & phone', 'Upto 2 custom features'];
-			let temp = pricePlans;
-			temp[1] = { ...temp[1], pricingName: 'Plus', pricing: '$85', features, };
-			console.log(temp);
-			setPricePlans(prev => prev = temp);
-		} else {
-			let features = ['Access of all features', 'Direct support through Slack'];
-			let temp = pricePlans;
-			temp[1] = { ...temp[1], pricingName: 'Standard', pricing: '$100', features, buttonText: 'Start your 30 day trial', };
-			setPricePlans(prev => prev = temp);
-		}
+	const getPriceString = (currency: '$' | '₹', isYearly: boolean) => {
+		const priceDecimal = (isYearly ? (10 / 12) : 1) * monthlyBasePriceUSD;
+		const price = Math.round(priceDecimal * 100) / 100;
+		return (<>  {currency} <span className='text-4xl'>{price} </span ></>);
 	}
+
+	const pricingStartDate = new Date(2023, 6, 1); // 1st July 2023
+	const today = new Date();
 
 	return (
 		<div>
 			<div className='mb-16'>
 				<Navbar ctaLink={chromeExtensionLink} transparent={true} />
 			</div>
-			<div id='pricing' className='w-full  py-12  bg-primary-light'>
+			<div id='pricing' className='w-full py-12 bg-primary-light'>
 				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-primary-main font-bold'>Plans</span></h2>
+				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after July 1, 2023)</small></p>) : null}
 
-				<div className='flex m-auto sm:w-[33%] w:[50%] justify-center rounded-md border-2 border-primary-dark mt-8'>
+				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-md border-2 border-primary-dark mt-8'>
 					{heading.map((item, index) => {
 						return (
 							<div
 								key={index}
-								onClick={() => HandleDuration()}
+								onClick={() => setIsYearly(!isYearly)}
 								className='text-center p-4 w-[100%] bg-primary-light cursor-pointer'
 								style={{ backgroundColor: item.flag ? "white" : "rgb(33 150 243)" }}>
 								<h2 className='text-[1.2rem] font-bold'
 									style={{ color: item.flag ? "black" : "white" }}
-								>{item.name == 'Yearly' ? <p className='text-[1.2rem]'>{item.name}<span className='text-[0.9rem]'> {'   (2 months free)'}</span></p> : item.name}</h2>
+								>{item.name == 'Yearly' ? <p className='text-[1.2rem]'>{item.name}<span className='text-[0.9rem] font-light'> {'(2 months free)'}</span></p> : item.name}</h2>
 							</div>
 						)
 					})}
 				</div>
 
-				<div className='m-auto sm:flex w-[80%] mt-3 p-4 '>
+				<div className='m-auto md:grid w-4/5 mt-3 md:p-4 grid-cols-3 gap-5 h-fit'>
 					{
-						pricePlans.map((item, index) => {
+						pricingPlan.map((item, index) => {
 							return (
-								<div key={index} className="sm:p-5 p-3 rounded-lg border-2 mt-7 sm:w-[40%] w-[80%] m-auto ml-10 border-primary-main  bg-primary-light shadow-md">
+								<div key={index} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
+									<h2 className='mx-auto font-semibold text-2xl text-center'>{item.pricingName}</h2>
 
-									<div className='flex justify-between'>
-										<h2 className='mx-auto font-semibold text-[1.5rem]'>{item.pricingName}</h2>
+									<div className='text-center h-16'>
+										<p className='mt-2 font-medium text-xl text-primary-main'>{(item.pricing) ? item.pricing : getPriceString("$", isYearly)}</p>
+										<p className='text-base'>{item.duration}</p>
 									</div>
 
-									<div>
-										<div className='text-center'>
-											<p className='mt-4 font-semibold text-[1.3rem] text-primary-main'>{item.pricing}</p>
-											<p className='text-[1.1rem]'>{item.duration}</p>
-										</div>
-
-										<div className={`ml-[2%] ${item.duration ? 'mt-3.5' : 'mt-10'} h-28`}>
-											{item.features.map((items, index) => {
-												return (
-													<div key={index} className='flex align-'>
-														<AiOutlineCheckCircle color='rgb(33 150 243)' size={20} />
-														<p className='text-[1.1rem] ml-1 mb-2'>{items}</p>
-													</div>
-												)
-											})}
-										</div>
-										<Link href={item.link} target='blank'>
-											<div className='text-center border-2 bg-primary-main mt-5 p-4 rounded-lg cursor-pointer hover:bg-primary-light  hover:text-primary-dark  text-primary-light'>
-												<p className='font-bold'>{item.buttonText}</p>
-											</div>
-										</Link>
-									</div>
-
+									<ul className='mt-3.5 grow'>
+										{item.features.map((feature, index) => {
+											return (
+												<li key={index} className='text-lg ml-1 mb-2'>
+													<AiOutlineCheckCircle className='text-primary-main w-5 inline mr-1' size={20} />
+													{feature}
+												</li>
+											)
+										})}
+									</ul>
+									<Button variant='contained' href={item.link} target='_blank' className='w-full mt-5'>
+										{item.buttonText}
+									</Button>
 								</div>
 
 
@@ -129,9 +114,6 @@ const Pricing = () => {
 						})
 					}
 				</div>
-
-
-				<p className='ml-[15%] text-red text-red-600 font-semibold mt-4'>*Pricing will start after 1 June 2023</p>
 			</div>
 			<Footer />
 		</div>
