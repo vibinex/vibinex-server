@@ -21,7 +21,7 @@ const pricingPlan = [
 		pricingName: 'Standard',
 		duration: 'per user/month',
 		pricing: undefined, // will be populated by formula
-		features: ['Access of all features', 'Direct support through Slack'],
+		features: ['Access of all features', 'Direct support through Slack', 'Free-of-cost setup assistance'],
 		buttonText: 'Start your 30 day trial',
 		link: '/u' // temp. adding user profile page link, need to replace it with payment link
 
@@ -30,7 +30,7 @@ const pricingPlan = [
 		pricingName: 'Enterprise',
 		duration: '',
 		pricing: 'custom pricing',
-		features: ['Good for large teams', 'Direct support through Slack & phone', 'Upto 2 custom features'],
+		features: ['Everything in Standard plan', 'On-call support', 'Upto 2 custom features'],
 		buttonText: 'Contact Us',
 		link: 'https://api.whatsapp.com/send/?phone=918511557566&text&type=phone_number&app_absent=0'
 
