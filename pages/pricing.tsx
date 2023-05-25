@@ -66,17 +66,18 @@ const Pricing = () => {
 				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-primary-main font-bold'>Plans</span></h2>
 				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after July 1, 2023)</small></p>) : null}
 
-				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-md border-2 border-primary-dark mt-8'>
+				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-xl mt-8 bg-gray-100'>
 					{heading.map((item, index) => {
 						return (
 							<div
 								key={index}
-								onClick={() => setIsYearly(!isYearly)}
-								className='text-center p-4 w-[100%] bg-primary-light cursor-pointer'
-								style={{ backgroundColor: item.flag ? "white" : "rgb(33 150 243)" }}>
-								<h2 className='text-[1.2rem] font-bold'
-									style={{ color: item.flag ? "black" : "white" }}
-								>{item.name == 'Yearly' ? <p className='text-[1.2rem]'>{item.name}<span className='text-[0.9rem] font-light'> {'(2 months free)'}</span></p> : item.name}</h2>
+								onClick={() => setIsYearly(item.name === 'Yearly')}
+								className={`text-center p-4 w-full rounded-xl cursor-pointer ${item.flag ? null : 'bg-primary-main border-2 border-primary-dark'}`}>
+								<h2 className={`sm:text-2xl font-bold ${item.flag ? 'text-secondary-dark' : 'text-secondary-main'}`}
+								>{item.name}{item.name === 'Yearly' ?
+									<span className='font-light text-sm whitespace-nowrap'>
+										{' (2 months free)'}
+									</span> : null}</h2>
 							</div>
 						)
 					})}
