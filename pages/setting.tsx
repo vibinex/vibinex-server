@@ -9,7 +9,7 @@ const Settings = () => {
 
 	const list = [
 		{
-			name: 'Enale coverage comments',
+			name: 'Enable coverage comments',
 			discription: `If enabled, you'll get coverage comments on each PR`,
 			type: 'toggle',
 			flag: false,
@@ -17,7 +17,7 @@ const Settings = () => {
 		},
 		{
 			name: 'Enable auto assignment',
-			discription: 'If enabled, it prioritize PR and auto assign to you and other teammates',
+			discription: 'If enabled, it automatically sets the reviewers for each PR',
 			type: 'toggle',
 			flag: false
 
