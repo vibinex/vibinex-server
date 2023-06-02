@@ -72,7 +72,7 @@ const Pricing = () => {
 
 	React.useEffect(() => {
 		rudderEventMethods().then((response) => {
-			response?.track("", "pricing page called", { eventStatusFlag: 1 }, "anonymous") //Anonymous Id is set in loca storage as soon as the user lands on the webiste.
+			response?.track("", "pricing page called", { eventStatusFlag: 1 }, "anonymous") //Anonymous Id is set in local storage as soon as the user lands on the webiste.
 		});
 	}, []);
 

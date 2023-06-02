@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
@@ -34,8 +34,6 @@ const Settings = () => {
 	const [updateList, setUpdateList] = useState(['']);
 	const session: Session | null = useSession().data;
 	const userId = getAuthUserId(session);
-	const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-	const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
 
 
 	async function apiCall(type: string, user_id: number, bodyData: string) {
@@ -79,20 +77,18 @@ const Settings = () => {
 
 		setUpdateList((prev) => prev = prevUpdateList);
 		rudderEventMethods().then((response) => {
-			response?.track("123", "settings-changed", value, anonymousId);
+			response?.track(`${userId}`, "settings-changed", value, "anonymousId");
 		});
-		localStorage.setItem('AnonymousId', anonymousId);
-
 	};
 
 
-	async function getSettings(userId: number) {
+	async function getSettings() {
 		const apiResponse = await apiCall('get', userId, '');
 		console.log('[API RESPONSE]', apiResponse);
-		// setSettingsList(prev => prev = apiResponse); // need to save the api response but api gives invalid json error 
+		// setSettingsList(prev => prev = apiResponse); // FixMe :  need to save the api response but api gives invalid json error 
 	}
 
-	useEffect(() => {
+	React.useEffect(() => {
 		let obj: any = {};
 		list.forEach((item) => {
 			obj[item.urlBody] = updateList.includes(item.urlBody);
@@ -102,11 +98,16 @@ const Settings = () => {
 	}, [updateList]);
 
 
-	useEffect(() => {
-		getSettings(userId);
+	React.useEffect(() => {
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+
+		getSettings();
+
 		rudderEventMethods().then((response) => {
 			response?.track("", "setting page called", { eventStatusFlag: 1 }, anonymousId)
 		});
+		localStorage.setItem('AnonymousId', anonymousId);
 	}, []);
 
 	return (
