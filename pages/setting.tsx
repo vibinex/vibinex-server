@@ -2,10 +2,41 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
+import { v4 as uuidv4 } from 'uuid';
+import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import { getAuthUserId } from "../utils/auth";
+import { useSession } from "next-auth/react";
+import { getServerSession, Session } from "next-auth";
 
 const Settings = () => {
 
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
+	const list = [
+
+		{
+			name: 'Enable coverage comments',
+			discription: `If enabled, you'll get coverage comments on each PR`,
+			type: 'toggle',
+			urlBody: 'auto_assign'
+
+		},
+		{
+			name: 'Enable auto assignment',
+			discription: 'If enabled, it automatically sets the reviewers for each PR',
+			type: 'toggle',
+			urlBody: 'coverage_comment'
+
+		},
+
+	];
+
+	const [settingsList, setSettingsList] = useState(list);
+	const [updateList, setUpdateList] = useState(['']);
+	const session: Session | null = useSession().data;
+	const userId = getAuthUserId(session);
+	const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+	const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+
 
 	async function apiCall(type: string, user_id: number, bodyData: string) {
 		const url = type == 'get' ? 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings' : 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings/update';
@@ -33,53 +64,33 @@ const Settings = () => {
 		}
 	}
 
-	const list = [
-
-		{
-			name: 'Enable coverage comments',
-			discription: `If enabled, you'll get coverage comments on each PR`,
-			type: 'toggle',
-			urlBody: 'auto_assign'
-
-		},
-		{
-			name: 'Enable auto assignment',
-			discription: 'If enabled, it automatically sets the reviewers for each PR',
-			type: 'toggle',
-			urlBody: 'coverage_comment'
-
-		},
-
-	];
-
-	const [settingsList, setSettingsList] = useState(list);
-	const [updateList, setUpdateList] = useState(['']);
-	const tempUserId = 5;
 
 	const toggleFlag = (urlBody: string) => {
-		setUpdateList((prevUpdateList) => {
-			const updatedList = [...prevUpdateList];
-			const index = updatedList.indexOf(urlBody);
+		const prevUpdateList = [...updateList];
+		let value: any = {};
+		const index = prevUpdateList.indexOf(urlBody);
+		if (index === -1) {
+			prevUpdateList.push(urlBody);
+			value[urlBody] = true;
+		} else {
+			prevUpdateList.splice(index, 1);
+			value[urlBody] = false;
+		}
 
-			if (index === -1) {
-				updatedList.push(urlBody);
-			} else {
-				updatedList.splice(index, 1);
-			}
-			return updatedList;
+		setUpdateList((prev) => prev = prevUpdateList);
+		rudderEventMethods().then((response) => {
+			response?.track("123", "settings-changed", value, anonymousId);
 		});
+		localStorage.setItem('AnonymousId', anonymousId);
+
 	};
+
 
 	async function getSettings(userId: number) {
 		const apiResponse = await apiCall('get', userId, '');
-		// after response need to set setSettingsList . but unble to do so cuz of temp. api error
 		console.log('[API RESPONSE]', apiResponse);
+		// setSettingsList(prev => prev = apiResponse); // need to save the api response but api gives invalid json error 
 	}
-
-	useEffect(() => {
-		// need to fetch the userid ; 
-		getSettings(tempUserId);
-	}, []);
 
 	useEffect(() => {
 		let obj: any = {};
@@ -87,8 +98,16 @@ const Settings = () => {
 			obj[item.urlBody] = updateList.includes(item.urlBody);
 		}
 		);
-		apiCall('post', tempUserId, obj); // calling api for every time button clicked
+		apiCall('post', userId, obj); // calling api for every time button clicked
 	}, [updateList]);
+
+
+	useEffect(() => {
+		getSettings(userId);
+		rudderEventMethods().then((response) => {
+			response?.track("", "setting page called", { eventStatusFlag: 1 }, anonymousId)
+		});
+	}, []);
 
 	return (
 		<div>
