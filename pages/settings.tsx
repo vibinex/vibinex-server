@@ -17,14 +17,14 @@ const Settings = () => {
 			name: 'Enable coverage comments',
 			discription: `If enabled, you'll get coverage comments on each PR`,
 			type: 'toggle',
-			urlBody: 'auto_assign'
+			item_id: 'auto_assign'
 
 		},
 		{
 			name: 'Enable auto assignment',
 			discription: 'If enabled, it automatically sets the reviewers for each PR',
 			type: 'toggle',
-			urlBody: 'coverage_comment'
+			item_id: 'coverage_comment'
 
 		},
 
@@ -63,16 +63,16 @@ const Settings = () => {
 	}
 
 
-	const toggleFlag = (urlBody: string) => {
+	const toggleFlag = (item_id: string) => {
 		const prevUpdateList = [...updateList];
 		let value: any = {};
-		const index = prevUpdateList.indexOf(urlBody);
+		const index = prevUpdateList.indexOf(item_id);
 		if (index === -1) {
-			prevUpdateList.push(urlBody);
-			value[urlBody] = true;
+			prevUpdateList.push(item_id);
+			value[item_id] = true;
 		} else {
 			prevUpdateList.splice(index, 1);
-			value[urlBody] = false;
+			value[item_id] = false;
 		}
 
 		setUpdateList((prev) => prev = prevUpdateList);
@@ -91,7 +91,7 @@ const Settings = () => {
 	React.useEffect(() => {
 		let obj: any = {};
 		list.forEach((item) => {
-			obj[item.urlBody] = updateList.includes(item.urlBody);
+			obj[item.item_id] = updateList.includes(item.item_id);
 		}
 		);
 		apiCall('post', userId, obj); // calling api for every time button clicked
@@ -105,7 +105,7 @@ const Settings = () => {
 		getSettings();
 
 		rudderEventMethods().then((response) => {
-			response?.track("", "setting page called", { eventStatusFlag: 1 }, anonymousId)
+			response?.track("", "settings page called", { eventStatusFlag: 1 }, anonymousId)
 		});
 		localStorage.setItem('AnonymousId', anonymousId);
 	}, []);
@@ -130,8 +130,8 @@ const Settings = () => {
 										<h1 className='sm:text-[1.3rem] text-[1rem] font-semibold'>{item.name}</h1>
 										<p className='sm:text-[0.9rem] text-[0.8rem] font-light mt-1 w-[90%]'>{item.discription}</p>
 									</div>
-									<div onClick={() => toggleFlag(item.urlBody)} className='cursor-pointer sm:pt-2 '>
-										{updateList.includes(item.urlBody) ?
+									<div onClick={() => toggleFlag(item.item_id)} className='cursor-pointer sm:pt-2 '>
+										{updateList.includes(item.item_id) ?
 											<BsToggleOn size={38} color='#2196F3' />
 											:
 											<BsToggleOn size={38} color='#c4c4c4' className='rotate-180' />

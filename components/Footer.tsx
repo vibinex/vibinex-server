@@ -13,7 +13,7 @@ const quickLinks = [
 	{ name: "Documentation", link: '/docs' },
 	{ name: "Contribute", link: 'https://github.com/Alokit-Innovations' },
 	{ name: "Pricing", link: '/' },
-	{ name: "Settings", link: '/setting' },
+	{ name: "Settings", link: '/settings' },
 ]
 
 const contactUs = [
