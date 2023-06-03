@@ -6,42 +6,37 @@ import { v4 as uuidv4 } from 'uuid';
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { getAuthUserId } from "../utils/auth";
 import { useSession } from "next-auth/react";
-import { getServerSession, Session } from "next-auth";
+import { Session } from "next-auth";
 
 const Settings = () => {
 
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
-	const list = [
+	const settingList = [
 
 		{
 			name: 'Enable coverage comments',
 			discription: `If enabled, you'll get coverage comments on each PR`,
 			type: 'toggle',
-			item_id: 'auto_assign'
+			item_id: 'coverage_comment'
 
 		},
 		{
 			name: 'Enable auto assignment',
 			discription: 'If enabled, it automatically sets the reviewers for each PR',
 			type: 'toggle',
-			item_id: 'coverage_comment'
+			item_id: 'auto_assign'
 
 		},
 
 	];
 
-	const [settingsList, setSettingsList] = useState(list);
 	const [updateList, setUpdateList] = useState(['']);
 	const session: Session | null = useSession().data;
 	const userId = getAuthUserId(session);
 
-
 	async function apiCall(type: string, user_id: number, bodyData: string) {
 		const url = type == 'get' ? 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings' : 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings/update';
 		const body = type == 'get' ? { user_id } : { user_id, settings: bodyData };
-
-		console.log('calling server ', body, '\n [url]', url);
-
 		try {
 			let dataFromAPI;
 			await fetch(url, {
@@ -54,16 +49,30 @@ const Settings = () => {
 				body: JSON.stringify(body)
 			})
 				.then((response) => response.json())
-				.then((data) => dataFromAPI = data);
-			console.log('[API SUCESS]', dataFromAPI)
+				.then((data) => dataFromAPI = data)
+			console.log('[API call]', dataFromAPI);
 			return dataFromAPI;
 		} catch (e) {
 			console.error(`[vibinex] Error while getting data from API. URL: ${url}, payload: ${JSON.stringify(body)}`, e);
 		}
+	};
+
+	async function getSettings() {
+		const apiResponse: Record<string, boolean> = await apiCall('get', userId, '') ?? {};
+		console.log('[API RESPONSE IS]', apiResponse)
+		const defaultUserSetting: any = [];
+		for (let prop in apiResponse) {
+			if (Object.prototype.hasOwnProperty.call(apiResponse, prop)) {
+				if (apiResponse[prop] === true) {
+					defaultUserSetting.push(prop);
+				}
+			}
+		}
+		setUpdateList(prev => prev = defaultUserSetting);
 	}
 
+	const toggleFlag = async (item_id: string) => {
 
-	const toggleFlag = (item_id: string) => {
 		const prevUpdateList = [...updateList];
 		let value: any = {};
 		const index = prevUpdateList.indexOf(item_id);
@@ -73,30 +82,22 @@ const Settings = () => {
 		} else {
 			prevUpdateList.splice(index, 1);
 			value[item_id] = false;
+		};
+
+
+		let obj: any = {};
+		settingList.forEach((item, index) => {
+			let status = prevUpdateList.includes(item.item_id);
+			obj[item.item_id] = status;
 		}
+		);
+		await apiCall('post', userId, obj); // calling api on every toggle 
 
 		setUpdateList((prev) => prev = prevUpdateList);
 		rudderEventMethods().then((response) => {
 			response?.track(`${userId}`, "settings-changed", value, "anonymousId");
 		});
 	};
-
-
-	async function getSettings() {
-		const apiResponse = await apiCall('get', userId, '');
-		console.log('[API RESPONSE]', apiResponse);
-		// setSettingsList(prev => prev = apiResponse); // FixMe :  need to save the api response but api gives invalid json error 
-	}
-
-	React.useEffect(() => {
-		let obj: any = {};
-		list.forEach((item) => {
-			obj[item.item_id] = updateList.includes(item.item_id);
-		}
-		);
-		apiCall('post', userId, obj); // calling api for every time button clicked
-	}, [updateList]);
-
 
 	React.useEffect(() => {
 		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
@@ -110,6 +111,7 @@ const Settings = () => {
 		localStorage.setItem('AnonymousId', anonymousId);
 	}, []);
 
+
 	return (
 		<div>
 			<div className='mb-16'>
@@ -121,7 +123,7 @@ const Settings = () => {
 				<div className='sm:w-[70%] w-[90%] m-auto sm:p-8 p-4 rounded-lg border-2'>
 
 					{
-						settingsList.map((item, index) => {
+						settingList.map((item, index) => {
 							return (
 								<div key={index}
 									className={`flex justify-between ${index === 0 ? '' : 'border-t-[0.1rem]'} sm:mb-4 mb-2 sm:mt-4 mt-4 sm:p-4 p-4`}
