@@ -48,9 +48,8 @@ const Settings = () => {
 				},
 				body: JSON.stringify(body)
 			})
-				.then((response) => response.json())
+				.then((response) => type == 'get' ? response.json() : null)
 				.then((data) => dataFromAPI = data)
-			console.log('[API call]', dataFromAPI);
 			return dataFromAPI;
 		} catch (e) {
 			console.error(`[vibinex] Error while getting data from API. URL: ${url}, payload: ${JSON.stringify(body)}`, e);
@@ -59,7 +58,6 @@ const Settings = () => {
 
 	async function getSettings() {
 		const apiResponse: Record<string, boolean> = await apiCall('get', userId, '') ?? {};
-		console.log('[API RESPONSE IS]', apiResponse)
 		const defaultUserSetting: any = [];
 		for (let prop in apiResponse) {
 			if (Object.prototype.hasOwnProperty.call(apiResponse, prop)) {
