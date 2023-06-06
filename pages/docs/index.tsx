@@ -17,7 +17,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			flag: true,
 			content: [
 				{ subHeading: "Sign up with github", article: "Sign in on Vibinex using GitHub" },
-				{ subHeading: "Install GitHub App", article: <>Install <Link href="https://github.com/apps/repoprofiler" target='_blank' className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
+				{ subHeading: "Install GitHub App", article: <>Install <Link href="https://github.com/apps/vibinex-code-review" target='_blank' className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
 				{
 					subHeading: "Setup GitHub Action",
 					article: <>
