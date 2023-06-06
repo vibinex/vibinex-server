@@ -104,7 +104,7 @@ const Settings = () => {
 		getSettings();
 
 		rudderEventMethods().then((response) => {
-			response?.track("", "settings page called", { eventStatusFlag: 1 }, anonymousId)
+			response?.track("", "settings-page", { eventStatusFlag: 1 }, anonymousId)
 		});
 		localStorage.setItem('AnonymousId', anonymousId);
 	}, []);
