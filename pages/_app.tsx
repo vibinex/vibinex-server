@@ -17,8 +17,8 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
   return (
     <SessionProvider session={session}>
       <Head>
-        <title>Vibinex: Context for code review</title>
-        <meta name="description" content="Prioritize & optimize pull request reviews to save time and maximize code-review coverage." />
+        <title>Vibinex • Open-source pull request personalization for GitHub, GitLab & Bitbucket</title>
+        <meta name="description" content="Helps you maintain high code quality, save time and ship faster by streamlining your code review process." />
         <meta name="keywords" content={keywords.join(", ")} />
       </Head>
       <Component {...pageProps} />
