@@ -6,8 +6,6 @@ import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } fro
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
-import Github from "next-auth/providers/github";
-
 interface signInParam {
 	user: User,
 	account: Account | null,
