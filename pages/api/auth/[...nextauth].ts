@@ -1,15 +1,15 @@
-import NextAuth, { Account, Session, TokenSet, User } from "next-auth"
+import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import GithubProvider from "next-auth/providers/github"
+import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
-
 interface signInParam {
 	user: User,
 	account: Account | null,
+	profile?: Profile | undefined
 }
 
 export const authOptions = {
@@ -30,7 +30,7 @@ export const authOptions = {
 		// ...add more providers here
 	],
 	callbacks: {
-		async signIn({ user, account }: signInParam) {
+		async signIn({ user, account, profile }: signInParam) {
 			// search for the user in the users table
 			let db_user: DbUser | undefined;
 			if (account) {
@@ -50,7 +50,7 @@ export const authOptions = {
 
 			if (!db_user) {
 				// finally, if user is not found, create a new account
-				db_user = createUserUpdateObj(user, account);
+				db_user = createUserUpdateObj(user, account, profile);
 				await createUser(db_user).catch(err => {
 					console.error("[signIn] Could not create user", err);
 				})
@@ -64,7 +64,7 @@ export const authOptions = {
 			} else {
 				const existingAuth = (account) ? Object.keys(db_user.auth_info!).includes(account.provider) && Object.keys(db_user.auth_info![account.provider]).includes(account.providerAccountId) : false;
 				// if user is found, update the db entry
-				const updateObj: DbUser = createUserUpdateObj(user, account, db_user);
+				const updateObj: DbUser = createUserUpdateObj(user, account, profile, db_user);
 				await updateUser(db_user.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
@@ -107,7 +107,26 @@ export const authOptions = {
 	}
 }
 
-const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUser) => {
+
+const getHandleFromProfile = (profile: Profile | undefined) => {
+	let handle: string | null;
+	// convert profile to GithubProfile or BitbucketProfile
+	const githubProfile = profile as GithubProfile;
+	const bitbucketProfile = profile as BitbucketProfile;
+	if (profile !== undefined) {
+		if ("login" in githubProfile) {
+			handle = githubProfile.login; // Assign profile.login if it's a GithubProfile
+		} else if ("username" in bitbucketProfile) {
+			handle = bitbucketProfile.username; // Assign profile.username if it's a BitbucketProfile
+		} else {
+			handle = null; // Set handle to null if it's neither a GithubProfile nor a BitbucketProfile
+		}
+	} else {
+		handle = null; // Assign null if it's null
+	}
+	return handle;
+}
+const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
 	const updateObj: DbUser = {}
 	if (account) {
 		updateObj.auth_info = {
@@ -118,10 +137,12 @@ const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUs
 					access_token: account.access_token,
 					expires_at: account.expires_at,
 					refresh_token: account.refresh_token,
+					handle: getHandleFromProfile(profile),
 				}
 			}
 		}
 	}
+	
 	if (user.name && user.name != db_user?.name) updateObj.name = user.name;
 	if (user.image && user.image != db_user?.profile_url) updateObj.profile_url = user.image;
 	if (user.email && !db_user?.aliases?.includes(user.email)) {

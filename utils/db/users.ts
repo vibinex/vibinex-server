@@ -109,6 +109,9 @@ export const createUpdateUserObj = async (userId: number, user: DbUser) => {
 								if (newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at > currAuthObj.expires_at) {
 									diffAuth[provider][providerAccountId] = newAuthObj;
 								}
+								if ((newAuthObj.handle && !currAuthObj.handle) || (newAuthObj.handle != currAuthObj.handle)) {
+									diffAuth[provider][providerAccountId] = newAuthObj;
+								}
 							} else {
 								diffAuth[provider][providerAccountId] = user.auth_info[provider][providerAccountId];
 							}
