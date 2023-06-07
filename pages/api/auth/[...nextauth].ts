@@ -1,6 +1,6 @@
-import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
+import NextAuth, { Account, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import GithubProvider, { GithubProfile } from "next-auth/providers/github"
+import GithubProvider from "next-auth/providers/github"
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
