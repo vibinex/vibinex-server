@@ -11,7 +11,7 @@ import Github from "next-auth/providers/github";
 interface signInParam {
 	user: User,
 	account: Account | null,
-	profile: any,
+	profile?: any | null,
 }
 
 export const authOptions = {
@@ -109,7 +109,7 @@ export const authOptions = {
 	}
 }
 
-const createUserUpdateObj = (user: User, account: Account | null, profile: any, db_user?: DbUser) => {
+const createUserUpdateObj = (user: User, account: Account | null, profile: any | null, db_user?: DbUser) => {
 	const updateObj: DbUser = {}
 	if (account) {
 		updateObj.auth_info = {
