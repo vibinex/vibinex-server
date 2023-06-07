@@ -1,15 +1,17 @@
-import NextAuth, { Account, Session, TokenSet, User } from "next-auth"
+import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import GithubProvider from "next-auth/providers/github"
+import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
+import Github from "next-auth/providers/github";
 
 interface signInParam {
 	user: User,
 	account: Account | null,
+	profile: any,
 }
 
 export const authOptions = {
@@ -30,7 +32,7 @@ export const authOptions = {
 		// ...add more providers here
 	],
 	callbacks: {
-		async signIn({ user, account }: signInParam) {
+		async signIn({ user, account, profile }: signInParam) {
 			// search for the user in the users table
 			let db_user: DbUser | undefined;
 			if (account) {
@@ -50,7 +52,7 @@ export const authOptions = {
 
 			if (!db_user) {
 				// finally, if user is not found, create a new account
-				db_user = createUserUpdateObj(user, account);
+				db_user = createUserUpdateObj(user, account, profile);
 				await createUser(db_user).catch(err => {
 					console.error("[signIn] Could not create user", err);
 				})
@@ -64,7 +66,7 @@ export const authOptions = {
 			} else {
 				const existingAuth = (account) ? Object.keys(db_user.auth_info!).includes(account.provider) && Object.keys(db_user.auth_info![account.provider]).includes(account.providerAccountId) : false;
 				// if user is found, update the db entry
-				const updateObj: DbUser = createUserUpdateObj(user, account, db_user);
+				const updateObj: DbUser = createUserUpdateObj(user, account, profile, db_user);
 				await updateUser(db_user.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
@@ -107,7 +109,7 @@ export const authOptions = {
 	}
 }
 
-const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUser) => {
+const createUserUpdateObj = (user: User, account: Account | null, profile: any, db_user?: DbUser) => {
 	const updateObj: DbUser = {}
 	if (account) {
 		updateObj.auth_info = {
@@ -118,6 +120,7 @@ const createUserUpdateObj = (user: User, account: Account | null, db_user?: DbUs
 					access_token: account.access_token,
 					expires_at: account.expires_at,
 					refresh_token: account.refresh_token,
+					handle: profile?.login ? profile.login : profile?.username,
 				}
 			}
 		}
