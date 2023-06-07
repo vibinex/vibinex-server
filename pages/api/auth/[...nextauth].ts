@@ -1,6 +1,6 @@
-import NextAuth, { Account, Session, TokenSet, User } from "next-auth"
+import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import GithubProvider from "next-auth/providers/github"
+import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
@@ -11,7 +11,7 @@ import Github from "next-auth/providers/github";
 interface signInParam {
 	user: User,
 	account: Account | null,
-	profile: any,
+	profile?: Profile | undefined
 }
 
 export const authOptions = {
@@ -109,8 +109,23 @@ export const authOptions = {
 	}
 }
 
-const createUserUpdateObj = (user: User, account: Account | null, profile: any, db_user?: DbUser) => {
+const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
 	const updateObj: DbUser = {}
+	let handle: string | null;
+	// convert profile to GithubProfile or BitbucketProfile
+	const githubProfile = profile as GithubProfile;
+	const bitbucketProfile = profile as BitbucketProfile;
+	if (profile !== undefined) {
+		if ("login" in githubProfile) {
+			handle = githubProfile.login; // Assign profile.login if it's a GithubProfile
+		} else if ("username" in bitbucketProfile) {
+			handle = bitbucketProfile.username; // Assign profile.username if it's a BitbucketProfile
+		} else {
+			handle = null; // Set handle to null if it's neither a GithubProfile nor a BitbucketProfile
+		}
+	} else {
+		handle = null; // Assign null if it's null
+	}
 	if (account) {
 		updateObj.auth_info = {
 			[account.provider]: {
@@ -120,11 +135,13 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: any, 
 					access_token: account.access_token,
 					expires_at: account.expires_at,
 					refresh_token: account.refresh_token,
-					handle: profile?.login ? profile.login : profile?.username,
+					// if profile is a githubprofile, use profile.login, if BitbucketProfile then profile.username and null if null
+					handle: handle ? handle : null,
 				}
 			}
 		}
 	}
+	
 	if (user.name && user.name != db_user?.name) updateObj.name = user.name;
 	if (user.image && user.image != db_user?.profile_url) updateObj.profile_url = user.image;
 	if (user.email && !db_user?.aliases?.includes(user.email)) {
