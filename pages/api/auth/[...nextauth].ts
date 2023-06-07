@@ -110,7 +110,7 @@ export const authOptions = {
 }
 
 const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
-	const updateObj: DbUser = {}
+		const updateObj: DbUser = {}
 	let handle: string | null;
 	// convert profile to GithubProfile or BitbucketProfile
 	const githubProfile = profile as GithubProfile;
