@@ -4,6 +4,8 @@ import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import Link from 'next/link';
 import Button from '../components/Button';
+import { v4 as uuidv4 } from 'uuid';
+import { rudderEventMethods } from "../utils/rudderstack_initialize";
 
 const monthlyBasePriceUSD = 10;
 
@@ -56,6 +58,23 @@ const Pricing = () => {
 
 	const pricingStartDate = new Date(2023, 6, 1); // 1st July 2023
 	const today = new Date();
+
+	React.useEffect(() => {
+		// tracking events on every button clicked 
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		rudderEventMethods().then((response) => {
+			response?.track("", "pricing-plan-changed", { "isYearly": isYearly }, anonymousId);
+		});
+		localStorage.setItem('AnonymousId', anonymousId);
+
+	}, [isYearly]);
+
+	React.useEffect(() => {
+		rudderEventMethods().then((response) => {
+			response?.track("", "pricing-page", { eventStatusFlag: 1 }, "anonymous") //Anonymous Id is set in local storage as soon as the user lands on the webiste.
+		});
+	}, []);
 
 	return (
 		<div>

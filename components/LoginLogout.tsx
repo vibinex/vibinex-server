@@ -29,6 +29,9 @@ export default function LoginLogout() {
 					<li className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='https://github.com/Alokit-Innovations/' target='_blank' className='cursor-pointer w-full'>Contribute</Link>
 					</li>
+					<li className='border-b-2 border-b-gray-200 p-2 text-center'>
+						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
+					</li>
 					<li className='p-2 text-center cursor-pointer' onClick={() => logout()}>
 						Logout
 					</li>
