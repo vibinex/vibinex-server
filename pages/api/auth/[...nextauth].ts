@@ -107,8 +107,8 @@ export const authOptions = {
 	}
 }
 
-const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
-		const updateObj: DbUser = {}
+
+const getHandleFromProfile = (profile: Profile | undefined) => {
 	let handle: string | null;
 	// convert profile to GithubProfile or BitbucketProfile
 	const githubProfile = profile as GithubProfile;
@@ -124,6 +124,10 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: Profi
 	} else {
 		handle = null; // Assign null if it's null
 	}
+	return handle;
+}
+const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
+	const updateObj: DbUser = {}
 	if (account) {
 		updateObj.auth_info = {
 			[account.provider]: {
@@ -133,7 +137,7 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: Profi
 					access_token: account.access_token,
 					expires_at: account.expires_at,
 					refresh_token: account.refresh_token,
-					handle: handle ? handle : null,
+					handle: getHandleFromProfile(profile),
 				}
 			}
 		}
