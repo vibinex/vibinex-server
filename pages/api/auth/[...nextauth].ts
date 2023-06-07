@@ -135,7 +135,6 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: Profi
 					access_token: account.access_token,
 					expires_at: account.expires_at,
 					refresh_token: account.refresh_token,
-					// if profile is a githubprofile, use profile.login, if BitbucketProfile then profile.username and null if null
 					handle: handle ? handle : null,
 				}
 			}
