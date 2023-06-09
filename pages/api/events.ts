@@ -1,9 +1,29 @@
 import Analytics from "@rudderstack/rudder-sdk-node";
 import { apiObject } from "rudder-sdk-js";
+
+
+type RudderStackEventPropertiesIdentify = {
+    userId: string;
+    anonymousId: string;
+    traits: {
+        name: string;
+        email: string;
+        githubId: string;
+        role: string;
+    };
+}
+
+type RudderStackEventPropertiesTrack = {
+    userId: string, 
+    anonymousId: string, 
+    event: string, 
+    properties: apiObject;
+    timestamp: Date;
+  };
 // we need the batch endpoint of the Rudder server you are running
     const client = (process.env.NODE_ENV === 'development') ? {
-        identify: (event_properties: <use type given by RudderStack>) => console.info(event_properties),
-        track: (event_properties: <again use RudderStack type>) => console.info(event_properties)
+        identify: (event_properties: RudderStackEventPropertiesIdentify) => console.info(event_properties),
+        track: (event_properties: RudderStackEventPropertiesTrack) => console.info(event_properties)
     } 
     : new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!, { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
     const rudderStackEvents = {
