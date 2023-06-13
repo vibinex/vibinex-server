@@ -25,22 +25,33 @@ import { v4 as uuidv4 } from 'uuid';
 		window.addEventListener('scroll', changeColor);
 	}, []);
 
-	const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-	const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-
-	const handleClick = () => {
-		// Track the event using Rudder SDK
-		rudderEventMethods().then((response) => {
-		response?.track("", "Download Link Clicked", {
-			ctaLink: props.ctaLink,
-			type: "link"
-		}, anonymousId);
-		});
+	React.useEffect(() => {
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		// Track the "Add to Chrome" event
+		const handlDownloadClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
+			});
+		};
+		
+		const handlPricingClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
+			});
+		};
 	
-		// Open the link in a new tab
-		window.open(props.ctaLink, '_blank');
-	};
+		const downloadLink = document.getElementById('download-link');
+  		const pricingLink = document.getElementById('pricing-link');
 
+  		downloadLink?.addEventListener('click', handlDownloadClick);
+  		pricingLink?.addEventListener('click', handlPricingClick);
+
+		return () => {
+			downloadLink?.removeEventListener('click', handlDownloadClick);
+			pricingLink?.removeEventListener('click', handlPricingClick);
+		};
+	  }, []);
   return (
     <div
       className={
@@ -60,11 +71,11 @@ import { v4 as uuidv4 } from 'uuid';
           <li className='p-4'>
             <Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
           </li>
-          <li className='p-4'>
+          <li className='p-4' id='pricing-link'>
             <Link href='/pricing'>Pricing</Link>
           </li>
-          <li className='p-4'>
-            <Link href={props.ctaLink} target="_blank" onClick={handleClick}>
+          <li className='p-4' id='download-link'>
+            <Link href={props.ctaLink} target="_blank">
               Download
               <Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
             </Link>

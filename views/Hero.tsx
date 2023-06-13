@@ -15,7 +15,7 @@ const Hero = (props: { ctaLink: string }) => {
 		// Track the "Add to Chrome" event
 		const handleAddToChrome = () => {
 			rudderEventMethods().then((response) => {
-				response?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1 }, anonymousId)
+				response?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero" }, anonymousId)
 			});
 		};
 	
