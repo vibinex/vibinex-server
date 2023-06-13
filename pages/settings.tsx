@@ -92,8 +92,10 @@ const Settings = () => {
 		await apiCall('post', userId, obj); // calling api on every toggle 
 
 		setUpdateList((prev) => prev = prevUpdateList);
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
 		rudderEventMethods().then((response) => {
-			response?.track(`${userId}`, "settings-changed", value, "anonymousId");
+			response?.track(`${userId}`, "settings-changed", value, anonymousId);
 		});
 	};
 
