@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useRouter } from 'next/router';
 import { AiOutlineCheckCircle } from 'react-icons/ai'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
@@ -42,9 +43,9 @@ const pricingPlan = [
 
 
 const Pricing = () => {
+	const router = useRouter();
 	const [isYearly, setIsYearly] = useState(false); // false for monthly
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
-
 	let heading = [
 		{ name: "Monthly", flag: isYearly },
 		{ name: "Yearly", flag: !isYearly },
@@ -64,7 +65,7 @@ const Pricing = () => {
 		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
 		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
 		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-plan-changed", { "isYearly": isYearly }, anonymousId);
+			response?.track("", "pricing-plan-changed", { isYearly: isYearly }, anonymousId);
 		});
 		localStorage.setItem('AnonymousId', anonymousId);
 
@@ -76,7 +77,7 @@ const Pricing = () => {
 		rudderEventMethods().then((response) => {
 			response?.track("", "pricing-page", { eventStatusFlag: 1 }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
 		});
-	}, []);
+	}, [router]);
 
 	return (
 		<div>

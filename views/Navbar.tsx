@@ -28,28 +28,38 @@ import { v4 as uuidv4 } from 'uuid';
 	React.useEffect(() => {
 		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
 		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-		// Track the "Add to Chrome" event
-		const handlDownloadClick = () => {
+
+		const handleDownloadClick = () => {
 			rudderEventMethods().then((response) => {
 				response?.track("", "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
 			});
 		};
 		
-		const handlPricingClick = () => {
+		const handlePricingClick = () => {
 			rudderEventMethods().then((response) => {
 				response?.track("", "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
 			});
 		};
+
+		const handleContributeClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "Contribute link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
+			});
+		};
+
 	
 		const downloadLink = document.getElementById('download-link');
   		const pricingLink = document.getElementById('pricing-link');
+		const contributeLink = document.getElementById('contribute-link');
 
-  		downloadLink?.addEventListener('click', handlDownloadClick);
-  		pricingLink?.addEventListener('click', handlPricingClick);
+  		downloadLink?.addEventListener('click', handleDownloadClick);
+  		pricingLink?.addEventListener('click', handlePricingClick);
+		contributeLink?.addEventListener('click', handleContributeClick)
 
 		return () => {
-			downloadLink?.removeEventListener('click', handlDownloadClick);
-			pricingLink?.removeEventListener('click', handlPricingClick);
+			downloadLink?.removeEventListener('click', handleDownloadClick);
+			pricingLink?.removeEventListener('click', handlePricingClick);
+			contributeLink?.removeEventListener('click', handleContributeClick)
 		};
 	  }, []);
   return (
@@ -68,7 +78,7 @@ import { v4 as uuidv4 } from 'uuid';
           <li className='p-4'>
             <Link href='/docs'>Docs</Link>
           </li>
-          <li className='p-4'>
+          <li id="contribute-link" className='p-4'>
             <Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
           </li>
           <li className='p-4' id='pricing-link'>

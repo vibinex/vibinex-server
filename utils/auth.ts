@@ -1,17 +1,27 @@
 import { signIn, signOut } from 'next-auth/react';
 import { Session } from 'next-auth/core/types';
+import { rudderEventMethods } from './rudderstack_initialize';
 
-export const login = () => {
+export const login = (userId: number, userName: string) => {
 	signIn().catch((err) => {
+		rudderEventMethods().then((response) => {
+			response?.track(`${userId}`, "login", {userId: `${userId}`, eventStatusFlag: 0, source: "profile-popup", name: userName}, `${null}`)
+		})	
 		console.error("[signIn] Authentication failed.", err);
 	})
 }
 
-export const logout = () => {
+export const logout = (userId: number, userName: string) => {
 	signOut().then(_ => {
+		rudderEventMethods().then((response) => {
+			response?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 1, source: "profile-popup", name: userName}, `${null}`)
+		})
 		window.location.href = "/";
 	})
 		.catch(err => {
+			rudderEventMethods().then((response) => {
+				response?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 0, source: "profile-popup", name: userName}, `${null}`)
+			})	
 			console.error("[signOut] Signout failed", err);
 		})
 }

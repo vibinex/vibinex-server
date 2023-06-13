@@ -12,7 +12,7 @@ import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { Session } from "next-auth/core/types";
-import { getAuthUserName } from "../utils/auth";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 type RepoProfileData = {
 	sessionObj: Session,
@@ -24,9 +24,7 @@ type RepoProfileData = {
 const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list, repo_name: repo_addr, contributor_2d_data }) => {
 	React.useEffect(() => {
 		rudderEventMethods().then((response) => {
-			response?.page("", "Repo Profile Page", {
-				name: getAuthUserName(session)
-			});
+			response?.track(`${getAuthUserId(session)}`, "Repo profile page", {name: getAuthUserName(session)}, `${null}`);
 		});
 	}, [session]);
 

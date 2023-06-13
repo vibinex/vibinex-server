@@ -1,9 +1,10 @@
 import Button from '../components/Button'
 import Image from "next/image";
-import { getAuthUserImage, getAuthUserName, logout, login } from '../utils/auth';
+import { getAuthUserImage, getAuthUserName, logout, login, getAuthUserId } from '../utils/auth';
 import { useEffect, useState } from "react";
 import type { Session } from 'next-auth';
 import Link from 'next/link';
+import { rudderEventMethods } from '../utils/rudderstack_initialize';
 
 export default function LoginLogout() {
 	const [showMenu, setShowMenu] = useState(false);
@@ -15,7 +16,40 @@ export default function LoginLogout() {
 			const sessionVal = await res.json();
 			setSession(sessionVal);
 		});
-	}, []);
+
+		const handleLogoutClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track(`${getAuthUserId(session)}`, "Logout link clicked", { type: "link", eventStatusFlag: 1, source: "profile popup", name: `${getAuthUserName(session)}`}, `${null}`)
+			});
+		};
+		
+		const handleContributeClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track(`${getAuthUserId(session)}`, "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, `${null}`)
+			});
+		};
+
+		const handleSettingsClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track(`${getAuthUserId(session)}`, "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, `${null}`)
+			});
+		};
+
+	
+		const logoutLink = document.getElementById('logout-link');
+  		const contributeLink = document.getElementById('contribute-link');
+		const settingsLink = document.getElementById('settings-link')
+
+  		logoutLink?.addEventListener('click', handleLogoutClick);
+  		contributeLink?.addEventListener('click', handleContributeClick);
+		settingsLink?.addEventListener('click', handleSettingsClick);
+
+		return () => {
+			logoutLink?.removeEventListener('click', handleLogoutClick);
+			contributeLink?.removeEventListener('click', handleContributeClick);
+			settingsLink?.removeEventListener('click', handleSettingsClick)
+		};
+	}, [session]);
 
 	if (session && session.user) return (
 		<>
@@ -26,13 +60,13 @@ export default function LoginLogout() {
 					<li className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='/u' className='cursor-pointer w-full'>Profile</Link>
 					</li>
-					<li className='border-b-2 border-b-gray-200 p-2 text-center'>
+					<li id='contribute-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='https://github.com/Alokit-Innovations/' target='_blank' className='cursor-pointer w-full'>Contribute</Link>
 					</li>
-					<li className='border-b-2 border-b-gray-200 p-2 text-center'>
+					<li id='settings-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
 					</li>
-					<li className='p-2 text-center cursor-pointer' onClick={() => logout()}>
+					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => logout(getAuthUserId(session), getAuthUserName(session))}>
 						Logout
 					</li>
 				</ol>
@@ -42,7 +76,7 @@ export default function LoginLogout() {
 		</>
 	)
 	else return (
-		<Button variant='contained' onClick={() => login()} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+		<Button variant='contained' onClick={() => login(getAuthUserId(session), getAuthUserName(session))} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
 			Login/Signup
 		</Button>
 	)

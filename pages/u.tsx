@@ -23,8 +23,21 @@ const Profile = ({ repo_list }: ProfileProps) => {
 	const session: Session | null = useSession().data;
 	useEffect(() => {
 		rudderEventMethods().then((response) => {
-			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {"userId": `${getAuthUserId(session)}`, "name": getAuthUserName(session)}, `${null}`);
+			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {userId: `${getAuthUserId(session)}`, name: getAuthUserName(session)}, `${null}`);
 		});
+
+		const handleAddRepositoryButton = () => {
+			rudderEventMethods().then((response) => {
+				response?.track(`${getAuthUserId(session)}`, "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session)}, `${null}`)
+			});
+		};
+			
+		const addRepositoryButton = document.getElementById('add-repository');
+		addRepositoryButton?.addEventListener('click', handleAddRepositoryButton);
+
+		return () => {
+			addRepositoryButton?.removeEventListener('click', handleAddRepositoryButton);
+		};
 	}, [session])
 
 	return (
@@ -32,7 +45,7 @@ const Profile = ({ repo_list }: ProfileProps) => {
 			<MainAppBar />
 			<div className="max-w-[80%] mx-auto flex-grow">
 				<RepoList repo_list={repo_list} />
-				<Button variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
+				<Button id='add-repository' variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
 			</div>
 			<Footer />
 		</div>
