@@ -5,8 +5,38 @@ import highlightPR from '../public/highlightPR.png'
 import highlightFile from '../public/highlightFile.png'
 import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
+import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import { v4 as uuidv4 } from 'uuid';
 
 const Hero = (props: { ctaLink: string }) => {
+	React.useEffect(() => {
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		// Track the "Add to Chrome" event
+		const handleAddToChrome = () => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero" }, anonymousId)
+			});
+		};
+	
+		// Track the "Book Demo" event
+		const handleBookDemo = () => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "Book demo button", { type: "button", eventStatusFlag: 1 }, anonymousId)
+			});
+		};
+	
+		const addToChromeButton = document.getElementById('add-to-chrome-btn');
+  		const bookDemoButton = document.getElementById('book-demo-btn');
+
+  		addToChromeButton?.addEventListener('click', handleAddToChrome);
+  		bookDemoButton?.addEventListener('click', handleBookDemo);
+
+		return () => {
+			addToChromeButton?.removeEventListener('click', handleAddToChrome);
+			bookDemoButton?.removeEventListener('click', handleBookDemo);
+		};
+	  }, []);
 	return (
 		<div className='flex items-center justify-center h-screen bg-fixed bg-center bg-cover'
 			style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503252947848-7338d3f92f31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80')" }}
@@ -24,11 +54,11 @@ const Hero = (props: { ctaLink: string }) => {
 						Know which code-changes need your <span className="text-primary-main">attention</span> while also maximizing <span className="text-primary-main">code-review coverage</span>
 					</p>
 					<div className="w-full flex space-x-4">
-						<Button variant="contained" href={props.ctaLink} target="_blank" className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] mt-5'>
+						<Button id="add-to-chrome-btn" variant="contained" href={props.ctaLink} target="_blank" className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] mt-5'>
 							<Image src={chromeLogo} alt="chrome extension logo" className="w-10 inline mr-2 border border-white rounded-full"></Image>
 							Add to Chrome
 						</Button>
-						<Button variant="outlined" href="https://calendly.com/avikalp-gupta/30min" target="_blank" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>
+						<Button id="book-demo-btn" variant="outlined" href="https://calendly.com/avikalp-gupta/30min" target="_blank" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>
 							Book demo
 						</Button>
 					</div>

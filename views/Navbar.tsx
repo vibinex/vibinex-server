@@ -4,24 +4,54 @@ import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
+import { rudderEventMethods } from '../utils/rudderstack_initialize';
+import { v4 as uuidv4 } from 'uuid';
 
-const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
-  const [showNavbar, setShowNavbar] = useState(false);
-  const [scrollDown, setScrollDown] = useState(props.transparent);
-  const changeNavbar = () => {
-    setShowNavbar(!showNavbar);
-  };
-  useEffect(() => {
-    const changeColor = () => {
-      if (window.scrollY >= 90) {
-        setScrollDown(true);
-      } else {
-        setScrollDown(false);
-      }
-    };
-    window.addEventListener('scroll', changeColor);
-  }, []);
 
+	const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
+	const [showNavbar, setShowNavbar] = useState(false);
+	const [scrollDown, setScrollDown] = useState(props.transparent);
+	const changeNavbar = () => {
+		setShowNavbar(!showNavbar);
+	};
+	useEffect(() => {
+		const changeColor = () => {
+		if (window.scrollY >= 90) {
+			setScrollDown(true);
+		} else {
+			setScrollDown(false);
+		}
+		};
+		window.addEventListener('scroll', changeColor);
+	}, []);
+
+	React.useEffect(() => {
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		// Track the "Add to Chrome" event
+		const handlDownloadClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
+			});
+		};
+		
+		const handlPricingClick = () => {
+			rudderEventMethods().then((response) => {
+				response?.track("", "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
+			});
+		};
+	
+		const downloadLink = document.getElementById('download-link');
+  		const pricingLink = document.getElementById('pricing-link');
+
+  		downloadLink?.addEventListener('click', handlDownloadClick);
+  		pricingLink?.addEventListener('click', handlPricingClick);
+
+		return () => {
+			downloadLink?.removeEventListener('click', handlDownloadClick);
+			pricingLink?.removeEventListener('click', handlPricingClick);
+		};
+	  }, []);
   return (
     <div
       className={
@@ -41,10 +71,10 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
           <li className='p-4'>
             <Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
           </li>
-          <li className='p-4'>
+          <li className='p-4' id='pricing-link'>
             <Link href='/pricing'>Pricing</Link>
           </li>
-          <li className='p-4'>
+          <li className='p-4' id='download-link'>
             <Link href={props.ctaLink} target="_blank">
               Download
               <Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>

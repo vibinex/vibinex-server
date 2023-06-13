@@ -23,10 +23,7 @@ const Profile = ({ repo_list }: ProfileProps) => {
 	const session: Session | null = useSession().data;
 	useEffect(() => {
 		rudderEventMethods().then((response) => {
-			response?.page("", "Repo Profile Page", {
-				userId: getAuthUserId(session),
-				name: getAuthUserName(session)
-			});
+			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {"userId": `${getAuthUserId(session)}`, "name": getAuthUserName(session)}, `${null}`);
 		});
 	}, [session])
 

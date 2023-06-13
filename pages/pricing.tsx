@@ -71,8 +71,10 @@ const Pricing = () => {
 	}, [isYearly]);
 
 	React.useEffect(() => {
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
 		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-page", { eventStatusFlag: 1 }, "anonymous") //Anonymous Id is set in local storage as soon as the user lands on the webiste.
+			response?.track("", "pricing-page", { eventStatusFlag: 1 }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
 		});
 	}, []);
 
