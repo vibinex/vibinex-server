@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { v4 as uuidv4 } from 'uuid';
 import Button from "../../components/Button";
 import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
 import { rudderEventMethods } from '../../utils/rudderstack_initialize';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/url_utils';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -16,10 +16,9 @@ const verifySetup = [
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const router = useRouter()
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods().then((response) => {
-			response?.track("", "docs page", { eventStatusFlag: 1 }, anonymousId)
+			response?.track("", "docs page", { type: "page", eventStatusFlag: 1 }, anonymousId)
 		});
 
 		const handleGitHubAppClick = () => {

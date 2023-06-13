@@ -5,7 +5,7 @@ import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
 import { rudderEventMethods } from '../utils/rudderstack_initialize';
-import { v4 as uuidv4 } from 'uuid';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 
 	const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
@@ -26,8 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 	}, []);
 
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 
 		const handleDownloadClick = () => {
 			rudderEventMethods().then((response) => {

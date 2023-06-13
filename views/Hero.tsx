@@ -6,12 +6,11 @@ import highlightFile from '../public/highlightFile.png'
 import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
-import { v4 as uuidv4 } from 'uuid';
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
 
 const Hero = (props: { ctaLink: string }) => {
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		// Track the "Add to Chrome" event
 		const handleAddToChrome = () => {
 			rudderEventMethods().then((response) => {

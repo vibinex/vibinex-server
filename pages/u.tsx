@@ -23,7 +23,7 @@ const Profile = ({ repo_list }: ProfileProps) => {
 	const session: Session | null = useSession().data;
 	useEffect(() => {
 		rudderEventMethods().then((response) => {
-			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {userId: `${getAuthUserId(session)}`, name: getAuthUserName(session)}, `${null}`);
+			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {type: "page", name: getAuthUserName(session)}, `${null}`);
 		});
 
 		const handleAddRepositoryButton = () => {

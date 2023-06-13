@@ -6,7 +6,7 @@ import WhyUs from '../views/WhyUs'
 import Features from '../views/Features'
 import TrustUs from '../views/TrustUs'
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
-import { v4 as uuidv4 } from 'uuid';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils'
 
 import JoinSlack from '../views/JoinSlack'
 
@@ -14,16 +14,13 @@ export default function Home() {
   const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 
   React.useEffect(() => {
-    const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-    const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-
+	const anonymousId = getAndSetAnonymousIdFromLocalStorage()
     rudderEventMethods().then((response) => {
       response?.identify("", "", "", anonymousId);
     });
 	rudderEventMethods().then((response) => {
-		response?.track("", "Landing page", {page: "Landing page"}, anonymousId)
+		response?.track("", "Landing page", {type: "page", page: "Landing page"}, anonymousId)
 	})
-    localStorage.setItem('AnonymousId', anonymousId);
   }, []);
 
   return (

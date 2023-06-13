@@ -5,8 +5,8 @@ import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import Link from 'next/link';
 import Button from '../components/Button';
-import { v4 as uuidv4 } from 'uuid';
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 const monthlyBasePriceUSD = 10;
 
@@ -61,21 +61,18 @@ const Pricing = () => {
 	const today = new Date();
 
 	React.useEffect(() => {
-		// tracking events on every button clicked 
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		// tracking events on every button clicked
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-plan-changed", { isYearly: isYearly }, anonymousId);
+			response?.track("", "pricing-plan-changed", { type: "button", isYearly: isYearly }, anonymousId);
 		});
-		localStorage.setItem('AnonymousId', anonymousId);
 
 	}, [isYearly]);
 
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-page", { eventStatusFlag: 1 }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
+			response?.track("", "pricing-page", { type: "page", eventStatusFlag: 1 }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
 		});
 	}, [router]);
 

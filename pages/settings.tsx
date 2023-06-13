@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
-import { v4 as uuidv4 } from 'uuid';
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { getAuthUserId } from "../utils/auth";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 const Settings = () => {
 
@@ -92,23 +92,19 @@ const Settings = () => {
 		await apiCall('post', userId, obj); // calling api on every toggle 
 
 		setUpdateList((prev) => prev = prevUpdateList);
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods().then((response) => {
 			response?.track(`${userId}`, "settings-changed", value, anonymousId);
 		});
 	};
 
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		getSettings();
 
 		rudderEventMethods().then((response) => {
-			response?.track(`${userId}`, "settings-page", { eventStatusFlag: 1 }, anonymousId)
+			response?.track(`${userId}`, "settings-page", { type: "page", eventStatusFlag: 1 }, anonymousId)
 		});
-		localStorage.setItem('AnonymousId', anonymousId);
 	}, []);
 
 
