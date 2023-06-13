@@ -1,8 +1,30 @@
 import React from 'react'
+import { useRouter } from 'next/router';
 import Link from 'next/link'
 import { BsSlack } from 'react-icons/bs'
+import { rudderEventMethods } from '../utils/rudderstack_initialize'
+import { v4 as uuidv4 } from 'uuid';
 
 const JoinSlack = () => {
+	const router = useRouter()
+	React.useEffect(() => {
+		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		
+		const handleJoinSlack = () => {
+			rudderEventMethods().then((response) => {
+				response?.track('', "join slack", { eventStatusFlag: 1 }, anonymousId)
+			});
+		}
+
+		const joinSlackLink = document.getElementById('join-slack');
+		joinSlackLink?.addEventListener('click', handleJoinSlack);
+
+		return () => {
+			joinSlackLink?.removeEventListener('click', handleJoinSlack);
+		}
+
+	}, [router])
 	return (
 		<div id='joinSlack' className='w-full text-center py-12  bg-black mb-[-5%]'>
 			<h2 className='font-bold text-[2rem] text-white'>Slack Community</h2>
@@ -13,7 +35,7 @@ const JoinSlack = () => {
 			</div>
 
 			{/* TODO: Instead of a forever link, use this: https://github.com/thesandlord/SlackEngine */}
-			<Link href={'https://join.slack.com/t/vibinex/shared_invite/zt-1sysjjso3-1ftC6deRcOgQXW9hD4ozWg'} target='blank'>
+			<Link id='join-slack' href={'https://join.slack.com/t/vibinex/shared_invite/zt-1sysjjso3-1ftC6deRcOgQXW9hD4ozWg'} target='blank'>
 				<div className='flex justify-center items-center'>
 					<div className='bg-primary-main	 m-auto w-[50%] sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5' >
 						<div className='flex text-primary-light justify-center items-center'>
