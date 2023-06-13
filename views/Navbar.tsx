@@ -4,23 +4,42 @@ import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
+import { rudderEventMethods } from '../utils/rudderstack_initialize';
+import { v4 as uuidv4 } from 'uuid';
 
-const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
-  const [showNavbar, setShowNavbar] = useState(false);
-  const [scrollDown, setScrollDown] = useState(props.transparent);
-  const changeNavbar = () => {
-    setShowNavbar(!showNavbar);
-  };
-  useEffect(() => {
-    const changeColor = () => {
-      if (window.scrollY >= 90) {
-        setScrollDown(true);
-      } else {
-        setScrollDown(false);
-      }
-    };
-    window.addEventListener('scroll', changeColor);
-  }, []);
+
+	const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
+	const [showNavbar, setShowNavbar] = useState(false);
+	const [scrollDown, setScrollDown] = useState(props.transparent);
+	const changeNavbar = () => {
+		setShowNavbar(!showNavbar);
+	};
+	useEffect(() => {
+		const changeColor = () => {
+		if (window.scrollY >= 90) {
+			setScrollDown(true);
+		} else {
+			setScrollDown(false);
+		}
+		};
+		window.addEventListener('scroll', changeColor);
+	}, []);
+
+	const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+	const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+
+	const handleClick = () => {
+		// Track the event using Rudder SDK
+		rudderEventMethods().then((response) => {
+		response?.track("", "Download Link Clicked", {
+			ctaLink: props.ctaLink,
+			type: "link"
+		}, anonymousId);
+		});
+	
+		// Open the link in a new tab
+		window.open(props.ctaLink, '_blank');
+	};
 
   return (
     <div
@@ -45,7 +64,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
             <Link href='/pricing'>Pricing</Link>
           </li>
           <li className='p-4'>
-            <Link href={props.ctaLink} target="_blank">
+            <Link href={props.ctaLink} target="_blank" onClick={handleClick}>
               Download
               <Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
             </Link>

@@ -7,7 +7,7 @@ export default function Download() {
 		let localStorageAnonymousId = localStorage.getItem("AnonymousId")
 		let anonymousId = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4()
 			rudderEventMethods().then((response) => {
-				response?.track("", "download page call", {eventStatusFlag: 1}, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
+				response?.track("", "download page", {eventStatusFlag: 1}, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
 			});
 	  }, []);
 

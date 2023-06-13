@@ -20,6 +20,9 @@ export default function Home() {
     rudderEventMethods().then((response) => {
       response?.identify("", "", "", anonymousId);
     });
+	rudderEventMethods().then((response) => {
+		response?.track("", "Landing page", {page: "Landing page"}, anonymousId)
+	})
     localStorage.setItem('AnonymousId', anonymousId);
   }, []);
 
