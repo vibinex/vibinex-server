@@ -22,7 +22,7 @@ async function loadRudderAnalytics(): Promise<typeof import("rudder-sdk-js") | n
   if (typeof window !== "undefined") {
     if (process.env.NODE_ENV === "development") {
       console.log("Running in development mode. Rudder Analytics is not loaded.");
-      return null;
+      return {} as typeof{};
     }
 
     const rudderAnalytics = await import("rudder-sdk-js");
