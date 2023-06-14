@@ -13,6 +13,7 @@ import conn from "../utils/db";
 import Footer from "../components/Footer";
 import { useSession } from "next-auth/react";
 import Button from "../components/Button";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
 
 type ProfileProps = {
 	session: Session,
@@ -22,13 +23,14 @@ type ProfileProps = {
 const Profile = ({ repo_list }: ProfileProps) => {
 	const session: Session | null = useSession().data;
 	useEffect(() => {
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods().then((response) => {
-			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {type: "page", name: getAuthUserName(session)}, `${null}`);
+			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {type: "page", name: getAuthUserName(session)}, anonymousId);
 		});
 
 		const handleAddRepositoryButton = () => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session)}, `${null}`)
+				response?.track(`${getAuthUserId(session)}`, "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session)}, anonymousId)
 			});
 		};
 			

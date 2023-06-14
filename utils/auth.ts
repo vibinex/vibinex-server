@@ -1,26 +1,27 @@
 import { signIn, signOut } from 'next-auth/react';
 import { Session } from 'next-auth/core/types';
 import { rudderEventMethods } from './rudderstack_initialize';
+import { getAndSetAnonymousIdFromLocalStorage } from './url_utils';
 
-export const login = (userId: number, userName: string) => {
+export const login = (anonymousId: string) => {
 	signIn().catch((err) => {
 		rudderEventMethods().then((response) => {
-			response?.track(`${userId}`, "login", {userId: `${userId}`, eventStatusFlag: 0, source: "profile-popup", name: userName}, `${null}`)
+			response?.track(``, "login", {eventStatusFlag: 0, source: "profile-popup"}, anonymousId)
 		})	
 		console.error("[signIn] Authentication failed.", err);
 	})
 }
 
-export const logout = (userId: number, userName: string) => {
+export const logout = (userId: number, userName: string, anonymousId: string) => {
 	signOut().then(_ => {
 		rudderEventMethods().then((response) => {
-			response?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 1, source: "profile-popup", name: userName}, `${null}`)
+			response?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
 		})
 		window.location.href = "/";
 	})
 		.catch(err => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 0, source: "profile-popup", name: userName}, `${null}`)
+				response?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 0, source: "profile-popup", name: userName}, anonymousId)
 			})	
 			console.error("[signOut] Signout failed", err);
 		})

@@ -13,6 +13,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { Session } from "next-auth/core/types";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
 
 type RepoProfileData = {
 	sessionObj: Session,
@@ -23,8 +24,9 @@ type RepoProfileData = {
 
 const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list, repo_name: repo_addr, contributor_2d_data }) => {
 	React.useEffect(() => {
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods().then((response) => {
-			response?.track(`${getAuthUserId(session)}`, "Repo profile page", {name: getAuthUserName(session)}, `${null}`);
+			response?.track(`${getAuthUserId(session)}`, "Repo profile page", {name: getAuthUserName(session)}, anonymousId);
 		});
 	}, [session]);
 

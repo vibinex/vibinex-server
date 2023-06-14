@@ -1,17 +1,6 @@
 import React from 'react'
-import { useRouter } from 'next/router';
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 export default function Download() {
-	const router = useRouter();
-	React.useEffect(() => {
-		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-			rudderEventMethods().then((response) => {
-				response?.track("", "download page", {eventStatusFlag: 1}, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
-			});
-	  }, [router]);
-
 	return (
 		<>
 			<h1>{"Downloads"}</h1>

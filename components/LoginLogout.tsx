@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { Session } from 'next-auth';
 import Link from 'next/link';
 import { rudderEventMethods } from '../utils/rudderstack_initialize';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 export default function LoginLogout() {
 	const [showMenu, setShowMenu] = useState(false);
@@ -12,6 +13,7 @@ export default function LoginLogout() {
 
 	// FIXME: Ideally, this should have been automatically accomplished using useSession provided by NextAuth. But that is not working.
 	useEffect(() => {
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
 			const sessionVal = await res.json();
 			setSession(sessionVal);
@@ -19,19 +21,19 @@ export default function LoginLogout() {
 
 		const handleLogoutClick = () => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Logout link clicked", { type: "link", eventStatusFlag: 1, source: "profile popup", name: `${getAuthUserName(session)}`}, `${null}`)
+				response?.track(`${getAuthUserId(session)}`, "Logout link clicked", { type: "link", eventStatusFlag: 1, source: "profile popup", name: `${getAuthUserName(session)}`}, anonymousId)
 			});
 		};
 		
 		const handleContributeClick = () => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, `${null}`)
+				response?.track(`${getAuthUserId(session)}`, "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, anonymousId)
 			});
 		};
 
 		const handleSettingsClick = () => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, `${null}`)
+				response?.track(`${getAuthUserId(session)}`, "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, anonymousId)
 			});
 		};
 
@@ -66,7 +68,7 @@ export default function LoginLogout() {
 					<li id='settings-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
 					</li>
-					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => logout(getAuthUserId(session), getAuthUserName(session))}>
+					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage())}>
 						Logout
 					</li>
 				</ol>
@@ -76,7 +78,7 @@ export default function LoginLogout() {
 		</>
 	)
 	else return (
-		<Button variant='contained' onClick={() => login(getAuthUserId(session), getAuthUserName(session))} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+		<Button variant='contained' onClick={() => login(getAndSetAnonymousIdFromLocalStorage())} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
 			Login/Signup
 		</Button>
 	)
