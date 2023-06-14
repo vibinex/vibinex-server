@@ -18,11 +18,16 @@ interface RudderstackClientSideEvents {
   ) => void;
 }
 
-async function loadRudderAnalytics(): Promise<typeof import("rudder-sdk-js") | null> {
+async function loadRudderAnalytics(): Promise<RudderstackClientSideEvents | null> {
   if (typeof window !== "undefined") {
     if (process.env.NODE_ENV === "development") {
-      console.log("Running in development mode. Rudder Analytics is not loaded.");
-      return {} as typeof{};
+      console.warn("Running in development mode. Rudder Analytics is not loaded.");
+      const emptyAnalyticsObject: RudderstackClientSideEvents = {
+        identify: () => {},
+        track: () => {},
+        page: () => {}
+      };
+      return emptyAnalyticsObject;
     }
 
     const rudderAnalytics = await import("rudder-sdk-js");
@@ -37,15 +42,7 @@ async function loadRudderAnalytics(): Promise<typeof import("rudder-sdk-js") | n
     rudderAnalytics.ready(() => {
       console.log("Rudder Analytics is all set!!!");
     });
-    return rudderAnalytics;
-  }
-  return null;
-}
 
-export async function rudderEventMethods(): Promise<RudderstackClientSideEvents | null> {
-  const rudderAnalytics = await loadRudderAnalytics();
-
-  if (rudderAnalytics) {
     const rudderstackClientSideEvents: RudderstackClientSideEvents = {
       identify: (userId, name, email, anonymousId) => {  // Anonymous Id is set in local storage as soon as a user lands on the webiste.
         console.log("identify");
@@ -90,4 +87,9 @@ export async function rudderEventMethods(): Promise<RudderstackClientSideEvents 
     return rudderstackClientSideEvents;
   }
   return null;
+}
+
+export async function rudderEventMethods(): Promise<RudderstackClientSideEvents | null> {
+  const rudderAnalytics = await loadRudderAnalytics();
+  return rudderAnalytics;
 }
