@@ -26,8 +26,9 @@ type RudderStackEventPropertiesTrack = {
     const client = (process.env.NODE_ENV === 'development') ? {
         identify: (event_properties: RudderStackEventPropertiesIdentify) => console.info(event_properties),
         track: (event_properties:  RudderStackEventPropertiesTrack) => console.info(event_properties)
-    } 
-    : new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!, { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
+    }: new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!, { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
+    
+    
     const rudderStackEvents = {
             identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => { // Anonymous Id is set in local storage as soon as a user lands on the webiste.
                 console.log("identify");
@@ -54,10 +55,10 @@ type RudderStackEventPropertiesTrack = {
                     event: event,
                     properties: properties,
                     timestamp: new Date(),
-                }, () => { console.log("Track event successfully recorded") }
+                }, () => { console.log("Track event successfully recorded"); }
                 );
             }
-        }
+        };
         export default rudderStackEvents;
 
 
