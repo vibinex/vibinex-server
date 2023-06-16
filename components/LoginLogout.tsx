@@ -18,22 +18,28 @@ export default function LoginLogout() {
 			const sessionVal = await res.json();
 			setSession(sessionVal);
 		});
+		let userId = "";
+		let userName = "";
+		if (session != null && session.user){
+			userId = `${getAuthUserId(session)}`;
+			userName = getAuthUserImage(session);
+		}
 
 		const handleLogoutClick = () => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Logout link clicked", { type: "link", eventStatusFlag: 1, source: "profile popup", name: `${getAuthUserName(session)}`}, anonymousId)
+				response?.track(userId, "Logout link clicked", { type: "link", eventStatusFlag: 1, source: "profile popup", name: userName}, anonymousId)
 			});
 		};
 		
 		const handleContributeClick = () => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, anonymousId)
+				response?.track(userId, "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
 			});
 		};
 
 		const handleSettingsClick = () => {
 			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: `${getAuthUserName(session)}`}, anonymousId)
+				response?.track(userId, "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
 			});
 		};
 
