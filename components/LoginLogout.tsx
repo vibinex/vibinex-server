@@ -1,15 +1,17 @@
 import Button from '../components/Button'
 import Image from "next/image";
 import { getAuthUserImage, getAuthUserName, logout, login, getAuthUserId } from '../utils/auth';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import type { Session } from 'next-auth';
 import Link from 'next/link';
-import { rudderEventMethods } from '../utils/rudderstack_initialize';
+import RudderContext from './RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 export default function LoginLogout() {
 	const [showMenu, setShowMenu] = useState(false);
 	const [session, setSession] = useState<Session | null>(null);
+	const { rudderEventMethods } = useContext(RudderContext);
+
 
 	// FIXME: Ideally, this should have been automatically accomplished using useSession provided by NextAuth. But that is not working.
 	useEffect(() => {
@@ -26,21 +28,15 @@ export default function LoginLogout() {
 		}
 
 		const handleLogoutClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track(userId, "Logout link clicked", { type: "link", eventStatusFlag: 1, source: "profile popup", name: userName}, anonymousId)
-			});
+			rudderEventMethods?.track(userId, "Logout link clicked", { type: "link", eventStatusFlag: 1, source: "profile popup", name: userName}, anonymousId)
 		};
 		
 		const handleContributeClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track(userId, "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
-			});
+			rudderEventMethods?.track(userId, "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
 		};
 
 		const handleSettingsClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track(userId, "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
-			});
+			rudderEventMethods?.track(userId, "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
 		};
 
 	
@@ -57,7 +53,7 @@ export default function LoginLogout() {
 			contributeLink?.removeEventListener('click', handleContributeClick);
 			settingsLink?.removeEventListener('click', handleSettingsClick)
 		};
-	}, [session]);
+	}, [rudderEventMethods]);
 
 	if (session && session.user) return (
 		<>
@@ -74,7 +70,7 @@ export default function LoginLogout() {
 					<li id='settings-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
 					</li>
-					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage())}>
+					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => { if (rudderEventMethods) {logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), rudderEventMethods)}}}>
 						Logout
 					</li>
 				</ol>
@@ -84,7 +80,9 @@ export default function LoginLogout() {
 		</>
 	)
 	else return (
-		<Button variant='contained' onClick={() => login(getAndSetAnonymousIdFromLocalStorage())} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+		<Button variant='contained' onClick={() => { if (rudderEventMethods) {
+			return login(getAndSetAnonymousIdFromLocalStorage(), rudderEventMethods);
+		  }}} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
 			Login/Signup
 		</Button>
 	)

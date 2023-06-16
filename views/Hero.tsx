@@ -5,24 +5,21 @@ import highlightPR from '../public/highlightPR.png'
 import highlightFile from '../public/highlightFile.png'
 import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import RudderContext from "../components/RudderContext";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
 
 const Hero = (props: { ctaLink: string }) => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		// Track the "Add to Chrome" event
 		const handleAddToChrome = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero" }, anonymousId)
-			});
+			rudderEventMethods?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero" }, anonymousId)
 		};
 	
 		// Track the "Book Demo" event
 		const handleBookDemo = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Book demo button", { type: "button", eventStatusFlag: 1 }, anonymousId)
-			});
+			rudderEventMethods?.track("", "Book demo button", { type: "button", eventStatusFlag: 1 }, anonymousId)
 		};
 	
 		const addToChromeButton = document.getElementById('add-to-chrome-btn');
@@ -35,7 +32,7 @@ const Hero = (props: { ctaLink: string }) => {
 			addToChromeButton?.removeEventListener('click', handleAddToChrome);
 			bookDemoButton?.removeEventListener('click', handleBookDemo);
 		};
-	  }, []);
+	  }, [rudderEventMethods]);
 	return (
 		<div className='flex items-center justify-center h-screen bg-fixed bg-center bg-cover'
 			style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503252947848-7338d3f92f31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80')" }}

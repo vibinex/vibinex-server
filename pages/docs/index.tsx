@@ -4,7 +4,7 @@ import Button from "../../components/Button";
 import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
-import { rudderEventMethods } from '../../utils/rudderstack_initialize';
+import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/url_utils';
 
 const verifySetup = [
@@ -14,23 +14,17 @@ const verifySetup = [
 ]
 
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
-	const router = useRouter()
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods().then((response) => {
-			response?.track("", "docs page", { type: "page", eventStatusFlag: 1 }, anonymousId)
-		});
+		rudderEventMethods?.track("", "docs page", { type: "page", eventStatusFlag: 1 }, anonymousId)
 
 		const handleGitHubAppClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Install github app ", { type: "link", eventStatusFlag: 1, source: "docs"}, anonymousId)
-			});
+			rudderEventMethods?.track("", "Install github app ", { type: "link", eventStatusFlag: 1, source: "docs"}, anonymousId)
 		};
 		
 		const handleAuthoriseBitbucketOauthButton = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Authorise bitbucket consumer button", { type: "button", eventStatusFlag: 1, source: "docs" }, anonymousId)
-			});
+			rudderEventMethods?.track("", "Authorise bitbucket consumer button", { type: "button", eventStatusFlag: 1, source: "docs" }, anonymousId)
 		};
 	
 		const githubAppInstallLink = document.getElementById('github-app-install');
@@ -43,7 +37,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			githubAppInstallLink?.removeEventListener('click', handleGitHubAppClick);
 			authoriseBitbucketOauth?.removeEventListener('click', handleAuthoriseBitbucketOauthButton);
 		};
-	}, [router]);
+	}, [rudderEventMethods]);
 
 	
 	const docs = [

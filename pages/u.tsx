@@ -5,8 +5,8 @@ import MainAppBar from "../views/MainAppBar";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { updateUser } from "../utils/db/users";
 import axios from "axios";
-import { useEffect } from "react";
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import { useEffect, useContext } from "react";
+import RudderContext from "../components/RudderContext";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
@@ -22,16 +22,13 @@ type ProfileProps = {
 
 const Profile = ({ repo_list }: ProfileProps) => {
 	const session: Session | null = useSession().data;
+	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods().then((response) => {
-			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {type: "page", name: getAuthUserName(session)}, anonymousId);
-		});
+		rudderEventMethods?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {type: "page", name: getAuthUserName(session)}, anonymousId);
 
 		const handleAddRepositoryButton = () => {
-			rudderEventMethods().then((response) => {
-				response?.track(`${getAuthUserId(session)}`, "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session)}, anonymousId)
-			});
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session)}, anonymousId)
 		};
 			
 		const addRepositoryButton = document.getElementById('add-repository');
@@ -40,7 +37,7 @@ const Profile = ({ repo_list }: ProfileProps) => {
 		return () => {
 			addRepositoryButton?.removeEventListener('click', handleAddRepositoryButton);
 		};
-	}, [session])
+	}, [rudderEventMethods])
 
 	return (
 		<div className="flex flex-col min-h-screen">

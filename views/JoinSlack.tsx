@@ -1,19 +1,16 @@
 import React from 'react'
-import { useRouter } from 'next/router';
 import Link from 'next/link'
 import { BsSlack } from 'react-icons/bs'
-import { rudderEventMethods } from '../utils/rudderstack_initialize'
+import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 const JoinSlack = () => {
-	const router = useRouter()
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		
 		const handleJoinSlack = () => {
-			rudderEventMethods().then((response) => {
-				response?.track('', "join slack", { type: "button", eventStatusFlag: 1 }, anonymousId)
-			});
+			rudderEventMethods?.track('', "join slack", { type: "button", eventStatusFlag: 1 }, anonymousId)
 		}
 
 		const joinSlackLink = document.getElementById('join-slack');
@@ -23,7 +20,7 @@ const JoinSlack = () => {
 			joinSlackLink?.removeEventListener('click', handleJoinSlack);
 		}
 
-	}, [router])
+	}, [rudderEventMethods])
 	return (
 		<div id='joinSlack' className='w-full text-center py-12  bg-black mb-[-5%]'>
 			<h2 className='font-bold text-[2rem] text-white'>Slack Community</h2>

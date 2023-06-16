@@ -5,7 +5,7 @@ import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import Link from 'next/link';
 import Button from '../components/Button';
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 const monthlyBasePriceUSD = 10;
@@ -43,7 +43,7 @@ const pricingPlan = [
 
 
 const Pricing = () => {
-	const router = useRouter();
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	const [isYearly, setIsYearly] = useState(false); // false for monthly
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	let heading = [
@@ -63,18 +63,14 @@ const Pricing = () => {
 	React.useEffect(() => {
 		// tracking events on every button clicked
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-plan-changed", { type: "button", isYearly: isYearly }, anonymousId);
-		});
+		rudderEventMethods?.track("", "pricing-plan-changed", { type: "button", isYearly: isYearly }, anonymousId);
 
 	}, [isYearly]);
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-page", { type: "page", eventStatusFlag: 1 }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
-		});
-	}, [router]);
+		rudderEventMethods?.track("", "pricing-page", { type: "page", eventStatusFlag: 1 }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
+	}, [rudderEventMethods]);
 
 	return (
 		<div>

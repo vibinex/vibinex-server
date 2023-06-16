@@ -5,6 +5,7 @@ import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
 import Features from '../views/Features'
 import TrustUs from '../views/TrustUs'
+import RudderContext from '../components/RudderContext'
 import { rudderEventMethods } from "../utils/rudderstack_initialize";
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils'
 
@@ -12,16 +13,13 @@ import JoinSlack from '../views/JoinSlack'
 
 export default function Home() {
   const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
+  const { rudderEventMethods } = React.useContext(RudderContext);
 
   React.useEffect(() => {
 	const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-    rudderEventMethods().then((response) => {
-      response?.identify("", "", "", anonymousId);
-    });
-	rudderEventMethods().then((response) => {
-		response?.track("", "Landing page", {type: "page", page: "Landing page"}, anonymousId)
-	})
-  }, []);
+    rudderEventMethods?.identify("", "", "", anonymousId);
+	rudderEventMethods?.track("", "Landing page", {type: "page", page: "Landing page"}, anonymousId)
+  }, [rudderEventMethods]);
 
   return (
     <div>

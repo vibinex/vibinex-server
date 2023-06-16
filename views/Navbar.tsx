@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
-import { rudderEventMethods } from '../utils/rudderstack_initialize';
+import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { login } from '../utils/auth';
 
 
-	const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
+const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	const [showNavbar, setShowNavbar] = useState(false);
 	const [scrollDown, setScrollDown] = useState(props.transparent);
 	const changeNavbar = () => {
@@ -29,38 +31,39 @@ import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 
 		const handleDownloadClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
-			});
+			rudderEventMethods?.track("", "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
 		};
 		
 		const handlePricingClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
-			});
+			rudderEventMethods?.track("", "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
 		};
 
 		const handleContributeClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Contribute link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
-			});
+			rudderEventMethods?.track("", "Contribute link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
+		};
+
+		const handleLoginLogoutClick = () => {
+			rudderEventMethods?.track("", " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
 		};
 
 	
 		const downloadLink = document.getElementById('download-link');
   		const pricingLink = document.getElementById('pricing-link');
 		const contributeLink = document.getElementById('contribute-link');
+		const loginLogoutLink = document.getElementById('login-logout-link');
 
   		downloadLink?.addEventListener('click', handleDownloadClick);
   		pricingLink?.addEventListener('click', handlePricingClick);
-		contributeLink?.addEventListener('click', handleContributeClick)
+		contributeLink?.addEventListener('click', handleContributeClick);
+		loginLogoutLink?.addEventListener('click', handleLoginLogoutClick);
 
 		return () => {
 			downloadLink?.removeEventListener('click', handleDownloadClick);
 			pricingLink?.removeEventListener('click', handlePricingClick);
-			contributeLink?.removeEventListener('click', handleContributeClick)
+			contributeLink?.removeEventListener('click', handleContributeClick);
+			loginLogoutLink?.removeEventListener('click', handleLoginLogoutClick);
 		};
-	  }, []);
+	  }, [rudderEventMethods]);
   return (
     <div
       className={
@@ -89,7 +92,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
               <Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
             </Link>
           </li>
-          <li className='p-4'>
+          <li id='login-logout-link' className='p-4'>
             <LoginLogout />
           </li>
         </ul>

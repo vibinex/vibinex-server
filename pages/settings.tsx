@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import RudderContext from '../components/RudderContext';
 import { getAuthUserId } from "../utils/auth";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 const Settings = () => {
-
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	const settingList = [
 
@@ -93,19 +93,14 @@ const Settings = () => {
 
 		setUpdateList((prev) => prev = prevUpdateList);
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods().then((response) => {
-			response?.track(`${userId}`, "settings-changed", value, anonymousId);
-		});
+		rudderEventMethods?.track(`${userId}`, "settings-changed", value, anonymousId);
 	};
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		getSettings();
-
-		rudderEventMethods().then((response) => {
-			response?.track(`${userId}`, "settings-page", { type: "page", eventStatusFlag: 1 }, anonymousId)
-		});
-	}, []);
+		rudderEventMethods?.track(`${userId}`, "settings-page", { type: "page", eventStatusFlag: 1 }, anonymousId)
+	}, [rudderEventMethods]);
 
 
 	return (
