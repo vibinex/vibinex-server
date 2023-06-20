@@ -22,7 +22,12 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'avatar-management--avatars.us-west-2.prod.public.atl-paas.net', // Bitbucket profile images
         pathname: '/**',
-      }
+      },
+	  {
+		protocol: 'https',
+		hostname: 'secure.gravatar.com',
+		pathname: '/**'
+	  }
     ],
   },
   webpack: (config) => {
