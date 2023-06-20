@@ -1,16 +1,20 @@
 import React from 'react'
+import { useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
 import Link from 'next/link'
 import { BsSlack } from 'react-icons/bs'
 import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAuthUserId, getAuthUserName } from '../utils/auth'
 
 const JoinSlack = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		
 		const handleJoinSlack = () => {
-			rudderEventMethods?.track('', "join slack", { type: "button", eventStatusFlag: 1 }, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "join slack", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 		}
 
 		const joinSlackLink = document.getElementById('join-slack');

@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
 import Link from 'next/link';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import LoginLogout from "../components/LoginLogout";
@@ -6,11 +8,12 @@ import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
 import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
-import { login } from '../utils/auth';
-
+import { getAuthUserId, getAuthUserName } from '../utils/auth';
 
 const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
+
 	const [showNavbar, setShowNavbar] = useState(false);
 	const [scrollDown, setScrollDown] = useState(props.transparent);
 	const changeNavbar = () => {
@@ -31,19 +34,19 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 
 		const handleDownloadClick = () => {
-			rudderEventMethods?.track("", "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session)}, anonymousId)
 		};
 		
 		const handlePricingClick = () => {
-			rudderEventMethods?.track("", "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handleContributeClick = () => {
-			rudderEventMethods?.track("", "Contribute link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Contribute link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handleLoginLogoutClick = () => {
-			rudderEventMethods?.track("", " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar"}, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session)}, anonymousId)
 		};
 
 	

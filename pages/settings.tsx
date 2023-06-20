@@ -3,7 +3,7 @@ import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
 import RudderContext from '../components/RudderContext';
-import { getAuthUserId } from "../utils/auth";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
@@ -99,7 +99,7 @@ const Settings = () => {
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		getSettings();
-		rudderEventMethods?.track(`${userId}`, "settings-page", { type: "page", eventStatusFlag: 1 }, anonymousId)
+		rudderEventMethods?.track(`${userId}`, "settings-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 	}, [rudderEventMethods]);
 
 

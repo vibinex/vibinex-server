@@ -1,4 +1,6 @@
 import React from "react";
+import { useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
 import Button from "../components/Button";
 import Image from "next/image";
 import highlightPR from '../public/highlightPR.png'
@@ -7,19 +9,22 @@ import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
 import RudderContext from "../components/RudderContext";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 const Hero = (props: { ctaLink: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
+
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		// Track the "Add to Chrome" event
 		const handleAddToChrome = () => {
-			rudderEventMethods?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero" }, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
 		};
 	
 		// Track the "Book Demo" event
 		const handleBookDemo = () => {
-			rudderEventMethods?.track("", "Book demo button", { type: "button", eventStatusFlag: 1 }, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Book demo button", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 		};
 	
 		const addToChromeButton = document.getElementById('add-to-chrome-btn');

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
 import Button from "../../components/Button";
 import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/url_utils';
+import { getAuthUserId, getAuthUserName } from '../../utils/auth';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -15,16 +17,17 @@ const verifySetup = [
 
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track("", "docs page", { type: "page", eventStatusFlag: 1 }, anonymousId)
+		rudderEventMethods?.track(`${getAuthUserId(session)}`, "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 
 		const handleGitHubAppClick = () => {
-			rudderEventMethods?.track("", "Install github app ", { type: "link", eventStatusFlag: 1, source: "docs"}, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Install github app ", { type: "link", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session)}, anonymousId)
 		};
 		
 		const handleAuthoriseBitbucketOauthButton = () => {
-			rudderEventMethods?.track("", "Authorise bitbucket consumer button", { type: "button", eventStatusFlag: 1, source: "docs" }, anonymousId)
+			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Authorise bitbucket consumer button", { type: "button", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session)}, anonymousId)
 		};
 	
 		const githubAppInstallLink = document.getElementById('github-app-install');

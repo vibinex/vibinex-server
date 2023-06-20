@@ -1,8 +1,5 @@
-import { useContext } from 'react';
 import { signIn, signOut } from 'next-auth/react';
 import { Session } from 'next-auth/core/types';
-import RudderContext from '../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from './url_utils';
 import { RudderstackClientSideEvents, rudderEventMethods } from './rudderstack_initialize';
 
 export const login = (anonymousId: string, rudderEventMethods: RudderstackClientSideEvents) => {
@@ -26,3 +23,4 @@ export const logout = (userId: number, userName: string, anonymousId: string, ru
 export const getAuthUserId = (session: Session | null) => session?.user.id ? session.user.id : 0;
 export const getAuthUserName = (session: Session | null) => session?.user?.name ? session?.user?.name : "User";
 export const getAuthUserImage = (session: Session | null) => session?.user?.image ? session?.user?.image : "/dummy-profile-pic-female-300n300.jpeg";
+export const getAuthUserEmail = (session: Session | null) => session?.user?.email ? session?.user?.email : "";

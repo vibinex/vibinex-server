@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
-import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react'
+import { Session } from 'next-auth'
 import { AiOutlineCheckCircle } from 'react-icons/ai'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
-import Link from 'next/link';
 import Button from '../components/Button';
 import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAuthUserId, getAuthUserName } from '../utils/auth';
 
 const monthlyBasePriceUSD = 10;
 
@@ -44,6 +45,7 @@ const pricingPlan = [
 
 const Pricing = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
 	const [isYearly, setIsYearly] = useState(false); // false for monthly
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	let heading = [
@@ -61,15 +63,8 @@ const Pricing = () => {
 	const today = new Date();
 
 	React.useEffect(() => {
-		// tracking events on every button clicked
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track("", "pricing-plan-changed", { type: "button", isYearly: isYearly }, anonymousId);
-
-	}, [isYearly]);
-
-	React.useEffect(() => {
-		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track("", "pricing-page", { type: "page", eventStatusFlag: 1 }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
+		rudderEventMethods?.track(`${getAuthUserId(session)}`, "pricing-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
 	}, [rudderEventMethods]);
 
 	return (
@@ -86,7 +81,7 @@ const Pricing = () => {
 						return (
 							<div
 								key={index}
-								onClick={() => setIsYearly(item.name === 'Yearly')}
+								onClick={() => {setIsYearly(item.name === 'Yearly'); rudderEventMethods?.track(`${getAuthUserId(session)}`, "pricing-changed", { type: "button", eventStatusFlag: 1, isYearly: isYearly, name: getAuthUserName(session) }, getAndSetAnonymousIdFromLocalStorage())}}
 								className={`text-center p-4 w-full rounded-xl cursor-pointer ${item.flag ? null : 'bg-primary-main border-2 border-primary-dark'}`}>
 								<h2 className={`sm:text-2xl font-bold ${item.flag ? 'text-secondary-dark' : 'text-secondary-main'}`}
 								>{item.name}{item.name === 'Yearly' ?
