@@ -4,7 +4,7 @@ import AuthInfo from "./AuthInfo";
 declare module "next-auth" {
 	interface Session extends DefaultSession {
 		user: {
-			id?: number,
+			id?: string,
 			name?: string,
 			email?: string,
 			image?: string,

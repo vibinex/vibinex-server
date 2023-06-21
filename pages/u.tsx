@@ -23,7 +23,7 @@ const Profile = ({ repo_list }: ProfileProps) => {
 	const session: Session | null = useSession().data;
 	useEffect(() => {
 		rudderEventMethods().then((response) => {
-			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {"userId": `${getAuthUserId(session)}`, "name": getAuthUserName(session)}, `${null}`);
+			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", { "userId": `${getAuthUserId(session)}`, "name": getAuthUserName(session) }, `${null}`);
 		});
 	}, [session])
 
@@ -52,6 +52,12 @@ type BitbucketEmailObj = {
 	email: string,
 	is_primary: boolean,
 	is_confirmed: boolean,
+}
+
+type GitlabEmailObj = {
+	id: number,
+	email: string,
+	confirmed_at: string | null,
 }
 
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
@@ -113,6 +119,28 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 		}
 	} else {
 		console.warn("Bitbucket provider not present");
+	}
+
+	if (Object.keys(session.user.auth_info!).includes("gitlab")) {
+		for (const gl_auth_info of Object.values(session.user.auth_info!["gitlab"])) {
+			const access_key: string = gl_auth_info['access_token'];
+			axios.get("https://gitlab.com/api/v4/user/emails", {
+				headers: {
+					'Authorization': `Bearer ${access_key}`
+				}
+			})
+				.then((response: { data: GitlabEmailObj[] }) => {
+					const aliases = response.data.map((emailObj: GitlabEmailObj) => emailObj.email);
+					updateUser(session.user.id!, { aliases: aliases }).catch(err => {
+						console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
+					})
+				})
+				.catch(err => {
+					console.error(`[Profile] Error occurred while getting user emails from GitLab API. Endpoint: /user/emails, userId: ${session.user.id}, name: ${session.user.name}`, err.message);
+				});
+		}
+	} else {
+		console.warn("Github provider not present");
 	}
 
 	// get the list of repositories of the user
