@@ -69,7 +69,9 @@ export const createUser = async (user: DbUser) => {
  */
 export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 	const user_q = `SELECT * FROM users WHERE id = ${convert(userId)}`;
-	const user_result = await conn.query(user_q);
+	const user_result = await conn.query(user_q).catch(err => {
+		throw Error("Error in running the query on the database", err);
+	});
 	if (user_result.rowCount == 0) return;
 
 	const currUser: DbUser = user_result.rows[0];
@@ -107,7 +109,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 								const currAuthObj = currUser.auth_info[provider][providerAccountId];
 								const newAuthObj = user.auth_info[provider][providerAccountId];
 
-								if (newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at > currAuthObj.expires_at) {
+								if (!(newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at < currAuthObj.expires_at)) {
 									diffAuth[provider][providerAccountId] = newAuthObj;
 								}
 								if ((newAuthObj.handle && !currAuthObj.handle) || (newAuthObj.handle != currAuthObj.handle)) {
@@ -137,10 +139,12 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
  * @param user updated user object (please only include fields that have changed)
  */
 export const updateUser = async (userId: string, user: DbUser) => {
-	const diffObj = await createUpdateUserObj(userId, user);
+	const diffObj = await createUpdateUserObj(userId, user).catch(err => {
+		console.error(`[createUpdateUserObj] Something went wrong`, err);
+	});
 	if (!diffObj || Object.keys(diffObj).length == 0) return;
-	const update_user_q = `UPDATE users 
-		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")} 
+	const update_user_q = `UPDATE users
+		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")}
 		WHERE id = ${convert(userId)} `;
 	conn.query(update_user_q)
 		.then(update_user_result => {

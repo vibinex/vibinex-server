@@ -1,6 +1,7 @@
 import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider, { GithubProfile } from "next-auth/providers/github"
+import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
@@ -27,7 +28,11 @@ export const authOptions = {
 		BitbucketProvider({
 			clientId: process.env.BITBUCKET_CLIENT_ID!,
 			clientSecret: process.env.BITBUCKET_CLIENT_SECRET!,
-		})
+		}),
+		GitlabProvider({
+			clientId: process.env.GITLAB_CLIENT_ID!,
+			clientSecret: process.env.GITLAB_CLIENT_SECRET!,
+		}),
 		// ...add more providers here
 	],
 	callbacks: {
@@ -114,11 +119,14 @@ const getHandleFromProfile = (profile: Profile | undefined) => {
 	// convert profile to GithubProfile or BitbucketProfile
 	const githubProfile = profile as GithubProfile;
 	const bitbucketProfile = profile as BitbucketProfile;
+	const gitlabProfile = profile as GitLabProfile;
 	if (profile !== undefined) {
 		if ("login" in githubProfile) {
 			handle = githubProfile.login; // Assign profile.login if it's a GithubProfile
 		} else if ("username" in bitbucketProfile) {
 			handle = bitbucketProfile.username; // Assign profile.username if it's a BitbucketProfile
+		} else if ("username" in gitlabProfile) {
+			handle = gitlabProfile.username; // Assign profile.username if it's a GitLabProfile
 		} else {
 			handle = null; // Set handle to null if it's neither a GithubProfile nor a BitbucketProfile
 		}
@@ -143,7 +151,7 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: Profi
 			}
 		}
 	}
-	
+
 	if (user.name && user.name != db_user?.name) updateObj.name = user.name;
 	if (user.image && user.image != db_user?.profile_url) updateObj.profile_url = user.image;
 	if (user.email && !db_user?.aliases?.includes(user.email)) {
