@@ -64,7 +64,7 @@ const Pricing = () => {
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(`${getAuthUserId(session)}`, "pricing-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
+		rudderEventMethods?.track(getAuthUserId(session), "pricing-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
 	}, [rudderEventMethods]);
 
 	return (
@@ -81,7 +81,7 @@ const Pricing = () => {
 						return (
 							<div
 								key={index}
-								onClick={() => {setIsYearly(item.name === 'Yearly'); rudderEventMethods?.track(`${getAuthUserId(session)}`, "pricing-changed", { type: "button", eventStatusFlag: 1, isYearly: isYearly, name: getAuthUserName(session) }, getAndSetAnonymousIdFromLocalStorage())}}
+								onClick={() => {setIsYearly(item.name === 'Yearly'); rudderEventMethods?.track(getAuthUserId(session), "pricing-changed", { type: "button", eventStatusFlag: 1, isYearly: isYearly, name: getAuthUserName(session) }, getAndSetAnonymousIdFromLocalStorage())}}
 								className={`text-center p-4 w-full rounded-xl cursor-pointer ${item.flag ? null : 'bg-primary-main border-2 border-primary-dark'}`}>
 								<h2 className={`sm:text-2xl font-bold ${item.flag ? 'text-secondary-dark' : 'text-secondary-main'}`}
 								>{item.name}{item.name === 'Yearly' ?

@@ -25,10 +25,10 @@ const Profile = ({ repo_list }: ProfileProps) => {
 	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(`${getAuthUserId(session)}`, "Repo Profile Page", {type: "page", name: getAuthUserName(session)}, anonymousId);
+		rudderEventMethods?.track(getAuthUserId(session), "Repo Profile Page", {type: "page", name: getAuthUserName(session)}, anonymousId);
 
 		const handleAddRepositoryButton = () => {
-			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session)}, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session)}, anonymousId)
 		};
 			
 		const addRepositoryButton = document.getElementById('add-repository');

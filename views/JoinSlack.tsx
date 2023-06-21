@@ -14,7 +14,7 @@ const JoinSlack = () => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		
 		const handleJoinSlack = () => {
-			rudderEventMethods?.track(`${getAuthUserId(session)}`, "join slack", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "join slack", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 		}
 
 		const joinSlackLink = document.getElementById('join-slack');

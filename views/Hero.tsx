@@ -19,12 +19,12 @@ const Hero = (props: { ctaLink: string }) => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		// Track the "Add to Chrome" event
 		const handleAddToChrome = () => {
-			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
 		};
 	
 		// Track the "Book Demo" event
 		const handleBookDemo = () => {
-			rudderEventMethods?.track(`${getAuthUserId(session)}`, "Book demo button", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Book demo button", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 		};
 	
 		const addToChromeButton = document.getElementById('add-to-chrome-btn');

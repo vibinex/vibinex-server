@@ -34,7 +34,7 @@ const Settings = () => {
 	const session: Session | null = useSession().data;
 	const userId = getAuthUserId(session);
 
-	async function apiCall(type: string, user_id: number, bodyData: string) {
+	async function apiCall(type: string, user_id: string, bodyData: string) {
 		const url = type == 'get' ? 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings' : 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings/update';
 		const body = type == 'get' ? { user_id } : { user_id, settings: bodyData };
 		try {
@@ -93,13 +93,13 @@ const Settings = () => {
 
 		setUpdateList((prev) => prev = prevUpdateList);
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(`${userId}`, "settings-changed", value, anonymousId);
+		rudderEventMethods?.track(userId, "settings-changed", value, anonymousId);
 	};
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		getSettings();
-		rudderEventMethods?.track(`${userId}`, "settings-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+		rudderEventMethods?.track(userId, "settings-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 	}, [rudderEventMethods]);
 
 

@@ -9,13 +9,13 @@ export const login = (anonymousId: string, rudderEventMethods: RudderstackClient
 	})
 }
 
-export const logout = (userId: number, userName: string, anonymousId: string, rudderEventMethods: RudderstackClientSideEvents) => {
+export const logout = (userId: string, userName: string, anonymousId: string, rudderEventMethods: RudderstackClientSideEvents) => {
 	signOut().then(_ => {
-		rudderEventMethods?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
+		rudderEventMethods?.track(userId, "logout", {userId: userId, eventStatusFlag: 1, source: "profile-popup", name: userName}, anonymousId)
 		window.location.href = "/";
 	})
 		.catch(err => {
-			rudderEventMethods?.track(`${userId}`, "logout", {userId: `${userId}`, eventStatusFlag: 0, source: "profile-popup", name: userName}, anonymousId)
+			rudderEventMethods?.track(userId, "logout", {userId: userId, eventStatusFlag: 0, source: "profile-popup", name: userName}, anonymousId)
 			console.error("[signOut] Signout failed", err);
 		})
 }

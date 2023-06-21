@@ -142,7 +142,6 @@ export const updateUser = async (userId: string, user: DbUser) => {
 	const update_user_q = `UPDATE users 
 		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")} 
 		WHERE id = ${convert(userId)} `;
-	console.log("update: ", update_user_q);
 	conn.query(update_user_q)
 		.then(update_user_result => {
 			if (update_user_result.rowCount == 1) {

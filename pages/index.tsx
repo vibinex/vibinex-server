@@ -23,8 +23,8 @@ export default function Home() {
 		let userName = getAuthUserName(session)
 		let userEmail = getAuthUserEmail(session)
 
-		rudderEventMethods?.identify(`${userId}`, userName, userEmail, anonymousId);
-		rudderEventMethods?.track(`${userId}`, "Landing page", {type: "page", page: "Landing page", name: userName}, anonymousId)
+		rudderEventMethods?.identify(userId, userName, userEmail, anonymousId);
+		rudderEventMethods?.track(userId, "Landing page", {type: "page", page: "Landing page", name: userName}, anonymousId)
 	}, [rudderEventMethods]);
 
 	return (
