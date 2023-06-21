@@ -59,8 +59,9 @@ const Pricing = () => {
 		return (<>  {currency} <span className='text-4xl'>{price} </span ></>);
 	}
 
-	const pricingStartDate = new Date(2023, 6, 1); // 1st July 2023
+	const pricingStartDate = new Date(2023, 7, 31); // 31st August 2023
 	const today = new Date();
+	const readableDate = (date: Date) => date.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -74,7 +75,7 @@ const Pricing = () => {
 			</div>
 			<div id='pricing' className='w-full py-12 bg-primary-light'>
 				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-primary-main font-bold'>Plans</span></h2>
-				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after July 1, 2023)</small></p>) : null}
+				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after {readableDate(pricingStartDate)})</small></p>) : null}
 
 				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-xl mt-8 bg-gray-100'>
 					{heading.map((item, index) => {
