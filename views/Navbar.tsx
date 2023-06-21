@@ -34,9 +34,9 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 
 		const handleDownloadClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session)}, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
-		
+
 		const handlePricingClick = () => {
 			rudderEventMethods?.track(getAuthUserId(session), "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
@@ -46,17 +46,17 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		};
 
 		const handleLoginLogoutClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session)}, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
-	
+
 		const downloadLink = document.getElementById('download-link');
-  		const pricingLink = document.getElementById('pricing-link');
+		const pricingLink = document.getElementById('pricing-link');
 		const contributeLink = document.getElementById('contribute-link');
 		const loginLogoutLink = document.getElementById('login-logout-link');
 
-  		downloadLink?.addEventListener('click', handleDownloadClick);
-  		pricingLink?.addEventListener('click', handlePricingClick);
+		downloadLink?.addEventListener('click', handleDownloadClick);
+		pricingLink?.addEventListener('click', handlePricingClick);
 		contributeLink?.addEventListener('click', handleContributeClick);
 		loginLogoutLink?.addEventListener('click', handleLoginLogoutClick);
 
@@ -69,15 +69,15 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 	}, [rudderEventMethods]);
 	return (
 		<div
-		className={
-			'fixed left-0 top-0 w-full z-10 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown || props.transparent ? ' bg-primary-light text-secondary-dark' : ' text-primary-light')
-		}
+			className={
+				'fixed left-0 top-0 w-full z-10 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown || props.transparent ? ' bg-primary-light text-secondary-dark' : ' text-primary-light')
+			}
 		>
 			<div className='max-w-[1240px] m-auto flex justify-between items-center p-4 '>
 				<Link href='/'>
-				<h1 className='font-bold text-4xl'>
-					Vibinex
-				</h1>
+					<h1 className='font-bold text-4xl'>
+						Vibinex
+					</h1>
 				</Link>
 				<ul className='hidden sm:flex'>
 					<li className='p-4'>
@@ -91,8 +91,8 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 					</li>
 					<li className='p-4' id='download-link'>
 						<Link href={props.ctaLink} target="_blank">
-						Download
-						<Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
+							Download
+							<Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
 						</Link>
 					</li>
 					<li id='login-logout-link' className='p-4'>
