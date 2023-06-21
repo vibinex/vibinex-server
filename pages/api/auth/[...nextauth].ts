@@ -6,6 +6,7 @@ import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } fro
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
+import { v4 as uuidv4 } from "uuid";
 interface signInParam {
 	user: User,
 	account: Account | null,
@@ -57,7 +58,7 @@ export const authOptions = {
 
 				// signup event
 				account && getUserByProvider(account.provider, account.providerAccountId).then(db_user => {
-					rudderStackEvents.track(db_user.id.toString(), "", "signup", { ...db_user, eventStatusFlag: 1 });
+					rudderStackEvents.track(db_user.id.toString(), uuidv4(), "signup", { ...db_user, eventStatusFlag: 1 });
 				}).catch(err => {
 					console.error("[signup] Rudderstack event failed: Could not get user id", db_user, err);
 				});
@@ -68,7 +69,7 @@ export const authOptions = {
 				await updateUser(db_user.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
-				rudderStackEvents.track(db_user.id!.toString(), "", "login", { ...updateObj, newAuth: !existingAuth });
+				rudderStackEvents.track(db_user.id!.toString(), uuidv4(), "login", { ...updateObj, newAuth: !existingAuth });
 			}
 			return true;
 		},
