@@ -32,10 +32,10 @@ const rudderStackEvents = {
             event: event,
             properties: properties,
             timestamp: new Date(),
-        }, () => { console.log("Track event successfully recorded"); }
+        }, () => { console.log("Track event successfully recorded") }
         );
     }
-};
+}
 export default rudderStackEvents;
 
 
