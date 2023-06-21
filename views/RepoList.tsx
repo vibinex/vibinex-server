@@ -43,7 +43,7 @@ const RepoList = (props: { repo_list: string[] }) => {
 export async function getRepoList(conn: Pool, userId?: string) {
 	const repo_list_q = `SELECT DISTINCT 
 		c.commit_json ->> 'repo_name' AS repo_name
-		FROM ` + ((!convert(userId)) ? "commits AS c" : `(SELECT 
+		FROM ` + ((!userId) ? "commits AS c" : `(SELECT 
 			id,
 			ENCODE(sha256(UNNEST(aliases)::bytea), 'hex') AS email_hash 
 			FROM users WHERE id = ${convert(userId)}

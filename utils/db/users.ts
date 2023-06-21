@@ -46,8 +46,8 @@ export const createUser = async (user: DbUser) => {
 	const { ...others } = user;
 	const id = uuidv4()
 	const insert_obj = [...Object.entries(others), ['id', id]].filter(([k, v]) => v);
-	const keys = [...insert_obj.map(x => x[0])];
-	const values = [...insert_obj.map(x => convert(x[1]))];
+	const keys = insert_obj.map(x => x[0]);
+	const values = insert_obj.map(x => convert(x[1]));
 	const insert_user_q = `INSERT INTO users (${keys.join(', ')}) VALUES (${values.join(', ')})`
 	conn.query(insert_user_q)
 		.then(insert_user_result => {
