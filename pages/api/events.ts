@@ -37,6 +37,3 @@ const rudderStackEvents = {
     }
 }
 export default rudderStackEvents;
-
-
-
