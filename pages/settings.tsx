@@ -5,7 +5,7 @@ import { BsToggleOn } from 'react-icons/bs';
 import RudderContext from '../components/RudderContext';
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { useSession } from "next-auth/react";
-import { Session } from "next-auth";
+import type { Session } from "next-auth";
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 const Settings = () => {
@@ -100,7 +100,7 @@ const Settings = () => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		getSettings();
 		rudderEventMethods?.track(userId, "settings-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
-	}, [rudderEventMethods]);
+	}, [rudderEventMethods, session]);
 
 
 	return (

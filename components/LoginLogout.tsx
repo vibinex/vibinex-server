@@ -47,7 +47,7 @@ export default function LoginLogout() {
 			contributeLink?.removeEventListener('click', handleContributeClick);
 			settingsLink?.removeEventListener('click', handleSettingsClick)
 		};
-	}, [rudderEventMethods]);
+	}, [rudderEventMethods, session]);
 
 	if (session && session.user) return (
 		<>

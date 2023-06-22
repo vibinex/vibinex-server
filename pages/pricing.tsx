@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { Session } from 'next-auth'
+import  type { Session } from 'next-auth'
 import { AiOutlineCheckCircle } from 'react-icons/ai'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
@@ -66,7 +66,7 @@ const Pricing = () => {
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "pricing-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId) //Anonymous Id is set in local storage as soon as the user lands on the webiste.
-	}, [rudderEventMethods]);
+	}, [rudderEventMethods, session]);
 
 	return (
 		<div>

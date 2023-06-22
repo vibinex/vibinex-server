@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react'
-import { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import Link from 'next/link';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import LoginLogout from "../components/LoginLogout";
@@ -66,7 +66,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 			contributeLink?.removeEventListener('click', handleContributeClick);
 			loginLogoutLink?.removeEventListener('click', handleLoginLogoutClick);
 		};
-	}, [rudderEventMethods]);
+	}, [rudderEventMethods, session]);
 	return (
 		<div
 			className={

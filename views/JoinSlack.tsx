@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSession } from 'next-auth/react'
-import { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import Link from 'next/link'
 import { BsSlack } from 'react-icons/bs'
 import RudderContext from '../components/RudderContext';
@@ -24,7 +24,7 @@ const JoinSlack = () => {
 			joinSlackLink?.removeEventListener('click', handleJoinSlack);
 		}
 
-	}, [rudderEventMethods])
+	}, [rudderEventMethods, session])
 	return (
 		<div id='joinSlack' className='w-full text-center py-12  bg-black mb-[-5%]'>
 			<h2 className='font-bold text-[2rem] text-white'>Slack Community</h2>

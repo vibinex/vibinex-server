@@ -25,7 +25,7 @@ export default function Home() {
 
 		rudderEventMethods?.identify(userId, userName, userEmail, anonymousId);
 		rudderEventMethods?.track(userId, "Landing page", { type: "page", page: "Landing page", name: userName }, anonymousId)
-	}, [rudderEventMethods]);
+	}, [rudderEventMethods, session]);
 
 	return (
 		<div>

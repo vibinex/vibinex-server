@@ -40,7 +40,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			githubAppInstallLink?.removeEventListener('click', handleGitHubAppClick);
 			authoriseBitbucketOauth?.removeEventListener('click', handleAuthoriseBitbucketOauthButton);
 		};
-	}, [rudderEventMethods]);
+	}, [rudderEventMethods, session]);
 
 
 	const docs = [
