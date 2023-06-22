@@ -154,6 +154,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	} else {
 		console.warn("Github provider not present");
 	}
+
 	// get the list of repositories of the user
 	const repo_list = await getRepoList(conn, session.user.id);
 
