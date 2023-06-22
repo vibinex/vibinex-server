@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
 import Link from 'next/link';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
-import { rudderEventMethods } from '../utils/rudderstack_initialize';
-import { v4 as uuidv4 } from 'uuid';
-
+import RudderContext from '../components/RudderContext';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAuthUserId, getAuthUserName } from '../utils/auth';
 
 const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
+
 	const [showNavbar, setShowNavbar] = useState(false);
 	const [scrollDown, setScrollDown] = useState(props.transparent);
 	const changeNavbar = () => {
@@ -26,32 +31,42 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 	}, []);
 
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-		// Track the "Add to Chrome" event
-		const handlDownloadClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
-			});
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+
+		const handleDownloadClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
-		const handlPricingClick = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar" }, anonymousId)
-			});
+		const handlePricingClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Pricing link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
+
+		const handleContributeClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+		};
+
+		const handleLoginLogoutClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+		};
+
 
 		const downloadLink = document.getElementById('download-link');
 		const pricingLink = document.getElementById('pricing-link');
+		const contributeLink = document.getElementById('contribute-link');
+		const loginLogoutLink = document.getElementById('login-logout-link');
 
-		downloadLink?.addEventListener('click', handlDownloadClick);
-		pricingLink?.addEventListener('click', handlPricingClick);
+		downloadLink?.addEventListener('click', handleDownloadClick);
+		pricingLink?.addEventListener('click', handlePricingClick);
+		contributeLink?.addEventListener('click', handleContributeClick);
+		loginLogoutLink?.addEventListener('click', handleLoginLogoutClick);
 
 		return () => {
-			downloadLink?.removeEventListener('click', handlDownloadClick);
-			pricingLink?.removeEventListener('click', handlPricingClick);
+			downloadLink?.removeEventListener('click', handleDownloadClick);
+			pricingLink?.removeEventListener('click', handlePricingClick);
+			contributeLink?.removeEventListener('click', handleContributeClick);
+			loginLogoutLink?.removeEventListener('click', handleLoginLogoutClick);
 		};
-	}, []);
+	}, [rudderEventMethods, session]);
 	return (
 		<div
 			className={
@@ -68,7 +83,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 					<li className='p-4'>
 						<Link href='/docs'>Docs</Link>
 					</li>
-					<li className='p-4'>
+					<li id="contribute-link" className='p-4'>
 						<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
 					</li>
 					<li className='p-4' id='pricing-link'>
@@ -80,11 +95,10 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 							<Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
 						</Link>
 					</li>
-					<li className='p-4'>
+					<li id='login-logout-link' className='p-4'>
 						<LoginLogout />
 					</li>
 				</ul>
-
 				{/* Mobile Button */}
 				<div onClick={changeNavbar}
 					className={

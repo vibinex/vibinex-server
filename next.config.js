@@ -25,6 +25,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'secure.gravatar.com', // Bitbucket profile images (additional)
+        pathname: '/**'
+      },
+      {
+        protocol: 'https',
         hostname: 'gitlab.com', // GitLab profile images
         pathname: '/uploads/-/system/user/avatar/**',
       }

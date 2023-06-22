@@ -1,40 +1,41 @@
 import React from 'react'
+import type { Session } from 'next-auth'
 import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
 import Hero from '../views/Hero'
 import WhyUs from '../views/WhyUs'
 import Features from '../views/Features'
 import TrustUs from '../views/TrustUs'
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
-import { v4 as uuidv4 } from 'uuid';
-
+import RudderContext from '../components/RudderContext'
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils'
 import JoinSlack from '../views/JoinSlack'
+import { useSession } from 'next-auth/react'
+import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
 
 export default function Home() {
-  const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
+	const session: Session | null = useSession().data;
+	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
+	const { rudderEventMethods } = React.useContext(RudderContext);
 
-  React.useEffect(() => {
-    const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-    const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+	React.useEffect(() => {
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+		let userId = getAuthUserId(session)
+		let userName = getAuthUserName(session)
+		let userEmail = getAuthUserEmail(session)
 
-    rudderEventMethods().then((response) => {
-      response?.identify("", "", "", anonymousId);
-    });
-	rudderEventMethods().then((response) => {
-		response?.track("", "Landing page", {page: "Landing page"}, anonymousId)
-	})
-    localStorage.setItem('AnonymousId', anonymousId);
-  }, []);
+		rudderEventMethods?.identify(userId, userName, userEmail, anonymousId);
+		rudderEventMethods?.track(userId, "Landing page", { type: "page", page: "Landing page", name: userName }, anonymousId)
+	}, [rudderEventMethods, session]);
 
-  return (
-    <div>
-      <Navbar ctaLink={chromeExtensionLink} transparent={false} />
-      <Hero ctaLink={chromeExtensionLink} />
-      <WhyUs />
-      <Features />
-      <TrustUs />
-      <JoinSlack />
-      <Footer />
-    </div>
-  )
+	return (
+		<div>
+			<Navbar ctaLink={chromeExtensionLink} transparent={false} />
+			<Hero ctaLink={chromeExtensionLink} />
+			<WhyUs />
+			<Features />
+			<TrustUs />
+			<JoinSlack />
+			<Footer />
+		</div>
+	)
 }

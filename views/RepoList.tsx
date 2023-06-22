@@ -2,6 +2,7 @@ import { Pool } from "pg";
 import Link from "next/link";
 import { TableCell, TableHeaderCell } from "../components/Table";
 import Image from "next/image";
+import { convert } from "../utils/db/converter";
 
 const RepoList = (props: { repo_list: string[] }) => {
 	const providerToLogo = (provider: string) => (
@@ -45,7 +46,7 @@ export async function getRepoList(conn: Pool, userId?: string) {
 		FROM ` + ((!userId) ? "commits AS c" : `(SELECT 
 			id,
 			ENCODE(sha256(UNNEST(aliases)::bytea), 'hex') AS email_hash 
-			FROM users WHERE id = '${userId}'
+			FROM users WHERE id = ${convert(userId)}
 		) AS u
 		INNER JOIN commits AS c
 		on u.email_hash = c.author_email`);

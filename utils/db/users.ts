@@ -1,6 +1,7 @@
 import conn from '.';
 import AuthInfo from '../../types/AuthInfo';
 import { convert } from './converter';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface DbUser {
 	id?: string,
@@ -42,11 +43,11 @@ export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | un
 }
 
 export const createUser = async (user: DbUser) => {
-	const { id, ...others } = user;
-	const insert_obj = Object.entries(others).filter(([k, v]) => v);
+	const { ...others } = user;
+	const id = uuidv4()
+	const insert_obj = [...Object.entries(others), ['id', id]].filter(([k, v]) => v);
 	const keys = insert_obj.map(x => x[0]);
 	const values = insert_obj.map(x => convert(x[1]));
-
 	const insert_user_q = `INSERT INTO users (${keys.join(', ')}) VALUES (${values.join(', ')})`
 	conn.query(insert_user_q)
 		.then(insert_user_result => {
@@ -67,7 +68,7 @@ export const createUser = async (user: DbUser) => {
  * @param user updated user object (please only include fields that have changed)
  */
 export const createUpdateUserObj = async (userId: string, user: DbUser) => {
-	const user_q = `SELECT * FROM users WHERE id = '${userId}'`;
+	const user_q = `SELECT * FROM users WHERE id = ${convert(userId)}`;
 	const user_result = await conn.query(user_q).catch(err => {
 		throw Error("Error in running the query on the database", err);
 	});
@@ -142,9 +143,9 @@ export const updateUser = async (userId: string, user: DbUser) => {
 		console.error(`[createUpdateUserObj] Something went wrong`, err);
 	});
 	if (!diffObj || Object.keys(diffObj).length == 0) return;
-	const update_user_q = `UPDATE users 
-		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")} 
-		WHERE id = '${userId}' `;
+	const update_user_q = `UPDATE users
+		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")}
+		WHERE id = ${convert(userId)} `;
 	conn.query(update_user_q)
 		.then(update_user_result => {
 			if (update_user_result.rowCount == 1) {

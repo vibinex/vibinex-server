@@ -1,4 +1,4 @@
-interface RudderstackClientSideEvents {
+export interface RudderstackClientSideEvents {
   identify: (
     userId: string,
     name: string,
@@ -18,6 +18,8 @@ interface RudderstackClientSideEvents {
   ) => void;
 }
 
+let rudderAnalyticsInstance: typeof import('rudder-sdk-js') | null = null;
+
 async function loadRudderAnalytics(): Promise<typeof import("rudder-sdk-js") | null> {
   if (typeof window !== "undefined") {
     const rudderAnalytics = await import("rudder-sdk-js");
@@ -28,13 +30,13 @@ async function loadRudderAnalytics(): Promise<typeof import("rudder-sdk-js") | n
         integrations: { All: true }, // load call options
       }
     );
-
+	
+	rudderAnalyticsInstance = rudderAnalytics
     rudderAnalytics.ready(() => {
       console.log("we are all set!!!");
     });
-    return rudderAnalytics;
   }
-  return null;
+  return rudderAnalyticsInstance;
 }
 
 export async function rudderEventMethods(): Promise<RudderstackClientSideEvents | null> {
