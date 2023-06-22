@@ -1,29 +1,30 @@
 import React from "react";
+import { useSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
 import Button from "../components/Button";
 import Image from "next/image";
 import highlightPR from '../public/highlightPR.png'
 import highlightFile from '../public/highlightFile.png'
 import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
-import { v4 as uuidv4 } from 'uuid';
+import RudderContext from "../components/RudderContext";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 const Hero = (props: { ctaLink: string }) => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
+
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		// Track the "Add to Chrome" event
 		const handleAddToChrome = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero" }, anonymousId)
-			});
+			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		// Track the "Book Demo" event
 		const handleBookDemo = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Book demo button", { type: "button", eventStatusFlag: 1 }, anonymousId)
-			});
+			rudderEventMethods?.track(getAuthUserId(session), "Book demo button", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const addToChromeButton = document.getElementById('add-to-chrome-btn');
@@ -36,7 +37,7 @@ const Hero = (props: { ctaLink: string }) => {
 			addToChromeButton?.removeEventListener('click', handleAddToChrome);
 			bookDemoButton?.removeEventListener('click', handleBookDemo);
 		};
-	}, []);
+	}, [rudderEventMethods, session]);
 	return (
 		<div className='flex items-center justify-center h-screen bg-fixed bg-center bg-cover'
 			style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503252947848-7338d3f92f31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80')" }}

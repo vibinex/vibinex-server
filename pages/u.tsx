@@ -5,14 +5,15 @@ import MainAppBar from "../views/MainAppBar";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { updateUser } from "../utils/db/users";
 import axios from "axios";
-import { useEffect } from "react";
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import { useEffect, useContext } from "react";
+import RudderContext from "../components/RudderContext";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
 import Footer from "../components/Footer";
 import { useSession } from "next-auth/react";
 import Button from "../components/Button";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
 
 type ProfileProps = {
 	session: Session,
@@ -21,18 +22,29 @@ type ProfileProps = {
 
 const Profile = ({ repo_list }: ProfileProps) => {
 	const session: Session | null = useSession().data;
+	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
-		rudderEventMethods().then((response) => {
-			response?.track(`${getAuthUserId(session)}`, "Repo Profile Page", { "userId": `${getAuthUserId(session)}`, "name": getAuthUserName(session) }, `${null}`);
-		});
-	}, [session])
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+		rudderEventMethods?.track(getAuthUserId(session), "User Profile Page", { type: "page", name: getAuthUserName(session) }, anonymousId);
+
+		const handleAddRepositoryButton = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Add repository ", { type: "button", eventStatusFlag: 1, source: "/u", name: getAuthUserName(session) }, anonymousId)
+		};
+
+		const addRepositoryButton = document.getElementById('add-repository');
+		addRepositoryButton?.addEventListener('click', handleAddRepositoryButton);
+
+		return () => {
+			addRepositoryButton?.removeEventListener('click', handleAddRepositoryButton);
+		};
+	}, [rudderEventMethods, session])
 
 	return (
 		<div className="flex flex-col min-h-screen">
 			<MainAppBar />
 			<div className="max-w-[80%] mx-auto flex-grow">
 				<RepoList repo_list={repo_list} />
-				<Button variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
+				<Button id='add-repository' variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
 			</div>
 			<Footer />
 		</div>
