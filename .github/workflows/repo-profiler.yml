@@ -4,6 +4,7 @@ on:
 jobs:
   profile:
     runs-on: ubuntu-22.04
+    timeout-minutes: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
