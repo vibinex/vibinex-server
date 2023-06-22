@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react'
-import { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import Button from "../../components/Button";
 import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
