@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
@@ -7,6 +7,7 @@ import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const Settings = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
@@ -31,8 +32,10 @@ const Settings = () => {
 	];
 
 	const [updateList, setUpdateList] = useState(['']);
-	const session: Session | null = useSession().data;
+	const [loading, setLoading] = useState(false);// while loading user can't send another api request to change setting
+	const { data: session, status } = useSession();
 	const userId = getAuthUserId(session);
+	console.log('[user presence from session is]', session);
 
 	async function apiCall(type: string, user_id: string, bodyData: string) {
 		const url = type == 'get' ? 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings' : 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings/update';
@@ -54,6 +57,7 @@ const Settings = () => {
 		} catch (e) {
 			console.error(`[vibinex] Error while getting data from API. URL: ${url}, payload: ${JSON.stringify(body)}`, e);
 		}
+
 	};
 
 	async function getSettings() {
@@ -70,7 +74,7 @@ const Settings = () => {
 	}
 
 	const toggleFlag = async (item_id: string) => {
-
+		setLoading(true);
 		const prevUpdateList = [...updateList];
 		let value: any = {};
 		const index = prevUpdateList.indexOf(item_id);
@@ -94,17 +98,31 @@ const Settings = () => {
 		setUpdateList((prev) => prev = prevUpdateList);
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(userId, "settings-changed", value, anonymousId);
+		setLoading(false);
 	};
 
 	React.useEffect(() => {
-		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		getSettings();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+		if (status == 'authenticated') {
+			getSettings();
+		}
 		rudderEventMethods?.track(userId, "settings-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 	}, [rudderEventMethods, session]);
 
+	const handleRedirect = async () => {
+		const { default: router } = await import('next/router');
+		if (status == 'unauthenticated') router.push('/');
+	};
+
+	useEffect(() => {
+		handleRedirect();
+	}, []);
 
 	return (
 		<div>
+			{(status === 'loading') ? (<LoadingOverlay />)
+				: (status === 'unauthenticated') ? (<LoadingOverlay text="You are not authenticated. Redirecting..." />)
+					: null}
 			<div className='mb-16'>
 				<Navbar ctaLink={chromeExtensionLink} transparent={true} />
 			</div>
@@ -123,7 +141,7 @@ const Settings = () => {
 										<h1 className='sm:text-[1.3rem] text-[1rem] font-semibold'>{item.name}</h1>
 										<p className='sm:text-[0.9rem] text-[0.8rem] font-light mt-1 w-[90%]'>{item.discription}</p>
 									</div>
-									<div onClick={() => toggleFlag(item.item_id)} className='cursor-pointer sm:pt-2 '>
+									<div onClick={() => loading ? null : toggleFlag(item.item_id)} className='cursor-pointer sm:pt-2 '>
 										{updateList.includes(item.item_id) ?
 											<BsToggleOn size={38} color='#2196F3' />
 											:
