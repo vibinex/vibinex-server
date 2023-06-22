@@ -44,7 +44,7 @@ const Hero = (props: { ctaLink: string }) => {
 		>
 			{/*Overlay*/}
 			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/75 z-0' />
-			<section className='p-5 text-primary-light z-0 my-auto lg:mt-[10%] pt-1 lg:w-1/2'>
+			<section className='p-5 text-primary-light z-10 my-auto lg:mt-[10%] pt-1 lg:w-1/2'>
 				<article className="text-center">
 					<h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold mb-4'>{'Personalization for'}
 						<span className='text-primary-main font-bold block'>

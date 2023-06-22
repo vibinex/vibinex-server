@@ -70,7 +70,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 	return (
 		<div
 			className={
-				'fixed left-0 top-0 w-full z-10 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown || props.transparent ? ' bg-primary-light text-secondary-dark' : ' text-primary-light')
+				'fixed left-0 top-0 w-full z-20 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown || props.transparent ? ' bg-primary-light text-secondary-dark' : ' text-primary-light')
 			}
 		>
 			<div className='max-w-[1240px] m-auto flex justify-between items-center p-4 '>
