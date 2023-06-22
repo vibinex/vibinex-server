@@ -34,15 +34,15 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 
 		const handleDownloadClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Download link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handlePricingClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Pricing link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Pricing link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handleContributeClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Contribute link clicked ", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handleLoginLogoutClick = () => {
