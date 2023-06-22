@@ -154,25 +154,6 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	} else {
 		console.warn("Github provider not present");
 	}
-	/*
-	Refund And Cancellation Policies
-	
-	
-	1. TradeVade and it's owner (Viboxl Services Pvt. Ltd) will not responsible for any payment failure. Third party payment gateway and the bank will be responsible for any payment failuer. 
-	2. TradeVade is not responsible for any 
-	
-	
-	For any payment glitch while deposit and withdrawal Payment gateway and User bank would be responsible for refund
-	Leagues joining amount would only be refunded in a condition that league is canceled due to technical glitch , not minimum number of participant joined the league and canceled due to policies violation issue rest there would be no refund for any amount you paid at time of joining
-	For league joining we would be using credits amount first 
-	If there is no credits balance but withdrawable balance is available then amount equal to  joining fees of league would be first converted to credits from withdrawable balance automatically and then deduct from credits would be done
-	League winning amount would be credited to withdrawable balance 
-	Minimum withdrawable limit is 100 withdrawable balance
-	
-	
-	Viboxil service have the right to change these refund and cancellation policy anytime with a prior information to all the users.
-	
-	*/
 	// get the list of repositories of the user
 	const repo_list = await getRepoList(conn, session.user.id);
 
