@@ -23,11 +23,11 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 
 		const handleGitHubAppClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Install github app ", { type: "link", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Install github app", { type: "link", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handleAuthoriseBitbucketOauthButton = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Authorise bitbucket consumer button", { type: "button", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Authorise bitbucket consumer", { type: "button", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const githubAppInstallLink = document.getElementById('github-app-install');
