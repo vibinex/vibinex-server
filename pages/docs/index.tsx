@@ -23,18 +23,18 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 
 		const handleGitHubAppClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Install github app ", { type: "link", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session)}, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Install github app ", { type: "link", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
 		};
-		
-		const handleAuthoriseBitbucketOauthButton = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Authorise bitbucket consumer button", { type: "button", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session)}, anonymousId)
-		};
-	
-		const githubAppInstallLink = document.getElementById('github-app-install');
-  		const authoriseBitbucketOauth = document.getElementById('authorise-bitbucket-oauth-consumer');
 
-  		githubAppInstallLink?.addEventListener('click', handleGitHubAppClick);
-  		authoriseBitbucketOauth?.addEventListener('click', handleAuthoriseBitbucketOauthButton);
+		const handleAuthoriseBitbucketOauthButton = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Authorise bitbucket consumer button", { type: "button", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
+		};
+
+		const githubAppInstallLink = document.getElementById('github-app-install');
+		const authoriseBitbucketOauth = document.getElementById('authorise-bitbucket-oauth-consumer');
+
+		githubAppInstallLink?.addEventListener('click', handleGitHubAppClick);
+		authoriseBitbucketOauth?.addEventListener('click', handleAuthoriseBitbucketOauthButton);
 
 		return () => {
 			githubAppInstallLink?.removeEventListener('click', handleGitHubAppClick);
@@ -42,7 +42,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 		};
 	}, [rudderEventMethods]);
 
-	
+
 	const docs = [
 		{
 			heading: "Github",

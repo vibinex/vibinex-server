@@ -1,5 +1,5 @@
 import React from 'react'
-import { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
 import Hero from '../views/Hero'
@@ -24,18 +24,18 @@ export default function Home() {
 		let userEmail = getAuthUserEmail(session)
 
 		rudderEventMethods?.identify(userId, userName, userEmail, anonymousId);
-		rudderEventMethods?.track(userId, "Landing page", {type: "page", page: "Landing page", name: userName}, anonymousId)
+		rudderEventMethods?.track(userId, "Landing page", { type: "page", page: "Landing page", name: userName }, anonymousId)
 	}, [rudderEventMethods]);
 
 	return (
 		<div>
-		<Navbar ctaLink={chromeExtensionLink} transparent={false} />
-		<Hero ctaLink={chromeExtensionLink} />
-		<WhyUs />
-		<Features />
-		<TrustUs />
-		<JoinSlack />
-		<Footer />
+			<Navbar ctaLink={chromeExtensionLink} transparent={false} />
+			<Hero ctaLink={chromeExtensionLink} />
+			<WhyUs />
+			<Features />
+			<TrustUs />
+			<JoinSlack />
+			<Footer />
 		</div>
 	)
-	}
+}

@@ -26,7 +26,7 @@ const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(getAuthUserId(session), "Repo profile page", {name: getAuthUserName(session)}, anonymousId);
+		rudderEventMethods?.track(getAuthUserId(session), "Repo profile page", { name: getAuthUserName(session) }, anonymousId);
 	}, [rudderEventMethods]);
 
 	const [repo_host, repo_owner, repo_name] = repo_addr ? repo_addr.split("/") : ["", "", ""];

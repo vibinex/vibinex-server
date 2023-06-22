@@ -12,7 +12,7 @@ const JoinSlack = () => {
 	const session: Session | null = useSession().data;
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		
+
 		const handleJoinSlack = () => {
 			rudderEventMethods?.track(getAuthUserId(session), "join slack", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 		}

@@ -64,7 +64,7 @@ export default function LoginLogout() {
 					<li id='settings-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
 					</li>
-					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => { if (rudderEventMethods) {logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), rudderEventMethods)}}}>
+					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => (logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods?rudderEventMethods:null)))}>
 						Logout
 					</li>
 				</ol>
@@ -74,9 +74,7 @@ export default function LoginLogout() {
 		</>
 	)
 	else return (
-		<Button variant='contained' onClick={() => { if (rudderEventMethods) {
-			return login(getAndSetAnonymousIdFromLocalStorage(), rudderEventMethods);
-		  }}} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+		<Button variant='contained' onClick={() => (login(getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods?rudderEventMethods:null)))} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
 			Login/Signup
 		</Button>
 	)

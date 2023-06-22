@@ -63,7 +63,7 @@ export const authOptions = {
 
 				// signup event
 				account && getUserByProvider(account.provider, account.providerAccountId).then(db_user => {
-					rudderStackEvents.track(db_user.id.toString(), uuidv4(), "signup", { ...db_user, eventStatusFlag: 1 });
+					rudderStackEvents.track(db_user.id.toString(), uuidv4(), "signup", { ...db_user, eventStatusFlag: 1 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.
 				}).catch(err => {
 					console.error("[signup] Rudderstack event failed: Could not get user id", db_user, err);
 				});
