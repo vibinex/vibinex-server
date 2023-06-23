@@ -28,7 +28,7 @@ export default function Home() {
 	}, [rudderEventMethods, session]);
 
 	return (
-		<div>
+		<div className='overflow-hidden'>
 			<Navbar ctaLink={chromeExtensionLink} transparent={false} />
 			<Hero ctaLink={chromeExtensionLink} />
 			<WhyUs />
