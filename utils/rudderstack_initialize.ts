@@ -1,4 +1,4 @@
-interface RudderstackClientSideEvents {
+export interface RudderstackClientSideEvents {
   identify: (userId: string, name: string, email: string, anonymousId: string) => void
   track: (
     userId: string,
