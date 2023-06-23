@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import  type { Session } from 'next-auth'
 import { AiOutlineCheckCircle } from 'react-icons/ai'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
-import Link from 'next/link';
 import Button from '../components/Button';
-import { v4 as uuidv4 } from 'uuid';
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import RudderContext from '../components/RudderContext';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAuthUserId, getAuthUserName } from '../utils/auth';
 
 const monthlyBasePriceUSD = 10;
 
@@ -42,9 +44,10 @@ const pricingPlan = [
 
 
 const Pricing = () => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
 	const [isYearly, setIsYearly] = useState(false); // false for monthly
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
-
 	let heading = [
 		{ name: "Monthly", flag: isYearly },
 		{ name: "Yearly", flag: !isYearly },
@@ -56,25 +59,14 @@ const Pricing = () => {
 		return (<>  {currency} <span className='text-4xl'>{price} </span ></>);
 	}
 
-	const pricingStartDate = new Date(2023, 6, 1); // 1st July 2023
+	const pricingStartDate = new Date(2023, 7, 31); // 31st August 2023
 	const today = new Date();
+	const readableDate = (date: Date) => date.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })
 
 	React.useEffect(() => {
-		// tracking events on every button clicked 
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-plan-changed", { "isYearly": isYearly }, anonymousId);
-		});
-		localStorage.setItem('AnonymousId', anonymousId);
-
-	}, [isYearly]);
-
-	React.useEffect(() => {
-		rudderEventMethods().then((response) => {
-			response?.track("", "pricing-page", { eventStatusFlag: 1 }, "anonymous") //Anonymous Id is set in local storage as soon as the user lands on the webiste.
-		});
-	}, []);
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+		rudderEventMethods?.track(getAuthUserId(session), "pricing-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+	}, [rudderEventMethods, session]);
 
 	return (
 		<div>
@@ -83,14 +75,14 @@ const Pricing = () => {
 			</div>
 			<div id='pricing' className='w-full py-12 bg-primary-light'>
 				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-primary-main font-bold'>Plans</span></h2>
-				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after July 1, 2023)</small></p>) : null}
+				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after {readableDate(pricingStartDate)})</small></p>) : null}
 
 				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-xl mt-8 bg-gray-100'>
 					{heading.map((item, index) => {
 						return (
 							<div
 								key={index}
-								onClick={() => setIsYearly(item.name === 'Yearly')}
+								onClick={() => { setIsYearly(item.name === 'Yearly'); rudderEventMethods?.track(getAuthUserId(session), "pricing-changed", { type: "button", eventStatusFlag: 1, isYearly: isYearly, name: getAuthUserName(session) }, getAndSetAnonymousIdFromLocalStorage()) }}
 								className={`text-center p-4 w-full rounded-xl cursor-pointer ${item.flag ? null : 'bg-primary-main border-2 border-primary-dark'}`}>
 								<h2 className={`sm:text-2xl font-bold ${item.flag ? 'text-secondary-dark' : 'text-secondary-main'}`}
 								>{item.name}{item.name === 'Yearly' ?

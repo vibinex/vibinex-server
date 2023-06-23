@@ -8,11 +8,12 @@ import { ContributorVector } from "../types/contributor";
 import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
 import CommitsPerFile from "../views/Dashboard/commitsPerFile";
 import RepoList, { getRepoList } from "../views/RepoList";
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
+import RudderContext from "../components/RudderContext";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { Session } from "next-auth/core/types";
-import { getAuthUserName } from "../utils/auth";
+import type { Session } from "next-auth/core/types";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
 
 type RepoProfileData = {
 	sessionObj: Session,
@@ -22,13 +23,11 @@ type RepoProfileData = {
 }
 
 const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repo_list, repo_name: repo_addr, contributor_2d_data }) => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	React.useEffect(() => {
-		rudderEventMethods().then((response) => {
-			response?.page("", "Repo Profile Page", {
-				name: getAuthUserName(session)
-			});
-		});
-	}, [session]);
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+		rudderEventMethods?.track(getAuthUserId(session), "Repo profile page", { name: getAuthUserName(session) }, anonymousId);
+	}, [rudderEventMethods, session]);
 
 	const [repo_host, repo_owner, repo_name] = repo_addr ? repo_addr.split("/") : ["", "", ""];
 	return (

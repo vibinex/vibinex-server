@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
-import { v4 as uuidv4 } from 'uuid';
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
-import { getAuthUserId } from "../utils/auth";
+import RudderContext from '../components/RudderContext';
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { useSession } from "next-auth/react";
-import { Session } from "next-auth";
+import type { Session } from "next-auth";
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 
 const Settings = () => {
-
+	const { rudderEventMethods } = React.useContext(RudderContext);
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	const settingList = [
 
@@ -34,7 +34,7 @@ const Settings = () => {
 	const session: Session | null = useSession().data;
 	const userId = getAuthUserId(session);
 
-	async function apiCall(type: string, user_id: number, bodyData: string) {
+	async function apiCall(type: string, user_id: string, bodyData: string) {
 		const url = type == 'get' ? 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings' : 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings/update';
 		const body = type == 'get' ? { user_id } : { user_id, settings: bodyData };
 		try {
@@ -92,22 +92,15 @@ const Settings = () => {
 		await apiCall('post', userId, obj); // calling api on every toggle 
 
 		setUpdateList((prev) => prev = prevUpdateList);
-		rudderEventMethods().then((response) => {
-			response?.track(`${userId}`, "settings-changed", value, "anonymousId");
-		});
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+		rudderEventMethods?.track(userId, "settings-changed", value, anonymousId);
 	};
 
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		getSettings();
-
-		rudderEventMethods().then((response) => {
-			response?.track("", "settings-page", { eventStatusFlag: 1 }, anonymousId)
-		});
-		localStorage.setItem('AnonymousId', anonymousId);
-	}, []);
+		rudderEventMethods?.track(userId, "settings-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+	}, [rudderEventMethods, session]);
 
 
 	return (

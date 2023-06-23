@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
+import { useSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
 import Button from "../../components/Button";
 import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
+import RudderContext from '../../components/RudderContext';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/url_utils';
+import { getAuthUserId, getAuthUserName } from '../../utils/auth';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -11,13 +16,40 @@ const verifySetup = [
 ]
 
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
+	React.useEffect(() => {
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+
+		const handleGitHubAppClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Install github app", { type: "link", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
+		};
+
+		const handleAuthoriseBitbucketOauthButton = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Authorise bitbucket consumer", { type: "button", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
+		};
+
+		const githubAppInstallLink = document.getElementById('github-app-install');
+		const authoriseBitbucketOauth = document.getElementById('authorise-bitbucket-oauth-consumer');
+
+		githubAppInstallLink?.addEventListener('click', handleGitHubAppClick);
+		authoriseBitbucketOauth?.addEventListener('click', handleAuthoriseBitbucketOauthButton);
+
+		return () => {
+			githubAppInstallLink?.removeEventListener('click', handleGitHubAppClick);
+			authoriseBitbucketOauth?.removeEventListener('click', handleAuthoriseBitbucketOauthButton);
+		};
+	}, [rudderEventMethods, session]);
+
+
 	const docs = [
 		{
 			heading: "Github",
 			flag: true,
 			content: [
 				{ subHeading: "Sign up with github", article: "Sign in on Vibinex using GitHub" },
-				{ subHeading: "Install GitHub App", article: <>Install <Link href="https://github.com/apps/vibinex-code-review" target='_blank' className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
+				{ subHeading: "Install GitHub App", article: <>Install <Link id="github-app-install" href="https://github.com/apps/vibinex-code-review" target='_blank' className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
 				{
 					subHeading: "Setup GitHub Action",
 					article: <>
@@ -30,6 +62,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 jobs:
   profile:
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -52,6 +85,7 @@ jobs:
 				{
 					subHeading: "Install OAuth consumer", article: <>
 						<Button
+							id='authorise-bitbucket-oauth-consumer'
 							variant="contained"
 							href={bitbucket_auth_url}
 							target='_blank'
