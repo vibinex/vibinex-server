@@ -20,7 +20,7 @@ export const logout = (userId: string, userName: string, anonymousId: string, ru
 		})
 }
 
-export const getAuthUserId = (session: Session | null) => session?.user.id ? session.user.id : "";
+export const getAuthUserId = (session: Session | null) => session?.user?.id ? session.user.id : "";
 export const getAuthUserName = (session: Session | null) => session?.user?.name ? session?.user?.name : "User";
 export const getAuthUserImage = (session: Session | null) => session?.user?.image ? session?.user?.image : "/dummy-profile-pic-female-300n300.jpeg";
 export const getAuthUserEmail = (session: Session | null) => session?.user?.email ? session?.user?.email : "";
