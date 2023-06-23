@@ -62,7 +62,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 jobs:
   profile:
     runs-on: ubuntu-22.04
-	timeout-minutes: 1
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v3
