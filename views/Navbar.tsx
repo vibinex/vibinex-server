@@ -49,22 +49,28 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 			rudderEventMethods?.track(getAuthUserId(session), " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
+		const handleDocsClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Docs link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+		}
 
 		const downloadLink = document.getElementById('download-link');
 		const pricingLink = document.getElementById('pricing-link');
 		const contributeLink = document.getElementById('contribute-link');
 		const loginLogoutLink = document.getElementById('login-logout-link');
+		const docsLink = document.getElementById('docs-link');
 
 		downloadLink?.addEventListener('click', handleDownloadClick);
 		pricingLink?.addEventListener('click', handlePricingClick);
 		contributeLink?.addEventListener('click', handleContributeClick);
 		loginLogoutLink?.addEventListener('click', handleLoginLogoutClick);
+		docsLink?.addEventListener('click', handleDocsClick);
 
 		return () => {
 			downloadLink?.removeEventListener('click', handleDownloadClick);
 			pricingLink?.removeEventListener('click', handlePricingClick);
 			contributeLink?.removeEventListener('click', handleContributeClick);
 			loginLogoutLink?.removeEventListener('click', handleLoginLogoutClick);
+			docsLink?.removeEventListener('click', handleDocsClick);
 		};
 	}, [rudderEventMethods, session]);
 	return (
@@ -80,7 +86,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 					</h1>
 				</Link>
 				<ul className='hidden sm:flex'>
-					<li className='p-4'>
+					<li id="docs-link" className='p-4'>
 						<Link href='/docs'>Docs</Link>
 					</li>
 					<li id="contribute-link" className='p-4'>
