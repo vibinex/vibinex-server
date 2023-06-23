@@ -35,7 +35,6 @@ const Settings = () => {
 	const [loading, setLoading] = useState(false);// while loading user can't send another api request to change setting
 	const { data: session, status } = useSession();
 	const userId = getAuthUserId(session);
-	console.log('[user presence from session is]', session);
 
 	async function apiCall(type: string, user_id: string, bodyData: string) {
 		const url = type == 'get' ? 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings' : 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings/update';
@@ -116,7 +115,7 @@ const Settings = () => {
 
 	useEffect(() => {
 		handleRedirect();
-	}, []);
+	}, [status]);
 
 	return (
 		<div>
