@@ -11,6 +11,7 @@
     "create-env": "printenv > .env"
   },
   "dependencies": {
+    "@google-cloud/pubsub": "^3.7.1",
     "@google-cloud/storage": "^6.9.0",
     "@mdx-js/loader": "^2.3.0",
     "@mdx-js/react": "^2.3.0",
