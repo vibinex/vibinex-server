@@ -3,7 +3,7 @@ import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const topicName = 'rtapish-fromserver';
-  const data = req.query.code;
+  const data = {'code': req.query.code};
   const msgtype = 'bb_install_callback';
 
   try {
