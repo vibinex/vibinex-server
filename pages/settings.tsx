@@ -102,19 +102,18 @@ const Settings = () => {
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
-		if (status == 'authenticated') {
+		if (status === 'authenticated') {
 			getSettings();
 		}
 		rudderEventMethods?.track(userId, "settings-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 	}, [rudderEventMethods, session]);
 
-	const handleRedirect = async () => {
-		const { default: router } = await import('next/router');
-		if (status == 'unauthenticated') router.push('/');
-	};
-
 	useEffect(() => {
-		handleRedirect();
+		if (status === 'unauthenticated') {
+			import('next/router').then(({ default: router }) => {
+				router.push('/');
+			});
+		}
 	}, [status]);
 
 	return (
