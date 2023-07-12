@@ -89,7 +89,9 @@ export const authOptions = {
 		},
 		async session({ session }: { session: Session }) {
 			if (session && session.user) {
-				const usersWithAlias = await getUserByAlias(session.user.email!)
+				const usersWithAlias = await getUserByAlias(session.user.email!).catch(err => {
+					console.error(`[session callback] getUserByAlias failed for ${session.user.email}`, err);
+				})
 				if (!usersWithAlias || usersWithAlias.length < 1) {
 					console.warn(`[session callback] No user found with this email: ${session.user.email}`);
 				}

@@ -33,9 +33,11 @@ export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | un
 	const user_alias_search_q = `SELECT *
 		FROM users
 		WHERE '${alias_email}' = ANY(aliases)`;
-	const user_alias_search_result = await conn.query(user_alias_search_q);
+	const user_alias_search_result = await conn.query(user_alias_search_q).catch(err => {
+		console.log(`[users/getUserByAlias] Query failed: Select from users where aliases contain ${alias_email}`, err);
+	});
 
-	if (user_alias_search_result.rowCount) {
+	if (user_alias_search_result && user_alias_search_result.rowCount) {
 		console.debug(`${user_alias_search_result.rowCount} user(s) exist with this email as an alias.`);
 		return user_alias_search_result.rows;
 	}
