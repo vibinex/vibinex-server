@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import  type { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import { AiOutlineCheckCircle } from 'react-icons/ai'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
@@ -27,8 +27,7 @@ const pricingPlan = [
 		pricing: undefined, // will be populated by formula
 		features: ['Access of all features', 'Direct support through Slack', 'Free-of-cost setup assistance'],
 		buttonText: 'Start your 30 day trial',
-		link: '/u' // temp. adding user profile page link, need to replace it with payment link
-
+		link: '/api/auth/signin?callbackUrl=https%3A%2F%2Fvibinex.com%2Fpricing%2F' // temp. adding login page link, need to replace it with payment link
 	},
 	{
 		pricingName: 'Enterprise',
@@ -39,7 +38,6 @@ const pricingPlan = [
 		link: 'https://api.whatsapp.com/send/?phone=918511557566&text&type=phone_number&app_absent=0'
 
 	},
-
 ]
 
 
@@ -120,8 +118,6 @@ const Pricing = () => {
 										{item.buttonText}
 									</Button>
 								</div>
-
-
 							)
 						})
 					}
