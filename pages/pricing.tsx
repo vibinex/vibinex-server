@@ -8,8 +8,10 @@ import Button from '../components/Button';
 import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
+import { getUserLocation, isUserInIndia } from '../utils/location';
 
-const monthlyBasePriceUSD = 10;
+const monthlyBasePriceUSD = 5;
+const monthlyBasePriceINR = 200;
 
 const pricingPlan = [
 	{
@@ -45,16 +47,21 @@ const Pricing = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
 	const [isYearly, setIsYearly] = useState(false); // false for monthly
+	const [location, setLocation] = useState<GeolocationPosition>();
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	let heading = [
 		{ name: "Monthly", flag: isYearly },
 		{ name: "Yearly", flag: !isYearly },
 	]
 
-	const getPriceString = (currency: '$' | '₹', isYearly: boolean) => {
-		const priceDecimal = (isYearly ? (10 / 12) : 1) * monthlyBasePriceUSD;
+	const getPriceString = (isYearly: boolean) => {
+		const isInIndia = isUserInIndia(location);
+
+		const currency: '$' | '₹' = isInIndia ? '₹' : '$';
+		const monthlyBasePrice = isInIndia ? monthlyBasePriceINR : monthlyBasePriceUSD;
+		const priceDecimal = (isYearly ? (10 / 12) : 1) * monthlyBasePrice;
 		const price = Math.round(priceDecimal * 100) / 100;
-		return (<>  {currency} <span className='text-4xl'>{price} </span ></>);
+		return (<span className='font-money'>  {currency} <span className='text-4xl'>{price} </span ></span>);
 	}
 
 	const pricingStartDate = new Date(2023, 7, 31); // 31st August 2023
@@ -65,6 +72,14 @@ const Pricing = () => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "pricing-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 	}, [rudderEventMethods, session]);
+
+	React.useEffect(() => {
+		getUserLocation()
+			.then(position => setLocation(position))
+			.catch(err => {
+				console.info("Could not get user's location. Using international values.", err.message);
+			})
+	}, [])
 
 	return (
 		<div>
@@ -100,7 +115,7 @@ const Pricing = () => {
 									<h2 className='mx-auto font-semibold text-2xl text-center'>{item.pricingName}</h2>
 
 									<div className='text-center h-16'>
-										<p className='mt-2 font-medium text-xl text-primary-main'>{(item.pricing) ? item.pricing : getPriceString("$", isYearly)}</p>
+										<p className='mt-2 font-medium text-xl text-primary-main'>{(item.pricing) ? item.pricing : getPriceString(isYearly)}</p>
 										<p className='text-base'>{item.duration}</p>
 									</div>
 
