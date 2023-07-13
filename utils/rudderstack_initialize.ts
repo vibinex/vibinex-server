@@ -19,7 +19,7 @@ export interface RudderstackClientSideEvents {
 }
 
 async function loadRudderAnalytics(): Promise<RudderstackClientSideEvents | null> {
-	if (typeof window !== 'undefined') {
+	if (typeof window !== "undefined") {
 		if (process.env.NODE_ENV === 'development') {
 			console.warn('Running in development mode. Rudder Analytics is not loaded.')
 			const emptyAnalyticsObject: RudderstackClientSideEvents = {
@@ -30,7 +30,7 @@ async function loadRudderAnalytics(): Promise<RudderstackClientSideEvents | null
 			return emptyAnalyticsObject
 		}
 
-		const rudderAnalytics = await import('rudder-sdk-js');
+		const rudderAnalytics = await import("rudder-sdk-js");
 		rudderAnalytics.load(
 			process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_WRITE_KEY!,
 			process.env.NEXT_PUBLIC_RUDDERSTACK_CLIENT_DATAPLANE_URL!,
