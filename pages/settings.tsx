@@ -126,9 +126,9 @@ const Settings = () => {
 									</div>
 									<div onClick={() => loading ? null : toggleFlag(settingItem.item_id)} className='cursor-pointer sm:pt-2 '>
 										{settings[settingItem.item_id] ?
-											<BsToggleOn size={38} color={loading ? '#2196F355' : '#2196F3'} />
+											<BsToggleOn size={38} className={loading ? "text-action-activeDisabled" : "text-action-active"} />
 											:
-											<BsToggleOn size={38} color={loading ? '#c4c4c455' : '#c4c4c4'} className='rotate-180' />
+											<BsToggleOn size={38} className={'rotate-180 ' + (loading ? 'text-action-inactiveDisabled' : 'text-action-inactive')} />
 										}
 									</div>
 								</div>
