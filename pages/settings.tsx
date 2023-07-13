@@ -5,7 +5,6 @@ import { BsToggleOn } from 'react-icons/bs';
 import RudderContext from '../components/RudderContext';
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { useSession } from "next-auth/react";
-import type { Session } from "next-auth";
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 import LoadingOverlay from '../components/LoadingOverlay';
 
@@ -19,26 +18,28 @@ const Settings = () => {
 			discription: `If enabled, you'll get coverage comments on each PR`,
 			type: 'toggle',
 			item_id: 'coverage_comment'
-
 		},
 		{
 			name: 'Enable auto assignment',
 			discription: 'If enabled, it automatically sets the reviewers for each PR',
 			type: 'toggle',
 			item_id: 'auto_assign'
-
 		},
 
 	];
 
-	const [updateList, setUpdateList] = useState(['']);
+	const [settings, setSettings] = useState<{ [setting: string]: boolean }>({});
 	const [loading, setLoading] = useState(false);// while loading user can't send another api request to change setting
 	const { data: session, status } = useSession();
 	const userId = getAuthUserId(session);
 
-	async function apiCall(type: string, user_id: string, bodyData: string) {
-		const url = type == 'get' ? 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings' : 'https://gcscruncsql-k7jns52mtq-el.a.run.app/settings/update';
-		const body = type == 'get' ? { user_id } : { user_id, settings: bodyData };
+	async function apiCall(type: 'get' | 'update', user_id: string, updatedSettings?: { [setting: string]: boolean }) {
+		const serverDomain = 'https://gcscruncsql-k7jns52mtq-el.a.run.app';
+		if (type === 'update' && !updatedSettings) {
+			console.error(`ERROR: settings update API call requires you to specify the updated settings`);
+		}
+		const url = type == 'get' ? `${serverDomain}/settings` : `${serverDomain}/settings/update`;
+		const body = type == 'get' ? { user_id } : { user_id, settings: updatedSettings };
 		try {
 			let dataFromAPI;
 			await fetch(url, {
@@ -56,51 +57,34 @@ const Settings = () => {
 		} catch (e) {
 			console.error(`[vibinex] Error while getting data from API. URL: ${url}, payload: ${JSON.stringify(body)}`, e);
 		}
-
 	};
 
 	async function getSettings() {
-		const apiResponse: Record<string, boolean> = await apiCall('get', userId, '') ?? {};
-		const defaultUserSetting: any = [];
-		for (let prop in apiResponse) {
-			if (Object.prototype.hasOwnProperty.call(apiResponse, prop)) {
-				if (apiResponse[prop] === true) {
-					defaultUserSetting.push(prop);
-				}
-			}
-		}
-		setUpdateList(prev => prev = defaultUserSetting);
+		const currentUserSettings: { [setting: string]: boolean } = await apiCall('get', userId) ?? {};
+		setSettings(currentUserSettings);
 	}
 
-	const toggleFlag = async (item_id: string) => {
+	const toggleFlag = (item_id: string) => {
 		setLoading(true);
-		const prevUpdateList = [...updateList];
-		let value: any = {};
-		const index = prevUpdateList.indexOf(item_id);
-		if (index === -1) {
-			prevUpdateList.push(item_id);
-			value[item_id] = true;
-		} else {
-			prevUpdateList.splice(index, 1);
-			value[item_id] = false;
-		};
-
-
-		let obj: any = {};
-		settingList.forEach((item, index) => {
-			let status = prevUpdateList.includes(item.item_id);
-			obj[item.item_id] = status;
-		}
-		);
-		await apiCall('post', userId, obj); // calling api on every toggle 
-
-		setUpdateList((prev) => prev = prevUpdateList);
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(userId, "settings-changed", value, anonymousId);
-		setLoading(false);
+
+		const newSettings = { ...settings }
+		newSettings[item_id] = !newSettings[item_id]
+
+		apiCall('update', userId, newSettings)
+			.then(() => {
+				rudderEventMethods?.track(userId, "settings-changed", { type: 'setting', eventStatusFlag: 1, name: getAuthUserName(session), eventProperties: newSettings }, anonymousId);
+				setSettings(newSettings);
+				setLoading(false);
+			})
+			.catch(err => {
+				rudderEventMethods?.track(userId, "settings-changed", { type: 'setting', eventStatusFlag: 0, name: getAuthUserName(session), eventProperties: newSettings }, anonymousId);
+				console.error("Failed to update settings", err);
+				setLoading(false);
+			})
 	};
 
-	React.useEffect(() => {
+	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
 		if (status === 'authenticated') {
 			getSettings();
@@ -120,7 +104,8 @@ const Settings = () => {
 		<div>
 			{(status === 'loading') ? (<LoadingOverlay />)
 				: (status === 'unauthenticated') ? (<LoadingOverlay text="You are not authenticated. Redirecting..." />)
-					: null}
+					: (Object.keys(settings).length == 0) ? (<LoadingOverlay text="Loading your settings..." />)
+						: null}
 			<div className='mb-16'>
 				<Navbar ctaLink={chromeExtensionLink} transparent={true} />
 			</div>
@@ -130,20 +115,20 @@ const Settings = () => {
 				<div className='sm:w-[70%] w-[90%] m-auto sm:p-8 p-4 rounded-lg border-2'>
 
 					{
-						settingList.map((item, index) => {
+						settingList.map((settingItem, index) => {
 							return (
 								<div key={index}
 									className={`flex justify-between ${index === 0 ? '' : 'border-t-[0.1rem]'} sm:mb-4 mb-2 sm:mt-4 mt-4 sm:p-4 p-4`}
 								>
 									<div>
-										<h1 className='sm:text-[1.3rem] text-[1rem] font-semibold'>{item.name}</h1>
-										<p className='sm:text-[0.9rem] text-[0.8rem] font-light mt-1 w-[90%]'>{item.discription}</p>
+										<h1 className='sm:text-[1.3rem] text-[1rem] font-semibold'>{settingItem.name}</h1>
+										<p className='sm:text-[0.9rem] text-[0.8rem] font-light mt-1 w-[90%]'>{settingItem.discription}</p>
 									</div>
-									<div onClick={() => loading ? null : toggleFlag(item.item_id)} className='cursor-pointer sm:pt-2 '>
-										{updateList.includes(item.item_id) ?
-											<BsToggleOn size={38} color='#2196F3' />
+									<div onClick={() => loading ? null : toggleFlag(settingItem.item_id)} className='cursor-pointer sm:pt-2 '>
+										{settings[settingItem.item_id] ?
+											<BsToggleOn size={38} color={loading ? '#2196F355' : '#2196F3'} />
 											:
-											<BsToggleOn size={38} color='#c4c4c4' className='rotate-180' />
+											<BsToggleOn size={38} color={loading ? '#c4c4c455' : '#c4c4c4'} className='rotate-180' />
 										}
 									</div>
 								</div>
