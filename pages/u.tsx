@@ -14,6 +14,7 @@ import Footer from "../components/Footer";
 import { useSession } from "next-auth/react";
 import Button from "../components/Button";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { decryptToken } from "../utils/secure";
 
 type ProfileProps = {
 	session: Session,
@@ -90,7 +91,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 
 	if (Object.keys(session.user.auth_info!).includes("github")) {
 		for (const gh_auth_info of Object.values(session.user.auth_info!["github"])) {
-			const access_key: string = gh_auth_info['access_token'];
+			const access_key: string = decryptToken(gh_auth_info['access_token']);
 			axios.get("https://api.github.com/user/emails", {
 				headers: {
 					'Accept': 'application/vnd.github+json',
@@ -113,7 +114,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 
 	if (Object.keys(session.user.auth_info!).includes("bitbucket")) {
 		for (const bb_auth_info of Object.values(session.user.auth_info!["bitbucket"])) {
-			const access_key: string = bb_auth_info['access_token'];
+			const access_key: string = decryptToken(bb_auth_info['access_token']);
 			axios.get("https://api.bitbucket.org/2.0/user/emails", {
 				headers: {
 					'Authorization': `Bearer ${access_key}`
@@ -135,7 +136,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 
 	if (Object.keys(session.user.auth_info!).includes("gitlab")) {
 		for (const gl_auth_info of Object.values(session.user.auth_info!["gitlab"])) {
-			const access_key: string = gl_auth_info['access_token'];
+			const access_key: string = decryptToken(gl_auth_info['access_token']);
 			axios.get("https://gitlab.com/api/v4/user/emails", {
 				headers: {
 					'Authorization': `Bearer ${access_key}`
