@@ -7,7 +7,7 @@ const client = (process.env.NODE_ENV === 'development') ? {
 } : new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!, { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
 
 const rudderStackEvents = {
-	identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => { // Anonymous Id is set in local storage as soon as a user lands on the webiste.
+	identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => { // Anonymous Id is set in local storage as soon as a user lands on the website.
 		console.log("identify");
 		client.identify({
 			userId: userId,
