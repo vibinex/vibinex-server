@@ -3,8 +3,10 @@ import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const topicName = 'rtapish-fromserver';
-  const data = {'code': req.query.code};
-  const msgtype = 'bb_install_callback';
+  const data = {
+    'repository_provider': 'bitbucket',
+    'installation_code': req.query.code};
+  const msgtype = 'install_callback';
 
   try {
     await publishMessage(topicName, data, msgtype);
