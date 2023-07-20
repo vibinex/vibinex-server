@@ -13,9 +13,9 @@ const WhyUs = () => {
       <h2 className='font-bold text-[2rem]'>Stay calm and get <span className='text-[2rem] text-primary-main font-bold'>Vibinex</span></h2>
       <div className='w-[100%] mt-3 p-4'>
         {
-          data.map((item, index) => {
+          data.map((item) => {
             return (
-              <div key={index} className="flex sm:p-5 p-3 rounded-lg border-2 mt-7 sm:w-[50%]  w-[90%] m-auto border-primary-main">
+              <div key={item.heading} className="flex sm:p-5 p-3 rounded-lg border-2 mt-7 sm:w-[50%]  w-[90%] m-auto border-primary-main">
                 <div className=''>
                   {item.icon}
                 </div>

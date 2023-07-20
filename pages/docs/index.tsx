@@ -132,7 +132,7 @@ pipelines:
 				<div className='mr-10 sm:border-r-2 p-4 sm:border-[gray] sm:block flex'>
 					{list.map((item, index) => {
 						return (
-							<div key={index}>
+							<div key={item.heading}>
 								<h1 onClick={() => {
 									setArticle(item.content);
 									setHeading(item.heading);
@@ -164,7 +164,7 @@ pipelines:
 					<ol>
 						{article.map((item, index) => {
 							return (
-								<li key={index} className='mt-4 font-sans'>
+								<li key={item.subHeading} className='mt-4 font-sans'>
 									{index + 1}.  {item.article}
 								</li>
 							)

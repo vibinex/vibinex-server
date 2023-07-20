@@ -91,10 +91,10 @@ const Pricing = () => {
 				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after {readableDate(pricingStartDate)})</small></p>) : null}
 
 				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-xl mt-8 bg-gray-100'>
-					{heading.map((item, index) => {
+					{heading.map((item) => {
 						return (
 							<div
-								key={index}
+								key={item.name}
 								onClick={() => { setIsYearly(item.name === 'Yearly'); rudderEventMethods?.track(getAuthUserId(session), "pricing-changed", { type: "button", eventStatusFlag: 1, isYearly: isYearly, name: getAuthUserName(session) }, getAndSetAnonymousIdFromLocalStorage()) }}
 								className={`text-center p-4 w-full rounded-xl cursor-pointer ${item.flag ? null : 'bg-primary-main border-2 border-primary-dark'}`}>
 								<h2 className={`sm:text-2xl font-bold ${item.flag ? 'text-secondary-dark' : 'text-secondary-main'}`}
@@ -109,9 +109,9 @@ const Pricing = () => {
 
 				<div className='m-auto md:grid w-4/5 mt-3 md:p-4 grid-cols-3 gap-5 h-fit'>
 					{
-						pricingPlan.map((item, index) => {
+						pricingPlan.map((item) => {
 							return (
-								<div key={index} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
+								<div key={item.buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
 									<h2 className='mx-auto font-semibold text-2xl text-center'>{item.pricingName}</h2>
 
 									<div className='text-center h-16'>
