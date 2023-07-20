@@ -15,8 +15,8 @@ export default function InstructionsSection({ heading, instructions }: Instructi
 			<h1>{heading}</h1>
 			<ol>
 				{
-					instructions.map(({ symbol, instruction }, index) => (
-						<li key={index}>
+					instructions.map(({ symbol, instruction }) => (
+						<li key={symbol}>
 							{(symbol) ? <Image src={symbol} alt={symbol} /> : null}
 							{instruction}
 						</li>

@@ -80,6 +80,9 @@ const Upload = () => {
 			case "addFileToList":
 				if (action.files)
 					return { ...state, fileList: state.fileList.concat(action.files) };
+				else
+					console.error("[Upload] Action type is `addFileToList` but no files found.");
+				return state;
 			default:
 				return state;
 		}

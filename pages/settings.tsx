@@ -117,7 +117,7 @@ const Settings = () => {
 					{
 						settingList.map((settingItem, index) => {
 							return (
-								<div key={index}
+								<div key={settingItem.item_id}
 									className={`flex justify-between ${index === 0 ? '' : 'border-t-[0.1rem]'} sm:mb-4 mb-2 sm:mt-4 mt-4 sm:p-4 p-4`}
 								>
 									<div>
