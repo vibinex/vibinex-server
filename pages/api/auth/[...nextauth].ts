@@ -7,6 +7,7 @@ import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } fro
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
+import { encryptToken } from "../../../utils/secure";
 import { v4 as uuidv4 } from "uuid";
 interface signInParam {
 	user: User,
@@ -140,6 +141,8 @@ const getHandleFromProfile = (profile: Profile | undefined) => {
 const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
 	const updateObj: DbUser = {}
 	if (account) {
+		const encryptedAccessToken = encryptToken(account.access_token);
+		account.access_token=encryptedAccessToken
 		updateObj.auth_info = {
 			[account.provider]: {
 				[account.providerAccountId]: {
