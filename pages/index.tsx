@@ -29,7 +29,7 @@ export default function Home() {
 
 	return (
 		<div className='overflow-hidden'>
-			<Navbar ctaLink={chromeExtensionLink} transparent={false} />
+			<Navbar ctaLink={chromeExtensionLink} transparent={true} />
 			<Hero ctaLink={chromeExtensionLink} />
 			<WhyUs />
 			<Features />
