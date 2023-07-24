@@ -9,6 +9,7 @@ import Image from 'next/image';
 import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
+import Banner, { BannerHeightType } from '../components/Banner';
 
 const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
@@ -16,6 +17,8 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 
 	const [showNavbar, setShowNavbar] = useState(false);
 	const [scrollDown, setScrollDown] = useState(props.transparent);
+	const [bannerHeight, setBannerHeight] = useState<BannerHeightType>();
+
 	const changeNavbar = () => {
 		setShowNavbar(!showNavbar);
 	};
@@ -30,7 +33,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		window.addEventListener('scroll', changeColor);
 	}, []);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 
 		const handleDownloadClick = () => {
@@ -74,72 +77,76 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		};
 	}, [rudderEventMethods, session]);
 	return (
-		<div
-			className={
-				'fixed left-0 top-0 w-full z-20 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown || props.transparent ? ' bg-primary-light text-secondary-dark' : ' text-primary-light')
-			}
-		>
-			<div className='max-w-[1240px] m-auto flex justify-between items-center p-4 '>
-				<Link href='/'>
-					<h1 className='font-bold text-4xl'>
-						Vibinex
-					</h1>
-				</Link>
-				<ul className='hidden sm:flex'>
-					<li id="docs-link" className='p-4'>
-						<Link href='/docs'>Docs</Link>
-					</li>
-					<li id="contribute-link" className='p-4'>
-						<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
-					</li>
-					<li className='p-4' id='pricing-link'>
-						<Link href='/pricing'>Pricing</Link>
-					</li>
-					<li className='p-4' id='download-link'>
-						<Link href={props.ctaLink} target="_blank">
-							Download
-							<Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
-						</Link>
-					</li>
-					<li id='login-logout-link' className='p-4'>
-						<LoginLogout />
-					</li>
-				</ul>
-				{/* Mobile Button */}
-				<div onClick={changeNavbar}
-					className={
-						'block sm:hidden z-10' + (scrollDown || props.transparent ? ' text-secondary-dark' : ' text-primary-light')
-					}
-				>
-					{showNavbar ? (
-						<AiOutlineClose size={20} />
-					) : (
-						<AiOutlineMenu size={20} />
-					)}
-				</div>
-				{/* Mobile Menu */}
-				<div
-					className={
-						'sm:hidden absolute flex justify-center items-center w-full h-screen bg-secondary-dark text-center ease-in duration-300' +
-						(showNavbar ? ' left-0 top-0 right-0 bottom-0' : ' left-[-100%] top-0 right-0 bottom-0')
-					}
-				>
-					<ul>
-						<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+		<div className={`${bannerHeight} bg-secondary-dark`}>
+			<div
+				className={
+					'fixed left-0 top-0 w-full z-20 ease-in duration-300 border-b-secondary-dark border-b-2' + (scrollDown || props.transparent ? ' bg-primary-light text-secondary-dark' : ' text-primary-light')
+				}
+			>
+				<Banner bannerHeight={bannerHeight} setBannerHeight={setBannerHeight} />
+				<div className='max-w-[1240px] m-auto flex justify-between items-center p-4 '>
+					<Link href='/'>
+						<h1 className='font-bold text-4xl'>
+							Vibinex
+						</h1>
+					</Link>
+					<ul className='hidden sm:flex'>
+						<li id="docs-link" className='p-4'>
 							<Link href='/docs'>Docs</Link>
 						</li>
-						<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+						<li id="contribute-link" className='p-4'>
 							<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
 						</li>
-						<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-							<Link href='#'>Pricing</Link>
+						<li className='p-4' id='pricing-link'>
+							<Link href='/pricing'>Pricing</Link>
 						</li>
-						<li className='p-4 text-secondary-main hover:text-secondary-light'>
+						<li className='p-4' id='download-link'>
+							<Link href={props.ctaLink} target="_blank">
+								Download
+								<Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
+							</Link>
+						</li>
+						<li id='login-logout-link' className='p-4'>
 							<LoginLogout />
 						</li>
 					</ul>
+					{/* Mobile Button */}
+					<div onClick={changeNavbar}
+						className={
+							'block sm:hidden z-10' + (scrollDown || props.transparent ? ' text-secondary-dark' : ' text-primary-light')
+						}
+					>
+						{showNavbar ? (
+							<AiOutlineClose size={20} />
+						) : (
+							<AiOutlineMenu size={20} />
+						)}
+					</div>
+					{/* Mobile Menu */}
+					<div
+						className={
+							'sm:hidden absolute flex justify-center items-center w-full h-screen bg-secondary-dark text-center ease-in duration-300' +
+							(showNavbar ? ' left-0 top-0 right-0 bottom-0' : ' left-[-100%] top-0 right-0 bottom-0')
+						}
+					>
+						<ul>
+							<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+								<Link href='/docs'>Docs</Link>
+							</li>
+							<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+								<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
+							</li>
+							<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+								<Link href='#'>Pricing</Link>
+							</li>
+							<li className='p-4 text-secondary-main hover:text-secondary-light'>
+								<LoginLogout />
+							</li>
+						</ul>
+					</div>
 				</div>
 			</div>
+			<div className={`${bannerHeight}`}></div>
 		</div>
 	);
 };
