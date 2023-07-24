@@ -76,9 +76,8 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		};
 	}, [rudderEventMethods, session]);
 	return (
-		<AppBar position='fixed' offset={!props.transparent} className={
-			'ease-in duration-300 border-b-secondary-dark border-b-2 justify-between items-center p-4' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-transparent text-primary-light')
-		}
+		<AppBar position='fixed' offset={!props.transparent} className='mx-auto p-4 justify-between items-center max-w-7xl'
+			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-transparent text-primary-light')}
 		>
 			<Link href='/'>
 				<h1 className='font-bold text-4xl'>
