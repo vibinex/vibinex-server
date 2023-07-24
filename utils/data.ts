@@ -17,7 +17,7 @@ const centralLimit = (type: 'avg' | 'median' | 'mode' | 'decay_avg' = 'avg', arr
 		case 'avg':
 			return arr.reduce((prev, curr, i) => (prev * i + curr) / (i + 1))
 		case 'median':
-			arr.sort();
+			arr.sort((a, b) => (a - b));
 			if (arr.length % 2 == 1)
 				return arr[(arr.length - 1) / 2]
 			else {

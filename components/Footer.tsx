@@ -12,8 +12,7 @@ const legal = [
 const quickLinks = [
 	{ name: "Documentation", link: '/docs' },
 	{ name: "Contribute", link: 'https://github.com/Alokit-Innovations' },
-	{ name: "Pricing", link: '/' },
-	{ name: "Settings", link: '/settings' },
+	{ name: "Pricing", link: '/pricing' },
 ]
 
 const contactUs = [
@@ -45,9 +44,9 @@ const Footer = (props: { className?: string }) => {
 					<h2 className='font-bold text-[22px] mb-3 sm:mt-0 mt-7'>Legal</h2>
 					<div>
 						{
-							legal.map((item, index) => {
+							legal.map((item) => {
 								return (
-									<div key={index} className='mt-3 text-[18px]'>
+									<div key={item.link} className='mt-3 text-[18px]'>
 										<Link href={item.link}><h2>{item.name}</h2></Link>
 									</div>
 								)
@@ -62,9 +61,9 @@ const Footer = (props: { className?: string }) => {
 					<h2 className='font-bold text-[22px] mb-3 sm:mt-0 mt-7'>Go to</h2>
 					<div>
 						{
-							quickLinks.map((item, index) => {
+							quickLinks.map((item) => {
 								return (
-									<div key={index} className='mt-3 text-[18px]'>
+									<div key={item.name} className='mt-3 text-[18px]'>
 										<Link href={item.link}><h2>{item.name}</h2></Link>
 									</div>
 								)
@@ -79,9 +78,9 @@ const Footer = (props: { className?: string }) => {
 					<h2 className='font-bold text-[22px] mb-3 sm:mt-0 mt-7'>Contact Us</h2>
 					<div>
 						{
-							contactUs.map((item, index) => {
+							contactUs.map((item) => {
 								return (
-									<Link key={index} href={item.link} className='mt-3 text-[18px] block'>
+									<Link key={item.name} href={item.link} className='mt-3 text-[18px] block'>
 										<item.icon className='h-full inline mr-2' />
 										{item.name}
 									</Link>

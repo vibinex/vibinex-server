@@ -1,57 +1,61 @@
 import React from "react";
+import { useSession } from 'next-auth/react'
+import type { Session } from 'next-auth'
 import Button from "../components/Button";
 import Image from "next/image";
 import highlightPR from '../public/highlightPR.png'
 import highlightFile from '../public/highlightFile.png'
 import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
-import { rudderEventMethods } from "../utils/rudderstack_initialize";
-import { v4 as uuidv4 } from 'uuid';
+import RudderContext from "../components/RudderContext";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 const Hero = (props: { ctaLink: string }) => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
+
 	React.useEffect(() => {
-		const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-		const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		// Track the "Add to Chrome" event
 		const handleAddToChrome = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero" }, anonymousId)
-			});
+			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
 		};
-	
+
 		// Track the "Book Demo" event
 		const handleBookDemo = () => {
-			rudderEventMethods().then((response) => {
-				response?.track("", "Book demo button", { type: "button", eventStatusFlag: 1 }, anonymousId)
-			});
+			rudderEventMethods?.track(getAuthUserId(session), "Book demo button", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 		};
-	
-		const addToChromeButton = document.getElementById('add-to-chrome-btn');
-  		const bookDemoButton = document.getElementById('book-demo-btn');
 
-  		addToChromeButton?.addEventListener('click', handleAddToChrome);
-  		bookDemoButton?.addEventListener('click', handleBookDemo);
+		const addToChromeButton = document.getElementById('add-to-chrome-btn');
+		const bookDemoButton = document.getElementById('book-demo-btn');
+
+		addToChromeButton?.addEventListener('click', handleAddToChrome);
+		bookDemoButton?.addEventListener('click', handleBookDemo);
 
 		return () => {
 			addToChromeButton?.removeEventListener('click', handleAddToChrome);
 			bookDemoButton?.removeEventListener('click', handleBookDemo);
 		};
-	  }, []);
+	}, [rudderEventMethods, session]);
 	return (
 		<div className='flex items-center justify-center h-screen bg-fixed bg-center bg-cover'
 			style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503252947848-7338d3f92f31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80')" }}
 		>
 			{/*Overlay*/}
-			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/75 z-[2]' />
-			<section className='p-5 text-primary-light z-[2] my-auto lg:mt-[10%] pt-1 lg:w-[50%]'>
+			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/75 z-0' />
+			<section className='p-5 text-primary-light z-10 my-auto lg:mt-[10%] pt-1 lg:w-1/2'>
 				<article className="text-center">
-					<h1 className='text-[35px] sm:text-[48px] lg:text-[60px] font-bold'>{'Personalization for'}
+					<h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold mb-4'>{'Personalization for'}
 						<span className='text-primary-main font-bold block'>
 							Code Reviews
 						</span>
 					</h1>
-					<p className="text-xl sm:text-2xl mt-15 mb-10 text-gray-300">
-						Know which code-changes need your <span className="text-primary-main">attention</span> while also maximizing <span className="text-primary-main">code-review coverage</span>
+					<p className="text-xl sm:text-2xl text-gray-300">
+						Automatic <span className="text-primary-main">reviewer</span> assignment • Better <span className="text-primary-main">quality</span> reviews
+					</p>
+					<p className="text-lg sm:text-lg mb-10 text-gray-300">
+						Open source • <span className="text-primary-main">100% code privacy</span>
 					</p>
 					<div className="w-full flex space-x-4">
 						<Button id="add-to-chrome-btn" variant="contained" href={props.ctaLink} target="_blank" className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] mt-5'>
@@ -72,7 +76,7 @@ const Hero = (props: { ctaLink: string }) => {
 				</article>
 			</section>
 
-			<section className='mt-[20%] h-screen items-center lg:block hidden z-[2]'>
+			<section className='mt-[20%] h-screen items-center lg:block hidden z-10'>
 				<Image priority alt='see your relevant files in the PR highlighted' src={highlightPR} className='w-[80%] sm:h-[50%] border-2 border-primary-light' />
 				<Image priority alt='see your relevant PRs highlighted' src={highlightFile} className='w-[80%] sm:h-[50%] mt-[-30%] ml-24 outline outline-2 outline-primary-light' />
 			</section>

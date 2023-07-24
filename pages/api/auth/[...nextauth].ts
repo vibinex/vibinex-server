@@ -1,11 +1,13 @@
 import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider, { GithubProfile } from "next-auth/providers/github"
+import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
+import { v4 as uuidv4 } from "uuid";
 interface signInParam {
 	user: User,
 	account: Account | null,
@@ -26,7 +28,11 @@ export const authOptions = {
 		BitbucketProvider({
 			clientId: process.env.BITBUCKET_CLIENT_ID!,
 			clientSecret: process.env.BITBUCKET_CLIENT_SECRET!,
-		})
+		}),
+		GitlabProvider({
+			clientId: process.env.GITLAB_CLIENT_ID!,
+			clientSecret: process.env.GITLAB_CLIENT_SECRET!,
+		}),
 		// ...add more providers here
 	],
 	callbacks: {
@@ -57,7 +63,7 @@ export const authOptions = {
 
 				// signup event
 				account && getUserByProvider(account.provider, account.providerAccountId).then(db_user => {
-					rudderStackEvents.track(db_user.id.toString(), "", "signup", { ...db_user, eventStatusFlag: 1 });
+					rudderStackEvents.track(db_user.id.toString(), uuidv4(), "signup", { ...db_user, eventStatusFlag: 1 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.
 				}).catch(err => {
 					console.error("[signup] Rudderstack event failed: Could not get user id", db_user, err);
 				});
@@ -68,7 +74,7 @@ export const authOptions = {
 				await updateUser(db_user.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
-				rudderStackEvents.track(db_user.id!.toString(), "", "login", { ...updateObj, newAuth: !existingAuth });
+				rudderStackEvents.track(db_user.id!.toString(), uuidv4(), "login", { ...updateObj, newAuth: !existingAuth });
 			}
 			return true;
 		},
@@ -83,7 +89,9 @@ export const authOptions = {
 		},
 		async session({ session }: { session: Session }) {
 			if (session && session.user) {
-				const usersWithAlias = await getUserByAlias(session.user.email!)
+				const usersWithAlias = await getUserByAlias(session.user.email!).catch(err => {
+					console.error(`[session callback] getUserByAlias failed for ${session.user.email}`, err);
+				})
 				if (!usersWithAlias || usersWithAlias.length < 1) {
 					console.warn(`[session callback] No user found with this email: ${session.user.email}`);
 				}
@@ -113,11 +121,14 @@ const getHandleFromProfile = (profile: Profile | undefined) => {
 	// convert profile to GithubProfile or BitbucketProfile
 	const githubProfile = profile as GithubProfile;
 	const bitbucketProfile = profile as BitbucketProfile;
+	const gitlabProfile = profile as GitLabProfile;
 	if (profile !== undefined) {
 		if ("login" in githubProfile) {
 			handle = githubProfile.login; // Assign profile.login if it's a GithubProfile
 		} else if ("username" in bitbucketProfile) {
 			handle = bitbucketProfile.username; // Assign profile.username if it's a BitbucketProfile
+		} else if ("username" in gitlabProfile) {
+			handle = gitlabProfile.username; // Assign profile.username if it's a GitLabProfile
 		} else {
 			handle = null; // Set handle to null if it's neither a GithubProfile nor a BitbucketProfile
 		}
@@ -142,7 +153,7 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: Profi
 			}
 		}
 	}
-	
+
 	if (user.name && user.name != db_user?.name) updateObj.name = user.name;
 	if (user.image && user.image != db_user?.profile_url) updateObj.profile_url = user.image;
 	if (user.email && !db_user?.aliases?.includes(user.email)) {

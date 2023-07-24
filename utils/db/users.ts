@@ -1,9 +1,10 @@
 import conn from '.';
 import AuthInfo from '../../types/AuthInfo';
 import { convert } from './converter';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface DbUser {
-	id?: number,
+	id?: string,
 	name?: string,
 	profile_url?: string,
 	auth_info?: AuthInfo,
@@ -32,9 +33,11 @@ export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | un
 	const user_alias_search_q = `SELECT *
 		FROM users
 		WHERE '${alias_email}' = ANY(aliases)`;
-	const user_alias_search_result = await conn.query(user_alias_search_q);
+	const user_alias_search_result = await conn.query(user_alias_search_q).catch(err => {
+		console.log(`[users/getUserByAlias] Query failed: Select from users where aliases contain ${alias_email}`, err);
+	});
 
-	if (user_alias_search_result.rowCount) {
+	if (user_alias_search_result && user_alias_search_result.rowCount) {
 		console.debug(`${user_alias_search_result.rowCount} user(s) exist with this email as an alias.`);
 		return user_alias_search_result.rows;
 	}
@@ -42,11 +45,11 @@ export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | un
 }
 
 export const createUser = async (user: DbUser) => {
-	const { id, ...others } = user;
-	const insert_obj = Object.entries(others).filter(([k, v]) => v);
+	const { ...others } = user;
+	const id = uuidv4()
+	const insert_obj = [...Object.entries(others), ['id', id]].filter(([k, v]) => v);
 	const keys = insert_obj.map(x => x[0]);
 	const values = insert_obj.map(x => convert(x[1]));
-
 	const insert_user_q = `INSERT INTO users (${keys.join(', ')}) VALUES (${values.join(', ')})`
 	conn.query(insert_user_q)
 		.then(insert_user_result => {
@@ -66,9 +69,11 @@ export const createUser = async (user: DbUser) => {
  * @param userId The id of the user in the database, that needs to be updated
  * @param user updated user object (please only include fields that have changed)
  */
-export const createUpdateUserObj = async (userId: number, user: DbUser) => {
-	const user_q = `SELECT * FROM users WHERE id = ${userId}`;
-	const user_result = await conn.query(user_q);
+export const createUpdateUserObj = async (userId: string, user: DbUser) => {
+	const user_q = `SELECT * FROM users WHERE id = ${convert(userId)}`;
+	const user_result = await conn.query(user_q).catch(err => {
+		throw Error("Error in running the query on the database", err);
+	});
 	if (user_result.rowCount == 0) return;
 
 	const currUser: DbUser = user_result.rows[0];
@@ -106,7 +111,7 @@ export const createUpdateUserObj = async (userId: number, user: DbUser) => {
 								const currAuthObj = currUser.auth_info[provider][providerAccountId];
 								const newAuthObj = user.auth_info[provider][providerAccountId];
 
-								if (newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at > currAuthObj.expires_at) {
+								if (!(newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at < currAuthObj.expires_at)) {
 									diffAuth[provider][providerAccountId] = newAuthObj;
 								}
 								if ((newAuthObj.handle && !currAuthObj.handle) || (newAuthObj.handle != currAuthObj.handle)) {
@@ -135,12 +140,14 @@ export const createUpdateUserObj = async (userId: number, user: DbUser) => {
  * @param userId The id of the user in the database, that needs to be updated
  * @param user updated user object (please only include fields that have changed)
  */
-export const updateUser = async (userId: number, user: DbUser) => {
-	const diffObj = await createUpdateUserObj(userId, user);
+export const updateUser = async (userId: string, user: DbUser) => {
+	const diffObj = await createUpdateUserObj(userId, user).catch(err => {
+		console.error(`[createUpdateUserObj] Something went wrong`, err);
+	});
 	if (!diffObj || Object.keys(diffObj).length == 0) return;
-	const update_user_q = `UPDATE users 
-		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")} 
-		WHERE id = ${userId} `;
+	const update_user_q = `UPDATE users
+		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")}
+		WHERE id = ${convert(userId)} `;
 	conn.query(update_user_q)
 		.then(update_user_result => {
 			if (update_user_result.rowCount == 1) {
