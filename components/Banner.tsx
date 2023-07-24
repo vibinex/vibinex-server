@@ -67,7 +67,7 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 	useEffect(() => {
 		const determineSituation = (): BannerSituation => {
 			// TODO: [amankr] Determine if a banner needs to be shown. If yes, then which one
-			return null;
+			return "not-installed";
 		}
 		const situation = determineSituation();
 		setBanner(situation);
