@@ -82,7 +82,7 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 		setBanner(situation);
 	}, [])
 
-	return (<div className={`w-full ${bannerHeight} bg-primary-main flex justify-center align-middle text-primary-light rounded-2xl`} >
+	return (<div className={`w-full ${bannerHeight} bg-primary-main flex justify-center align-middle text-primary-light`} >
 		{(bannerHeight) ? bannerHTML : null}
 	</div>)
 }
