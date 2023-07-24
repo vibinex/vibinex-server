@@ -1,11 +1,11 @@
 import React from 'react'
 import Footer from '../components/Footer'
-import TitleBar from '../views/TitleBar'
+import Navbar from '../views/Navbar'
 
 const Policy = () => {
 	return (
 		<>
-			<TitleBar />
+			<Navbar transparent={false} ctaLink='https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc' />
 			<div className='p-5 w-[90%] m-auto'>
 				<h2 className="my-1 font-bold text-4xl">Privacy Policy</h2>
 				<div>
