@@ -30,19 +30,21 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 					return `h-${bannerHeight}`;
 				})
 				break;
-			case "incompatible-browser":
-				setBannerHeight(() => {
-					const bannerHeight = 24;
-					setBannerHTML((<>
-						<Image src={chromeLogo} alt="chrome extension logo" className={`inline m-6 mr-8 border border-white rounded-full w-${bannerHeight - 12}`}></Image>
-						<p className='text-center font-bold text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
-							Vibinex is only supported in Chromium browsers<br />
-							<span className='text-sm font-normal'>Google Chrome, Microsoft Edge, Opera, Chromium, Brave etc.</span>
-						</p>
-					</>))
-					return `h-${bannerHeight}`;
-				})
-				break;
+            case "incompatible-browser":
+                setBannerHeight(() => {
+                    const bannerHeight = 24;
+                    setBannerHTML((<>
+                        <div className="flex items-center m-6">
+                            <Image src={chromeLogo} alt="chrome extension logo" className="w-12 h-12 border border-white rounded-full"></Image>
+                            <p className='text-center font-bold text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
+                                Vibinex is only supported in Chromium browsers<br />
+                                <span className='text-sm font-normal'>Google Chrome, Microsoft Edge, Opera, Chromium, Brave etc.</span>
+                            </p>
+                        </div>
+                    </>))
+                    return `h-${bannerHeight}`;
+                })
+                break;                  
 			case "incompatible-device":
 				setBannerHeight(() => {
 					const bannerHeight = 12;
@@ -66,14 +68,13 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 
 	useEffect(() => {
 		const determineSituation = (): BannerSituation => {
+
 			if ('chrome' in window) {
 				return null;
-			  } else {
-				// TODO: Add more checks based on your extension's behavior to determine the specific scenario
+			} else {
 				return "incompatible-browser";
-			  }
+			}
 			// TODO: [amankr] Determine if a banner needs to be shown. If yes, then which one
-			// return null;
 		}
 		const situation = determineSituation();
 		setBanner(situation);
