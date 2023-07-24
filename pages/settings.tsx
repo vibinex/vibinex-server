@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
 import RudderContext from '../components/RudderContext';
