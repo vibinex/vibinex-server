@@ -4,6 +4,7 @@ import Button from '../components/Button';
 import chromeLogo from '../public/chrome-logo.png'
 
 export type BannerHeightType = "h-12" | "h-24" | "h-32" | "h-40" | "h-44" | undefined;
+type BannerSituation = "not-installed" | "incompatible-browser" | "incompatible-device" | null;
 
 const Banner = ({ bannerHeight, setBannerHeight }: {
 	bannerHeight: BannerHeightType,
@@ -12,10 +13,8 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	const [bannerHTML, setBannerHTML] = useState((<></>));
 
-	useEffect(() => {
-		// TODO: [amankr] Put this in the condition where a banner needs to be shown
-		const condition: "not-installed" | "incompatible-browser" | "incompatible-device" | null = 'not-installed';
-		switch (condition) {
+	const setBanner = (situation: BannerSituation) => {
+		switch (situation) {
 			case "not-installed":
 				setBannerHeight(() => {
 					const bannerHeight = 32;
@@ -63,6 +62,15 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 				})
 				break;
 		}
+	}
+
+	useEffect(() => {
+		const determineSituation = (): BannerSituation => {
+			// TODO: [amankr] Determine if a banner needs to be shown. If yes, then which one
+			return null;
+		}
+		const situation = determineSituation();
+		setBanner(situation);
 	}, [])
 
 	return (<div className={`w-full ${bannerHeight} bg-primary-main flex justify-center align-middle text-primary-light rounded-2xl`} >
