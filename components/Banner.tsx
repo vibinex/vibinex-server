@@ -68,10 +68,12 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 
 	useEffect(() => {
 		const determineSituation = (): BannerSituation => {
-
-			if ('chrome' in window) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+			if ('chrome' in window && !isMobile) {
 				return null;
-			} else {
+			} else if (isMobile) {
+                return "incompatible-device";
+            } else {
 				return "incompatible-browser";
 			}
 			// TODO: [amankr] Determine if a banner needs to be shown. If yes, then which one
