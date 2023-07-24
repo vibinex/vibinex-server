@@ -66,8 +66,14 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 
 	useEffect(() => {
 		const determineSituation = (): BannerSituation => {
+			if ('chrome' in window) {
+				return null;
+			  } else {
+				// TODO: Add more checks based on your extension's behavior to determine the specific scenario
+				return "incompatible-browser";
+			  }
 			// TODO: [amankr] Determine if a banner needs to be shown. If yes, then which one
-			return "not-installed";
+			// return null;
 		}
 		const situation = determineSituation();
 		setBanner(situation);
