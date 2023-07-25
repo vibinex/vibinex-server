@@ -13,7 +13,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
 import type { Session } from "next-auth/core/types";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
-import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 
 type RepoProfileData = {
 	sessionObj: Session,

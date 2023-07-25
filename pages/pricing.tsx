@@ -6,7 +6,7 @@ import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import RudderContext from '../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
 import { getUserLocation, isUserInIndia } from '../utils/location';
 

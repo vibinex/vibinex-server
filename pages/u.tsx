@@ -13,7 +13,7 @@ import conn from "../utils/db";
 import Footer from "../components/Footer";
 import { useSession } from "next-auth/react";
 import Button from "../components/Button";
-import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 
 type ProfileProps = {
 	session: Session,

@@ -7,7 +7,7 @@ import LoginLogout from "../components/LoginLogout";
 import chromeLogo from '../public/chrome-logo.png'
 import Image from 'next/image';
 import RudderContext from '../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
 
 const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
