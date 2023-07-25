@@ -33,14 +33,13 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
             case "incompatible-browser":
                 setBannerHeight(() => {
                     const bannerHeight = 24;
-                    setBannerHTML((
-                        <div className="flex items-center m-6">
-                            <Image src={chromeLogo} alt="chrome extension logo" className={`w-${bannerHeight - 4} inline mr-8 border border-white rounded-full`}></Image>
-                            <p className='text-center font-bold text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
-                                Vibinex is only supported in Chromium browsers<br />
-                                <span className='text-sm font-normal'>Google Chrome, Microsoft Edge, Opera, Chromium, Brave etc.</span>
-                            </p>
-                        </div>))
+                    setBannerHTML((<>
+						<Image src={chromeLogo} alt="chrome extension logo" className={`w-12 inline mr-8 m-6 border border-white rounded-full`}></Image>
+						<p className='text-center font-bold text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
+							Vibinex is only supported in Chromium browsers<br />
+							<span className='text-sm font-normal'>Google Chrome, Microsoft Edge, Opera, Chromium, Brave etc.</span>
+						</p>
+					</>))
                     return `h-${bannerHeight}`;
                 })
                 break;                  
