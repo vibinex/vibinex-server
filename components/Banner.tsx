@@ -43,7 +43,7 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 						</>))
 						return `h-${bannerHeight}`;
 					})
-					break;                  
+					break;
 				case "incompatible-device":
 					setBannerHeight(() => {
 						const bannerHeight = 12;
