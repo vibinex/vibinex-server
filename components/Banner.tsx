@@ -35,7 +35,7 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 					setBannerHeight(() => {
 						const bannerHeight = 24;
 						setBannerHTML((<>
-							<Image src={chromeLogo} alt="chrome extension logo" className={`inline m-6 mr-8 border border-white rounded-full w-${bannerHeight - 12}`}></Image>
+							<Image src={chromeLogo} alt="chrome extension logo" className={`w-12 inline mr-8 m-6 border border-white rounded-full`}></Image>
 							<p className='text-center font-bold text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
 								Vibinex is only supported in Chromium browsers<br />
 								<span className='text-sm font-normal'>Google Chrome, Microsoft Edge, Opera, Chromium, Brave etc.</span>
@@ -66,14 +66,21 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 		}
 
 		const determineSituation = (): BannerSituation => {
-			// TODO: [amankr] Determine if a banner needs to be shown. If yes, then which one
-			return null;
+            const isUnsupportedDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+			// currently, this is the best way to check if browser extensions are supported. Ref: https://stackoverflow.com/a/60927213/4677052
+			if ('chrome' in window && !isUnsupportedDevice) {
+				return null;
+			} else if (isUnsupportedDevice) {
+                return "incompatible-device";
+            } else {
+				return "incompatible-browser";
+			}
 		}
 		const situation = determineSituation();
 		setBanner(situation);
 	}, [setBannerHeight])
 
-	return (<div className={`w-full ${bannerHeight} bg-primary-main flex justify-center align-middle text-primary-light rounded-2xl`} >
+	return (<div className={`w-full ${bannerHeight} bg-primary-main flex justify-center align-middle text-primary-light`} >
 		{(bannerHeight) ? bannerHTML : null}
 	</div>)
 }
