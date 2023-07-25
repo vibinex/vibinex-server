@@ -8,7 +8,7 @@ import highlightFile from '../public/highlightFile.png'
 import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
 import RudderContext from "../components/RudderContext";
-import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 const Hero = (props: { ctaLink: string }) => {
