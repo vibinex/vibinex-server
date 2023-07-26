@@ -9,7 +9,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initi
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 export type BannerHeightType = "h-12" | "h-24" | "h-32" | "h-40" | "h-44" | undefined;
-type BannerSituation = "not-installed" | "incompatible-browser" | "incompatible-device" | null;
+type BannerSituation = "extension-not-installed" | "incompatible-browser" | "incompatible-device" | null;
 
 const Banner = ({ bannerHeight, setBannerHeight }: {
 	bannerHeight: BannerHeightType,
@@ -24,7 +24,7 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 	useEffect(() => {
 		const setBanner = (situation: BannerSituation) => {
 			switch (situation) {
-				case "not-installed":
+				case "extension-not-installed":
 					setBannerHeight(() => {
 						const bannerHeight = 32;
 						setBannerHTML((<>
@@ -86,6 +86,10 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 		}
 
 		const situation = determineSituation();
+		if (situation) {
+			const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+			rudderEventMethods?.track(getAuthUserId(session), situation, { type: "detection", eventStatusFlag: 0, source: "banner", name: getAuthUserName(session) }, anonymousId);
+		}
 		setBanner(situation);
 	}, [setBannerHeight])
 
@@ -93,7 +97,7 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 
 		const handleDownloadClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "link", eventStatusFlag: 1, source: "banner", name: getAuthUserName(session) }, anonymousId)
 		};
 		const downloadLink = document.getElementById('add-to-chrome-btn');
 		downloadLink?.addEventListener('click', handleDownloadClick);
