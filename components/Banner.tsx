@@ -11,15 +11,13 @@ import { getAuthUserId, getAuthUserName } from "../utils/auth";
 export type BannerHeightType = "h-12" | "h-24" | "h-32" | "h-40" | "h-44" | undefined;
 type BannerSituation = "extension-not-installed" | "incompatible-browser" | "incompatible-device" | null;
 
-const Banner = ({ bannerHeight, setBannerHeight }: {
-	bannerHeight: BannerHeightType,
-	setBannerHeight: React.Dispatch<React.SetStateAction<BannerHeightType>>
-}) => {
+const Banner = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
 
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	const [bannerHTML, setBannerHTML] = useState((<></>));
+	const [bannerHeight, setBannerHeight] = useState<BannerHeightType>();
 
 	useEffect(() => {
 		const setBanner = (situation: BannerSituation) => {
