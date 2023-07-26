@@ -6,11 +6,9 @@ import chromeLogo from '../public/chrome-logo.png'
 export type BannerHeightType = "h-12" | "h-24" | "h-32" | "h-40" | "h-44" | undefined;
 type BannerSituation = "not-installed" | "incompatible-browser" | "incompatible-device" | null;
 
-const Banner = ({ bannerHeight, setBannerHeight }: {
-	bannerHeight: BannerHeightType,
-	setBannerHeight: React.Dispatch<React.SetStateAction<BannerHeightType>>
-}) => {
+const Banner = () => {
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
+	const [bannerHeight, setBannerHeight] = useState<BannerHeightType>();
 	const [bannerHTML, setBannerHTML] = useState((<></>));
 
 	useEffect(() => {
@@ -66,13 +64,13 @@ const Banner = ({ bannerHeight, setBannerHeight }: {
 		}
 
 		const determineSituation = (): BannerSituation => {
-            const isUnsupportedDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+			const isUnsupportedDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 			// currently, this is the best way to check if browser extensions are supported. Ref: https://stackoverflow.com/a/60927213/4677052
 			if ('chrome' in window && !isUnsupportedDevice) {
 				return null;
 			} else if (isUnsupportedDevice) {
-                return "incompatible-device";
-            } else {
+				return "incompatible-device";
+			} else {
 				return "incompatible-browser";
 			}
 		}
