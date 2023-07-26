@@ -92,7 +92,6 @@ const Settings = () => {
 	}, [rudderEventMethods, session]);
 
 	useEffect(() => {
-		console.log("status", status)
 		if (status === 'unauthenticated') {
 			import('next/router').then(({ default: router }) => {
 				router.push('/');
