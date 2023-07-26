@@ -4,7 +4,7 @@ import type { Session } from 'next-auth'
 import Link from 'next/link'
 import { BsSlack } from 'react-icons/bs'
 import RudderContext from '../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName } from '../utils/auth'
 
 const JoinSlack = () => {

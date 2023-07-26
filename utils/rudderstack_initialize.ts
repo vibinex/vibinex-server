@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 export interface RudderstackClientSideEvents {
 	identify: (
 		userId: string,
@@ -99,4 +101,11 @@ async function loadRudderAnalytics(): Promise<RudderstackClientSideEvents | null
 export async function rudderEventMethods(): Promise<RudderstackClientSideEvents | null> {
 	const rudderAnalytics = await loadRudderAnalytics()
 	return rudderAnalytics
+}
+
+export const getAndSetAnonymousIdFromLocalStorage = () => {
+	const localStorageAnonymousId = localStorage.getItem('AnonymousId');
+	const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
+	localStorage.setItem('AnonymousId', anonymousId);
+	return anonymousId;
 }

@@ -6,7 +6,7 @@ import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/url_utils';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName } from '../../utils/auth';
 
 const verifySetup = [

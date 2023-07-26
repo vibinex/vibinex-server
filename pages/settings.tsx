@@ -4,7 +4,7 @@ import { BsToggleOn } from 'react-icons/bs';
 import RudderContext from '../components/RudderContext';
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { useSession } from "next-auth/react";
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 import LoadingOverlay from '../components/LoadingOverlay';
 import MainAppBar from '../views/MainAppBar';
 

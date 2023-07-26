@@ -5,7 +5,7 @@ import { useEffect, useState, useContext } from "react";
 import type { Session } from 'next-auth';
 import Link from 'next/link';
 import RudderContext from './RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 
 export default function LoginLogout() {
 	const [showMenu, setShowMenu] = useState(false);
