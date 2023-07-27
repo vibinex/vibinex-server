@@ -75,6 +75,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 			docsLink?.removeEventListener('click', handleDocsClick);
 		};
 	}, [rudderEventMethods, session]);
+
 	return (
 		<AppBar position='fixed' offset={!props.transparent} className='mx-auto p-4 justify-between items-center max-w-7xl'
 			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-transparent text-primary-light')}
@@ -124,16 +125,16 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 				}
 			>
 				<ul>
-					<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li onClick={changeNavbar} id="docs-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
 						<Link href='/docs'>Docs</Link>
 					</li>
-					<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li onClick={changeNavbar} id="contribute-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
 						<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
 					</li>
-					<li onClick={changeNavbar} className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
-						<Link href='#'>Pricing</Link>
+					<li onClick={changeNavbar} id='pricing-link' className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+						<Link href='/pricing'>Pricing</Link>
 					</li>
-					<li className='p-4 text-secondary-main hover:text-secondary-light'>
+					<li id='login-logout-link' className='p-4 text-secondary-main hover:text-secondary-light'>
 						<LoginLogout />
 					</li>
 				</ul>

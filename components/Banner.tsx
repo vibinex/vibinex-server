@@ -2,19 +2,27 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import Button from '../components/Button';
 import chromeLogo from '../public/chrome-logo.png'
+import { useSession } from "next-auth/react";
+import type { Session } from "next-auth";
+import RudderContext from "./RudderContext";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 export type BannerHeightType = "h-12" | "h-24" | "h-32" | "h-40" | "h-44" | undefined;
-type BannerSituation = "not-installed" | "incompatible-browser" | "incompatible-device" | null;
+type BannerSituation = "extension-not-installed" | "incompatible-browser" | "incompatible-device" | null; // DO NOT EDIT THESE NAMES (They are also the name of the events)
 
 const Banner = () => {
+	const { rudderEventMethods } = React.useContext(RudderContext);
+	const session: Session | null = useSession().data;
+
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
-	const [bannerHeight, setBannerHeight] = useState<BannerHeightType>();
 	const [bannerHTML, setBannerHTML] = useState((<></>));
+	const [bannerHeight, setBannerHeight] = useState<BannerHeightType>();
 
 	useEffect(() => {
 		const setBanner = (situation: BannerSituation) => {
 			switch (situation) {
-				case "not-installed":
+				case "extension-not-installed":
 					setBannerHeight(() => {
 						const bannerHeight = 32;
 						setBannerHTML((<>
@@ -46,8 +54,8 @@ const Banner = () => {
 					setBannerHeight(() => {
 						const bannerHeight = 12;
 						setBannerHTML((<>
-							<p className='text-center text-sm sm:text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
-								Browser extensions are not supported on this device.
+							<p className='text-center text-sm sm:text-xl w-fit sm:max-w-1/2 h-fit my-auto p-1'>
+								Browser extensions are not supported on this device. Try Vibinex on a laptop or a desktop computer.
 							</p>
 						</>))
 						return `h-${bannerHeight}`;
@@ -74,9 +82,28 @@ const Banner = () => {
 				return "incompatible-browser";
 			}
 		}
+
 		const situation = determineSituation();
+		if (situation) {
+			const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+			rudderEventMethods?.track(getAuthUserId(session), situation, { type: "detection", eventStatusFlag: 0, source: "banner", name: getAuthUserName(session) }, anonymousId);
+		}
 		setBanner(situation);
 	}, [setBannerHeight])
+
+	useEffect(() => {
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+
+		const handleDownloadClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "link", eventStatusFlag: 1, source: "banner", name: getAuthUserName(session) }, anonymousId)
+		};
+		const downloadLink = document.getElementById('add-to-chrome-btn');
+		downloadLink?.addEventListener('click', handleDownloadClick);
+
+		return () => {
+			downloadLink?.removeEventListener('click', handleDownloadClick);
+		};
+	}, [rudderEventMethods, session, bannerHTML]);
 
 	return (<div className={`w-full ${bannerHeight} bg-primary-main flex justify-center align-middle text-primary-light`} >
 		{(bannerHeight) ? bannerHTML : null}
