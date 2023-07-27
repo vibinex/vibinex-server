@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import { BsToggleOn } from 'react-icons/bs';
 import RudderContext from '../components/RudderContext';
@@ -7,10 +6,10 @@ import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { useSession } from "next-auth/react";
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 import LoadingOverlay from '../components/LoadingOverlay';
+import MainAppBar from '../views/MainAppBar';
 
 const Settings = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
-	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	const settingList = [
 
 		{
@@ -107,7 +106,7 @@ const Settings = () => {
 					: (Object.keys(settings).length == 0) ? (<LoadingOverlay text="Loading your settings..." />)
 						: null}
 			<div className='mb-16'>
-				<Navbar ctaLink={chromeExtensionLink} transparent={true} />
+				<MainAppBar />
 			</div>
 			<div id='pricing' className='w-full py-12 bg-primary-light'>
 				<h2 className='font-bold text-center text-[2rem] mb-4'>Settings</h2>

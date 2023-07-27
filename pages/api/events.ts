@@ -8,7 +8,7 @@ const client = (process.env.NODE_ENV === 'development') ? {
 
 const rudderStackEvents = {
 	identify: (userId: string, name: string, email: string, githubId: string, role: string, anonymousId: string) => { // Anonymous Id is set in local storage as soon as a user lands on the website.
-		console.log("identify");
+		console.debug("[rudderstack] identify event initiated");
 		client.identify({
 			userId: userId,
 			anonymousId: anonymousId,
@@ -18,21 +18,21 @@ const rudderStackEvents = {
 				githubId: githubId,
 				role: role
 			}
-		}, () => { console.log("identify event successfully recorded") }
+		}, () => { console.debug("[rudderstack] identify event successfully recorded") }
 		);
 	},
 	/**
 	 * @param {*} properties properties should be a dictionary of properties of the event. It must contain an "eventStatusFlag" which will define the status of a single event. If the flag is 1, event is successful and if it is 0, event is failed.
 	 */
 	track: (userId: string, anonymousId: string, event: string, properties: apiObject) => {
-		console.log("track");
+		console.debug("[rudderstack] track event initiated");
 		client.track({
 			userId: userId,
 			anonymousId: anonymousId,
 			event: event,
 			properties: properties,
 			timestamp: new Date(),
-		}, () => { console.log("Track event successfully recorded") }
+		}, () => { console.debug("[rudderstack] Track event successfully recorded") }
 		);
 	}
 }

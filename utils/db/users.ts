@@ -34,7 +34,7 @@ export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | un
 		FROM users
 		WHERE '${alias_email}' = ANY(aliases)`;
 	const user_alias_search_result = await conn.query(user_alias_search_q).catch(err => {
-		console.log(`[users/getUserByAlias] Query failed: Select from users where aliases contain ${alias_email}`, err);
+		console.error(`[users/getUserByAlias] Query failed: Select from users where aliases contain ${alias_email}`, err);
 	});
 
 	if (user_alias_search_result && user_alias_search_result.rowCount) {
