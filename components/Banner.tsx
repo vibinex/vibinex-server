@@ -9,7 +9,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initi
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 export type BannerHeightType = "h-12" | "h-24" | "h-32" | "h-40" | "h-44" | undefined;
-type BannerSituation = "extension-not-installed" | "incompatible-browser" | "incompatible-device" | null;
+type BannerSituation = "extension-not-installed" | "incompatible-browser" | "incompatible-device" | null; // DO NOT EDIT THESE NAMES (They are also the name of the events)
 
 const Banner = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
