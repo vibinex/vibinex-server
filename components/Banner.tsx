@@ -91,7 +91,7 @@ const Banner = () => {
 			rudderEventMethods?.track(getAuthUserId(session), situation, { type: "detection", eventStatusFlag: 0, source: "banner", name: getAuthUserName(session) }, anonymousId);
 		}
 		setBanner(situation);
-	}, [session, setBannerHeight])
+	}, [session, rudderEventMethods])
 
 	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
