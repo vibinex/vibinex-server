@@ -1,9 +1,5 @@
 import * as crypto from 'crypto';
 
-
-// const key = crypto.randomBytes(32);
-
-
 export function encryptToken(data: string | undefined): string {
   const algorithm = 'aes-256-cbc';
   const iv = crypto.randomBytes(16);
@@ -34,9 +30,3 @@ export function decryptToken(combinedData: string): string {
 
   return decryptedData;
 }
-
-// const dataToEncrypt = 'Hello, loloposdjvbvdivp';
-// const combinedData = encryptToken(dataToEncrypt);
-// const decryptedData = decryptToken(combinedData);
-
-// console.log('Decrypted Data:', decryptedData);
