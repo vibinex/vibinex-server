@@ -74,6 +74,8 @@ const Banner = () => {
 		const determineSituation = (): BannerSituation => {
 			const isUnsupportedDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 			// currently, this is the best way to check if browser extensions are supported. Ref: https://stackoverflow.com/a/60927213/4677052
+			if (!session) return null;
+			
 			if ('chrome' in window && !isUnsupportedDevice) {
 				return null;
 			} else if (isUnsupportedDevice) {
@@ -89,7 +91,7 @@ const Banner = () => {
 			rudderEventMethods?.track(getAuthUserId(session), situation, { type: "detection", eventStatusFlag: 0, source: "banner", name: getAuthUserName(session) }, anonymousId);
 		}
 		setBanner(situation);
-	}, [setBannerHeight])
+	}, [session, rudderEventMethods])
 
 	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
