@@ -74,16 +74,14 @@ const Banner = () => {
 		const determineSituation = (): BannerSituation => {
 			const isUnsupportedDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 			// currently, this is the best way to check if browser extensions are supported. Ref: https://stackoverflow.com/a/60927213/4677052
-			if (session) {
-				if ('chrome' in window && !isUnsupportedDevice) {
-					return null;
-				} else if (isUnsupportedDevice) {
-					return "incompatible-device";
-				} else {
-					return "incompatible-browser";
-				}
-			} else {
+			if (!session) return null;
+			
+			if ('chrome' in window && !isUnsupportedDevice) {
 				return null;
+			} else if (isUnsupportedDevice) {
+				return "incompatible-device";
+			} else {
+				return "incompatible-browser";
 			}
 		}
 
