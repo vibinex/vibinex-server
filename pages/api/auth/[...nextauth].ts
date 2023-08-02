@@ -143,8 +143,6 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: Profi
 	if (account) {
 		const encryptedAccessToken = encryptToken(account.access_token);
 		account.access_token=encryptedAccessToken
-		const encryptedRefresh=encryptToken(account.refresh_token)
-		account.refresh_token=encryptedRefresh
 		updateObj.auth_info = {
 			[account.provider]: {
 				[account.providerAccountId]: {
