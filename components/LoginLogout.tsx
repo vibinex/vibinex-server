@@ -18,6 +18,8 @@ export default function LoginLogout() {
 		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
 			const sessionVal = await res.json();
 			setSession(sessionVal);
+		}).catch((err) => {
+			console.error(`[LoginLogout] Error in getting session`, err);
 		});
 	}, [])
 
