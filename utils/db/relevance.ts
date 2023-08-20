@@ -37,7 +37,7 @@ export async function getAuthorAliases(account_id: String, provider: String) {
 export async function getHunkData(provider: String, owner: String, reponame: String, 
 	review_id: String, user_emails: Set<String>) {
 	const hunk_query = `
-		SELECT hunks 
+		SELECT author, hunks 
 		FROM hunks
 		WHERE repo_provider = '${provider}' 
 		AND repo_owner = '${owner}'
@@ -45,8 +45,10 @@ export async function getHunkData(provider: String, owner: String, reponame: Str
 		AND review_id = '${review_id}'
 	`;
 	const result = await conn.query(hunk_query);
+	const author_aliases = await getAuthorAliases(result.rows[0]["author"], provider);
 	const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: { [x: string]: String; }) => {
-		return user_emails.has(obj["author"]); 
+		const hunk_author = obj["author"].toString();
+      	return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author)); 
 	});
 	return filteredBlamevec;
 }
