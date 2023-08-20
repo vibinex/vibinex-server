@@ -3,16 +3,19 @@ import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const topicName = 'rtapish-fromserver';
+  const jsonbody = req.body;
   const data = {
     'repository_provider': 'bitbucket',
-    'installation_code': req.query.code};
-  const msgtype = 'install_callback';
-  console.log("Publishing message: {}", data);
+    'event_payload': jsonbody};
+  const msgtype = 'webhook_callback';
+
   try {
+    console.log(JSON.stringify(data));
     await publishMessage(topicName, data, msgtype);
   } catch (error) {
     console.error('Error publishing message:', error);
-    res.status(500).json({ error: '<failure>Failed to publish message. Data must be in the form of a Buffer.</failure>' });
+    res.status(500).json({ error: 'Failed to publish message. Data must be in the form of a Buffer' });
   }
-  res.redirect('/u');
+  res.status(200);
+  res.send("Success");
 }
