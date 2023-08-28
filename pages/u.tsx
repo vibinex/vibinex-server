@@ -1,6 +1,5 @@
 import { GetServerSideProps } from "next";
 import { getServerSession, Session } from "next-auth";
-import Link from "next/link";
 import MainAppBar from "../views/MainAppBar";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { updateUser } from "../utils/db/users";

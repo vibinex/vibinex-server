@@ -34,22 +34,15 @@ export default function LoginLogout() {
 			rudderEventMethods?.track(getAuthUserId(session), "Contribute link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: getAuthUserName(session) }, anonymousId)
 		};
 
-		const handleSettingsClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Settings link clicked", { type: "link", eventStatusFlag: 1, source: "profile-popup", name: getAuthUserName(session) }, anonymousId)
-		};
-
 		const logoutLink = document.getElementById('logout-link');
 		const contributeLink = document.getElementById('contribute-link');
-		const settingsLink = document.getElementById('settings-link')
 
 		logoutLink?.addEventListener('click', handleLogoutClick);
 		contributeLink?.addEventListener('click', handleContributeClick);
-		settingsLink?.addEventListener('click', handleSettingsClick);
 
 		return () => {
 			logoutLink?.removeEventListener('click', handleLogoutClick);
 			contributeLink?.removeEventListener('click', handleContributeClick);
-			settingsLink?.removeEventListener('click', handleSettingsClick)
 		};
 	}, [rudderEventMethods, session]);
 
@@ -64,9 +57,6 @@ export default function LoginLogout() {
 					</li>
 					<li id='contribute-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
 						<Link href='https://github.com/Alokit-Innovations/' target='_blank' className='cursor-pointer w-full'>Contribute</Link>
-					</li>
-					<li id='settings-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
-						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
 					</li>
 					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => (logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods ? rudderEventMethods : null)))}>
 						Logout
