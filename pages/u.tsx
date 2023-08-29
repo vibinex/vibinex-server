@@ -7,7 +7,7 @@ import { updateUser } from "../utils/db/users";
 import axios from "axios";
 import { useEffect, useContext } from "react";
 import RudderContext from "../components/RudderContext";
-import { getAuthUserId, getAuthUserName } from "../utils/auth";
+import { callProviderAPI, getAuthUserId, getAuthUserName } from "../utils/auth";
 import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
 import Footer from "../components/Footer";
@@ -88,72 +88,36 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 		};
 	}
 
-	if (Object.keys(session.user.auth_info!).includes("github")) {
-		for (const gh_auth_info of Object.values(session.user.auth_info!["github"])) {
-			const access_key: string = gh_auth_info['access_token'];
-			axios.get("https://api.github.com/user/emails", {
-				headers: {
-					'Accept': 'application/vnd.github+json',
-					'Authorization': `Bearer ${access_key}`
-				}
+	callProviderAPI('github', session, '/user/emails',
+		(response: { data: GithubEmailObj[] }) => {
+			const aliases = response.data.map((emailObj: GithubEmailObj) => emailObj.email);
+			updateUser(session.user.id!, { aliases: aliases }).catch(err => {
+				console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 			})
-				.then((response: { data: GithubEmailObj[] }) => {
-					const aliases = response.data.map((emailObj: GithubEmailObj) => emailObj.email);
-					updateUser(session.user.id!, { aliases: aliases }).catch(err => {
-						console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
-					})
-				})
-				.catch(err => {
-					console.error(`[Profile] Error occurred while getting user emails from Github API. userId: ${session.user.id}, name: ${session.user.name}`, err);
-				})
-		}
-	} else {
-		console.warn("Github provider not present");
-	}
+		}, err => {
+			console.error(`[Profile] Error occurred while getting user emails from Github API. userId: ${session.user.id}, name: ${session.user.name}`, err);
+		});
 
-	if (Object.keys(session.user.auth_info!).includes("bitbucket")) {
-		for (const bb_auth_info of Object.values(session.user.auth_info!["bitbucket"])) {
-			const access_key: string = bb_auth_info['access_token'];
-			axios.get("https://api.bitbucket.org/2.0/user/emails", {
-				headers: {
-					'Authorization': `Bearer ${access_key}`
-				}
+	callProviderAPI('bitbucket', session, '/user/emails',
+		(response: { data: { values: BitbucketEmailObj[] } }) => {
+			const aliases = response.data.values.map((emailObj: BitbucketEmailObj) => emailObj.email);
+			updateUser(session.user.id!, { aliases: aliases }).catch(err => {
+				console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 			})
-				.then((response: { data: { values: BitbucketEmailObj[] } }) => {
-					const aliases = response.data.values.map((emailObj: BitbucketEmailObj) => emailObj.email);
-					updateUser(session.user.id!, { aliases: aliases }).catch(err => {
-						console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
-					})
-				})
-				.catch(err => {
-					console.error(`[Profile] Error occurred while getting user emails from Bitbucket API. userId: ${session.user.id}, name: ${session.user.name}`, err.message);
-				})
-		}
-	} else {
-		console.warn("Bitbucket provider not present");
-	}
+		},
+		err => {
+			console.error(`[Profile] Error occurred while getting user emails from Bitbucket API. userId: ${session.user.id}, name: ${session.user.name}`, err.message);
+		})
 
-	if (Object.keys(session.user.auth_info!).includes("gitlab")) {
-		for (const gl_auth_info of Object.values(session.user.auth_info!["gitlab"])) {
-			const access_key: string = gl_auth_info['access_token'];
-			axios.get("https://gitlab.com/api/v4/user/emails", {
-				headers: {
-					'Authorization': `Bearer ${access_key}`
-				}
+	callProviderAPI('gitlab', session, '/user/emails',
+		(response: { data: GitlabEmailObj[] }) => {
+			const aliases = response.data.map((emailObj: GitlabEmailObj) => emailObj.email);
+			updateUser(session.user.id!, { aliases: aliases }).catch(err => {
+				console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 			})
-				.then((response: { data: GitlabEmailObj[] }) => {
-					const aliases = response.data.map((emailObj: GitlabEmailObj) => emailObj.email);
-					updateUser(session.user.id!, { aliases: aliases }).catch(err => {
-						console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
-					})
-				})
-				.catch(err => {
-					console.error(`[Profile] Error occurred while getting user emails from GitLab API. Endpoint: /user/emails, userId: ${session.user.id}, name: ${session.user.name}`, err.message);
-				});
-		}
-	} else {
-		console.warn("Github provider not present");
-	}
+		}, err => {
+			console.error(`[Profile] Error occurred while getting user emails from GitLab API. Endpoint: /user/emails, userId: ${session.user.id}, name: ${session.user.name}`, err.message);
+		})
 
 	// get the list of repositories of the user
 	const repo_list = await getRepoList(conn, session.user.id);
