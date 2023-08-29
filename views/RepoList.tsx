@@ -3,8 +3,11 @@ import Link from "next/link";
 import { TableCell, TableHeaderCell } from "../components/Table";
 import Image from "next/image";
 import { convert } from "../utils/db/converter";
+import SwitchSubmit from "../components/SwitchSubmit";
 
 const RepoList = (props: { repo_list: string[] }) => {
+	// TODO: add rudderstack events for changes in settings.
+
 	const providerToLogo = (provider: string) => (
 		(provider === "github") ? <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/github.svg" alt="github" className="mx-auto" />
 			: (provider === "bitbucket") ? <Image loading="lazy" height={24} width={24} src="/bitbucket-dark.svg" alt="bitbucket" className="mx-auto" />
@@ -19,6 +22,8 @@ const RepoList = (props: { repo_list: string[] }) => {
 					<TableHeaderCell>Repo Name</TableHeaderCell>
 					<TableHeaderCell>Owner</TableHeaderCell>
 					<TableHeaderCell>Provider</TableHeaderCell>
+					<TableHeaderCell>Auto-assign</TableHeaderCell>
+					<TableHeaderCell>PR Comments</TableHeaderCell>
 					<TableHeaderCell>Stats</TableHeaderCell>
 				</tr>
 			</thead>
@@ -30,6 +35,8 @@ const RepoList = (props: { repo_list: string[] }) => {
 							<TableCell>{repo_name}</TableCell>
 							<TableCell>{owner}</TableCell>
 							<TableCell className="text-center">{providerToLogo(provider)}</TableCell>
+							<TableCell className="text-center"><SwitchSubmit checked={true} toggleFunction={() => { }} /></TableCell>
+							<TableCell className="text-center"><SwitchSubmit checked={true} toggleFunction={() => { }} /></TableCell>
 							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repo_addr}`}>Link</Link></TableCell>
 						</tr>
 					)
@@ -40,7 +47,7 @@ const RepoList = (props: { repo_list: string[] }) => {
 	</>)
 }
 
-export async function getRepoList(conn: Pool, userId?: string) {
+export const getRepoList = async (conn: Pool, userId?: string) => {
 	const repo_list_q = `SELECT DISTINCT 
 		c.commit_json ->> 'repo_name' AS repo_name
 		FROM ` + ((!userId) ? "commits AS c" : `(SELECT 

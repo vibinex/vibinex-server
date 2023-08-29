@@ -20,6 +20,7 @@
     "@nivo/core": "^0.80.0",
     "@nivo/radar": "^0.80.0",
     "@nivo/voronoi": "^0.80.0",
+    "@radix-ui/react-switch": "^1.0.3",
     "@rudderstack/rudder-sdk-node": "^2.0.2",
     "@types/mdx": "^2.0.5",
     "@types/node": "18.11.14",
