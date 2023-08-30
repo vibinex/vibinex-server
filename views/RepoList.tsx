@@ -4,6 +4,8 @@ import { TableCell, TableHeaderCell } from "../components/Table";
 import Image from "next/image";
 import { convert } from "../utils/db/converter";
 import SwitchSubmit from "../components/SwitchSubmit";
+import type { Session } from "next-auth";
+import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
 
 const RepoList = (props: { repo_list: string[] }) => {
 	// TODO: add rudderstack events for changes in settings.
@@ -47,7 +49,10 @@ const RepoList = (props: { repo_list: string[] }) => {
 	</>)
 }
 
-export const getRepoList = async (conn: Pool, userId?: string) => {
+export const getRepoList = async (conn: Pool, session: Session) => {
+	const allRepos = await getUserRepositories(session);
+	console.log(allRepos);
+	const userId = session.user.id;
 	const repo_list_q = `SELECT DISTINCT 
 		c.commit_json ->> 'repo_name' AS repo_name
 		FROM ` + ((!userId) ? "commits AS c" : `(SELECT 

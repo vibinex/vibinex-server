@@ -90,7 +90,7 @@ export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ 
 	}
 
 	// by default, show the list of repositories of the user
-	const repo_list = await getRepoList(conn, session.user.id);
+	const repo_list = await getRepoList(conn, session);
 	return {
 		props: {
 			sessionObj: session,
