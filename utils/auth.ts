@@ -1,7 +1,6 @@
 import { signIn, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth/core/types';
 import { RudderstackClientSideEvents } from './rudderstack_initialize';
-import axios, { AxiosResponse } from 'axios';
 
 export const login = (anonymousId: string, rudderEventMethods: RudderstackClientSideEvents | null) => {
 	signIn().catch((err) => {
