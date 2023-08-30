@@ -3,16 +3,16 @@ import { getServerSession, Session } from "next-auth";
 import MainAppBar from "../views/MainAppBar";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { updateUser } from "../utils/db/users";
-import axios from "axios";
 import { useEffect, useContext } from "react";
 import RudderContext from "../components/RudderContext";
-import { callProviderAPI, getAuthUserId, getAuthUserName } from "../utils/auth";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import RepoList, { getRepoList } from "../views/RepoList";
 import conn from "../utils/db";
 import Footer from "../components/Footer";
 import { useSession } from "next-auth/react";
 import Button from "../components/Button";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
+import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
 
 type ProfileProps = {
 	session: Session,
@@ -50,27 +50,6 @@ const Profile = ({ repo_list }: ProfileProps) => {
 	)
 }
 
-type GithubEmailObj = {
-	email: string,
-	primary: boolean,
-	verified: boolean,
-	visibility: string | null
-}
-
-type BitbucketEmailObj = {
-	type: "email",
-	links: object,
-	email: string,
-	is_primary: boolean,
-	is_confirmed: boolean,
-}
-
-type GitlabEmailObj = {
-	id: number,
-	email: string,
-	confirmed_at: string | null,
-}
-
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
 	res.setHeader(
 		'Cache-Control',
@@ -87,36 +66,11 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 		};
 	}
 
-	callProviderAPI('github', session, '/user/emails',
-		(response: { data: GithubEmailObj[] }) => {
-			const aliases = response.data.map((emailObj: GithubEmailObj) => emailObj.email);
-			updateUser(session.user.id!, { aliases: aliases }).catch(err => {
-				console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
-			})
-		}, err => {
-			console.error(`[Profile] Error occurred while getting user emails from Github API. userId: ${session.user.id}, name: ${session.user.name}`, err);
-		});
-
-	callProviderAPI('bitbucket', session, '/user/emails',
-		(response: { data: { values: BitbucketEmailObj[] } }) => {
-			const aliases = response.data.values.map((emailObj: BitbucketEmailObj) => emailObj.email);
-			updateUser(session.user.id!, { aliases: aliases }).catch(err => {
-				console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
-			})
-		},
-		err => {
-			console.error(`[Profile] Error occurred while getting user emails from Bitbucket API. userId: ${session.user.id}, name: ${session.user.name}`, err.message);
+	getEmailAliases(session).then((aliases) => {
+		updateUser(session.user.id!, { aliases: aliases }).catch(err => {
+			console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 		})
-
-	callProviderAPI('gitlab', session, '/user/emails',
-		(response: { data: GitlabEmailObj[] }) => {
-			const aliases = response.data.map((emailObj: GitlabEmailObj) => emailObj.email);
-			updateUser(session.user.id!, { aliases: aliases }).catch(err => {
-				console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
-			})
-		}, err => {
-			console.error(`[Profile] Error occurred while getting user emails from GitLab API. Endpoint: /user/emails, userId: ${session.user.id}, name: ${session.user.name}`, err.message);
-		})
+	})
 
 	// get the list of repositories of the user
 	const repo_list = await getRepoList(conn, session.user.id);
