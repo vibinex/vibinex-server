@@ -160,9 +160,9 @@ export const updateUser = async (userId: string, user: DbUser) => {
 		});
 }
 
-export const getUserEmails = async (email: string): Promise<Set<String>> => {  
+export const getUserEmails = async (email: string): Promise<Set<string>> => {  
 	const users: DbUser[] | undefined = await getUserByAlias(email);
-	const emails = new Set<String>();
+	const emails = new Set<string>();
 	if (users) {
 		for (const user in users) {
 			const dbuser = users[user];

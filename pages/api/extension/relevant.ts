@@ -5,19 +5,21 @@ import { getUserEmails } from '../../../utils/db/users'
 
 const getUser = async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await getToken({req: req})
-  let emails = new Set<String>();
-  if (user && user.email) {
+  let emails = new Set<string>();
+  if (user?.email) {
     emails = await getUserEmails(user.email);
   }
   return emails;
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  // For cors prefetch options request
   if (req.method == "OPTIONS") {
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Authorization");
     res.status(200).send("Ok");
     return;
   }
+  // For normal requests
   console.info("Getting relevant info for ", req.body.repo_name);
   const user_emails = await getUser(req, res);
   const { type } = req.query;
@@ -77,7 +79,7 @@ const formatReviewResponse = async (query_res: Promise<{[key: string]: any}>[]) 
   return {"relevant": prsObj};
 }
 
-const formatFileResponse = (query_res: Set<String>) => {
+const formatFileResponse = (query_res: Set<string>) => {
   return {
     "files": Array.from(query_res)
   };

@@ -21,7 +21,7 @@ export const saveHunk = async (hunkInfo: string) => {
   }
 }
 
-export const getAuthorAliases = async (account_id: String, provider: String) => {
+export const getAuthorAliases = async (account_id: string, provider: string) => {
 	const query = `
 	SELECT aliases
 	FROM users
@@ -31,8 +31,8 @@ export const getAuthorAliases = async (account_id: String, provider: String) => 
 	return res.rows[0]["aliases"];
 }
 
-export const getHunkData = async (provider: String, owner: String, reponame: String, 
-	review_id: String, user_emails: Set<String>) => {
+export const getHunkData = async (provider: string, owner: string, reponame: string, 
+	review_id: string, user_emails: Set<string>) => {
 	const hunk_query = `
 		SELECT author, hunks 
 		FROM hunks
@@ -43,14 +43,14 @@ export const getHunkData = async (provider: String, owner: String, reponame: Str
 	`;
 	const result = await conn.query(hunk_query);
 	const author_aliases = await getAuthorAliases(result.rows[0]["author"], provider);
-	const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: { [x: string]: String; }) => {
+	const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: { [x: string]: string; }) => {
 		const hunk_author = obj["author"].toString();
       	return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author)); 
 	});
 	return filteredBlamevec;
 }
 
-export const getReviewData = async (provider: String, owner: String, reponame: String, user_emails: Set<String>) => {
+export const getReviewData = async (provider: string, owner: string, reponame: string, user_emails: Set<string>) => {
 	const review_query = `
 	SELECT review_id, author, hunks 
 	FROM hunks
@@ -61,7 +61,7 @@ export const getReviewData = async (provider: String, owner: String, reponame: S
   const result = await conn.query(review_query);
   const filteredRows = result.rows.map(async (row: any) => {
 	const author_aliases = await getAuthorAliases(row["author"].toString(), provider);
-    const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: {[key: string]: String}) => {
+    const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: {[key: string]: string}) => {
 		const hunk_author = obj["author"].toString();
       	return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author));
     });
@@ -74,10 +74,10 @@ export const getReviewData = async (provider: String, owner: String, reponame: S
   return filteredRows;
 }
 
-export const getFileData = async (provider: String, owner: String, reponame: String, 
-	review_id: String, author_emails: Set<String>) => {
+export const getFileData = async (provider: string, owner: string, reponame: string, 
+	review_id: string, author_emails: Set<string>) => {
   let hunks = await getHunkData(provider, owner, reponame, review_id, author_emails);
-  let files =  new Set<String>();
+  let files =  new Set<string>();
   for (const hunk in hunks) {
 	files.add(hunks[hunk]["filepath"]);
   }
