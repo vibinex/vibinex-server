@@ -1,8 +1,7 @@
 import type { Session } from "next-auth";
 import { baseURL, supportedProviders } from ".";
 import axios from "axios";
-
-type RepoIdentifier = { repo_provider: string, repo_owner: string, repo_name: string }
+import type { RepoIdentifier } from "../../types/RepoIdentifier";
 
 type GithubRepoObj = {
 	name: string,
@@ -21,8 +20,6 @@ type GithubRepoObj = {
 
 // type GitlabRepoObj = {
 // }
-
-type ProviderRepoObj = GithubRepoObj;
 
 const getUserRepositoriesForGitHub = async (access_key: string, authId?: string) => {
 	const perPage = 100;
@@ -43,7 +40,7 @@ const getUserRepositoriesForGitHub = async (access_key: string, authId?: string)
 				throw err;
 			})
 		const allGitHubRepoIdentifiers = repos.map(repo => ({
-			repo_provider: 'github',
+			repo_provider: supportedProviders[0],
 			repo_owner: repo.full_name.split('/')[0],
 			repo_name: repo.name
 		}))

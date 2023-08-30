@@ -14,10 +14,11 @@ import { authOptions } from "./api/auth/[...nextauth]";
 import type { Session } from "next-auth/core/types";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
+import type { RepoIdentifier } from "../types/RepoIdentifier";
 
 type RepoProfileData = {
 	sessionObj: Session,
-	repo_list?: string[],
+	repo_list?: RepoIdentifier[],
 	repo_name?: string,
 	contributor_2d_data?: Array<ContributorVector>
 }

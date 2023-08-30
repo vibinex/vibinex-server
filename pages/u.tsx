@@ -13,10 +13,11 @@ import { useSession } from "next-auth/react";
 import Button from "../components/Button";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
+import type { RepoIdentifier } from "../types/RepoIdentifier";
 
 type ProfileProps = {
 	session: Session,
-	repo_list: string[],
+	repo_list: RepoIdentifier[],
 }
 
 const Profile = ({ repo_list }: ProfileProps) => {
