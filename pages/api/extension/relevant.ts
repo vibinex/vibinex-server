@@ -1,8 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getServerSession } from "next-auth/next"
-// import { headers } from "next/headers"  
 import { getReviewData, getFileData, getHunkData } from '../../../utils/db/relevance'
-import { Session } from 'next-auth'
 import { getToken } from 'next-auth/jwt'
 import { getUserEmails } from '../../../utils/db/users'
 
@@ -15,14 +12,13 @@ const getUser = async (req: NextApiRequest, res: NextApiResponse) => {
   return emails;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log(req.method);
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method == "OPTIONS") {
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Authorization");
     res.status(200).send("Ok");
     return;
   }
-  
+  console.info("Getting relevant info for ", req.body.repo_name);
   const user_emails = await getUser(req, res);
   const { type } = req.query;
   if ("repo_provider" in req.body && 
@@ -57,14 +53,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           res.status(400).send('Invalid type parameter');
           return;
       }
-      console.log("formatted data = ", formattedData);
       res.status(200).json(formattedData);
     } else {
       res.status(401).send('Invalid request body');
     }
 }
 
-async function formatReviewResponse(query_res: Promise<{[key: string]: any}>[]) {
+const formatReviewResponse = async (query_res: Promise<{[key: string]: any}>[]) => {
   let prs = new Map();
   for (const promise of query_res) {
     const row = await promise;
@@ -82,7 +77,7 @@ async function formatReviewResponse(query_res: Promise<{[key: string]: any}>[]) 
   return {"relevant": prsObj};
 }
 
-function formatFileResponse(query_res: Set<String>) {
+const formatFileResponse = (query_res: Set<String>) => {
   return {
     "files": Array.from(query_res)
   };
@@ -93,3 +88,5 @@ function formatHunkResponse(query_res: string) {
     "hunkinfo": query_res
   };
 }
+
+export default handler;

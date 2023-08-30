@@ -1,14 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { saveHunk } from '../../utils/db/relevance';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const hunkjson = req.body;
-  console.log("Publishing message: ", hunkjson);
+  console.info("Saving hunks...", hunkjson);
   try {
-    saveHunk(hunkjson);
+    await saveHunk(hunkjson);
   } catch (error) {
     console.error('Error publishing message:', error);
-    res.status(500).json({ error: '<failure>Failed to publish message. Data must be in the form of a Buffer.</failure>' });
+    res.status(500).json({ error: 'Failed to publish message. Data must be in the form of a Buffer.' });
   }
   res.status(200).send("Success");
 }
+
+export default handler;
