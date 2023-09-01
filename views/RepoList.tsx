@@ -8,16 +8,17 @@ import type { Session } from "next-auth";
 import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
 import type { RepoIdentifier } from "../types/RepoIdentifier";
 import type { RepoProvider } from "../utils/providerAPI";
+import type { ReactElement } from "react";
 
 const RepoList = (props: { repo_list: RepoIdentifier[] }) => {
 	// TODO: add rudderstack events for changes in settings.
 
-	const providerToLogo = (provider: RepoProvider) => (
-		(provider === "github") ? <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/github.svg" alt="github" className="mx-auto" />
-			: (provider === "bitbucket") ? <Image loading="lazy" height={24} width={24} src="/bitbucket-dark.svg" alt="bitbucket" className="mx-auto" />
-				: (provider === "gitlab") ? <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/gitlab.svg" alt="gitlab" className="mx-auto" />
-					: provider
-	)
+	const repoProviderLogo: { [key in RepoProvider]: ReactElement } = {
+		"github": <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/github.svg" alt="github" className="mx-auto" />,
+		"bitbucket": <Image loading="lazy" height={24} width={24} src="/bitbucket-dark.svg" alt="bitbucket" className="mx-auto" />,
+		"gitlab": <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/gitlab.svg" alt="gitlab" className="mx-auto" />
+	}
+	const providerToLogo = (provider: RepoProvider) => (provider in repoProviderLogo) ? repoProviderLogo[provider] : provider;
 
 	return (<>
 		<h2 className="text-xl font-semibold my-2">Added Repositories</h2>
