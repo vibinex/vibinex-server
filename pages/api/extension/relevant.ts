@@ -5,7 +5,6 @@ import { getUserEmails } from '../../../utils/db/users'
 
 const getUser = async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await getToken({req: req})
-  let emails = new Set<string>();
   return (user?.email) ? await getUserEmails(user.email) : new Set<string>();
 }
 
