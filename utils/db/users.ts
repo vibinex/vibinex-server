@@ -161,26 +161,31 @@ export const updateUser = async (userId: string, user: DbUser) => {
 }
 
 export const getUserEmails = async (email: string): Promise<Set<string>> => {  
-	const users: DbUser[] | undefined = await getUserByAlias(email);
 	const emails = new Set<string>();
-	if (users) {
-		for (const dbUser of users) {
-			if (dbUser.aliases) {
-				for (const idx in dbUser.aliases) {
-					emails.add(dbUser.aliases[idx]);
+	try {
+		const users: DbUser[] | undefined = await getUserByAlias(email);
+		if (users) {
+			for (const dbUser of users) {
+				if (dbUser.aliases) {
+					for (const idx in dbUser.aliases) {
+						emails.add(dbUser.aliases[idx]);
+					}
 				}
-			}
-			if (dbUser.auth_info) {
-				for (const provider in dbUser.auth_info) {
-					for (const account in dbUser.auth_info[provider]) {
-						const auth = dbUser.auth_info[provider][account];
-						if (auth.email) {
-							emails.add(auth.email);
-						}
-					}		
+				if (dbUser.auth_info) {
+					for (const provider in dbUser.auth_info) {
+						for (const account in dbUser.auth_info[provider]) {
+							const auth = dbUser.auth_info[provider][account];
+							if (auth.email) {
+								emails.add(auth.email);
+							}
+						}		
+					}
 				}
 			}
 		}
+	}
+	catch(err){
+		console.error(`Unable to get user aliases for ${email}, error = ${err}`);
 	}
 	return emails;
 }
