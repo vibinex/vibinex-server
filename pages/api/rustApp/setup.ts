@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { saveTopicName } from '../../../utils/db/relevance';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    console.info("Saving setup info...");
+const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+    console.info("Saving setup info in db...");
     const jsonbody = req.body;
     for (const idx in jsonbody.info) {
         let owner_info = jsonbody.info[idx];
@@ -17,4 +17,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).send("Ok");
 }
 
-export default handler;
+export default setupHandler;

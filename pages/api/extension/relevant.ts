@@ -6,13 +6,10 @@ import { getUserEmails } from '../../../utils/db/users'
 const getUser = async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await getToken({req: req})
   let emails = new Set<string>();
-  if (user?.email) {
-    emails = await getUserEmails(user.email);
-  }
-  return emails;
+  return (user?.email) ? await getUserEmails(user.email) : new Set<string>();
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   // For cors prefetch options request
   if (req.method == "OPTIONS") {
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Authorization");
@@ -62,7 +59,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const formatReviewResponse = async (query_res: Promise<{[key: string]: any}>[]) => {
-  let prs = new Map();
+  const prs = new Map();
   for (const promise of query_res) {
     const row = await promise;
 	  const reviewId = row["review_id"].toString();
@@ -72,7 +69,7 @@ const formatReviewResponse = async (query_res: Promise<{[key: string]: any}>[]) 
       prs.set(reviewId, {"num_hunks_changed": hunks.length});
     }
   }
-  const prsObj = {} as {[key: string]: any};
+  const prsObj : {[key: string]: any} = {};
   prs.forEach((value, key) => {
     prsObj[key] = value;
   });
@@ -91,4 +88,4 @@ function formatHunkResponse(query_res: string) {
   };
 }
 
-export default handler;
+export default relevantHandler;

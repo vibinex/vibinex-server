@@ -97,8 +97,8 @@ export const getTopicNameFromDB = async (owner: string, repoName: string, provid
   return result.rows[0].install_id;
 }
 
-export const saveTopicName = async (owner: string, provider: string, topicName: string, reponames: string[]) => {
-	const rows = reponames.map(repo => `('${repo}', '${owner}', '${provider}', '${topicName}')`).join(', ');
+export const saveTopicName = async (owner: string, provider: string, topicName: string, repoNames: string[]) => {
+	const rows = repoNames.map(repo => `('${repo}', '${owner}', '${provider}', '${topicName}')`).join(', ');
     const query = `
         INSERT INTO repos (repo_name, repo_owner, repo_provider, install_id) 
         VALUES ${rows}

@@ -52,10 +52,6 @@ const nextConfig = {
         // Apply these headers to all static assets
         source: "/api/:path*",
         headers: [
-          {
-            key: "Cache-Control",
-            value: "max-age=86400, s-maxage=86400, stale-while-revalidate",
-          },
           { key: "Access-Control-Allow-Credentials", value: "true" },
           { key: "Access-Control-Allow-Origin", value: "*" },
           {
@@ -67,6 +63,12 @@ const nextConfig = {
             value:
               "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization",
           },
+        ],
+      }, {
+        source: "/(.*)",
+        headers: [{
+          key: "Cache-Control",
+          value: "max-age=86400, s-maxage=86400, stale-while-revalidate", },
         ],
       },
     ];

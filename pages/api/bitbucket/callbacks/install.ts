@@ -1,16 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const topicName = process.env.TOPIC_NAME;
   if (topicName) {
     const data = {
       'repository_provider': 'bitbucket',
       'installation_code': req.query.code};
-    const msgtype = 'install_callback';
+    const msgType = 'install_callback';
     console.info("Recieved installation code for bitbucket, published to ", topicName);
     try {
-      await publishMessage(topicName, data, msgtype);
+      await publishMessage(topicName, data, msgType);
     } catch (error) {
       console.error('Error publishing message:', error);
       res.status(500).json({ error: 'Failed to publish message. Data must be in the form of a Buffer.' });
@@ -22,4 +22,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.redirect('/u');
 }
 
-export default handler;
+export default installHandler;

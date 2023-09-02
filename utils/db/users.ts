@@ -164,17 +164,16 @@ export const getUserEmails = async (email: string): Promise<Set<string>> => {
 	const users: DbUser[] | undefined = await getUserByAlias(email);
 	const emails = new Set<string>();
 	if (users) {
-		for (const user in users) {
-			const dbuser = users[user];
-			if (dbuser.aliases) {
-				for (const idx in dbuser.aliases) {
-					emails.add(dbuser.aliases[idx]);
+		for (const dbUser of users) {
+			if (dbUser.aliases) {
+				for (const idx in dbUser.aliases) {
+					emails.add(dbUser.aliases[idx]);
 				}
 			}
-			if (dbuser.auth_info) {
-				for (const provider in dbuser.auth_info) {
-					for (const account in dbuser.auth_info[provider]) {
-						const auth = dbuser.auth_info[provider][account];
+			if (dbUser.auth_info) {
+				for (const provider in dbUser.auth_info) {
+					for (const account in dbUser.auth_info[provider]) {
+						const auth = dbUser.auth_info[provider][account];
 						if (auth.email) {
 							emails.add(auth.email);
 						}
