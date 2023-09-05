@@ -28,24 +28,27 @@ type ProviderEmailObj = GithubEmailObj | BitbucketEmailObj | GitlabEmailObj;
 export const getEmailAliases = async (session: Session) => {
 	const allUserEmailsPromises = [];
 	for (const repoProvider of supportedProviders) {
-		if (Object.keys(session.user.auth_info!).includes(repoProvider)) {
-			for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
-				const access_key: string = providerAuthInfo['access_token']; // handle expired access token with refresh token here
-				const endPoint = '/user/emails';
-				const userEmailsPromise: Promise<{ data: ProviderEmailObj[] }> = axios.get(baseURL[repoProvider] + endPoint, {
-					headers: {
-						'Accept': (repoProvider === 'github') ? 'application/vnd.github+json' : 'application/json',
-						'Authorization': `Bearer ${access_key}`
-					}
-				})
-					.catch(err => {
-						console.error(`[Profile] Error occurred while getting user emails from ${repoProvider} API (provider-assigned id: ${authId}). Endpoint: ${endPoint}, userId: ${session.user.id}, name: ${session.user.name}`, err.message);
-						throw err;
-					})
-				allUserEmailsPromises.push(userEmailsPromise);
-			}
-		} else {
+		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) {
 			console.warn(`${repoProvider} provider not present`);
+			continue;
+		}
+		for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
+			const access_key: string = providerAuthInfo['access_token']; // handle expired access token with refresh token here
+			const endPoint = '/user/emails';
+			const userEmailsPromise: Promise<ProviderEmailObj[]> = axios.get(baseURL[repoProvider] + endPoint, {
+				headers: {
+					'Accept': (repoProvider === 'github') ? 'application/vnd.github+json' : 'application/json',
+					'Authorization': `Bearer ${access_key}`
+				}
+			})
+				.then((res) => {
+					return (repoProvider === 'bitbucket') ? res.data.values : res.data;
+				})
+				.catch(err => {
+					console.error(`[Profile] Error occurred while getting user emails from ${repoProvider} API (provider-assigned id: ${authId}). Endpoint: ${endPoint}, userId: ${session.user.id}, name: ${session.user.name}`, err.message);
+					throw err;
+				})
+			allUserEmailsPromises.push(userEmailsPromise);
 		}
 	}
 
@@ -55,7 +58,7 @@ export const getEmailAliases = async (session: Session) => {
 			if (result.status !== 'fulfilled') {
 				return;
 			}
-			const emailObjects = result.value.data;
+			const emailObjects = result.value;
 			emailObjects.forEach((emailObj: ProviderEmailObj) => allAliases.add(emailObj.email));
 		})
 	})
