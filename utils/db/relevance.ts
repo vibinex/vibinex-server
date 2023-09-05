@@ -78,8 +78,8 @@ export const getFileData = async (provider: string, owner: string, reponame: str
 	review_id: string, author_emails: Set<string>) => {
   let hunks = await getHunkData(provider, owner, reponame, review_id, author_emails);
   let files =  new Set<string>();
-  for (const hunk in hunks) {
-	files.add(hunks[hunk]["filepath"]);
+  for (const hunk of hunks) {
+	files.add(hunk["filepath"]);
   }
   return files;
 }

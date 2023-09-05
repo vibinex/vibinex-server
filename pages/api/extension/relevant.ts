@@ -19,42 +19,42 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.info("Getting relevant info for ", req.body.repo_name);
   const user_emails = await getUser(req, res);
   const { type } = req.query;
-  if ("repo_provider" in req.body && 
-      "repo_owner" in req.body && 
-      "repo_name" in req.body) {
-      let formattedData;
-      if (type === 'review') {
-          let review_db = await getReviewData(req.body.repo_provider,
-          req.body.repo_owner,
-          req.body.repo_name,
-          user_emails);
-          formattedData = await formatReviewResponse(review_db);
-      } else if (type === 'file') {
-        if ("pr_number" in req.body) {
-          let file_set = await getFileData(req.body.repo_provider,
-          req.body.repo_owner,
-          req.body.repo_name,
-          req.body.pr_number,
-          user_emails);
-          formattedData = formatFileResponse(file_set);
-        } else { res.status(400).send('Invalid request body'); return;}
-      } else if (type === 'hunk') {
-        if ("pr_number" in req.body) {
-          let hunks_res = await getHunkData(req.body.repo_provider, 
-          req.body.repo_owner, 
-          req.body.repo_name, 
-          req.body.pr_number,
-          user_emails);
-          formattedData = formatHunkResponse(hunks_res);
-        } else { res.status(400).send('Invalid request body'); return;}
-      } else {
-          res.status(400).send('Invalid type parameter');
-          return;
-      }
-      res.status(200).json(formattedData);
-    } else {
-      res.status(401).send('Invalid request body');
+  if (!("repo_provider" in req.body) || 
+    !("repo_owner" in req.body) || 
+    !("repo_name" in req.body)) {
+    res.status(401).send('Invalid request body');
+  }
+  let formattedData;
+  if (type === 'review') {
+      let review_db = await getReviewData(req.body.repo_provider,
+      req.body.repo_owner,
+      req.body.repo_name,
+      user_emails);
+      formattedData = await formatReviewResponse(review_db);
+  } else if (type === 'file') {
+    if (!("pr_number" in req.body)) {
+      res.status(400).send('Invalid request body');
+      return;
     }
+      let file_set = await getFileData(req.body.repo_provider,
+      req.body.repo_owner,
+      req.body.repo_name,
+      req.body.pr_number,
+      user_emails);
+      formattedData = formatFileResponse(file_set);
+  } else if (type === 'hunk') {
+    if (!("pr_number" in req.body)) {
+      res.status(400).send('Invalid request body'); 
+      return;
+    }
+    let hunks_res = await getHunkData(req.body.repo_provider, 
+    req.body.repo_owner, 
+    req.body.repo_name, 
+    req.body.pr_number,
+    user_emails);
+    formattedData = formatHunkResponse(hunks_res);
+  }
+  res.status(200).json(formattedData);
 }
 
 const formatReviewResponse = async (query_res: Promise<{[key: string]: any}>[]) => {

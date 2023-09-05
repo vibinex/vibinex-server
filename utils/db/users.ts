@@ -167,8 +167,8 @@ export const getUserEmails = async (email: string): Promise<Set<string>> => {
 		if (users) {
 			for (const dbUser of users) {
 				if (dbUser.aliases) {
-					for (const idx in dbUser.aliases) {
-						emails.add(dbUser.aliases[idx]);
+					for (const email of dbUser.aliases) {
+						emails.add(email);
 					}
 				}
 				if (dbUser.auth_info) {
