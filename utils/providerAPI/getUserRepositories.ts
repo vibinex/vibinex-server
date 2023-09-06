@@ -1,7 +1,7 @@
 import type { Session } from "next-auth";
 import { baseURL, supportedProviders } from ".";
 import axios from "axios";
-import type { RepoIdentifier } from "../../types/RepoIdentifier";
+import type { RepoIdentifier } from "../../types/repository";
 
 type GithubRepoObj = {
 	name: string,

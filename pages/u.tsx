@@ -13,14 +13,14 @@ import { useSession } from "next-auth/react";
 import Button from "../components/Button";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
-import type { RepoIdentifier } from "../types/RepoIdentifier";
+import type { DbRepoSerializable } from "../types/repository";
 
 type ProfileProps = {
 	session: Session,
-	repo_list: RepoIdentifier[],
+	repoList: DbRepoSerializable[],
 }
 
-const Profile = ({ repo_list }: ProfileProps) => {
+const Profile = ({ repoList }: ProfileProps) => {
 	const session: Session | null = useSession().data;
 	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
@@ -43,7 +43,7 @@ const Profile = ({ repo_list }: ProfileProps) => {
 		<div className="flex flex-col min-h-screen">
 			<MainAppBar />
 			<div className="max-w-[80%] mx-auto flex-grow">
-				<RepoList repo_list={repo_list} />
+				<RepoList repoList={repoList} />
 				<Button id='add-repository' variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
 			</div>
 			<Footer />
@@ -74,12 +74,12 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	})
 
 	// get the list of repositories of the user
-	const repo_list = await getRepoList(conn, session);
+	const repoList = await getRepoList(conn, session);
 
 	return {
 		props: {
 			session,
-			repo_list
+			repoList
 		}
 	}
 }
