@@ -1,16 +1,19 @@
-import { Pool } from "pg";
-import Link from "next/link";
-import { TableCell, TableHeaderCell } from "../components/Table";
-import Image from "next/image";
-import { convert } from "../utils/db/converter";
-import SwitchSubmit from "../components/SwitchSubmit";
+import axios from "axios";
 import type { Session } from "next-auth";
-import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
-import type { DbRepo, DbRepoSerializable } from "../types/repository";
+import Image from "next/image";
+import Link from "next/link";
+import { Pool } from "pg";
+import { useState, type ReactElement } from "react";
+import SwitchSubmit from "../components/SwitchSubmit";
+import { TableCell, TableHeaderCell } from "../components/Table";
+import type { DbRepo, DbRepoSerializable, RepoIdentifier } from "../types/repository";
+import { convert } from "../utils/db/converter";
 import type { RepoProvider } from "../utils/providerAPI";
-import type { ReactElement } from "react";
+import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
 
 const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
+	const [loading, setLoading] = useState(false); // while loading user can't send another api request to change setting
+	const [repoList, setRepoList] = useState(props.repoList);
 	// TODO: add rudderstack events for changes in settings.
 
 	const repoProviderLogo: { [key in RepoProvider]: ReactElement } = {
@@ -19,6 +22,25 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 		"gitlab": <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/gitlab.svg" alt="gitlab" className="mx-auto" />
 	}
 	const providerToLogo = (provider: RepoProvider) => (provider in repoProviderLogo) ? repoProviderLogo[provider] : provider;
+
+	const setConfig = (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
+		setLoading(true);
+		axios.post("/api/setRepoConfig", { repo, configType, value })
+			.then(res => {
+				console.log("Config has been successfully changed. Database response:", res);
+				for (const repository of repoList) {
+					if (repository.repo_provider === repo.repo_provider && repository.repo_owner === repo.repo_owner && repository.repo_name === repo.repo_name) {
+						repository.config[configType] = value;
+					}
+				}
+				setRepoList(repoList);
+				setLoading(false);
+			})
+			.catch(err => {
+				console.error(`[RepoList] updating config failed for this repository: ${repo.repo_provider}/${repo.repo_owner}/${repo.repo_name}`, err);
+				setLoading(false);
+			})
+	}
 
 	return (<>
 		<h2 className="text-xl font-semibold my-2">Added Repositories</h2>
@@ -34,15 +56,20 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 				</tr>
 			</thead>
 			<tbody className="bg-white divide-y divide-gray-200">
-				{props.repoList.map(({ repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, config }) => {
+				{repoList.map(({ repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, config }) => {
 					const repoAddr = `${repoProvider}/${repoOwner}/${repoName}`;
+					const repo_id: RepoIdentifier = {
+						repo_provider: repoProvider,
+						repo_owner: repoOwner,
+						repo_name: repoName
+					}
 					return (
 						<tr key={repoAddr}>
 							<TableCell>{repoName}</TableCell>
 							<TableCell>{repoOwner}</TableCell>
 							<TableCell className="text-center">{providerToLogo(repoProvider)}</TableCell>
-							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => { }} /></TableCell>
-							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => { }} /></TableCell>
+							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => setConfig(repo_id, 'auto_assign', !config.auto_assign)} disabled={loading} /></TableCell>
+							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => setConfig(repo_id, 'comment', !config.comment)} disabled={loading} /></TableCell>
 							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repoAddr}`}>Link</Link></TableCell>
 						</tr>
 					)

@@ -1,6 +1,11 @@
-import type { RepoProvider } from "../utils/providerAPI";
+import { supportedProviders, type RepoProvider } from "../utils/providerAPI";
 
 export type RepoIdentifier = { repo_provider: RepoProvider, repo_owner: string, repo_name: string }
+
+/* This is a "Type Guard" function. It is useful for runtime type checking, like from user input, API calls etc.*/
+export const isRepoIdentifier = (x: any): x is RepoIdentifier => {
+	return x && (supportedProviders.includes(x.repo_provider)) && (typeof x.repo_owner === "string") && (typeof x.repo_name === "string");
+}
 
 export type DbRepo = {
 	id: number,
