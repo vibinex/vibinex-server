@@ -27,12 +27,13 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 		setLoading(true);
 		axios.post("/api/setRepoConfig", { repo, configType, value })
 			.then(() => {
-				for (const repository of repoList) {
+				const updatedRepoList = repoList.map(repository => {
 					if (repository.repo_provider === repo.repo_provider && repository.repo_owner === repo.repo_owner && repository.repo_name === repo.repo_name) {
-						repository.config[configType] = value;
+						return { ...repository, config: { ...repository.config, [configType]: value } };
 					}
-				}
-				setRepoList(repoList);
+					return repository;
+				});
+				setRepoList(updatedRepoList);
 				setLoading(false);
 			})
 			.catch(err => {
