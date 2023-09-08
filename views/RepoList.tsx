@@ -26,8 +26,7 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 	const setConfig = (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
 		setLoading(true);
 		axios.post("/api/setRepoConfig", { repo, configType, value })
-			.then(res => {
-				console.log("Config has been successfully changed. Database response:", res);
+			.then(() => {
 				for (const repository of repoList) {
 					if (repository.repo_provider === repo.repo_provider && repository.repo_owner === repo.repo_owner && repository.repo_name === repo.repo_name) {
 						repository.config[configType] = value;
