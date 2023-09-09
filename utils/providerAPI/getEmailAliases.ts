@@ -1,6 +1,6 @@
+import axios from "axios";
 import type { Session } from "next-auth";
 import { baseURL, supportedProviders } from ".";
-import axios from "axios";
 
 type GithubEmailObj = {
 	email: string,
@@ -33,7 +33,7 @@ export const getEmailAliases = async (session: Session) => {
 			continue;
 		}
 		for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
-			const access_key: string = providerAuthInfo['access_token']; // handle expired access token with refresh token here
+			const access_key: string = providerAuthInfo['access_token']; // TODO: handle expired access token with refresh token here
 			const endPoint = '/user/emails';
 			const userEmailsPromise: Promise<ProviderEmailObj[]> = axios.get(baseURL[repoProvider] + endPoint, {
 				headers: {

@@ -1,6 +1,6 @@
-import type { Session } from "next-auth";
-import { baseURL, supportedProviders } from ".";
 import axios from "axios";
+import type { Session } from "next-auth";
+import { baseURL, retrieveAllPagesBitbucket, supportedProviders } from ".";
 import type { RepoIdentifier } from "../../types/repository";
 
 type GithubRepoObj = {
@@ -93,34 +93,14 @@ const getUserRepositoriesForGitHub = async (access_key: string, authId?: string)
 	return allGitHubRepositories;
 }
 
-export const getUserRepositoriesForBitbucket = async (access_key: string, authId?: string) => {
-	const workspacesEndPoint = '/user/permissions/workspaces';
-	const response: { data: { values: BitbucketWorkspaceObj[] }, status: number } = await axios.get(baseURL['bitbucket'] + workspacesEndPoint, {
-		headers: {
-			'Accept': 'application/json',
-			'Authorization': `Bearer ${access_key}`
-		}
-	}) // TODO: implement pagination
-	if (response.status !== 200) {
-		throw ReferenceError(`[getUserRepositories] Could not get Bitbucket workspaces of the user (auth-id: ${authId}`);
-	}
+export const getUserRepositoriesForBitbucket = async (access_key: string, authId?: string): Promise<RepoIdentifier[]> => {
+	const workspacesData = await retrieveAllPagesBitbucket<BitbucketWorkspaceObj>(`/user/permissions/workspaces`, access_key, authId);
+	const workspaces = workspacesData.map((workspaceObj) => workspaceObj.workspace.slug);
 
-	const workspaces = response.data.values.map((workspaceObj) => workspaceObj.workspace.slug);
-
-	const repositories: RepoIdentifier[] = []
+	const repositories: RepoIdentifier[] = [];
 	for (const workspace of workspaces) {
-		const repositoriesEndPoint = `/repositories/${workspace}`;
-		const response: { data: { values: BitbucketRepoObj[] }, status: number } = await axios.get(baseURL['bitbucket'] + repositoriesEndPoint, {
-			headers: {
-				'Accept': 'application/json',
-				'Authorization': `Bearer ${access_key}`
-			}
-		}) // TODO: implement pagination
-		if (response.status !== 200) {
-			console.error(`[getUserRepositories] Could not get Bitbucket repositories for the workspace (${workspace}) for auth-id ${authId}`, response.data);
-			continue;
-		}
-		const allBitbucketRepoIdentifiers = response.data.values.map(repoObj => ({
+		const repositoriesData = await retrieveAllPagesBitbucket<BitbucketRepoObj>(`/repositories/${workspace}`, access_key, authId);
+		const allBitbucketRepoIdentifiers = repositoriesData.map(repoObj => ({
 			repo_provider: supportedProviders[1],
 			repo_owner: repoObj.workspace.slug,
 			repo_name: repoObj.slug
@@ -135,7 +115,7 @@ export const getUserRepositories = async (session: Session) => {
 	for (const repoProvider of supportedProviders) {
 		if (Object.keys(session.user.auth_info!).includes(repoProvider)) {
 			for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
-				const access_key: string = providerAuthInfo['access_token']; // handle expired access token with refresh token here
+				const access_key: string = providerAuthInfo['access_token']; // TODO: handle expired access token with refresh token here
 				switch (repoProvider) {
 					case 'github':
 						const userReposPromiseGitHub = getUserRepositoriesForGitHub(access_key, authId)
