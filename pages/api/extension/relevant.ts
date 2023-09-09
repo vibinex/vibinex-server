@@ -26,40 +26,40 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   let formattedData;
   if (type === 'review') {
-      let review_db = await getReviewData(req.body.repo_provider,
+      const reviewDb = await getReviewData(req.body.repo_provider,
       req.body.repo_owner,
       req.body.repo_name,
       user_emails);
-      formattedData = await formatReviewResponse(review_db);
+      formattedData = await formatReviewResponse(reviewDb);
   } else if (type === 'file') {
     if (!("pr_number" in req.body)) {
       res.status(400).send('Invalid request body');
       return;
     }
-      let file_set = await getFileData(req.body.repo_provider,
+      const fileSet = await getFileData(req.body.repo_provider,
       req.body.repo_owner,
       req.body.repo_name,
       req.body.pr_number,
       user_emails);
-      formattedData = formatFileResponse(file_set);
+      formattedData = formatFileResponse(fileSet);
   } else if (type === 'hunk') {
     if (!("pr_number" in req.body)) {
       res.status(400).send('Invalid request body'); 
       return;
     }
-    let hunks_res = await getHunkData(req.body.repo_provider, 
+    const hunkRes = await getHunkData(req.body.repo_provider, 
     req.body.repo_owner, 
     req.body.repo_name, 
     req.body.pr_number,
     user_emails);
-    formattedData = formatHunkResponse(hunks_res);
+    formattedData = formatHunkResponse(hunkRes);
   }
   res.status(200).json(formattedData);
 }
 
-const formatReviewResponse = async (query_res: Promise<{[key: string]: any}>[]) => {
+const formatReviewResponse = async (queryRes: Promise<{[key: string]: any}>[]) => {
   const prs = new Map();
-  for (const promise of query_res) {
+  for (const promise of queryRes) {
     const row = await promise;
 	  const reviewId = row["review_id"].toString();
 	  const blamevec = row["blamevec"];
@@ -75,15 +75,15 @@ const formatReviewResponse = async (query_res: Promise<{[key: string]: any}>[]) 
   return {"relevant": prsObj};
 }
 
-const formatFileResponse = (query_res: Set<string>) => {
+const formatFileResponse = (queryRes: Set<string>) => {
   return {
-    "files": Array.from(query_res)
+    "files": Array.from(queryRes)
   };
 }
 
-function formatHunkResponse(query_res: string) {
+function formatHunkResponse(queryRes: string) {
   return {
-    "hunkinfo": query_res
+    "hunkinfo": queryRes
   };
 }
 
