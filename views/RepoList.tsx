@@ -2,12 +2,11 @@ import axios from "axios";
 import type { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
-import { Pool } from "pg";
 import { useState, type ReactElement } from "react";
 import SwitchSubmit from "../components/SwitchSubmit";
 import { TableCell, TableHeaderCell } from "../components/Table";
-import type { DbRepo, DbRepoSerializable, RepoIdentifier } from "../types/repository";
-import { convert } from "../utils/db/converter";
+import type { DbRepoSerializable, RepoIdentifier } from "../types/repository";
+import { getReposFromNames } from "../utils/db/repos";
 import type { RepoProvider } from "../utils/providerAPI";
 import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
 
@@ -80,17 +79,10 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 	</>)
 }
 
-export const getRepoList = async (conn: Pool, session: Session) => {
-	const allRepos = await getUserRepositories(session);
-	const allReposFormattedAsTuples = allRepos.map(repo => `(${convert(repo.repo_provider)}, ${convert(repo.repo_owner)}, ${convert(repo.repo_name)})`).join(',');
-	const repo_list_q = `SELECT *
-		FROM repos 
-		WHERE (repo_provider, repo_owner, repo_name) IN (${allReposFormattedAsTuples})`;
-	const result: { rows: DbRepo[] } = await conn.query(repo_list_q).catch(err => {
-		console.error(`[RepoList] Error in getting repository-list from the database`, err);
-		throw Error(err); // FIXME: handle this more elegantly
-	});
-	return result.rows.map(repo => {
+export const getRepoList = async (session: Session): Promise<DbRepoSerializable[]> => {
+	const userReposFromProvider = await getUserRepositories(session);
+	const userReposFromDb = await getReposFromNames(userReposFromProvider);
+	return userReposFromDb.map(repo => {
 		const { created_at, ...other } = repo;
 		return { created_at: created_at.toDateString(), ...other }
 	});
