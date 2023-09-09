@@ -1,7 +1,8 @@
 import axios from "axios";
 import type { Session } from "next-auth";
-import { baseURL, retrieveAllPagesBitbucket, supportedProviders } from ".";
+import { baseURL, supportedProviders } from ".";
 import type { RepoIdentifier } from "../../types/repository";
+import { Bitbucket } from "./Bitbucket";
 
 type GithubRepoObj = {
 	name: string,
@@ -94,12 +95,12 @@ const getUserRepositoriesForGitHub = async (access_key: string, authId?: string)
 }
 
 export const getUserRepositoriesForBitbucket = async (access_key: string, authId?: string): Promise<RepoIdentifier[]> => {
-	const workspacesData = await retrieveAllPagesBitbucket<BitbucketWorkspaceObj>(`/user/permissions/workspaces`, access_key, authId);
+	const workspacesData = await Bitbucket.retrieveAllPages<BitbucketWorkspaceObj>(`/user/permissions/workspaces`, access_key, authId);
 	const workspaces = workspacesData.map((workspaceObj) => workspaceObj.workspace.slug);
 
 	const repositories: RepoIdentifier[] = [];
 	for (const workspace of workspaces) {
-		const repositoriesData = await retrieveAllPagesBitbucket<BitbucketRepoObj>(`/repositories/${workspace}`, access_key, authId);
+		const repositoriesData = await Bitbucket.retrieveAllPages<BitbucketRepoObj>(`/repositories/${workspace}`, access_key, authId);
 		const allBitbucketRepoIdentifiers = repositoriesData.map(repoObj => ({
 			repo_provider: supportedProviders[1],
 			repo_owner: repoObj.workspace.slug,
