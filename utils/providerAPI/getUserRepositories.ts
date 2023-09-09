@@ -118,6 +118,7 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 		}) // TODO: implement pagination
 		if (response.status !== 200) {
 			console.error(`[getUserRepositories] Could not get Bitbucket repositories for the workspace (${workspace}) for auth-id ${authId}`, response.data);
+			continue;
 		}
 		const allBitbucketRepoIdentifiers = response.data.values.map(repoObj => ({
 			repo_provider: supportedProviders[1],
