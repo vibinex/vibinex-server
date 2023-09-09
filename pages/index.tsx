@@ -7,7 +7,7 @@ import WhyUs from '../views/WhyUs'
 import Features from '../views/Features'
 import TrustUs from '../views/TrustUs'
 import RudderContext from '../components/RudderContext'
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils'
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize'
 import JoinSlack from '../views/JoinSlack'
 import { useSession } from 'next-auth/react'
 import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
@@ -29,7 +29,7 @@ export default function Home() {
 
 	return (
 		<div className='overflow-hidden'>
-			<Navbar ctaLink={chromeExtensionLink} transparent={false} />
+			<Navbar ctaLink={chromeExtensionLink} transparent={true} />
 			<Hero ctaLink={chromeExtensionLink} />
 			<WhyUs />
 			<Features />

@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import  type { Session } from 'next-auth'
+import type { Session } from 'next-auth'
 import { AiOutlineCheckCircle } from 'react-icons/ai'
 import Navbar from '../views/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import RudderContext from '../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../utils/url_utils';
+import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
+import { getUserLocation, isUserInIndia } from '../utils/location';
 
-const monthlyBasePriceUSD = 10;
+const monthlyBasePriceUSD = 5;
+const monthlyBasePriceINR = 200;
 
 const pricingPlan = [
 	{
@@ -27,8 +29,7 @@ const pricingPlan = [
 		pricing: undefined, // will be populated by formula
 		features: ['Access of all features', 'Direct support through Slack', 'Free-of-cost setup assistance'],
 		buttonText: 'Start your 30 day trial',
-		link: '/u' // temp. adding user profile page link, need to replace it with payment link
-
+		link: '/api/auth/signin?callbackUrl=https%3A%2F%2Fvibinex.com%2Fpricing%2F' // temp. adding login page link, need to replace it with payment link
 	},
 	{
 		pricingName: 'Enterprise',
@@ -39,7 +40,6 @@ const pricingPlan = [
 		link: 'https://api.whatsapp.com/send/?phone=918511557566&text&type=phone_number&app_absent=0'
 
 	},
-
 ]
 
 
@@ -47,16 +47,21 @@ const Pricing = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
 	const [isYearly, setIsYearly] = useState(false); // false for monthly
+	const [location, setLocation] = useState<GeolocationPosition>();
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	let heading = [
 		{ name: "Monthly", flag: isYearly },
 		{ name: "Yearly", flag: !isYearly },
 	]
 
-	const getPriceString = (currency: '$' | '₹', isYearly: boolean) => {
-		const priceDecimal = (isYearly ? (10 / 12) : 1) * monthlyBasePriceUSD;
+	const getPriceString = (isYearly: boolean) => {
+		const isInIndia = isUserInIndia(location);
+
+		const currency: '$' | '₹' = isInIndia ? '₹' : '$';
+		const monthlyBasePrice = isInIndia ? monthlyBasePriceINR : monthlyBasePriceUSD;
+		const priceDecimal = (isYearly ? (10 / 12) : 1) * monthlyBasePrice;
 		const price = Math.round(priceDecimal * 100) / 100;
-		return (<>  {currency} <span className='text-4xl'>{price} </span ></>);
+		return (<span className='font-money'>  {currency} <span className='text-4xl'>{price} </span ></span>);
 	}
 
 	const pricingStartDate = new Date(2023, 7, 31); // 31st August 2023
@@ -68,20 +73,28 @@ const Pricing = () => {
 		rudderEventMethods?.track(getAuthUserId(session), "pricing-page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 	}, [rudderEventMethods, session]);
 
+	React.useEffect(() => {
+		getUserLocation()
+			.then(position => setLocation(position))
+			.catch(err => {
+				console.info("Could not get user's location. Using international values.", err.message);
+			})
+	}, [])
+
 	return (
 		<div>
 			<div className='mb-16'>
-				<Navbar ctaLink={chromeExtensionLink} transparent={true} />
+				<Navbar ctaLink={chromeExtensionLink} transparent={false} />
 			</div>
 			<div id='pricing' className='w-full py-12 bg-primary-light'>
 				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-primary-main font-bold'>Plans</span></h2>
 				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after {readableDate(pricingStartDate)})</small></p>) : null}
 
 				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-xl mt-8 bg-gray-100'>
-					{heading.map((item, index) => {
+					{heading.map((item) => {
 						return (
 							<div
-								key={index}
+								key={item.name}
 								onClick={() => { setIsYearly(item.name === 'Yearly'); rudderEventMethods?.track(getAuthUserId(session), "pricing-changed", { type: "button", eventStatusFlag: 1, isYearly: isYearly, name: getAuthUserName(session) }, getAndSetAnonymousIdFromLocalStorage()) }}
 								className={`text-center p-4 w-full rounded-xl cursor-pointer ${item.flag ? null : 'bg-primary-main border-2 border-primary-dark'}`}>
 								<h2 className={`sm:text-2xl font-bold ${item.flag ? 'text-secondary-dark' : 'text-secondary-main'}`}
@@ -96,13 +109,13 @@ const Pricing = () => {
 
 				<div className='m-auto md:grid w-4/5 mt-3 md:p-4 grid-cols-3 gap-5 h-fit'>
 					{
-						pricingPlan.map((item, index) => {
+						pricingPlan.map((item) => {
 							return (
-								<div key={index} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
+								<div key={item.buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
 									<h2 className='mx-auto font-semibold text-2xl text-center'>{item.pricingName}</h2>
 
 									<div className='text-center h-16'>
-										<p className='mt-2 font-medium text-xl text-primary-main'>{(item.pricing) ? item.pricing : getPriceString("$", isYearly)}</p>
+										<p className='mt-2 font-medium text-xl text-primary-main'>{(item.pricing) ? item.pricing : getPriceString(isYearly)}</p>
 										<p className='text-base'>{item.duration}</p>
 									</div>
 
@@ -120,8 +133,6 @@ const Pricing = () => {
 										{item.buttonText}
 									</Button>
 								</div>
-
-
 							)
 						})
 					}

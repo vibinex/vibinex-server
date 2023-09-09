@@ -8,7 +8,7 @@ import highlightFile from '../public/highlightFile.png'
 import chromeLogo from '../public/chrome-logo.png'
 import Link from "next/link";
 import RudderContext from "../components/RudderContext";
-import { getAndSetAnonymousIdFromLocalStorage } from "../utils/url_utils";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 
 const Hero = (props: { ctaLink: string }) => {
@@ -43,7 +43,7 @@ const Hero = (props: { ctaLink: string }) => {
 			style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503252947848-7338d3f92f31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1331&q=80')" }}
 		>
 			{/*Overlay*/}
-			<div className='absolute top-0 right-0 bottom-0 left-0 bg-black/75 z-0' />
+			<div className='absolute h-full w-full bg-black/75 z-0' />
 			<section className='p-5 text-primary-light z-10 my-auto lg:mt-[10%] pt-1 lg:w-1/2'>
 				<article className="text-center">
 					<h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold mb-4'>{'Personalization for'}
