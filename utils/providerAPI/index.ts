@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export type RepoProvider = 'github' | 'bitbucket' | 'gitlab';
 
 export const supportedProviders: RepoProvider[] = [
