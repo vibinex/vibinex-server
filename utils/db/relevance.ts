@@ -17,7 +17,11 @@ export const saveHunk = async (hunkInfo: string) => {
 		ON CONFLICT (repo_provider, repo_owner, repo_name, review_id) DO UPDATE SET 
 		hunks = EXCLUDED.hunks
 	`;
-	await conn.query(hunk_query);
+	try {
+		await conn.query(hunk_query);
+	} catch (error) {
+		console.error("Failed to get hunks from db");
+	}
   }
 }
 
@@ -27,8 +31,13 @@ export const getAuthorAliases = async (account_id: string, provider: string) => 
 	FROM users
 	WHERE auth_info -> '${provider}' -> '${account_id}' IS NOT NULL
 	`
-	const res = await conn.query(query);
-	return res.rows[0]["aliases"];
+	try {
+		const res = await conn.query(query);
+		return res.rows[0]["aliases"];
+	} catch (error) {
+		console.error("Failed to get author aliases from db", error);
+		throw new Error('Cant proceed without author aliases'); //TODO - handle this more gracefully
+	}
 }
 
 export const getHunkData = async (provider: string, owner: string, reponame: string, 
@@ -105,5 +114,9 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
         ON CONFLICT (repo_name, repo_owner, repo_provider) DO UPDATE SET 
             install_id = EXCLUDED.install_id
     `;
-    await conn.query(query);
+	try {
+		await conn.query(query);
+	} catch (error) {
+		console.error("Unable to insert topic name in db", error);
+	}
 }
