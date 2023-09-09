@@ -50,13 +50,18 @@ export const getHunkData = async (provider: string, owner: string, reponame: str
 		AND repo_name = '${reponame}'  
 		AND review_id = '${review_id}'
 	`;
-	const result = await conn.query(hunk_query);
-	const author_aliases = await getAuthorAliases(result.rows[0]["author"], provider);
-	const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: { [x: string]: string; }) => {
-		const hunk_author = obj["author"].toString();
-      	return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author)); 
-	});
-	return filteredBlamevec;
+	try {
+		const result = await conn.query(hunk_query);
+		const author_aliases = await getAuthorAliases(result.rows[0]["author"], provider);
+		const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: { [x: string]: string; }) => {
+			const hunk_author = obj["author"].toString();
+			return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author)); 
+		});
+		return filteredBlamevec;
+	} catch (error) {
+		console.error("Unable to get author and hunks from db", error);
+		throw new Error('Unable to proceed without hunk data from db');
+	}
 }
 
 export const getReviewData = async (provider: string, owner: string, reponame: string, user_emails: Set<string>) => {
