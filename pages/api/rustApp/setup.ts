@@ -3,12 +3,12 @@ import { saveTopicName } from '../../../utils/db/relevance';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.info("Saving setup info in db...");
-    const jsonbody = req.body;
-    for (const idx in jsonbody.info) {
-        let owner_info = jsonbody.info[idx];
+    const jsonBody = req.body;
+    for (const idx in jsonBody.info) {
+        let ownerInfo = jsonBody.info[idx];
         try {
-            await saveTopicName(owner_info.owner, owner_info.provider, 
-                jsonbody.installation_id, owner_info.repos);
+            await saveTopicName(ownerInfo.owner, ownerInfo.provider, 
+                jsonBody.installationId, ownerInfo.repos);
         } catch(err) {
             console.error("Unable to save setup info, ", err);
             res.status(500).send({"error": "Unable to save setup info"});
