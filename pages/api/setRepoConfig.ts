@@ -12,10 +12,10 @@ const isSetRepoConfigReqBody = (x: any): x is SetRepoConfigReqBody => {
 	return x && isRepoIdentifier(x.repo) && (x.configType === "auto_assign" || x.configType === "comment") && typeof x.value === "boolean";
 }
 
-export default function handler(
+const setRepoConfigHandler = (
 	req: NextApiRequest,
 	res: NextApiResponse<{ message: string }>
-) {
+) => {
 	if (req.method !== 'POST') {
 		return res.status(405).json({ message: 'setRepoConfig API must be called using POST method' });
 	}
@@ -26,3 +26,5 @@ export default function handler(
 	setRepoConfig(repo, configType, value);
 	res.status(200).json({ message: 'success' })
 }
+
+export default setRepoConfigHandler;
