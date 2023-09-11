@@ -6,7 +6,8 @@ export const getRepos = async (allRepos: RepoIdentifier[]) => {
 	const allReposFormattedAsTuples = allRepos.map(repo => `(${convert(repo.repo_provider)}, ${convert(repo.repo_owner)}, ${convert(repo.repo_name)})`).join(',');
 	const repo_list_q = `SELECT *
 		FROM repos 
-		WHERE (repo_provider, repo_owner, repo_name) IN (${allReposFormattedAsTuples})`;
+		WHERE (repo_provider, repo_owner, repo_name) IN (${allReposFormattedAsTuples})
+		ORDER BY repo_provider, repo_owner, repo_name`;
 	const result: { rows: DbRepo[] } = await conn.query(repo_list_q).catch(err => {
 		console.error(`[RepoList] Error in getting repository-list from the database`, err);
 		throw Error(err); // FIXME: handle this more elegantly
@@ -20,8 +21,16 @@ export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assi
 	WHERE repo_provider = ${convert(repo.repo_provider)}
 		AND repo_owner = ${convert(repo.repo_owner)}
 		AND repo_name = ${convert(repo.repo_name)}`;
-	const dbResponse = await conn.query(update_repo_config_q).catch(err => {
-		console.error(`[db/setRepoConfig] Could not update config of this repository: ${repo}`, err);
-	})
-	return dbResponse;
+	const queryIsSuccessful = await conn.query(update_repo_config_q)
+		.then((dbResponse) => {
+			if (dbResponse.rowCount == 0) {
+				return false;
+			}
+			return true;
+		})
+		.catch((err: Error) => {
+			console.error(`[db/setRepoConfig] Could not update config of this repository: ${repo}`, err);
+			return false;
+		})
+	return queryIsSuccessful;
 };
