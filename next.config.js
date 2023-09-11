@@ -35,7 +35,7 @@ const nextConfig = {
       }
     ],
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.fallback = {
       fs: false,
       net: false,
@@ -44,6 +44,8 @@ const nextConfig = {
       'pg-native': false,
     };
 
+    // Exclude pg-cloudflare from client-side bundles 
+    if (!isServer) { config.externals.push('pg-cloudflare'); }
     return config;
   },
   async headers() {

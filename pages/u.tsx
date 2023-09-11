@@ -1,19 +1,18 @@
 import { GetServerSideProps } from "next";
-import { getServerSession, Session } from "next-auth";
-import MainAppBar from "../views/MainAppBar";
-import { authOptions } from "./api/auth/[...nextauth]";
-import { updateUser } from "../utils/db/users";
-import { useEffect, useContext } from "react";
-import RudderContext from "../components/RudderContext";
-import { getAuthUserId, getAuthUserName } from "../utils/auth";
-import RepoList, { getRepoList } from "../views/RepoList";
-import conn from "../utils/db";
-import Footer from "../components/Footer";
+import { getServerSession, type Session } from "next-auth";
 import { useSession } from "next-auth/react";
+import { useContext, useEffect } from "react";
 import Button from "../components/Button";
-import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
-import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
+import Footer from "../components/Footer";
+import RudderContext from "../components/RudderContext";
 import type { DbRepoSerializable } from "../types/repository";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
+import { updateUser } from "../utils/db/users";
+import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
+import MainAppBar from "../views/MainAppBar";
+import RepoList, { getRepoList } from "../views/RepoList";
+import { authOptions } from "./api/auth/[...nextauth]";
 
 type ProfileProps = {
 	session: Session,
@@ -74,7 +73,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	})
 
 	// get the list of repositories of the user
-	const repoList = await getRepoList(conn, session);
+	const repoList = await getRepoList(session);
 
 	return {
 		props: {

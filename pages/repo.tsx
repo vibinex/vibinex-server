@@ -1,20 +1,20 @@
-import MainAppBar from "../views/MainAppBar";
-import Footer from "../components/Footer";
-import conn from '../utils/db';
 import { GetServerSideProps, NextPage } from "next";
-import React from "react";
-import { renderObjAsTable } from "../utils/data";
-import { ContributorVector } from "../types/contributor";
-import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
-import CommitsPerFile from "../views/Dashboard/commitsPerFile";
-import RepoList, { getRepoList } from "../views/RepoList";
-import RudderContext from "../components/RudderContext";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "./api/auth/[...nextauth]";
 import type { Session } from "next-auth/core/types";
-import { getAuthUserId, getAuthUserName } from "../utils/auth";
-import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
+import { getServerSession } from "next-auth/next";
+import React from "react";
+import Footer from "../components/Footer";
+import RudderContext from "../components/RudderContext";
+import { ContributorVector } from "../types/contributor";
 import type { DbRepoSerializable } from "../types/repository";
+import { getAuthUserId, getAuthUserName } from "../utils/auth";
+import { renderObjAsTable } from "../utils/data";
+import conn from '../utils/db';
+import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
+import CommitsPerFile from "../views/Dashboard/commitsPerFile";
+import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
+import MainAppBar from "../views/MainAppBar";
+import RepoList, { getRepoList } from "../views/RepoList";
+import { authOptions } from "./api/auth/[...nextauth]";
 
 type RepoProfileData = {
 	sessionObj: Session,
@@ -91,7 +91,7 @@ export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ 
 	}
 
 	// by default, show the list of repositories of the user
-	const repoList = await getRepoList(conn, session);
+	const repoList = await getRepoList(session);
 	return {
 		props: {
 			sessionObj: session,

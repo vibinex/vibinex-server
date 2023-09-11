@@ -1,10 +1,10 @@
 {
   "name": "vibinex-website",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "homepage": "https://vibinex.com",
   "description": "A plugin that works with GitHub, Bitbucket and GitLab to personalize and data-enrich their code review interfaces",
-  "license":"LGPL-3.0-or-later",
+  "license": "LGPL-3.0-or-later",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -35,7 +35,7 @@
     "eslint-config-next": "13.0.6",
     "next": "13.3.1",
     "next-auth": "4.22.1",
-    "pg": "^8.9.0",
+    "pg": "^8.11.3",
     "react": "18.2.0",
     "react-calendly": "^4.1.1",
     "react-dom": "18.2.0",
