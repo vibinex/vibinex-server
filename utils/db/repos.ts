@@ -2,7 +2,7 @@ import conn from '.';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
 import { convert } from './converter';
 
-export const getReposFromNames = async (allRepos: RepoIdentifier[]) => {
+export const getRepos = async (allRepos: RepoIdentifier[]) => {
 	const allReposFormattedAsTuples = allRepos.map(repo => `(${convert(repo.repo_provider)}, ${convert(repo.repo_owner)}, ${convert(repo.repo_name)})`).join(',');
 	const repo_list_q = `SELECT *
 		FROM repos 

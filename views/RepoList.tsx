@@ -6,7 +6,7 @@ import { useState, type ReactElement } from "react";
 import SwitchSubmit from "../components/SwitchSubmit";
 import { TableCell, TableHeaderCell } from "../components/Table";
 import type { DbRepoSerializable, RepoIdentifier } from "../types/repository";
-import { getReposFromNames } from "../utils/db/repos";
+import { getRepos } from "../utils/db/repos";
 import type { RepoProvider } from "../utils/providerAPI";
 import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
 
@@ -81,7 +81,7 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 
 export const getRepoList = async (session: Session): Promise<DbRepoSerializable[]> => {
 	const userReposFromProvider = await getUserRepositories(session);
-	const userReposFromDb = await getReposFromNames(userReposFromProvider);
+	const userReposFromDb = await getRepos(userReposFromProvider);
 	return userReposFromDb.map(repo => {
 		const { created_at, ...other } = repo;
 		return { created_at: created_at.toDateString(), ...other }
