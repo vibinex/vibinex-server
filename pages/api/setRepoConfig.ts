@@ -3,6 +3,8 @@ import { isRepoIdentifier, type RepoIdentifier } from '../../types/repository';
 import { setRepoConfig } from '../../utils/db/repos';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
+import rudderStackEvents from "./events";
+import { getAuthUserName } from '../../utils/auth';
 
 type SetRepoConfigReqBody = {
 	repo: RepoIdentifier,
@@ -34,14 +36,22 @@ const setRepoConfigHandler = async (
 
 	// update repo config
 	const { repo, configType, value }: SetRepoConfigReqBody = req.body;
+	const eventProperties = {
+		...repo,
+		configType,
+		updatedValue: value
+	}
 	await setRepoConfig(repo, configType, value)
 		.then((queryResponse) => {
-			if (queryResponse)
+			if (queryResponse) {
+				rudderStackEvents.track(session.user.id!, "", 'settings-changed', { type: 'setting', eventStatusFlag: 1, name: getAuthUserName(session), eventProperties })
 				res.status(200).json({ message: 'success' });
+			}
 			else
 				throw new Error('Failed to modify repository configuration');
 		})
 		.catch((err) => {
+			rudderStackEvents.track(session.user.id!, "", 'settings-changed', { type: 'setting', eventStatusFlag: 0, name: getAuthUserName(session), eventProperties })
 			console.error(`[setRepoConfig] Failed to update config for ${repo.repo_provider}/${repo.repo_owner}/${repo.repo_name}`, err);
 			res.status(500).json({ message: 'Internal error: Could not update repository configuration.' })
 		})
