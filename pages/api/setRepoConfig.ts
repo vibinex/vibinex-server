@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { isRepoIdentifier, type RepoIdentifier } from '../../types/repository';
 import { setRepoConfig } from '../../utils/db/repos';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './auth/[...nextauth]';
 
 type SetRepoConfigReqBody = {
 	repo: RepoIdentifier,
@@ -17,7 +19,10 @@ const setRepoConfigHandler = async (
 	res: NextApiResponse<{ message: string }>
 ) => {
 	// check auth
-
+	const session = await getServerSession(req, res, authOptions);
+	if (!session) {
+		return res.status(401).json({ message: 'Unauthenticated' });
+	}
 
 	// validate request
 	if (req.method !== 'POST') {
