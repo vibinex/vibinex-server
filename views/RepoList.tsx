@@ -13,7 +13,6 @@ import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
 const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 	const [loading, setLoading] = useState(false); // while loading user can't send another api request to change setting
 	const [repoList, setRepoList] = useState(props.repoList);
-	// TODO: add rudderstack events for changes in settings.
 
 	const repoProviderLogo: { [key in RepoProvider]: ReactElement } = {
 		"github": <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/github.svg" alt="github" className="mx-auto" />,
