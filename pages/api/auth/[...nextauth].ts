@@ -23,7 +23,12 @@ export const authOptions = {
 		// }),
 		GithubProvider({
 			clientId: process.env.GITHUB_CLIENT_ID!,
-			clientSecret: process.env.GITHUB_CLIENT_SECRET!
+			clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+			authorization: {
+				params: {
+					scope: "read:user user:email read:org" // add your custom scope here
+				}
+			}
 		}),
 		BitbucketProvider({
 			clientId: process.env.BITBUCKET_CLIENT_ID!,
