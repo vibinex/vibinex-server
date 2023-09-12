@@ -10,7 +10,7 @@ const Policy = () => {
 				<h2 className="my-1 font-bold text-4xl">Privacy Policy</h2>
 				<div>
 					<small>Last modified: October 7th, 2018.</small>
-					<h4 className='font-semibold'> Vibinex™ is committed to protecting and respecting your privacy. This Privacy Policy sets out how we collect and process personal information about you when you visit the website alokit.in, when you use our products and services (our “Services”), or when you otherwise do business or make contact with us.</h4>
+					<h4 className='font-semibold'> Vibinex™ is committed to protecting and respecting your privacy. This Privacy Policy sets out how we collect and process personal information about you when you visit the website vibinex.com, when you use our products and services (our “Services”), or when you otherwise do business or make contact with us.</h4>
 					<h4>Please read this policy carefully to understand how we handle and treat your personal information.</h4>
 
 					<h2 className='font-semibold text-xl mt-4 mb-2'>WHAT INFORMATION DO WE COLLECT?</h2>
