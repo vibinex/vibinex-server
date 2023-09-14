@@ -49,7 +49,7 @@ const Navbar = (props: { transparent: boolean }) => {
 		};
 
 		const handleLoginLogoutClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handleDocsClick = () => {

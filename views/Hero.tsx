@@ -16,24 +16,24 @@ const Hero = (props: { ctaLink: string }) => {
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		// Track the "Add to Chrome" event
-		const handleAddToChrome = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
+		// Track the "Get Started" event
+		const handleCTAClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Primary CTA clicked", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		// Track the "Book Demo" event
 		const handleBookDemo = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Book demo button", { type: "button", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Book demo button", { type: "button", eventStatusFlag: 1, source: "landing-hero", name: getAuthUserName(session) }, anonymousId)
 		};
 
-		const addToChromeButton = document.getElementById('add-to-chrome-btn');
+		const primaryCTAButton = document.getElementById('cta-btn');
 		const bookDemoButton = document.getElementById('book-demo-btn');
 
-		addToChromeButton?.addEventListener('click', handleAddToChrome);
+		primaryCTAButton?.addEventListener('click', handleCTAClick);
 		bookDemoButton?.addEventListener('click', handleBookDemo);
 
 		return () => {
-			addToChromeButton?.removeEventListener('click', handleAddToChrome);
+			primaryCTAButton?.removeEventListener('click', handleCTAClick);
 			bookDemoButton?.removeEventListener('click', handleBookDemo);
 		};
 	}, [rudderEventMethods, session]);
@@ -57,7 +57,7 @@ const Hero = (props: { ctaLink: string }) => {
 						Open source • <span className="text-primary-main">100% code privacy</span>
 					</p>
 					<div className="w-full flex space-x-4">
-						<Button id="add-to-chrome-btn" variant="contained" href={props.ctaLink} target="_blank" className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] mt-5'>
+						<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] mt-5'>
 							Get Started
 						</Button>
 						<Button id="book-demo-btn" variant="outlined" href="https://calendly.com/avikalp-gupta/30min" target="_blank" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>
