@@ -1,11 +1,10 @@
 import React from "react";
-import { useSession } from 'next-auth/react'
-import type { Session } from 'next-auth'
+import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import Button from "../components/Button";
 import Image from "next/image";
-import highlightPR from '../public/highlightPR.png'
-import highlightFile from '../public/highlightFile.png'
-import chromeLogo from '../public/chrome-logo.png'
+import highlightPR from '../public/highlightPR.png';
+import highlightFile from '../public/highlightFile.png';
 import Link from "next/link";
 import RudderContext from "../components/RudderContext";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
@@ -59,8 +58,7 @@ const Hero = (props: { ctaLink: string }) => {
 					</p>
 					<div className="w-full flex space-x-4">
 						<Button id="add-to-chrome-btn" variant="contained" href={props.ctaLink} target="_blank" className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] mt-5'>
-							<Image src={chromeLogo} alt="chrome extension logo" className="w-10 inline mr-2 border border-white rounded-full"></Image>
-							Add to Chrome
+							Get Started
 						</Button>
 						<Button id="book-demo-btn" variant="outlined" href="https://calendly.com/avikalp-gupta/30min" target="_blank" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>
 							Book demo
