@@ -5,7 +5,7 @@ import Navbar from '../views/Navbar'
 const Policy = () => {
 	return (
 		<>
-			<Navbar transparent={false} ctaLink='https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc' />
+			<Navbar transparent={false} />
 			<div className='p-5 w-[90%] m-auto'>
 				<h2 className="my-1 font-bold text-4xl">Privacy Policy</h2>
 				<div>

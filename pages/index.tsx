@@ -14,7 +14,6 @@ import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
 
 export default function Home() {
 	const session: Session | null = useSession().data;
-	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	const { rudderEventMethods } = React.useContext(RudderContext);
 
 	React.useEffect(() => {
@@ -29,7 +28,7 @@ export default function Home() {
 
 	return (
 		<div className='overflow-hidden'>
-			<Navbar ctaLink={chromeExtensionLink} transparent={true} />
+			<Navbar transparent={true} />
 			<Hero ctaLink={'/u'} />
 			<WhyUs />
 			<Features />
