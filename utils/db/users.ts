@@ -21,7 +21,7 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 		WHERE (auth_info -> '${provider}' -> '${providerAccountId}') IS NOT NULL`
 	const user_auth_search_result = await conn.query(user_auth_search_q).catch(err => {
 		console.error(`[getUserByProvider] Could not get the ${provider} user for account id: ${providerAccountId}`, { pg_query: user_auth_search_q }, err);
-		throw Error("Error in running the query on the database", err);
+		throw new Error("Error in running the query on the database", err);
 	});;
 	if (user_auth_search_result.rowCount) {
 		if (user_auth_search_result.rowCount > 1) {
@@ -76,7 +76,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 	const user_q = `SELECT * FROM users WHERE id = ${convert(userId)}`;
 	const user_result = await conn.query(user_q).catch(err => {
 		console.error(`[createUpdateUserObj] Could not get the user for user-id: ${userId}`, { pg_query: user_q }, err)
-		throw Error("Error in running the query on the database", err);
+		throw new Error("Error in running the query on the database", err);
 	});
 	if (user_result.rowCount == 0) return;
 

@@ -10,7 +10,7 @@ export const getRepos = async (allRepos: RepoIdentifier[]) => {
 		ORDER BY repo_provider, repo_owner, repo_name`;
 	const result: { rows: DbRepo[] } = await conn.query(repo_list_q).catch(err => {
 		console.error(`[getRepos] Error in getting repository-list from the database`, { pg_query: repo_list_q }, err);
-		throw Error(err); // FIXME: handle this more elegantly
+		throw new Error(err); // FIXME: handle this more elegantly
 	});
 	return result.rows
 }
