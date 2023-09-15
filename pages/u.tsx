@@ -13,6 +13,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initi
 import MainAppBar from "../views/MainAppBar";
 import RepoList, { getRepoList } from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
+import { getURLWithParams } from "../utils/url_utils";
 
 type ProfileProps = {
 	session: Session,
@@ -60,7 +61,9 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	if (!session) {
 		return {
 			redirect: {
-				destination: '/api/auth/signin',
+				destination: getURLWithParams('/api/auth/signin', {
+					callbackUrl: `${process.env.NEXTAUTH_URL}/u`
+				}),
 				permanent: false
 			}
 		};

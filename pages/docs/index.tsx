@@ -7,7 +7,7 @@ import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
-import { getAuthUserId, getAuthUserName } from '../../utils/auth';
+import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -48,7 +48,14 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			heading: "Github",
 			flag: true,
 			content: [
-				{ subHeading: "Sign up with github", article: "Sign in on Vibinex using GitHub" },
+				{
+					subHeading: "Sign up with github",
+					article: <span className="text-blue-500 cursor-pointer" onClick={() => login(
+						getAndSetAnonymousIdFromLocalStorage(),
+						(rudderEventMethods || null),
+						'github'
+					)}>Sign in on Vibinex using GitHub</span>
+				},
 				{ subHeading: "Install GitHub App", article: <>Install <Link id="github-app-install" href="https://github.com/apps/vibinex-code-review" target='_blank' className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
 				{
 					subHeading: "Setup GitHub Action",
@@ -81,7 +88,13 @@ jobs:
 			heading: "Bitbucket",
 			flag: false,
 			content: [
-				{ subHeading: "Sign up with Bitbucket", article: "Sign in on Vibinex using Bitbucket" },
+				{
+					subHeading: "Sign up with Bitbucket", article: <span className="text-blue-500 cursor-pointer" onClick={() => login(
+						getAndSetAnonymousIdFromLocalStorage(),
+						(rudderEventMethods || null),
+						'bitbucket'
+					)}>Sign in on Vibinex using Bitbucket</span>
+				},
 				{
 					subHeading: "Install OAuth consumer", article: <>
 						<Button

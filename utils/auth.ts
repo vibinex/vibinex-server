@@ -1,9 +1,10 @@
 import { signIn, signOut } from 'next-auth/react';
 import type { Session } from 'next-auth/core/types';
 import { RudderstackClientSideEvents } from './rudderstack_initialize';
+import { AuthProviderType } from 'next-auth';
 
-export const login = (anonymousId: string, rudderEventMethods: RudderstackClientSideEvents | null) => {
-	signIn().catch((err) => {
+export const login = (anonymousId: string, rudderEventMethods: RudderstackClientSideEvents | null, provider?: AuthProviderType) => {
+	signIn(provider).catch((err) => {
 		rudderEventMethods?.track(``, "login", { eventStatusFlag: 0, source: "profile-popup" }, anonymousId)
 		console.error("[signIn] Authentication failed.", err);
 	})
