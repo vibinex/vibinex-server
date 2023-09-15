@@ -52,7 +52,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 					subHeading: "Sign up with github",
 					article: <span className="text-blue-500 cursor-pointer" onClick={() => login(
 						getAndSetAnonymousIdFromLocalStorage(),
-						(rudderEventMethods ? rudderEventMethods : null),
+						(rudderEventMethods || null),
 						'github'
 					)}>Sign in on Vibinex using GitHub</span>
 				},
@@ -91,7 +91,7 @@ jobs:
 				{
 					subHeading: "Sign up with Bitbucket", article: <span className="text-blue-500 cursor-pointer" onClick={() => login(
 						getAndSetAnonymousIdFromLocalStorage(),
-						(rudderEventMethods ? rudderEventMethods : null),
+						(rudderEventMethods || null),
 						'bitbucket'
 					)}>Sign in on Vibinex using Bitbucket</span>
 				},
