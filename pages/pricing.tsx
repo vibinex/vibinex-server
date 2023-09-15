@@ -29,7 +29,7 @@ const pricingPlan = [
 		pricing: undefined, // will be populated by formula
 		features: ['Access of all features', 'Direct support through Slack', 'Free-of-cost setup assistance'],
 		buttonText: 'Start your 30 day trial',
-		link: '/api/auth/signin?callbackUrl=https%3A%2F%2Fvibinex.com%2Fpricing%2F' // temp. adding login page link, need to replace it with payment link
+		link: '/u'
 	},
 	{
 		pricingName: 'Enterprise',
@@ -63,7 +63,7 @@ const Pricing = () => {
 		return (<span className='font-money'>  {currency} <span className='text-4xl'>{price} </span ></span>);
 	}
 
-	const pricingStartDate = new Date(2023, 7, 31); // 31st August 2023
+	const pricingStartDate = new Date(2023, 9, 31); // 31st October 2023
 	const today = new Date();
 	const readableDate = (date: Date) => date.toLocaleDateString('en-us', { year: 'numeric', month: 'long', day: 'numeric' })
 
