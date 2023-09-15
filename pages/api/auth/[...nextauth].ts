@@ -89,8 +89,8 @@ export const authOptions = {
 			else if (new URL(url).origin === baseUrl) path = new URL(url).pathname;
 			else path = "/";
 
-			if (path = "/") return `${baseUrl}/u`;
-			return baseUrl
+			if (path === "/") return `${baseUrl}/u`;
+			return `${baseUrl}${path}`
 		},
 		async session({ session }: { session: Session }) {
 			if (session && session.user) {
