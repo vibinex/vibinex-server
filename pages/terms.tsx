@@ -6,7 +6,7 @@ import Navbar from '../views/Navbar';
 const Terms = () => {
 	return (
 		<>
-			<Navbar transparent={false} ctaLink='https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc' />
+			<Navbar transparent={false} />
 			<div className='p-5 md:w-4/5 m-auto'>
 				<TermsMD />
 			</div>

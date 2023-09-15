@@ -11,7 +11,8 @@ import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initi
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
 import AppBar from '../components/AppBar';
 
-const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
+const Navbar = (props: { transparent: boolean }) => {
+	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
 
@@ -48,7 +49,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 		};
 
 		const handleLoginLogoutClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), " Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+			rudderEventMethods?.track(getAuthUserId(session), "Login-Logout link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
 		const handleDocsClick = () => {
@@ -96,7 +97,7 @@ const Navbar = (props: { ctaLink: string, transparent: boolean }) => {
 					<Link href='/pricing'>Pricing</Link>
 				</li>
 				<li className='p-4' id='download-link'>
-					<Link href={props.ctaLink} target="_blank">
+					<Link href={chromeExtensionLink} target="_blank">
 						Download
 						<Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
 					</Link>

@@ -60,7 +60,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	if (!session) {
 		return {
 			redirect: {
-				destination: '/',
+				destination: '/api/auth/signin',
 				permanent: false
 			}
 		};

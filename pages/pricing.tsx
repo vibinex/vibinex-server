@@ -48,7 +48,6 @@ const Pricing = () => {
 	const session: Session | null = useSession().data;
 	const [isYearly, setIsYearly] = useState(false); // false for monthly
 	const [location, setLocation] = useState<GeolocationPosition>();
-	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
 	let heading = [
 		{ name: "Monthly", flag: isYearly },
 		{ name: "Yearly", flag: !isYearly },
@@ -84,7 +83,7 @@ const Pricing = () => {
 	return (
 		<div>
 			<div className='mb-16'>
-				<Navbar ctaLink={chromeExtensionLink} transparent={false} />
+				<Navbar transparent={false} />
 			</div>
 			<div id='pricing' className='w-full py-12 bg-primary-light'>
 				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-primary-main font-bold'>Plans</span></h2>
