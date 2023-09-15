@@ -9,7 +9,7 @@ export const getRepos = async (allRepos: RepoIdentifier[]) => {
 		WHERE (repo_provider, repo_owner, repo_name) IN (${allReposFormattedAsTuples})
 		ORDER BY repo_provider, repo_owner, repo_name`;
 	const result: { rows: DbRepo[] } = await conn.query(repo_list_q).catch(err => {
-		console.error(`[RepoList] Error in getting repository-list from the database`, err);
+		console.error(`[getRepos] Error in getting repository-list from the database`, { pg_query: repo_list_q }, err);
 		throw Error(err); // FIXME: handle this more elegantly
 	});
 	return result.rows
@@ -29,7 +29,7 @@ export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assi
 			return true;
 		})
 		.catch((err: Error) => {
-			console.error(`[db/setRepoConfig] Could not update config of this repository: ${repo}`, err);
+			console.error(`[db/setRepoConfig] Could not update config of this repository: ${repo}`, { pg_query: update_repo_config_q }, err);
 			return false;
 		})
 	return queryIsSuccessful;
