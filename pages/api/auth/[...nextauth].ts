@@ -1,5 +1,5 @@
 import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+// import GoogleProvider from "next-auth/providers/google"
 import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
@@ -8,10 +8,11 @@ import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
 import { v4 as uuidv4 } from "uuid";
+
 interface signInParam {
 	user: User,
 	account: Account | null,
-	profile?: Profile | undefined
+	profile?: Profile
 }
 
 export const authOptions = {

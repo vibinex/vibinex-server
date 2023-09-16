@@ -1,5 +1,5 @@
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
-import Banner, { BannerHeightType } from "./Banner";
+import { PropsWithChildren, useEffect, useRef } from "react";
+import Banner from "./Banner";
 
 const AppBar = (props: PropsWithChildren<{
 	position: 'absolute' | 'fixed' | 'relative' | 'static' | 'sticky',
