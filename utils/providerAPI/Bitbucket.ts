@@ -4,7 +4,7 @@ class BitbucketAPI {
 	baseURL: string;
 
 	constructor(baseURL?: string) {
-		this.baseURL = baseURL ? baseURL : "https://api.bitbucket.org/2.0";
+		this.baseURL = baseURL || "https://api.bitbucket.org/2.0";
 	}
 
 	getData = async <T>(endpoint: string, accessKey: string, authId?: string): Promise<T> => {
