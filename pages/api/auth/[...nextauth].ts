@@ -94,7 +94,7 @@ export const authOptions = {
 			return `${baseUrl}${path}`
 		},
 		async session({ session }: { session: Session }) {
-			if (session && session.user) {
+			if (session?.user) {
 				const usersWithAlias = await getUserByAlias(session.user.email!).catch(err => {
 					console.error(`[session callback] getUserByAlias failed for ${session.user.email}`, err);
 				})
