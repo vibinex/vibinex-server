@@ -45,7 +45,7 @@ const centralLimit = (type: 'avg' | 'median' | 'mode' | 'decay_avg' = 'avg', arr
 				return null;
 			}
 		default:
-			throw Error(`Type not implemented: ${type}`);
+			throw new Error(`Type not implemented: ${type}`);
 	}
 }
 

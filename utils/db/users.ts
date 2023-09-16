@@ -19,7 +19,10 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 	const user_auth_search_q = `SELECT *
 		FROM users
 		WHERE (auth_info -> '${provider}' -> '${providerAccountId}') IS NOT NULL`
-	const user_auth_search_result = await conn.query(user_auth_search_q);
+	const user_auth_search_result = await conn.query(user_auth_search_q).catch(err => {
+		console.error(`[getUserByProvider] Could not get the ${provider} user for account id: ${providerAccountId}`, { pg_query: user_auth_search_q }, err);
+		throw new Error("Error in running the query on the database", err);
+	});;
 	if (user_auth_search_result.rowCount) {
 		if (user_auth_search_result.rowCount > 1) {
 			console.warn("[getUser] Multiple users exist with same auth", { provider, providerAccountId });
@@ -34,7 +37,7 @@ export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | un
 		FROM users
 		WHERE '${alias_email}' = ANY(aliases)`;
 	const user_alias_search_result = await conn.query(user_alias_search_q).catch(err => {
-		console.error(`[users/getUserByAlias] Query failed: Select from users where aliases contain ${alias_email}`, err);
+		console.error(`[users/getUserByAlias] Query failed: Select from users where aliases contain ${alias_email}`, { pg_query: user_alias_search_q }, err);
 	});
 
 	if (user_alias_search_result && user_alias_search_result.rowCount) {
@@ -60,7 +63,7 @@ export const createUser = async (user: DbUser) => {
 			}
 		})
 		.catch(err => {
-			console.error('[createUser] Insert user failed', { user }, err);
+			console.error('[createUser] Insert user failed', { user, pg_query: insert_user_q }, err);
 			return;
 		});
 }
@@ -72,7 +75,8 @@ export const createUser = async (user: DbUser) => {
 export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 	const user_q = `SELECT * FROM users WHERE id = ${convert(userId)}`;
 	const user_result = await conn.query(user_q).catch(err => {
-		throw Error("Error in running the query on the database", err);
+		console.error(`[createUpdateUserObj] Could not get the user for user-id: ${userId}`, { pg_query: user_q }, err)
+		throw new Error("Error in running the query on the database", err);
 	});
 	if (user_result.rowCount == 0) return;
 
@@ -157,12 +161,12 @@ export const updateUser = async (userId: string, user: DbUser) => {
 			}
 		})
 		.catch(err => {
-			console.error('[updateUser] Update user failed', { userId, user }, err);
+			console.error('[updateUser] Update user failed', { pg_query: update_user_q }, { userId, user }, err);
 			return;
 		});
 }
 
-export const getUserEmails = async (email: string): Promise<Set<string>> => {  
+export const getUserEmails = async (email: string): Promise<Set<string>> => {
 	const emails = new Set<string>();
 	try {
 		const users: DbUser[] | undefined = await getUserByAlias(email);
@@ -180,13 +184,13 @@ export const getUserEmails = async (email: string): Promise<Set<string>> => {
 							if (auth.email) {
 								emails.add(auth.email);
 							}
-						}		
+						}
 					}
 				}
 			}
 		}
 	}
-	catch(err){
+	catch (err) {
 		console.error(`Unable to get user aliases for ${email}, error = ${err}`);
 	}
 	return emails;
