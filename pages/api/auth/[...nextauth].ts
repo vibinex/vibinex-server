@@ -9,7 +9,7 @@ import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
 import { v4 as uuidv4 } from "uuid";
 
-interface signInParam {
+interface SignInParam {
 	user: User,
 	account: Account | null,
 	profile?: Profile
@@ -42,7 +42,7 @@ export const authOptions = {
 		// ...add more providers here
 	],
 	callbacks: {
-		async signIn({ user, account, profile }: signInParam) {
+		async signIn({ user, account, profile }: SignInParam) {
 			// search for the user in the users table
 			let db_user: DbUser | undefined;
 			if (account) {
