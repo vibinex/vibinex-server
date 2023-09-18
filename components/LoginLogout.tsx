@@ -46,7 +46,7 @@ export default function LoginLogout() {
 		};
 	}, [rudderEventMethods, session]);
 
-	if (session && session.user) return (
+	if (session?.user) return (
 		<>
 			<Image src={getAuthUserImage(session)} onClick={() => setShowMenu(prev => !prev)} alt="Display picture" title={getAuthUserName(session)} width={300} height={300} className="h-full w-auto hover:cursor-pointer rounded-xl cursor-pointer max-h-8 mx-auto" />
 			{/* Log out Pop up  */}

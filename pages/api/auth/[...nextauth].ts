@@ -1,5 +1,5 @@
 import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+// import GoogleProvider from "next-auth/providers/google"
 import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
@@ -8,10 +8,11 @@ import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
 import { v4 as uuidv4 } from "uuid";
-interface signInParam {
+
+interface SignInParam {
 	user: User,
 	account: Account | null,
-	profile?: Profile | undefined
+	profile?: Profile
 }
 
 export const authOptions = {
@@ -41,7 +42,7 @@ export const authOptions = {
 		// ...add more providers here
 	],
 	callbacks: {
-		async signIn({ user, account, profile }: signInParam) {
+		async signIn({ user, account, profile }: SignInParam) {
 			// search for the user in the users table
 			let db_user: DbUser | undefined;
 			if (account) {
@@ -93,7 +94,7 @@ export const authOptions = {
 			return `${baseUrl}${path}`
 		},
 		async session({ session }: { session: Session }) {
-			if (session && session.user) {
+			if (session?.user) {
 				const usersWithAlias = await getUserByAlias(session.user.email!).catch(err => {
 					console.error(`[session callback] getUserByAlias failed for ${session.user.email}`, err);
 				})

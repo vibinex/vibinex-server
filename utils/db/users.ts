@@ -40,7 +40,7 @@ export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | un
 		console.error(`[users/getUserByAlias] Query failed: Select from users where aliases contain ${alias_email}`, { pg_query: user_alias_search_q }, err);
 	});
 
-	if (user_alias_search_result && user_alias_search_result.rowCount) {
+	if (user_alias_search_result?.rowCount) {
 		console.debug(`${user_alias_search_result.rowCount} user(s) exist with this email as an alias.`);
 		return user_alias_search_result.rows;
 	}
