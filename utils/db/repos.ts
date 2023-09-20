@@ -62,11 +62,11 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
     const get_repo_config_q = `
         SELECT config 
         FROM repos 
-        WHERE repo_provider = ${convert(repo.repo_provider)}
-            AND repo_owner = ${convert(repo.repo_owner)}
-            AND repo_name = ${convert(repo.repo_name)}`;
+        WHERE repo_provider = $1
+            AND repo_owner = $2
+            AND repo_name = $3`;
 
-    const config = await conn.query(get_repo_config_q)
+	const config = await conn.query(get_repo_config_q, [repo.repo_provider, repo.repo_owner, repo.repo_name])
         .then((dbResponse) => {
             if (dbResponse.rowCount == 0) {
                 throw new Error(`Repository not found: ${JSON.stringify(repo)}`);
