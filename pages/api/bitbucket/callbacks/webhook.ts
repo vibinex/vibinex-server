@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
 import { getTopicNameFromDB } from '../../../../utils/db/relevance';
-import { getRepoConfig } from '../../../..//utils/db/repos'; // Make sure to import the getRepoConfig function
 
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const jsonBody = req.body;
@@ -9,18 +8,10 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const provider = "bitbucket";
   const name = jsonBody.repository.name;
   const topicName = await getTopicNameFromDB(owner, name, provider);
-
-  // Fetch the repository configuration
-  const repoConfig = await getRepoConfig({
-    repo_provider: provider,
-    repo_owner: owner,
-    repo_name: name
-  });
-
+  
   const data = {
     repositoryProvider: 'bitbucket',
-    eventPayload: jsonBody,
-    repoConfig: repoConfig // Add the fetched configuration to the data object
+    eventPayload: jsonBody
   };
   
   const msgType = 'webhook_callback';
@@ -28,7 +19,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.info("Received bitbucket webhook event for ", name);
   console.debug(`data = ${JSON.stringify(jsonBody)}`)
   console.debug(`topicname = ${topicName}`)
-  console.debug(`repoConfig = ${JSON.stringify(repoConfig)}`)
   
   try {
     await publishMessage(topicName, data, msgType);
