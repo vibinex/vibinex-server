@@ -53,7 +53,7 @@ export const getEmailAliases = async (session: Session) => {
 	}
 
 	const allAliases: Set<string> = new Set();
-	Promise.allSettled(allUserEmailsPromises).then((results) => {
+	await Promise.allSettled(allUserEmailsPromises).then((results) => {
 		results.forEach((result) => {
 			if (result.status !== 'fulfilled') {
 				return;

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, type ReactElement } from "react";
 import SwitchSubmit from "../components/SwitchSubmit";
 import { TableCell, TableHeaderCell } from "../components/Table";
-import type { DbRepoSerializable, RepoIdentifier } from "../types/repository";
+import type { DbRepo, DbRepoSerializable, RepoIdentifier } from "../types/repository";
 import { getRepos } from "../utils/db/repos";
 import type { RepoProvider } from "../utils/providerAPI";
 import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
@@ -79,8 +79,14 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 }
 
 export const getRepoList = async (session: Session): Promise<DbRepoSerializable[]> => {
-	const userReposFromProvider = await getUserRepositories(session);
-	const userReposFromDb = await getRepos(userReposFromProvider);
+	const userReposFromProvider = await getUserRepositories(session).catch((err): RepoIdentifier[] => {
+		console.error(`[RepoList] getRepos for the user from the providers failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
+		return [];
+	});;
+	const userReposFromDb = await getRepos(userReposFromProvider).catch((err): DbRepo[] => {
+		console.error(`[RepoList] getRepos for the user from the database failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
+		return [];
+	});
 	return userReposFromDb.map(repo => {
 		const { created_at, ...other } = repo;
 		return { created_at: created_at.toDateString(), ...other }
