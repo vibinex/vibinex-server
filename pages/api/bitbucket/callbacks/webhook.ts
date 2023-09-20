@@ -38,8 +38,8 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(500).json({ error: 'Internal Server Error' });
   });;
   console.info("Sending message to pubsub for ", name);
-    res.status(200);
-    res.send("Success");
+  res.status(200);
+  res.send("Success");
 }
 
 export default webhookHandler;
