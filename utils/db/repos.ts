@@ -3,16 +3,24 @@ import type { DbRepo, RepoIdentifier } from '../../types/repository';
 import { convert } from './converter';
 
 export const getRepos = async (allRepos: RepoIdentifier[]) => {
-	const allReposFormattedAsTuples = allRepos.map(repo => `(${convert(repo.repo_provider)}, ${convert(repo.repo_owner)}, ${convert(repo.repo_name)})`).join(',');
-	const repo_list_q = `SELECT *
+	const batchSize = 50;
+	const allDbRepos = [];
+	for (let index = 0; index < allRepos.length; index += batchSize) {
+		const allReposSubset = allRepos.slice(index, index + batchSize);
+		const allReposFormattedAsTuples = allReposSubset.map(repo => `(${convert(repo.repo_provider)}, ${convert(repo.repo_owner)}, ${convert(repo.repo_name)})`).join(',');
+		console.log('[getRepos] allReposFormatedAsTuples:', allReposSubset.length, allReposFormattedAsTuples.length, allReposFormattedAsTuples);
+		const repo_list_q = `SELECT *
 		FROM repos 
 		WHERE (repo_provider, repo_owner, repo_name) IN (${allReposFormattedAsTuples})
 		ORDER BY repo_provider, repo_owner, repo_name`;
-	const result: { rows: DbRepo[] } = await conn.query(repo_list_q).catch(err => {
-		console.error(`[getRepos] Error in getting repository-list from the database`, { pg_query: repo_list_q }, err);
-		throw new Error(err); // FIXME: handle this more elegantly
-	});
-	return result.rows
+		const result: { rows: DbRepo[] } = await conn.query(repo_list_q).catch(err => {
+			console.error(`[getRepos] Error in getting repository-list from the database`, { pg_query: repo_list_q }, err);
+			throw new Error(err); // FIXME: handle this more elegantly
+		});
+		allDbRepos.push(...result.rows);
+	}
+
+	return allDbRepos;
 }
 
 export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
