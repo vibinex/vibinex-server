@@ -3,6 +3,8 @@ import type { Session } from "next-auth";
 import { baseURL, supportedProviders } from ".";
 import type { RepoIdentifier } from "../../types/repository";
 import { Bitbucket } from "./Bitbucket";
+import AuthInfo from "../../types/AuthInfo";
+import { bitbucketAccessToken } from "./auth";
 
 type GithubRepoObj = {
 	name: string,
@@ -115,15 +117,30 @@ export const getUserRepositories = async (session: Session) => {
 	const allUserReposPromises = [];
 	for (const repoProvider of supportedProviders) {
 		if (Object.keys(session.user.auth_info!).includes(repoProvider)) {
-			for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
-				const access_key: string = providerAuthInfo['access_token']; // TODO: handle expired access token with refresh token here
+			const authInfo: AuthInfo = session.user.auth_info!;
+			for (const [authId, providerAuthInfo] of Object.entries(authInfo[repoProvider])) {
 				switch (repoProvider) {
 					case 'github':
-						const userReposPromiseGitHub = getUserRepositoriesForGitHub(access_key, authId)
+						if (!providerAuthInfo) {
+							console.error("Unable to deserialize providerAuthInfo ", providerAuthInfo);
+							continue;
+						}
+						const access_key_gh = providerAuthInfo.access_token;
+						if (!access_key_gh) {
+							// TODO implement refresh token
+							console.error("[getUserRepositories] No access key found", providerAuthInfo);
+							continue;
+						}
+						const userReposPromiseGitHub = getUserRepositoriesForGitHub(access_key_gh, authId)
 						allUserReposPromises.push(userReposPromiseGitHub);
 						break;
 					case 'bitbucket':
-						const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key, authId);
+						const access_key_bb: string | null = await bitbucketAccessToken(authId, session.user.id!);
+						if (!access_key_bb) {
+							console.error("[getUserRepositories] No access token in auth_info: ", providerAuthInfo);
+							continue;
+						}
+						const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key_bb, authId);
 						allUserReposPromises.push(userReposPromiseBitbucket);
 						break;
 					default:
