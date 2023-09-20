@@ -12,7 +12,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.error('Failed to get repoConfig from db :', error);
     res.status(500).json({ error: 'Internal Server Error' });
   });
-  const repoConfig = getRepoConfig({
+  const repoConfig = await getRepoConfig({
     repo_provider: provider,
     repo_owner: owner,
     repo_name: name
