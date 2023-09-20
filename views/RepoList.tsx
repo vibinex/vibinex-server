@@ -79,9 +79,19 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 }
 
 export const getRepoList = async (session: Session): Promise<DbRepoSerializable[]> => {
-	const userReposFromProvider = await getUserRepositories(session);
-	const userReposFromDb = await getRepos(userReposFromProvider);
-	return userReposFromDb.map(repo => {
+	const userReposFromProvider = await getUserRepositories(session).catch((err): RepoIdentifier[] => {
+		console.error(`[RepoList] getRepos from the providers failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
+		return [];
+	});;
+	const userReposFromDb = await getRepos(userReposFromProvider).catch((err) => {
+		console.error(`[RepoList] getRepos from the database failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
+		return { repos: [], failureRate: 1 };
+	});
+	if (userReposFromDb.failureRate != 0) {
+		// if necessary, we can add this to the returned object
+		console.warn(`[RepoList] getRepos from database failed to query ~${(100 * userReposFromDb.failureRate).toFixed(2)}% of the repositories for user: ${session.user.id} (Name: ${session.user.name})`)
+	}
+	return userReposFromDb.repos.map(repo => {
 		const { created_at, ...other } = repo;
 		return { created_at: created_at.toDateString(), ...other }
 	});

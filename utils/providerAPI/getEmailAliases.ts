@@ -53,9 +53,10 @@ export const getEmailAliases = async (session: Session) => {
 	}
 
 	const allAliases: Set<string> = new Set();
-	Promise.allSettled(allUserEmailsPromises).then((results) => {
+	await Promise.allSettled(allUserEmailsPromises).then((results) => {
 		results.forEach((result) => {
 			if (result.status !== 'fulfilled') {
+				console.error(`[getEmailAliases] Promise rejected for one of the providers with this reason: ${result.reason}`);
 				return;
 			}
 			const emailObjects = result.value;
