@@ -4,8 +4,7 @@ import { saveTopicName } from '../../../utils/db/relevance';
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.info("Saving setup info in db...");
     const jsonBody = req.body;
-    for (const idx in jsonBody.info) {
-        let ownerInfo = jsonBody.info[idx];
+    for (const ownerInfo of jsonBody.info) {
         try {
             await saveTopicName(ownerInfo.owner, ownerInfo.provider, 
                 jsonBody.installationId, ownerInfo.repos);
