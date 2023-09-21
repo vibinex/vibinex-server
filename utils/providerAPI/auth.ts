@@ -4,7 +4,8 @@ import AuthInfo from "../../types/AuthInfo";
 
 
 export const bitbucketAccessToken = async function(providerAccountId: string, userId: string): Promise<string | null> {
-	const provider = "bitbucket";
+	console.info("Providing access token...", providerAccountId, userId);
+    const provider = "bitbucket";
 	// get authinfo from db
 	const authInfo: AuthInfo | null = await getAuthInfoFromDb(userId).catch(_ => {
         console.error("Failed to fetch auth info from the database.");
@@ -18,6 +19,8 @@ export const bitbucketAccessToken = async function(providerAccountId: string, us
 	// Check if token has expired.
     const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds.
     if (account.expires_at && account.expires_at > currentTime) {
+        console.info("access token not expired yet ",
+            currentTime, account.expires_at);
         return account.access_token!; // Token is still valid.
     }
 	// If it has expired, use the refresh token to obtain a new access token.
@@ -25,9 +28,9 @@ export const bitbucketAccessToken = async function(providerAccountId: string, us
         console.error("No refresh token available.");
         return null;
     }
-	const newAuthInfo = await bitbucketRefreshToken(account.refresh_token);
-	if (!newAuthInfo) {
-		console.error("No new access token returned from refresh token api");
+	const newAuthInfo = await bitbucketRefreshToken(account.refresh_token, authInfo, providerAccountId);
+	if (!newAuthInfo || !newAuthInfo[provider] || !newAuthInfo[provider][providerAccountId]) {
+		console.error("No new access token returned from refresh token api", JSON.stringify(newAuthInfo!));
 		return null;
 	}
 	// save new auth info to db
@@ -35,7 +38,8 @@ export const bitbucketAccessToken = async function(providerAccountId: string, us
 	return newAuthInfo[provider][providerAccountId].access_token!;
 }
 
-const bitbucketRefreshToken = async function (refreshToken: string): Promise<AuthInfo | null> {
+const bitbucketRefreshToken = async function (refreshToken: string, authInfoDb: AuthInfo, providerAccountId: string): Promise<AuthInfo | null> {
+    console.info("Refreshing bitbucket token...", providerAccountId, refreshToken, JSON.stringify(authInfoDb));
     const tokenUrl = 'https://bitbucket.org/site/oauth2/access_token';
     const clientId = process.env.BITBUCKET_CLIENT_ID;
     const clientSecret = process.env.BITBUCKET_CLIENT_SECRET;
@@ -65,6 +69,15 @@ const bitbucketRefreshToken = async function (refreshToken: string): Promise<Aut
 		console.error(`Failed to get refresh token, status: ${JSON.stringify(response)}`);
 		return null;
 	}
-	console.debug(`response data = ${JSON.stringify(response.data)}`)
-	return response.data as AuthInfo;
+    const provider = "bitbucket";
+    if (!authInfoDb[provider] || !authInfoDb[provider][providerAccountId]) {
+		console.error("No new access token returned from refresh token api", JSON.stringify(authInfoDb));
+		return null;
+	}
+    authInfoDb[provider][providerAccountId].access_token = response.data.access_token;
+    authInfoDb[provider][providerAccountId].expires_at = response.data.expires_at;
+    authInfoDb[provider][providerAccountId].refresh_token = response.data.refresh_token;
+    authInfoDb[provider][providerAccountId].handle = response.data.handle;
+    console.debug(`[bitbucketRefreshToken] Updated authinfo = ${JSON.stringify(authInfoDb)}`)
+	return authInfoDb;
 }

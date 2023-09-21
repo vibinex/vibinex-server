@@ -34,11 +34,11 @@ export const getEmailAliases = async (session: Session) => {
 			console.warn(`${repoProvider} provider not present`);
 			continue;
 		}
-		const authInfo: AuthInfo = session.user.auth_info!;
-		for (const [authId, providerAuthInfo] of Object.entries(authInfo[repoProvider])) {
+		for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
 			const access_key: string | null = (repoProvider === 'bitbucket')
 				? await bitbucketAccessToken(authId, session.user.id!)
 				: providerAuthInfo.access_token!;
+			// const access_key: string = providerAuthInfo['access_token'];
 			if (!access_key) {
 				console.error("[getEmailAliases] No access token found: ", providerAuthInfo);
 				continue;

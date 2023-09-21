@@ -4,15 +4,15 @@ import AuthInfo from '../../types/AuthInfo';
 export const saveAuthInfoToDb = async function (userId: string, authInfo: AuthInfo) {
     const update_user_authinfo_q = `UPDATE users 
         SET auth_info = $1
-        WHERE user_id = $2`;
-    const params = [userId, authInfo];
+        WHERE id = $2`;
+    const params = [authInfo, userId];
     await conn.query(update_user_authinfo_q, params)
     .then((result) => {
         console.info("Succesfully inserted authInfo in Db");
         console.debug("authinfo update result = ", result);
     })
     .catch((error) => {
-        console.error(`[getAuthInfoFromDb] Error in getting authInfo from the database`, 
+        console.error(`[saveAuthInfoToDb] Error in saving authInfo to the database`, 
             { pg_query: update_user_authinfo_q }, error);
     });
 }
