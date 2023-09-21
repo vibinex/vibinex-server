@@ -6,12 +6,12 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.info("[hunkHandler] Saving hunks...");
   const result: void | null = await saveHunk(hunkJson)
   .catch((error) => {
-    console.error('[hunkHandler] Error publishing message:', error);
+    console.error('[hunkHandler] Error saving hunk:', error);
     return null;
   });
   if (result == null) {
     res.status(500)
-      .json({ error: 'Failed to publish message. Data must be in the form of a Buffer.' });
+      .json({ error: 'Failed to save hunk to db' });
     return;
   }
   res.status(200).send("Success");
