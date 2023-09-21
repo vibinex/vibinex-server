@@ -7,4 +7,5 @@ type AuthInfo = {
 		}
 	}
 }
+
 export default AuthInfo
