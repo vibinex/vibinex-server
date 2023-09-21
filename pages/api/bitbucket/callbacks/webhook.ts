@@ -18,7 +18,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     repo_name: name
   }).catch((error) => {
     console.error('Failed to get repoConfig from db :', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error' });
   });
   const data = {
     repositoryProvider: 'bitbucket',
