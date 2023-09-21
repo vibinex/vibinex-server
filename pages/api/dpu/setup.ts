@@ -2,18 +2,27 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { saveTopicName } from '../../../utils/db/relevance';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    console.info("Saving setup info in db...");
+    console.info("[setupHandler]Saving setup info in db...");
     const jsonBody = req.body;
-    for (const idx in jsonBody.info) {
-        let ownerInfo = jsonBody.info[idx];
-        await saveTopicName(ownerInfo.owner, ownerInfo.provider, 
-                jsonBody.installationId, ownerInfo.repos)
+    const allTopicPromises = [];
+    for (const ownerInfo of jsonBody.info) {
+        const saveTopicPromises = saveTopicName(ownerInfo.owner, 
+            ownerInfo.provider, 
+            jsonBody.installationId, ownerInfo.repos)
         .catch((err) => {
-            console.error("Unable to save setup info, ", err);
-            res.status(500).send({"error": "Unable to save setup info"});
+            console.error("[setupHandler] Unable to save setup info, ", err);
         });
+        allTopicPromises.push(saveTopicPromises);
     }
-    res.status(200).send("Ok");
+    await Promise.all(allTopicPromises).then((values) => {
+        console.info("[setupHandler] All setup info saved succesfully...")
+        res.status(200).send("Ok");
+        return;
+    }).catch((error) => {
+        console.error("[setupHandler] Unable to save all setup info in db, error: ", error);
+        res.status(500).json({"error": "Unable to save setup info"});
+        return;
+    });
 }
 
 export default setupHandler;

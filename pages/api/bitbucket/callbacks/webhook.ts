@@ -17,14 +17,13 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const msgType = 'webhook_callback';
   
   console.info("Received bitbucket webhook event for ", name);
-  
-  try {
-    await publishMessage(topicName, data, msgType);
-  } catch (error) {
+  console.debug(`data = ${JSON.stringify(jsonBody)}`)
+  console.debug(`topicname = ${topicName}`)
+
+  await publishMessage(topicName, data, msgType).catch((error) => {
     console.error('Error publishing message:', error);
-    res.status(500).json({ error: 'Failed to publish message. Data must be in the form of a Buffer' });
-  }
-  
+    res.status(500).json({ error: 'Failed to publish Pubsub message.' });
+  });
   res.status(200);
   res.send("Success");
 }
