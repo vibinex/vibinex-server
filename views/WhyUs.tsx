@@ -1,10 +1,10 @@
-import React from 'react'
-import { GoSettings } from 'react-icons/go'
-import { AiOutlineFileSearch, AiOutlineApartment } from 'react-icons/ai'
+import { AiOutlineApartment, AiOutlineFileSearch } from 'react-icons/ai'
+import { VscSettings } from 'react-icons/vsc'
+
 const data = [
   { icon: <AiOutlineApartment size={40} />, heading: 'Quality Control', content: 'Always stay informed if someone overwrites your code.' },
   { icon: <AiOutlineFileSearch size={40} />, heading: 'Know your code', content: 'You should review every PR. But do you? Now you can!' },
-  { icon: <GoSettings size={40} />, heading: 'Reduce noise', content: 'Not everything needs your attention, focus on what matters the most.' },
+  { icon: <VscSettings size={40} />, heading: 'Reduce noise', content: 'Not everything needs your attention, focus on what matters the most.' },
 ]
 
 const WhyUs = () => {
