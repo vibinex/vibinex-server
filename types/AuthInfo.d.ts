@@ -8,4 +8,4 @@ type AuthInfo = {
 	}
 }
 
-export default AuthInfo
+export default AuthInfo;
