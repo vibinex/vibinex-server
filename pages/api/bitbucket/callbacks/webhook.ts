@@ -9,7 +9,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const provider = "bitbucket";
   const name = jsonBody.repository.name;
   const topicName = await getTopicNameFromDB(owner, name, provider).catch((error) => {
-    console.error('Failed to get repoConfig from db :', error);
+    console.error('[bitbucket/webookHandler] Failed to get repoConfig from db:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   });
   const repoConfig = await getRepoConfig({
