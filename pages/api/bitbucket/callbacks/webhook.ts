@@ -19,7 +19,8 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     repo_name: name
   }).catch((error) => {
     console.error('Failed to get repoConfig from db :', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error' });
+    return;
   });
   const data = {
     repositoryProvider: 'bitbucket',
@@ -37,10 +38,10 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   await publishMessage(topicName_str, data, msgType).catch((error) => {
     console.error('Failed to get repoConfig from db :', error);
     res.status(500).json({ error: 'Internal Server Error' });
+    return;
   });;
   console.info("Sending message to pubsub for ", name);
-  res.status(200);
-  res.send("Success");
+  res.status(200).send("Success");
 }
 
 export default webhookHandler;
