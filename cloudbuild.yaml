@@ -5,6 +5,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: 
   - 'build'
+  - '--no-cache'
   - '-t'
   - 'asia-docker.pkg.dev/$PROJECT_ID/asia.gcr.io/$PROJECT_ID/tmw'
   - '.'
