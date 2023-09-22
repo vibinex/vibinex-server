@@ -43,9 +43,6 @@ ARG NODE_ENV
 
 COPY . .
 RUN npm install
-
-# Set NODE_ENV to development for the build phase
-ENV NODE_ENV=development
 RUN npm run build
 
 CMD ["npm", "run", "dev"]
