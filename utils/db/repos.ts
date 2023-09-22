@@ -31,7 +31,7 @@ export const getRepos = async (allRepos: RepoIdentifier[]) => {
 		})
 		return {
 			repos: allDbRepoLists.flat(),
-			failureRate: numFailedPromises / allDbReposPromises.length
+			failureRate: (allDbReposPromises.length === 0) ? 1.01 : (numFailedPromises / allDbReposPromises.length),
 		};
 	})
 
@@ -59,7 +59,7 @@ export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assi
 };
 
 export const getRepoConfig = async (repo: RepoIdentifier) => {
-    const get_repo_config_q = `
+	const get_repo_config_q = `
         SELECT config 
         FROM repos 
         WHERE repo_provider = $1
@@ -67,16 +67,16 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
             AND repo_name = $3`;
 
 	const config = await conn.query(get_repo_config_q, [repo.repo_provider, repo.repo_owner, repo.repo_name])
-        .then((dbResponse) => {
-            if (dbResponse.rowCount == 0) {
-                throw new Error(`Repository not found: ${JSON.stringify(repo)}`);
-            }
-            return dbResponse.rows[0].config;
-        })
-        .catch((err: Error) => {
-            console.error(`[db/getRepoConfig] Could not retrieve config of this repository: ${repo}`, { pg_query: get_repo_config_q }, err);
-            throw err;
-        });
+		.then((dbResponse) => {
+			if (dbResponse.rowCount == 0) {
+				throw new Error(`Repository not found: ${JSON.stringify(repo)}`);
+			}
+			return dbResponse.rows[0].config;
+		})
+		.catch((err: Error) => {
+			console.error(`[db/getRepoConfig] Could not retrieve config of this repository: ${repo}`, { pg_query: get_repo_config_q }, err);
+			throw err;
+		});
 
-    return config;
+	return config;
 };
