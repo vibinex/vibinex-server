@@ -51,7 +51,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   console.info("[webookHandler] Sent message to pubsub for ", topicName, result);
   res.status(200).send("Success");
-  return;
 }
 
 export default webhookHandler;
