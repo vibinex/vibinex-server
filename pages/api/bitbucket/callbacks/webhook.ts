@@ -18,7 +18,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       .json({ error: 'Unable to get topic name from db' });
     return;
   }
-  const repoConfig: any | null = await getRepoConfig({
+  const repoConfig = await getRepoConfig({
     repo_provider: provider,
     repo_owner: owner,
     repo_name: name
