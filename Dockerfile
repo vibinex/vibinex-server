@@ -48,4 +48,4 @@ RUN npm install
 ENV NODE_ENV=development
 RUN npm run build
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
