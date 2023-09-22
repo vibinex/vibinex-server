@@ -57,3 +57,26 @@ export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assi
 		})
 	return queryIsSuccessful;
 };
+
+export const getRepoConfig = async (repo: RepoIdentifier) => {
+    const get_repo_config_q = `
+        SELECT config 
+        FROM repos 
+        WHERE repo_provider = $1
+            AND repo_owner = $2
+            AND repo_name = $3`;
+
+	const config = await conn.query(get_repo_config_q, [repo.repo_provider, repo.repo_owner, repo.repo_name])
+        .then((dbResponse) => {
+            if (dbResponse.rowCount == 0) {
+                throw new Error(`Repository not found: ${JSON.stringify(repo)}`);
+            }
+            return dbResponse.rows[0].config;
+        })
+        .catch((err: Error) => {
+            console.error(`[db/getRepoConfig] Could not retrieve config of this repository: ${repo}`, { pg_query: get_repo_config_q }, err);
+            throw err;
+        });
+
+    return config;
+};
