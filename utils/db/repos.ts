@@ -31,7 +31,7 @@ export const getRepos = async (allRepos: RepoIdentifier[]) => {
 		})
 		return {
 			repos: allDbRepoLists.flat(),
-			failureRate: numFailedPromises / allDbReposPromises.length
+			failureRate: (allDbReposPromises.length === 0) ? 0 : (numFailedPromises / allDbReposPromises.length),
 		};
 	})
 
