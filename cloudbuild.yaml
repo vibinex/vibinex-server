@@ -58,6 +58,6 @@ steps:
   - '-c'
   - |
     gcloud config set app/cloud_build_timeout 1600
-    gcloud app deploy --version=$COMMIT_SHA --env-vars-file=env-staging.yaml
+    gcloud app deploy app.yaml --version=$COMMIT_SHA
 
 timeout: '1600s'
