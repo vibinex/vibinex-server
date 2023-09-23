@@ -11,15 +11,13 @@ steps:
     done < env-staging-names.txt
 
 - name: node:18.13.0
-  entrypoint: npm
-  args: ["install"]
-  
-- name: node:18.13.0
   entrypoint: bash
   args:
   - '-c'
   - |
     source /workspace/secrets_as_env.sh
+    printenv
+    npm install
     npm run build
 
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
