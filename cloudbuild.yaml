@@ -7,7 +7,7 @@ steps:
     while IFS= read -r line
     do
         SECRET_NAME=$(echo $line | cut -d'=' -f1)
-        gcloud secrets versions access latest --secret=$SECRET_NAME > /workspace/$SECRET_NAME.txt
+        gcloud secrets versions access latest --secret="$SECRET_NAME" > /workspace/$SECRET_NAME.txt
     done < secrets.txt
 
 - name: node:18.13.0
