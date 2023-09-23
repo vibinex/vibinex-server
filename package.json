@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "create-env": "printenv"
+    "create-env": "printenv > .env"
   },
   "dependencies": {
     "@google-cloud/pubsub": "^3.7.1",

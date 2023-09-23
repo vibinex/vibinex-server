@@ -1,5 +1,8 @@
 steps:
 - name: node:18.13.0
+  entrypoint: bash
+  args: ["-c", "rm -rf node_modules"]
+- name: node:18.13.0
   entrypoint: npm
   args: ["install"]
 - name: node:18.13.0
@@ -47,5 +50,5 @@ steps:
   args: ["run", "build"]
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
-  args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy']
+  args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy --version=$COMMIT_SHA']
 timeout: '1600s'
