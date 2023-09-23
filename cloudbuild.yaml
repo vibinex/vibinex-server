@@ -8,7 +8,7 @@ steps:
     do
         SECRET_NAME=$$(echo $line | cut -d'=' -f1)
         gcloud secrets versions access latest --secret=$$SECRET_NAME > /workspace/$$SECRET_NAME.txt
-    done < secrets.txt
+    done < env-staging-names.txt
 
 - name: node:18.13.0
   entrypoint: bash
