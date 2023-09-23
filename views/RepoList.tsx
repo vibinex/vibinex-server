@@ -82,7 +82,11 @@ export const getRepoList = async (session: Session): Promise<DbRepoSerializable[
 	const userReposFromProvider = await getUserRepositories(session).catch((err): RepoIdentifier[] => {
 		console.error(`[RepoList] getRepos from the providers failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
 		return [];
-	});;
+	});
+	if (userReposFromProvider.length === 0) {
+		console.warn(`[RepoList] getRepos from the providers got zero repositories for user: ${session.user.id} (Name: ${session.user.name})`);
+		return [];
+	}
 	const userReposFromDb = await getRepos(userReposFromProvider).catch((err) => {
 		console.error(`[RepoList] getRepos from the database failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
 		return { repos: [], failureRate: 1 };

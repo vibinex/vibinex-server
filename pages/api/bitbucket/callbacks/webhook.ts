@@ -10,7 +10,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const name = jsonBody.repository.name;
   console.info("[webookHandler] Received bitbucket webhook event for ", name);
   const topicName: string | null = await getTopicNameFromDB(owner, name, provider).catch((error) => {
-    console.error('[webookHandler] Failed to get topic name from db:', error);
+    console.error('[webhookHandler] Failed to get topic name from db:', error);
     return null;
   });
   if (!topicName) {
@@ -18,7 +18,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       .json({ error: 'Unable to get topic name from db' });
     return;
   }
-  const repoConfig: any | null = await getRepoConfig({
+  const repoConfig = await getRepoConfig({
     repo_provider: provider,
     repo_owner: owner,
     repo_name: name
@@ -51,7 +51,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   console.info("[webookHandler] Sent message to pubsub for ", topicName, result);
   res.status(200).send("Success");
-  return;
 }
 
 export default webhookHandler;
