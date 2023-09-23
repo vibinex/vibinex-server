@@ -55,6 +55,6 @@ steps:
   - |
     gcloud config set app/cloud_build_timeout 1600
     ENV_VARS="NEXTAUTH_URL=${_NEXTAUTH_URL},NEXTAUTH_SECRET=${_NEXTAUTH_SECRET},...,(all your other variables),LOG_LEVEL=debug"
-    echo $ENV_VARS > env_vars.txt
+    echo "$ENV_VARS" > env_vars.txt
     gcloud app deploy --version=$COMMIT_SHA --set-env-vars=$(cat env_vars.txt)
 timeout: '1600s'
