@@ -2,12 +2,18 @@ steps:
 - name: node:18.13.0
   entrypoint: bash
   args: ["-c", "rm -rf node_modules"]
+  
 - name: node:18.13.0
   entrypoint: npm
   args: ["install"]
+  
 - name: node:18.13.0
   entrypoint: npm
   args: ["run", "create-env"]
+  
+- name: node:18.13.0
+  entrypoint: npm
+  args: ["run", "build"]
   env:
   - 'NEXTAUTH_URL=${_NEXTAUTH_URL}'
   - 'NEXTAUTH_SECRET=${_NEXTAUTH_SECRET}'
@@ -45,16 +51,13 @@ steps:
   - 'GITLAB_CLIENT_SECRET=${_GITLAB_CLIENT_SECRET}'
   - 'CLARITY_ID=${_CLARITY_ID}'
   - 'LOG_LEVEL=debug'
-- name: node:18.13.0
-  entrypoint: npm
-  args: ["run", "build"]
+  
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     gcloud config set app/cloud_build_timeout 1600
-    ENV_VARS="NEXTAUTH_URL=${_NEXTAUTH_URL},NEXTAUTH_SECRET=${_NEXTAUTH_SECRET},...,(all your other variables),LOG_LEVEL=debug"
-    echo "$ENV_VARS" > env_vars.txt
-    gcloud app deploy --version=$COMMIT_SHA --set-env-vars=$(cat env_vars.txt)
+    gcloud app deploy --version=$COMMIT_SHA --env-vars-file=env-staging.yaml
+
 timeout: '1600s'
