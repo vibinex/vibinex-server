@@ -42,6 +42,8 @@ steps:
   - 'GITLAB_CLIENT_SECRET=${_GITLAB_CLIENT_SECRET}'
   - 'CLARITY_ID=${_CLARITY_ID}'
   - 'LOG_LEVEL=debug'
+  - 'TOPIC_NAME=${_TOPIC_NAME}'
+  - 'SUBSCRIPTION_NAME=${_SUBSCRIPTION_NAME}'
 - name: node:18.13.0
   entrypoint: npm
   args: ["run", "build"]
