@@ -44,7 +44,6 @@ export const authOptions = {
 	callbacks: {
 		async signIn({ user, account, profile }: SignInParam) {
 			// search for the user in the users table
-			console.debug(`[signIn]======================<next_auth_url>================= = ${process.env.NEXTAUTH_URL}`)
 			let db_user: DbUser | undefined;
 			if (account) {
 				// first search based on auth_info
@@ -86,7 +85,6 @@ export const authOptions = {
 			return true;
 		},
 		async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
-			console.debug(`[redirect]======================<next_auth_url>================= = ${process.env.NEXTAUTH_URL}`)
 			let path: string;
 			if (url.startsWith("/")) path = url;
 			else if (new URL(url).origin === baseUrl) path = new URL(url).pathname;
@@ -96,7 +94,6 @@ export const authOptions = {
 			return `${baseUrl}${path}`
 		},
 		async session({ session }: { session: Session }) {
-			console.debug(`[session]======================<next_auth_url>================= = ${process.env.NEXTAUTH_URL}`)
 			if (session?.user) {
 				const usersWithAlias = await getUserByAlias(session.user.email!).catch(err => {
 					console.error(`[session callback] getUserByAlias failed for ${session.user.email}`, err);
@@ -148,6 +145,7 @@ const getHandleFromProfile = (profile: Profile | undefined) => {
 }
 const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
 	const updateObj: DbUser = {}
+	console.debug(`================= account = ${account}, profile = ${profile}==================`)
 	if (account) {
 		updateObj.auth_info = {
 			[account.provider]: {
