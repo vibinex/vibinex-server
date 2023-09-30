@@ -107,29 +107,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 					diffObj.auth_info = user.auth_info;
 					break;
 				}
-				const diffAuth = currUser.auth_info;
-				for (const provider in user.auth_info) {
-					if (Object.keys(currUser.auth_info).includes(provider)) {
-						for (const providerAccountId in user.auth_info[provider]) {
-							if (Object.keys(currUser.auth_info[provider]).includes(providerAccountId)) {
-								const currAuthObj = currUser.auth_info[provider][providerAccountId];
-								const newAuthObj = user.auth_info[provider][providerAccountId];
-
-								if (!(newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at < currAuthObj.expires_at)) {
-									diffAuth[provider][providerAccountId] = newAuthObj;
-								}
-								if ((newAuthObj.handle && !currAuthObj.handle) || (newAuthObj.handle != currAuthObj.handle)) {
-									diffAuth[provider][providerAccountId] = newAuthObj;
-								}
-							} else {
-								diffAuth[provider][providerAccountId] = user.auth_info[provider][providerAccountId];
-							}
-						}
-					} else {
-						diffAuth[provider] = user.auth_info[provider];
-					}
-				}
-				diffObj.auth_info = diffAuth;
+				diffObj.auth_info = calculateAuthDiff(currUser.auth_info, user.auth_info);
 				break;
 			default:
 				console.warn("[updateUser] Not implemented. Field: " + key);
@@ -137,6 +115,32 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 		}
 	}
 	return diffObj;
+}
+
+const calculateAuthDiff = (currAuthInfo: AuthInfo, newAuthInfo?: AuthInfo) => {
+	const diffAuth = currAuthInfo;
+	for (const provider in newAuthInfo) {
+		if (!Object.keys(currAuthInfo).includes(provider)) {
+			diffAuth[provider] = newAuthInfo[provider];
+			continue;
+		}
+		for (const providerAccountId in newAuthInfo[provider]) {
+			if (!Object.keys(currAuthInfo[provider]).includes(providerAccountId)) {
+				diffAuth[provider][providerAccountId] = newAuthInfo[provider][providerAccountId];
+				continue;
+			}
+			const currAuthObj = currAuthInfo[provider][providerAccountId];
+			const newAuthObj = newAuthInfo[provider][providerAccountId];
+
+			if (!(newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at < currAuthObj.expires_at)) {
+				diffAuth[provider][providerAccountId] = newAuthObj;
+			}
+			if ((newAuthObj.handle && !currAuthObj.handle) || (newAuthObj.handle != currAuthObj.handle)) {
+				diffAuth[provider][providerAccountId] = newAuthObj;
+			}
+		}
+	}
+	return diffAuth;
 }
 
 /**
