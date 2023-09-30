@@ -135,7 +135,7 @@ const calculateAuthDiff = (currAuthInfo: AuthInfo, newAuthInfo?: AuthInfo) => {
 			if (!(newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at < currAuthObj.expires_at)) {
 				diffAuth[provider][providerAccountId] = newAuthObj;
 			}
-			if ((newAuthObj.handle && !currAuthObj.handle) || (newAuthObj.handle != currAuthObj.handle)) {
+			if (newAuthObj.handle != currAuthObj?.handle) {
 				diffAuth[provider][providerAccountId] = newAuthObj;
 			}
 		}
