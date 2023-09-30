@@ -114,6 +114,50 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 			expect(Object.keys(actual_output).length).toBe(1);
 	})
 
+	it("repeating auth with updated handle details (and older expiry)", async () => {
+		const original_auth_info = await getOriginalAuthInfo(TEST_USERID);
+		const new_user: DbUser = {
+			auth_info: JSON.parse(JSON.stringify(original_auth_info))
+		};
+		const bitbucketProviderId = "712020:fd994dba-f921-420b-a9af-8b150ee17d5a";
+		expect(new_user?.auth_info?.bitbucket).toHaveProperty(bitbucketProviderId)
+		if (new_user?.auth_info?.bitbucket[bitbucketProviderId] === undefined) {
+			console.error("Outdated test data, auth_info does not contain expected bitbucket key");
+			return;
+		}
+		new_user.auth_info.bitbucket[bitbucketProviderId].handle = "newhandle";
+		new_user.auth_info.bitbucket[bitbucketProviderId].expires_at = 1695543210; // older timestamp than original
+		const actual_output = await createUpdateUserObj(TEST_USERID, new_user);
+
+		expect(actual_output?.auth_info).toStrictEqual(new_user.auth_info);
+		expect(actual_output?.auth_info).not.toStrictEqual(original_auth_info);
+		if (actual_output)
+			expect(Object.keys(actual_output).length).toBe(1);
+	})
+
+	it("repeating auth with handle that didn't previously exist details (and older expiry)", async () => {
+		const original_auth_info = await getOriginalAuthInfo(TEST_USERID);
+		const new_user: DbUser = {
+			auth_info: JSON.parse(JSON.stringify(original_auth_info))
+		};
+
+		const bitbucketProviderId = "712020:fd994dba-f921-420b-a9af-8b150ee17d5a";
+		delete original_auth_info.bitbucket[bitbucketProviderId].handle;
+		expect(new_user?.auth_info?.bitbucket).toHaveProperty(bitbucketProviderId)
+		if (new_user?.auth_info?.bitbucket[bitbucketProviderId] === undefined) {
+			console.error("Outdated test data, auth_info does not contain expected bitbucket key");
+			return;
+		}
+		new_user.auth_info.bitbucket[bitbucketProviderId].handle = "newhandle";
+		new_user.auth_info.bitbucket[bitbucketProviderId].expires_at = 1695543210; // older timestamp than original
+		const actual_output = await createUpdateUserObj(TEST_USERID, new_user);
+
+		expect(actual_output?.auth_info).toStrictEqual(new_user.auth_info);
+		expect(actual_output?.auth_info).not.toStrictEqual(original_auth_info);
+		if (actual_output)
+			expect(Object.keys(actual_output).length).toBe(1);
+	})
+
 	it("repeating auth with updated details", async () => {
 		const original_auth_info = await getOriginalAuthInfo(TEST_USERID);
 		const new_user: DbUser = {
