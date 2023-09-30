@@ -2,8 +2,8 @@ import conn from ".";
 import AuthInfo from "../../types/AuthInfo";
 import { DbUser, createUpdateUserObj } from "./users";
 
-const TEST_USERID = 'f0aab7ff-f241-4eb4-9d3f-672fa2f6d979'
-const RANDOM_UID = '2893hdf9qss-jdhf9q3f982q34hrh0-2dfhq'
+const TEST_USERID = '3e5738b2-9b08-49b9-9eb8-9fbf32c1d725';
+const RANDOM_UID = '2893hdf9qss-jdhf9q3f982q34hrh0-2dfhq';
 
 describe('unit testing updateUser object creation (except auth_info)', () => {
 	it("changing id", async () => {
@@ -55,7 +55,7 @@ describe('unit testing updateUser object creation (except auth_info)', () => {
 	})
 
 	it("repeating same aliases", async () => {
-		const new_user: DbUser = { aliases: ["contact@vibinex.com", "test@vibinex.com", "129674662+Vibinextest@users.noreply.github.com"] };
+		const new_user: DbUser = { aliases: ["vibi-test@vibinex.com"] };
 		const actual_output = await createUpdateUserObj(TEST_USERID, new_user).catch(err => {
 			console.error("[Test] function call failed.", err)
 		});
@@ -71,19 +71,19 @@ describe('unit testing updateUser object creation (except auth_info)', () => {
 			console.error("[Test] function call failed.", err)
 		});
 
-		expect(actual_output?.aliases?.length).toBe(5);
+		expect(actual_output?.aliases?.length).toBe(3);
 		if (actual_output)
 			expect(Object.keys(actual_output).length).toBe(1);
 		new_user.aliases?.forEach(alias => expect(actual_output?.aliases).toContain(alias));
 	})
 
 	it("adding and repeating aliases", async () => {
-		const new_user: DbUser = { aliases: ["contact@vibinex.com", "newemail@example.com"] };
+		const new_user: DbUser = { aliases: ["vibi-test@vibinex.com", "newemail@example.com"] };
 		const actual_output = await createUpdateUserObj(TEST_USERID, new_user).catch(err => {
 			console.error("[Test] function call failed.", err)
 		});
 
-		expect(actual_output?.aliases?.length).toBe(4);
+		expect(actual_output?.aliases?.length).toBe(2);
 		if (actual_output)
 			expect(Object.keys(actual_output).length).toBe(1);
 		new_user.aliases?.forEach(alias => expect(actual_output?.aliases).toContain(alias));
@@ -118,11 +118,12 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 		const original_auth_info = await getOriginalAuthInfo(TEST_USERID);
 		const new_user: DbUser = {
 			auth_info: {
-				"github": {
-					"129674662": {
+				"bitbucket": {
+					"712020:fd994dba-f921-420b-a9af-8b150ee17d5a": {
 						"type": "oauth",
-						"scope": "read:user,user:email",
-						"access_token": "gho_AKL890fj3jkaLJF09j34flkjlKJF0uLkjgf9"
+						"access_token": "aRandomStringThatIamGeneratingJustforThis1test",
+						"expires_at": 1695554248,
+						"handle": "vibitest"
 					}
 				}
 			}
@@ -139,7 +140,7 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 		const original_auth_info = await getOriginalAuthInfo(TEST_USERID);
 		const new_user: DbUser = {
 			auth_info: {
-				"github": {
+				"bitbucket": {
 					"129674663": {
 						"type": "oauth",
 						"scope": "read:user,user:email",
@@ -153,10 +154,10 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 		if (actual_output)
 			expect(Object.keys(actual_output).length).toBe(1);
 		expect(actual_output?.auth_info).not.toStrictEqual(original_auth_info);
-		expect(actual_output?.auth_info?.github).toHaveProperty('129674662');
-		expect(actual_output?.auth_info?.github['129674662']).toStrictEqual(original_auth_info.github['129674662']);
-		expect(actual_output?.auth_info?.github).toHaveProperty('129674663');
-		expect(actual_output?.auth_info?.github['129674663']).toStrictEqual(new_user.auth_info?.github['129674663']);
+		expect(actual_output?.auth_info?.bitbucket).toHaveProperty('712020:fd994dba-f921-420b-a9af-8b150ee17d5a');
+		expect(actual_output?.auth_info?.bitbucket['712020:fd994dba-f921-420b-a9af-8b150ee17d5a']).toStrictEqual(original_auth_info.bitbucket['712020:fd994dba-f921-420b-a9af-8b150ee17d5a']);
+		expect(actual_output?.auth_info?.bitbucket).toHaveProperty('129674663');
+		expect(actual_output?.auth_info?.bitbucket['129674663']).toStrictEqual(new_user.auth_info?.bitbucket['129674663']);
 	})
 
 	it("adding new auth provider", async () => {
@@ -180,7 +181,7 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 		expect(actual_output?.auth_info).not.toStrictEqual(original_auth_info);
 		expect(actual_output?.auth_info).toHaveProperty('google');
 		expect(actual_output?.auth_info?.google).toStrictEqual(new_user.auth_info?.google);
-		expect(actual_output?.auth_info).toHaveProperty('github');
-		expect(actual_output?.auth_info?.github).toStrictEqual(original_auth_info.github);
+		expect(actual_output?.auth_info).toHaveProperty('bitbucket');
+		expect(actual_output?.auth_info?.bitbucket).toStrictEqual(original_auth_info.bitbucket);
 	})
 })
