@@ -41,6 +41,9 @@ steps:
   - 'GITLAB_CLIENT_ID=${_GITLAB_CLIENT_ID}'
   - 'GITLAB_CLIENT_SECRET=${_GITLAB_CLIENT_SECRET}'
   - 'CLARITY_ID=${_CLARITY_ID}'
+  - 'LOG_LEVEL=debug'
+  - 'TOPIC_NAME=${_TOPIC_NAME}'
+  - 'SUBSCRIPTION_NAME=${_SUBSCRIPTION_NAME}'
 - name: node:18.13.0
   entrypoint: npm
   args: ["run", "build"]
@@ -62,11 +65,11 @@ steps:
   args: ['on-prem-bitbucket-tests.py']
   dir: 'test-scripts'
   env: 
-    - 'test_oauth_consumer_key=${_TEST_OAUTH_CONSUMER_KEY}'
-    - 'test_oauth_consumer_secret=${_TEST_OAUTH_CONSUMER_SECRET}'
-    - 'test_db_host=${_TEST_DB_HOST}'
-    - 'test_db_port=${_TEST_DB_PORT}'
-    - 'test_db_name=${_TEST_DB_NAME}'
-    - 'test_db_user=${_TEST_DB_USER}'
-    - 'test_db_password=${_TEST_DB_PASSWORD}'
+    - 'test_oauth_consumer_key=${_BITBUCKET_OAUTH_CLIENT_ID}'
+    - 'test_oauth_consumer_secret=${_BITBUCKET_OAUTH_CLIENT_SECRET}'
+    - 'test_db_host=${_PGSQL_HOST}'
+    - 'test_db_port=${_PGSQL_PORT}'
+    - 'test_db_name=${_PGSQL_DATABASE}'
+    - 'test_db_user=${_PGSQL_USER}'
+    - 'test_db_password=${_PGSQL_PASSWORD}'
 timeout: '1600s'
