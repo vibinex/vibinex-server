@@ -49,5 +49,27 @@ steps:
   args: ["run", "build"]
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
-  args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy --version=$COMMIT_SHA']
+  args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy']
+
+# Clone the main repository
+- name: 'gcr.io/cloud-builders/git'
+  args: ['clone', '--recursive', 'https://github.com/Alokit-Innovations/test-scripts.git']
+
+# Install Python dependencies
+- name: 'gcr.io/cloud-builders/python'
+  args: ['pip', 'install', '-r', 'requirements.txt']
+  dir: 'test-scripts'
+
+# Run the script from the main repository
+- name: 'gcr.io/cloud-builders/python'
+  args: ['on-prem-bitbucket-tests.py']
+  dir: 'test-scripts'
+  env: 
+    - 'test_oauth_consumer_key=${_BITBUCKET_OAUTH_CLIENT_ID}'
+    - 'test_oauth_consumer_secret=${_BITBUCKET_OAUTH_CLIENT_SECRET}'
+    - 'test_db_host=${_PGSQL_HOST}'
+    - 'test_db_port=${_PGSQL_PORT}'
+    - 'test_db_name=${_PGSQL_DATABASE}'
+    - 'test_db_user=${_PGSQL_USER}'
+    - 'test_db_password=${_PGSQL_PASSWORD}'
 timeout: '1600s'
