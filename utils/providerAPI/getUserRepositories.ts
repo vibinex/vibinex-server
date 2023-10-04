@@ -83,6 +83,9 @@ const getUserRepositoriesForGitHub = async (access_key: string, authId?: string)
 				console.error(`[getUserRepositories] Error occurred while getting user repositories from GitHub API (provider-assigned id: ${authId}). Endpoint: ${endPoint}`, err.message);
 				throw err;
 			})
+		if (repos.length === 0) {
+			console.warn(`[getUserRepositories] No repositories received from GitHub API (provider-assigned id: ${authId}). Endpoint: ${endPoint}`);
+		}
 		const allGitHubRepoIdentifiers = repos.map(repo => ({
 			repo_provider: supportedProviders[0],
 			repo_owner: repo.full_name.split('/')[0],
@@ -151,6 +154,7 @@ export const getUserRepositories = async (session: Session) => {
 	await Promise.allSettled(allUserReposPromises).then((results) => {
 		results.forEach((result) => {
 			if (result.status !== 'fulfilled') {
+				console.error(`[getUserRepositories] Failed to get repositories of the user (id: ${session.user.id}, name: ${session.user.name}) from one of the providers`, result.reason);
 				return;
 			}
 			const providerRepos = result.value;
