@@ -14,8 +14,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return null;
 	});
 	if (!topicName) {
-		res.status(500)
-		.json({ error: 'Unable to get topic name from db' });
+		res.status(400).json({ error: 'Unable to get topic name from db' });
 		return;
 	}
 	const repoConfig = await getRepoConfig({
@@ -27,7 +26,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return null;
 	});
 	if (!repoConfig) {
-		res.status(500).json({ error: 'Unable to get repoConfig from db' });
+		res.status(400).json({ error: 'Unable to get repoConfig from db' });
 		return;
 	}
 	const data = {
