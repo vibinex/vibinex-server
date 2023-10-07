@@ -10,11 +10,14 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		};
 		const msgType = 'install_callback';
 		console.info("Recieved installation code for github, published to ", topicName);
-		try {
-			await publishMessage(topicName, data, msgType);
-		} catch (error) {
-			console.error('Error publishing message:', error);
-			res.status(500).json({ error: 'Failed to publish message. Data must be in the form of a Buffer.' });
+		const result: string | null = await publishMessage(topicName, data, msgType)
+		.catch((error) => {
+			console.error('[install_callback] Failed to publish message:', error);
+			return null;
+		});
+		if (result == null) {
+			res.status(500).json({ error: 'Internal Server Error' });
+			return;
 		}
 	} else {
 		console.error('TOPIC_NAME not set');

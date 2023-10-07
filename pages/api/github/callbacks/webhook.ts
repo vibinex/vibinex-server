@@ -45,7 +45,8 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	
 	const result: string | null = await publishMessage(topicName_str, data, msgType)
 	.catch((error) => {
-		console.error('[webookHandler] Failed to publish message:', error);		return null;
+		console.error('[webookHandler] Failed to publish message:', error);
+		return null;
 	});
 	if (result == null) {
 		res.status(500).json({ error: 'Internal Server Error' });
