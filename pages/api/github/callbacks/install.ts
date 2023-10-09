@@ -5,7 +5,12 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const topicName = process.env.TOPIC_NAME;
 	if (!topicName) {
 		console.error('TOPIC_NAME not set');
-		res.status(400).json({ error: 'Failed to publish message'});
+		res.status(400).json({ error: 'Bad Request' });
+		return;
+	}
+	if (!req.query.code) {
+		console.error('Installation code not provided');
+		res.status(400).json({ error: 'Bad Request' });
 		return;
 	}
 	const data = {
