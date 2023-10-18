@@ -18,8 +18,6 @@ export const bitbucketAccessToken = async function(providerAccountId: string, us
 	// Check if token has expired.
     const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds.
     if (account.expires_at && account.expires_at > currentTime) {
-        console.info("[bitbucketAccessToken] access token not expired yet ",
-            currentTime, account.expires_at);
         return account.access_token!; // Token is still valid.
     }
 	// If it has expired, use the refresh token to obtain a new access token.
