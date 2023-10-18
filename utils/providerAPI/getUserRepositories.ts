@@ -116,34 +116,38 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 export const getUserRepositories = async (session: Session) => {
 	const allUserReposPromises = [];
 	for (const repoProvider of supportedProviders) {
-		if (Object.keys(session.user.auth_info!).includes(repoProvider)) {
-			for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
-				const access_key: string = providerAuthInfo['access_token'];
-				switch (repoProvider) {
-					case 'github':
-						if (!providerAuthInfo) {
-							console.error("Unable to deserialize providerAuthInfo ", providerAuthInfo);
-							continue;
-						}
-						const access_key_gh = access_key;
-						const userReposPromiseGitHub = getUserRepositoriesForGitHub(access_key_gh, authId)
-						allUserReposPromises.push(userReposPromiseGitHub);
-						break;
-					case 'bitbucket':
-						const access_key_bb: string | null = await bitbucketAccessToken(authId, session.user.id!);
-						if (!access_key_bb) {
-							console.error("[getUserRepositories] No access token in auth_info: ", providerAuthInfo);
-							continue;
-						}
-						const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key, authId);
-						allUserReposPromises.push(userReposPromiseBitbucket);
-						break;
-					default:
-						break;
-				}
+		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) {
+			console.warn(`[getUserRepositories] ${repoProvider} provider not present`);
+			continue;
+		}
+		for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
+			if (!providerAuthInfo) {
+				console.error("[getUserRepositories] Unable to deserialize providerAuthInfo ", providerAuthInfo);
+				continue;
 			}
-		} else {
-			console.warn(`${repoProvider} provider not present`);
+			const access_key: string = providerAuthInfo['access_token'];
+			if (!access_key) {
+				console.error("[getUserRepositories] No access token in providerAuthInfo ", providerAuthInfo);
+				continue;
+			}
+			switch (repoProvider) {
+				case 'github':
+					const access_key_gh = access_key;
+					const userReposPromiseGitHub = getUserRepositoriesForGitHub(access_key_gh, authId)
+					allUserReposPromises.push(userReposPromiseGitHub);
+					break;
+				case 'bitbucket':
+					const access_key_bb: string | null = await bitbucketAccessToken(authId, session.user.id!);
+					if (!access_key_bb) {
+						console.error("[getUserRepositories] No access token in auth_info: ", providerAuthInfo);
+						continue;
+					}
+					const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key, authId);
+					allUserReposPromises.push(userReposPromiseBitbucket);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
