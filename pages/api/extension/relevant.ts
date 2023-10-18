@@ -100,7 +100,7 @@ const formatFileResponse = (queryRes: Set<string>) => {
 
 function formatHunkResponse(queryRes: HunkInfo[]) {
 	return {
-		"hunkinfo": queryRes.toString()
+		"hunkinfo": queryRes
 	};
 }
 
