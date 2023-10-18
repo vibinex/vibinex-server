@@ -11,7 +11,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	if (!req.query.code) {
 		console.error(`[bitbucket/installHandler] Installation code not provided for topic: ${topicName}`);
-		res.status(400).json(constructHtml("Bad Request: Bitbucket did not send a valid auth code", "error"));
+		res.status(400).send(constructHtml("Bad Request: Bitbucket did not send a valid auth code", "error"));
 		return;
 	}
 	const data = {
