@@ -107,29 +107,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 					diffObj.auth_info = user.auth_info;
 					break;
 				}
-				const diffAuth = currUser.auth_info;
-				for (const provider in user.auth_info) {
-					if (Object.keys(currUser.auth_info).includes(provider)) {
-						for (const providerAccountId in user.auth_info[provider]) {
-							if (Object.keys(currUser.auth_info[provider]).includes(providerAccountId)) {
-								const currAuthObj = currUser.auth_info[provider][providerAccountId];
-								const newAuthObj = user.auth_info[provider][providerAccountId];
-
-								if (!(newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at < currAuthObj.expires_at)) {
-									diffAuth[provider][providerAccountId] = newAuthObj;
-								}
-								if ((newAuthObj.handle && !currAuthObj.handle) || (newAuthObj.handle != currAuthObj.handle)) {
-									diffAuth[provider][providerAccountId] = newAuthObj;
-								}
-							} else {
-								diffAuth[provider][providerAccountId] = user.auth_info[provider][providerAccountId];
-							}
-						}
-					} else {
-						diffAuth[provider] = user.auth_info[provider];
-					}
-				}
-				diffObj.auth_info = diffAuth;
+				diffObj.auth_info = calculateAuthDiff(currUser.auth_info, user.auth_info);
 				break;
 			default:
 				console.warn("[updateUser] Not implemented. Field: " + key);
@@ -137,6 +115,32 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 		}
 	}
 	return diffObj;
+}
+
+const calculateAuthDiff = (currAuthInfo: AuthInfo, newAuthInfo?: AuthInfo) => {
+	const diffAuth = currAuthInfo;
+	for (const provider in newAuthInfo) {
+		if (!Object.keys(currAuthInfo).includes(provider)) {
+			diffAuth[provider] = newAuthInfo[provider];
+			continue;
+		}
+		for (const providerAccountId in newAuthInfo[provider]) {
+			if (!Object.keys(currAuthInfo[provider]).includes(providerAccountId)) {
+				diffAuth[provider][providerAccountId] = newAuthInfo[provider][providerAccountId];
+				continue;
+			}
+			const currAuthObj = currAuthInfo[provider][providerAccountId];
+			const newAuthObj = newAuthInfo[provider][providerAccountId];
+
+			if (!(newAuthObj.expires_at && currAuthObj.expires_at && newAuthObj.expires_at < currAuthObj.expires_at)) {
+				diffAuth[provider][providerAccountId] = newAuthObj;
+			}
+			if (newAuthObj.handle != currAuthObj?.handle) {
+				diffAuth[provider][providerAccountId] = newAuthObj;
+			}
+		}
+	}
+	return diffAuth;
 }
 
 /**
@@ -168,30 +172,64 @@ export const updateUser = async (userId: string, user: DbUser) => {
 
 export const getUserEmails = async (email: string): Promise<Set<string>> => {
 	const emails = new Set<string>();
-	try {
-		const users: DbUser[] | undefined = await getUserByAlias(email);
-		if (users) {
-			for (const dbUser of users) {
-				if (dbUser.aliases) {
-					for (const email of dbUser.aliases) {
-						emails.add(email);
-					}
-				}
-				if (dbUser.auth_info) {
-					for (const provider in dbUser.auth_info) {
-						for (const account in dbUser.auth_info[provider]) {
-							const auth = dbUser.auth_info[provider][account];
-							if (auth.email) {
-								emails.add(auth.email);
-							}
-						}
-					}
+	const users: DbUser[] | undefined = await getUserByAlias(email).catch((err) => {
+		console.error(`Unable to get user aliases for ${email}, error = ${err}`);
+		return [] as DbUser[];
+	});
+	if (!users || users.length == 0) {
+		console.error(`No users found for email ${email}`);
+		return emails;
+	}
+	for (const dbUser of users) {
+		for (const email of dbUser.aliases ?? []) {
+			emails.add(email);
+		}
+		for (const providerAuthInfo of Object.values(dbUser.auth_info ?? {})) {
+			for (const auth of Object.values(providerAuthInfo)) {
+				if (auth.email) {
+					emails.add(auth.email);
 				}
 			}
 		}
 	}
-	catch (err) {
-		console.error(`Unable to get user aliases for ${email}, error = ${err}`);
-	}
+
 	return emails;
+}
+
+export const saveAuthInfoToDb = async function (userId: string, authInfo: AuthInfo) {
+    const update_user_authinfo_q = `UPDATE users 
+        SET auth_info = $1
+        WHERE id = $2`;
+    const params = [authInfo, userId];
+    await conn.query(update_user_authinfo_q, params)
+        .then((result) => {
+            console.info(`[saveAuthInfoToDb] Successfully updated AuthInfo in the database for user ${userId}`);
+            console.debug("[saveAuthInfoToDb] authinfo update result = ", result);
+        })
+        .catch((error) => {
+            console.error(`[saveAuthInfoToDb] Error in saving authInfo to the database`,
+                { pg_query: update_user_authinfo_q }, error);
+        });
+}
+
+export const getAuthInfoFromDb = async function (user_id: string): Promise<AuthInfo | null> {
+    const user_auth_search_q = `SELECT auth_info
+		FROM users
+		WHERE id = $1`;
+    const params = [user_id];
+    const authinfo_promise = await conn.query(user_auth_search_q, params)
+        .then((result): { authInfo: AuthInfo | null } => {
+            // Assuming the auth_info is in the first row of the result
+            if (result.rows && result.rows.length > 0) {
+                return { authInfo: result.rows[0].auth_info };
+            } else {
+                return { authInfo: null };
+            }
+        })
+        .catch((error): { authInfo: AuthInfo | null } => {
+            console.error(`[getAuthInfoFromDb] Error in getting authInfo from the database`,
+                { pg_query: user_auth_search_q }, error);
+            return { authInfo: null };
+        });
+    return authinfo_promise.authInfo;
 }

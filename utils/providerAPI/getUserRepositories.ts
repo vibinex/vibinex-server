@@ -3,6 +3,8 @@ import type { Session } from "next-auth";
 import { baseURL, supportedProviders } from ".";
 import type { RepoIdentifier } from "../../types/repository";
 import { Bitbucket } from "./Bitbucket";
+import AuthInfo from "../../types/AuthInfo";
+import { bitbucketAccessToken } from "./auth";
 
 type GithubRepoObj = {
 	name: string,
@@ -117,24 +119,29 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 export const getUserRepositories = async (session: Session) => {
 	const allUserReposPromises = [];
 	for (const repoProvider of supportedProviders) {
-		if (Object.keys(session.user.auth_info!).includes(repoProvider)) {
-			for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
-				const access_key: string = providerAuthInfo['access_token']; // TODO: handle expired access token with refresh token here
-				switch (repoProvider) {
-					case 'github':
-						const userReposPromiseGitHub = getUserRepositoriesForGitHub(access_key, authId)
-						allUserReposPromises.push(userReposPromiseGitHub);
-						break;
-					case 'bitbucket':
-						const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key, authId);
-						allUserReposPromises.push(userReposPromiseBitbucket);
-						break;
-					default:
-						break;
-				}
+		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) {
+			console.warn(`[getUserRepositories] ${repoProvider} provider not present`);
+			continue;
+		}
+		for (const [authId, providerAuthInfo] of Object.entries(session.user.auth_info![repoProvider])) {
+			if (!providerAuthInfo) {
+				console.error("[getUserRepositories] Unable to deserialize providerAuthInfo ", providerAuthInfo);
+				continue;
 			}
-		} else {
-			console.warn(`${repoProvider} provider not present`);
+			switch (repoProvider) {
+				case 'github':
+					const userReposPromiseGitHub = getUserRepositoriesForGitHub(providerAuthInfo['access_token'], authId)
+					allUserReposPromises.push(userReposPromiseGitHub);
+					break;
+				case 'bitbucket':
+					const access_key_refreshed: string | null = await bitbucketAccessToken(authId, session.user.id!);
+					const access_key = access_key_refreshed ?? providerAuthInfo['access_token']; // decision: continue with old access key if the refresh operation fails
+					const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key, authId);
+					allUserReposPromises.push(userReposPromiseBitbucket);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
