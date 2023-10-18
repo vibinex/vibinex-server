@@ -10,7 +10,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			'installation_code': req.query.code
 		};
 		const msgType = 'install_callback';
-		console.info("Recieved installation code for bitbucket, published to ", topicName);
+		console.info("Received installation code for bitbucket, published to ", topicName);
 		try {
 			res.write(constructHtml("Starting installation...<br><small>This may take some time. Please be patient.</small>"));
 			await publishMessage(topicName, data, msgType);
