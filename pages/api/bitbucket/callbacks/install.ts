@@ -16,11 +16,11 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			await publishMessage(topicName, data, msgType);
 		} catch (error) {
 			console.error('Error publishing message:', error);
-			res.status(500).send(constructHtml("ERROR: Failed to publish message. Data must be in the form of a Buffer.<br>Redirecting...", "error"));
+			res.status(500).send(constructHtml("ERROR: Failed to publish message. Data must be in the form of a Buffer.", "error"));
 		}
 	} else {
 		console.error('TOPIC_NAME not set');
-		res.status(500).send(constructHtml("ERROR: Failed to publish message.<br>Redirecting...", "error"));
+		res.status(500).send(constructHtml("ERROR: Failed to publish message.", "error"));
 	}
 	res.write(
 		`<script>
