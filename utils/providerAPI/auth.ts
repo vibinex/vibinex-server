@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getAuthInfoFromDb, saveAuthInfoToDb } from '../db/authInfo';
+import { getAuthInfoFromDb, saveAuthInfoToDb } from '../db/users';
 import AuthInfo from "../../types/AuthInfo";
 
 
