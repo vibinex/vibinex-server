@@ -128,23 +128,14 @@ export const getUserRepositories = async (session: Session) => {
 				console.error("[getUserRepositories] Unable to deserialize providerAuthInfo ", providerAuthInfo);
 				continue;
 			}
-			const access_key: string = providerAuthInfo['access_token'];
-			if (!access_key) {
-				console.error("[getUserRepositories] No access token in providerAuthInfo ", providerAuthInfo);
-				continue;
-			}
 			switch (repoProvider) {
 				case 'github':
-					const access_key_gh = access_key;
-					const userReposPromiseGitHub = getUserRepositoriesForGitHub(access_key_gh, authId)
+					const userReposPromiseGitHub = getUserRepositoriesForGitHub(providerAuthInfo['access_token'], authId)
 					allUserReposPromises.push(userReposPromiseGitHub);
 					break;
 				case 'bitbucket':
-					const access_key_bb: string | null = await bitbucketAccessToken(authId, session.user.id!);
-					if (!access_key_bb) {
-						console.error("[getUserRepositories] No access token in auth_info: ", providerAuthInfo);
-						continue;
-					}
+					const access_key_refreshed: string | null = await bitbucketAccessToken(authId, session.user.id!);
+					const access_key = access_key_refreshed ?? providerAuthInfo['access_token']; // decision: continue with old access key if the refresh operation fails
 					const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key, authId);
 					allUserReposPromises.push(userReposPromiseBitbucket);
 					break;
