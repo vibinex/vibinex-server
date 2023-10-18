@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getAuthInfoFromDb, saveAuthInfoToDb} from '../db/authInfo';
+import { getAuthInfoFromDb, saveAuthInfoToDb } from '../db/authInfo';
 import AuthInfo from "../../types/AuthInfo";
 
 
@@ -71,10 +71,10 @@ const bitbucketRefreshToken = async function (refreshToken: string, authInfoDb: 
 		console.error("[bitbucketRefreshToken] No new access token returned from refresh token api", JSON.stringify(authInfoDb));
 		return null;
 	}
-    authInfoDb[provider][providerAccountId].access_token = response.data.access_token;
-    authInfoDb[provider][providerAccountId].expires_at = response.data.expires_at;
-    authInfoDb[provider][providerAccountId].refresh_token = response.data.refresh_token;
-    authInfoDb[provider][providerAccountId].handle = response.data.handle;
-    console.debug(`[bitbucketRefreshToken] Updated authinfo = ${JSON.stringify(authInfoDb)}`)
+	authInfoDb[provider][providerAccountId].access_token = response.data.access_token;
+	authInfoDb[provider][providerAccountId].expires_at = response.data.expires_at;
+	authInfoDb[provider][providerAccountId].refresh_token = response.data.refresh_token;
+	authInfoDb[provider][providerAccountId].handle = response.data.handle;
+	console.debug(`[bitbucketRefreshToken] Updated authinfo = ${JSON.stringify(authInfoDb)}`)
 	return authInfoDb;
 }
