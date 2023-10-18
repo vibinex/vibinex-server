@@ -1,4 +1,5 @@
 import conn from '.';
+import { getUserByAlias } from './users';
 
 export const saveHunk = async (hunkInfo: string) => {
 	const hunkinfo_json = JSON.parse(hunkInfo);
@@ -23,17 +24,15 @@ export const saveHunk = async (hunkInfo: string) => {
 	}
 }
 
-export const getAuthorAliases = async (accountId: string, provider: string) => {
-	const query = `
-	SELECT aliases
-	FROM users
-	WHERE auth_info -> '${provider}' -> '${accountId}' IS NOT NULL
-	`
-	const res = await conn.query(query).catch(err => {
-		console.error(`[getAuthorAliases] Failed to get author aliases from db of the ${provider} user with account-id ${accountId}`, { pg_query: query }, err);
-		throw new Error('Cant proceed without author aliases', err); //TODO - handle this more gracefully
-	});
-	return res.rows[0]["aliases"];
+export const getAuthorAliases = async (alias_email: string) => {
+	const users = await getUserByAlias(alias_email);
+	for (const user of users ?? []) {
+		if (user["aliases"]) {
+			return user["aliases"];
+		}
+	}
+	console.error(`[getAuthorAliases] Failed to get author aliases from db of the user with alias ${alias_email}`);
+	throw new Error('Cant proceed without author aliases'); //TODO - handle this more gracefully
 }
 
 export const getHunkData = async (provider: string, owner: string, repoName: string,
@@ -50,7 +49,7 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 		console.error(`[getHunkData] Unable to get author and hunks from db for review-id ${reviewId} in the repository: ${provider}/${owner}/${repoName}`, { pg_query: hunk_query }, err);
 		throw new Error("Unable to proceed without hunk data from db", err);
 	});
-	const author_aliases = await getAuthorAliases(result.rows[0]["author"], provider);
+	const author_aliases = await getAuthorAliases(result.rows[0]["author"]);
 	const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: { [x: string]: string; }) => {
 		const hunk_author = obj["author"].toString();
 		return (!(author_aliases.includes(hunk_author)) && userEmails.has(hunk_author));
@@ -71,7 +70,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 		throw new Error("Error in running the query on the database", err);
 	});
 	const filteredRows = result.rows.map(async (row: any) => {
-		const author_aliases = await getAuthorAliases(row["author"].toString(), provider);
+		const author_aliases = await getAuthorAliases(row["author"].toString());
 		const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: { [key: string]: string }) => {
 			const hunk_author = obj["author"].toString();
 			return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author));
