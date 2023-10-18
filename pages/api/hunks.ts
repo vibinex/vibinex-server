@@ -9,7 +9,7 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.error('[hunkHandler] Error saving hunk:', error);
     return null;
   });
-  if (result == null) {
+  if (result === null) {
     res.status(500).json({ error: 'Failed to save hunk to db' });
     return;
   }

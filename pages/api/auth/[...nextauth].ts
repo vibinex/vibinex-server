@@ -145,6 +145,7 @@ const getHandleFromProfile = (profile: Profile | undefined) => {
 }
 const createUserUpdateObj = (user: User, account: Account | null, profile: Profile | undefined, db_user?: DbUser) => {
 	const updateObj: DbUser = {}
+	console.debug(`================= account = ${account}, profile = ${profile}==================`)
 	if (account) {
 		updateObj.auth_info = {
 			[account.provider]: {
