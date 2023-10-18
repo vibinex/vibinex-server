@@ -15,7 +15,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	const data = {
 		'repository_provider': 'github',
-		'installation_code': req.query.code
+		'installation_code': req.query.installation_id,
 	};
 	const msgType = 'install_callback';
 	console.info("Recieved installation code for github, published to ", topicName);
