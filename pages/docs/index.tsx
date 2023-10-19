@@ -206,6 +206,7 @@ Docs.getInitialProps = async () => {
 	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
 
 	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
+	console.debug(`[getInitialProps] url: `, url)
 	return {
 		bitbucket_auth_url: url
 	}
