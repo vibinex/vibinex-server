@@ -51,7 +51,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.debug(`[webookHandler] repoConfig = ${JSON.stringify(repoConfig)}`)
 		const result: string | null = await publishMessage(topicName, data, msgType)
 		.catch((error) => {
-			console.error('[webookHandler] Failed to get repoConfig from db :', error);
+			console.error('[webookHandler] Failed to publish message :', error);
 			return null;
 		});
 		if (result == null) {
