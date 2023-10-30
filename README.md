@@ -24,6 +24,9 @@ There are two backends:
 
 ## Contribute
 
+Pre-requisites:
+-Have NextJS installed on your system.
+
 ### Start NextJS server
 
 First, run the development server:
