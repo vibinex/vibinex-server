@@ -24,7 +24,17 @@ There are two backends:
 
 ## Contribute
 
-Pre-requisites: Have NextJS installed on your system.
+Pre-requisites: 
+
+-NextJS
+
+It can be installed through:
+
+```bash
+npm install
+# or
+npm install next
+```
 
 ### Start NextJS server
 
