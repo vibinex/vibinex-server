@@ -24,6 +24,31 @@ There are two backends:
 
 ## Contribute
 
+### Repository setup
+1. Fork this repository using the GitHub GUI.
+2. Clone your fork of the repository:
+```sh
+git clone https://github.com/<your_username>/vibinex-server.git
+```
+
+or, if you use `SSH` cloning:
+
+```sh
+git clone git@github.com:<your_username>/vibinex-server.git
+```
+3. Create a new branch with your user-prefixed branch name. <br>_Optional: If you are working on an issue, you can directly use the issue number as the branch name._
+```sh
+git checkout -b <your_username>/<your_branch_name>
+```
+
+### Install dependencies
+Enter the repository folder and install dependencies:
+```sh
+npm install
+# or
+yarn
+```
+
 ### Start NextJS server
 
 First, run the development server:
