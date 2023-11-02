@@ -24,17 +24,21 @@ There are two backends:
 
 ## Contribute
 
-Pre-requisites: 
+1. Fork or Clone Repository
 
--NextJS
+2. Enter the Repository Folder and install dependencies
 
-It can be installed through:
+   ```sh
+   npm install
+   ```
 
-```bash
-npm install
-# or
-npm install next
-```
+   Or
+
+   ```sh
+   yarn
+   ```
+
+3. Make changes, forked repositories can be used to submit pull requests to the original repository.
 
 ### Start NextJS server
 
