@@ -24,7 +24,7 @@ There are two backends:
 
 ## Contribute
 
-1. Fork or Clone Repository
+1. Fork and Clone Repository
 
 2. Enter the Repository Folder and install dependencies
 
