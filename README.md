@@ -24,22 +24,11 @@ There are two backends:
 
 ## Contribute
 
-1. Fork and Clone Repository
-
-2. Enter the Repository Folder and install dependencies
-
-   ```sh
-   npm install
-   ```
-
-   Or
-
-   ```sh
-   yarn
-   ```
-
-3. Make changes, forked repositories can be used to submit pull requests to the original repository.
-
+### Fork and clone repository 
+Fork this repository using the GitHub GUI.
+Clone your fork of the repository:
+```sh
+git clone https://github.com/<your_username>/vibinex-server.git
 ### Start NextJS server
 
 First, run the development server:
