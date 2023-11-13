@@ -13,7 +13,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const { owner: { username: owner }, name } = jsonBody.repository;
 	const provider = "github";
 	const event_type = req.headers['X-GitHub-Event'];
-	console.log("[webhookHandler] Received github event ", event_type);
+	console.log("[webhookHandler] Received github event ", req.headers, event_type);
 
 	// Verify the event type
 	if (typeof event_type === 'string' && !["pull_request", "pull_request_review"].includes(event_type)) {
