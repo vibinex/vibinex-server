@@ -124,6 +124,7 @@ export const getFileData = async (provider: string, owner: string, reponame: str
 }
 
 export const getTopicNameFromDB = async (owner: string, repoName: string, provider: string): Promise<string> => {
+	console.log(`[getTopicNameFromDB] Getting topic name from db for ${provider}/${owner}/${repoName}`);
 	const query = `
     SELECT install_id 
     FROM repos 
