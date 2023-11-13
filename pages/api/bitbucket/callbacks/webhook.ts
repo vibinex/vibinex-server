@@ -16,7 +16,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const repo_name = jsonBody.repository.name;
 
 	// Verify the event type
-	if (typeof eventHeader === 'string' && !['pullrequest:approved', 'pullrequest:created', 'pullrequest:updated'].includes(eventHeader)) {
+	if (eventHeader !== 'pullrequest:approved' && eventHeader !== 'pullrequest:created' && eventHeader !== 'pullrequest:updated') {
 		res.status(400).json({ error: 'Invalid event header' });
 		return;
 	}

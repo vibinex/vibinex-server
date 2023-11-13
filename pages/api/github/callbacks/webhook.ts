@@ -10,14 +10,13 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 
 	const jsonBody = req.body;
-	const { name }  = jsonBody.repository;
-	const owner = jsonBody.repository.owner.login;
+	const { owner: { login: owner }, name } = jsonBody.repository;
 	const provider = "github";
 	const event_type = req.headers['x-github-event'];
 	console.log("[webhookHandler] Received github event ", event_type);
 
 	// Verify the event type
-	if (typeof event_type === 'string' && !["pull_request", "pull_request_review"].includes(event_type)) {
+	if (event_type !== "pull_request" && event_type !== "pull_request_review") {
 		res.status(400).json({ error: 'Invalid event header' });
 		return;
 	}
