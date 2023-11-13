@@ -4,10 +4,23 @@ import { getTopicNameFromDB } from '../../../../utils/db/relevance';
 import { getRepoConfig } from '../../../../utils/db/repos';
 
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+	if (req.method !== 'POST') {
+		res.status(405).json({ error: 'Method Not Allowed' });
+		return;
+	}
+
 	const jsonBody = req.body;
 	const { owner: { username: owner }, name } = jsonBody.repository;
 	const provider = "github";
-	
+	const event_type = req.headers['X-GitHub-Event'];
+	console.log("[webhookHandler] Received github event ", event_type);
+
+	// Verify the event type
+	if (typeof event_type === 'string' && !["pull_request", "pull_request_review"].includes(event_type)) {
+		res.status(400).json({ error: 'Invalid event header' });
+		return;
+	}
+		
 	console.info("[webookHandler] Received github webhook event for ", name);
 	const topicName: string | null = await getTopicNameFromDB(owner, name, provider).catch((error) => {
 		console.error('[webhookHandler] Failed to get topic name from db:', error);
@@ -33,7 +46,8 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const data = {
 		repositoryProvider: 'github',
 		eventPayload: jsonBody,
-		repoConfig: repoConfig
+		repoConfig: repoConfig,
+		eventType: event_type
 	};
 	
 	const msgType = 'webhook_callback';
