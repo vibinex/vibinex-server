@@ -13,7 +13,7 @@ export interface DbHunks {
 	repo_provider: string,
 	repo_owner: string,
 	repo_name: string,
-	review_id: string,
+	pr_number: string,
 	author: string,
 	hunks: {
 		blamevec: HunkInfo[]
@@ -23,6 +23,7 @@ export interface DbHunks {
 export const saveHunk = async (hunkInfo: string) => {
 	const hunkinfo_json = JSON.parse(hunkInfo);
 	console.info("[saveHunk] Saving hunk for ", hunkinfo_json.repo_name);
+	console.info("[saveHunk] Hunk info: ", JSON.stringify(hunkinfo_json));
 	for (const prHunk of hunkinfo_json.prhunkvec) {
 		const hunk_val = JSON.stringify({ "blamevec": prHunk.blamevec });
 		const hunk_query = `
@@ -58,11 +59,11 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 	reviewId: string, userEmails: Set<string>) => {
 	const hunk_query = `
 		SELECT author, hunks 
-		FROM hunks
+		FROM pr_hunks
 		WHERE repo_provider = '${provider}' 
 		AND repo_owner = '${owner}'
 		AND repo_name = '${repoName}'  
-		AND review_id = '${reviewId}'
+		AND pr_number = '${reviewId}'
 	`;
 	const result = await conn.query<DbHunks>(hunk_query).catch(err => {
 		console.error(`[getHunkData] Unable to get author and hunks from db for review-id ${reviewId} in the repository: ${provider}/${owner}/${repoName}`, { pg_query: hunk_query }, err);
@@ -81,8 +82,8 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 
 export const getReviewData = async (provider: string, owner: string, repoName: string, user_emails: Set<string>) => {
 	const review_query = `
-	SELECT review_id, author, hunks 
-	FROM hunks
+	SELECT pr_number, author, hunks 
+	FROM pr_hunks
 	WHERE repo_provider = '${provider}' 
 	AND repo_owner = '${owner}'
 	AND repo_name = '${repoName}'  
@@ -101,7 +102,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 			return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author));
 		});
 		const reviewData = {
-			review_id: row["review_id"].toString(),
+			review_id: row["pr_number"].toString(),
 			blamevec: filteredBlamevec
 		}
 		return reviewData;
