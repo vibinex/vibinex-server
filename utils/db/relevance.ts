@@ -58,7 +58,7 @@ export const getAuthorAliases = async (alias_email: string) => {
 export const getHunkData = async (provider: string, owner: string, repoName: string,
 	reviewId: string, userEmails: Set<string>) => {
 	const hunk_query = `
-		SELECT author, hunks 
+		SELECT hunks 
 		FROM pr_hunks
 		WHERE repo_provider = '${provider}' 
 		AND repo_owner = '${owner}'
@@ -69,20 +69,16 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 		console.error(`[getHunkData] Unable to get author and hunks from db for review-id ${reviewId} in the repository: ${provider}/${owner}/${repoName}`, { pg_query: hunk_query }, err);
 		throw new Error("Unable to proceed without hunk data from db", err);
 	});
-	const author_aliases = await getAuthorAliases(result.rows[0]["author"]).catch(err => {
-		console.error(`[getHunkData] Failed to get author aliases from db of the user with email ${result.rows[0]["author"]}`, err);
-		return [result.rows[0]["author"]];
-	});
 	const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: HunkInfo) => {
 		const hunk_author = obj["author"];
-		return (!(author_aliases.includes(hunk_author)) && userEmails.has(hunk_author));
+		return userEmails.has(hunk_author);
 	});
 	return filteredBlamevec;
 }
 
 export const getReviewData = async (provider: string, owner: string, repoName: string, user_emails: Set<string>) => {
 	const review_query = `
-	SELECT pr_number, author, hunks 
+	SELECT pr_number, hunks 
 	FROM pr_hunks
 	WHERE repo_provider = '${provider}' 
 	AND repo_owner = '${owner}'
@@ -93,13 +89,9 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 		throw new Error("Error in running the query on the database", err);
 	});
 	const filteredRows = result.rows.map(async (row) => {
-		const author_aliases = await getAuthorAliases(row["author"]).catch(err => {
-			console.error(`[getReviewData] Failed to get author aliases from db of the user with email ${row["author"]}`, err);
-			return [row["author"]]
-		});
 		const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
 			const hunk_author = obj["author"].toString();
-			return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author));
+			return user_emails.has(hunk_author);
 		});
 		const reviewData = {
 			review_id: row["pr_number"].toString(),
