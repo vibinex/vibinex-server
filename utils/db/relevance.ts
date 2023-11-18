@@ -23,7 +23,6 @@ export interface DbHunks {
 export const saveHunk = async (hunkInfo: string) => {
 	const hunkinfo_json = JSON.parse(hunkInfo);
 	console.info("[saveHunk] Saving hunk for ", hunkinfo_json.repo_name);
-	console.info("[saveHunk] Hunk info: ", JSON.stringify(hunkinfo_json));
 	for (const prHunk of hunkinfo_json.prhunkvec) {
 		const hunk_val = JSON.stringify({ "blamevec": prHunk.blamevec });
 		const hunk_query = `
