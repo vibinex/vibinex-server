@@ -8,6 +8,7 @@ import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
+import { MdContentCopy } from "react-icons/md";
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -61,8 +62,18 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 					subHeading: "Setup GitHub Action",
 					article: <>
 						Add this code in a file named &quot;repo-profiler.yml&quot; present on the following path - &quot;.github/workflows/repo-profiler.yml&quot; inside the repository.
-						<pre className="bg-gray-100 rounded-md p-3 ml-4 mb-4 font-mono whitespace-pre-wrap">
-							<code>
+						<pre className="bg-gray-100 rounded-md p-3 ml-4 mb-4 font-mono whitespace-pre-wrap relative">
+							<button
+								className="absolute top-0 right-0 border-none p-2"
+								onClick={() => {
+									const codeElement = document.getElementById("githubWorkflowCode");
+									const workflowText = codeElement?.textContent
+									navigator.clipboard.writeText(workflowText ?? "");
+								}}
+							>
+								<MdContentCopy />
+							</button>
+							<code id="githubWorkflowCode">
 								{`on:
   repository_dispatch:
     types: repo_profile_execution
@@ -112,8 +123,18 @@ jobs:
 					subHeading: "Code for setup",
 					article: <>
 						For each repository, add this Bitbucket Pipeline code in: `bitbucket-pipelines.yml`:
-						<pre className="bg-gray-100 ml-4 p-3 rounded-md font-mono whitespace-pre-wrap" >
-							<code>
+						<pre className="bg-gray-100 ml-4 p-3 rounded-md font-mono whitespace-pre-wrap relative" >
+							<button
+								className="absolute top-0 right-0 border-none p-2"
+								onClick={() => {
+									const codeElement = document.getElementById("bitbucketWorkflowCode");
+									const workflowText = codeElement?.textContent
+									navigator.clipboard.writeText(workflowText ?? "");
+								}}
+							>
+								<MdContentCopy />
+							</button>
+							<code id="bitbucketWorkflowCode">
 								{`image: atlassian/default-image:4
 pipelines:
   branches
