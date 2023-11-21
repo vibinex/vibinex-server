@@ -1,5 +1,5 @@
 import conn from '.';
-import { getUserByAlias } from './users';
+import { getUserByAlias, getUserById, DbUser } from './users';
 
 export interface HunkInfo {
 	author: string,
@@ -151,4 +151,27 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
 	await conn.query(query).catch(err => {
 		console.error(`[saveTopicName] Unable to insert topic name in db`, { pg_query: query }, err)
 	});
+}
+
+export const createTopicName = async (user_id: string, provider: string, org_name: string) => {
+	console.log(`[createTopicName] creating topic name for user with id: ${user_id} and provider: ${provider} for org: ${org_name}`);
+	let userData : DbUser | undefined;
+	userData = await getUserById(user_id).catch((error) => {
+		console.error('[createTopicName] Failed to get user data from db:', error);
+		return null;
+	});
+	if (!userData) {
+		console.error('[createTopicName]user data not found in db');
+		return;
+	}
+	const auth_info = userData.auth_info;
+	if (!auth_info){
+		console.error(` [createTopicName] auth_info is null for user with user_id: ${user_id}`);
+		return;
+	}
+	const provider_data = auth_info[provider];
+	const provider_id = provider_data[Object.keys(provider_data)[0]];
+
+	let topicName = `${org_name}-${userData.name}-${provider_id}`;
+	return topicName;
 }
