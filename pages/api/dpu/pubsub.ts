@@ -5,11 +5,11 @@ import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
 const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.info("[pubsubHandler] pub sub setup info in db...");
     const jsonBody = req.body;
-    // if (!jsonBody.user_id || !jsonBody.provider || !jsonBody.org_name) {
-    //     console.error("[pubsubHandler] Invalid request body, 'info' is missing or not an array");
-    //     res.status(400).json({"error": "Invalid request body"});
-    //     return;
-    // }
+    if (!jsonBody.user_id || !jsonBody.provider || !jsonBody.org_name) {
+        console.error("[pubsubHandler] Invalid request body, 'info' is missing or not an array");
+        res.status(400).json({"error": "Invalid request body"});
+        return;
+    }
     const topicName = await createTopicName(jsonBody.user_id, jsonBody.provider, jsonBody.org_name);
     console.log("[pubsubhandler] topicName", topicName);
     if (!topicName){

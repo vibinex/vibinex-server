@@ -171,7 +171,6 @@ export const createTopicName = async (user_id: string, provider: string, org_nam
 	if (!provider_id) {
 		console.error('[createTopicName] could not find provider_id');
 		return;
-
 	}
 
 	let topicName = `${org_name}-${userData.name?.replace(' ', '-')}-${provider_id}`;
