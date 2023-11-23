@@ -167,7 +167,7 @@ export const createTopicName = async (user_id: string, provider: string, org_nam
 		console.error(`[createTopicName] no auth_info present for the user with id: ${user_id} for provider: ${provider}`);
 		return;
 	}
-	const provider_id = provider_data[Object.keys(provider_data)[0]];
+	const provider_id = Object.keys(provider_data)[0];
 	if (!provider_id) {
 		console.error('[createTopicName] could not find provider_id');
 		return;
