@@ -2,7 +2,7 @@ import { PubSub } from '@google-cloud/pubsub';
 import PubSubMessage from '../../types/PubSubMessage';
 
 // Set up authentication and initialize PubSub client
-const pubsub = new PubSub({ projectId: process.env.PROJECT_ID , keyFilename: process.env.PUB_SUB_JSON});
+const pubsub = new PubSub({ projectId: process.env.PROJECT_ID });
 
 
 export function publishMessage(topicName: string, data: PubSubMessage, msgType: string) {
