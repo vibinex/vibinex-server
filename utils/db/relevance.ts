@@ -163,8 +163,16 @@ export const createTopicName = async (user_id: string, provider: string, org_nam
 		return;
 	}
 	const provider_data = auth_info[provider];
-	console.log("[createTopicName] provider_data: ", provider_data, Object.keys(provider));
+	if (!provider_data) {
+		console.error(`[createTopicName] no auth_info present for the user with id: ${user_id} for provider: ${provider}`);
+		return;
+	}
 	const provider_id = provider_data[Object.keys(provider_data)[0]];
+	if (!provider_id) {
+		console.error('[createTopicName] could not find provider_id');
+		return;
+
+	}
 
 	let topicName = `${org_name}-${userData.name?.replace(' ', '-')}-${provider_id}`;
 	return topicName;
