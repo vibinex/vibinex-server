@@ -164,7 +164,7 @@ export const createTopicName = async (user_id: string, provider: string, org_nam
 	}
 	const provider_data = auth_info[provider];
 	console.log("[createTopicName] provider_data: ", provider_data, Object.keys(provider));
-	const provider_id = provider_data[Object.keys(provider)[0]];
+	const provider_id = provider_data[Object.keys(provider_data)[0]];
 
 	let topicName = `${org_name}-${userData.name?.replace(' ', '-')}-${provider_id}`;
 	return topicName;
