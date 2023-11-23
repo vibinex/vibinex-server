@@ -13,6 +13,7 @@ export interface DbUser {
 	code_url?: Array<string>,
 	social_url?: Array<string>,
 	repos?: Array<number>,
+	topic_name?: string,
 }
 
 export const getUserByProvider = async (provider: string, providerAccountId: string) => {
