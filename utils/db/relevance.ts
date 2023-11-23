@@ -1,3 +1,4 @@
+import { error } from 'console';
 import conn from '.';
 import { getUserByAlias, getUserById, DbUser } from './users';
 
@@ -154,7 +155,7 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
 }
 
 export const createTopicName = async (user_id: string, provider: string, org_name: string) => {
-	console.log(`[createTopicName] creating topic name for user with id: ${user_id} and provider: ${provider} for org: ${org_name}`);
+	console.log(`[createTopicName] creating topic name for user with id: ${user_id} and provider: ${provider} for org: ${org_name}`); 
 	let userData : DbUser | undefined;
 	userData = await getUserById(user_id).catch((error) => {
 		console.error('[createTopicName] Failed to get user data from db:', error);
@@ -174,4 +175,16 @@ export const createTopicName = async (user_id: string, provider: string, org_nam
 
 	let topicName = `${org_name}-${userData.name}-${provider_id}`;
 	return topicName;
+}
+
+export const saveTopicNameInUsersTable = async (userId: string, topicName: string) => {
+	console.log(`[saveTopicNameInUsersTable] saving topic name: ${topicName} in users table in db for user_id:  ${userId}`); //TODO: To be removed
+	const query = `
+    Update users 
+    set topic_name = ${topicName} 
+    WHERE id = ${userId}'
+  `;
+	await conn.query(query).catch(error => {
+		console.error(`[saveTopicNameInUsersTable] Unable to insert topic name in db`, { pg_query: query }, error);
+	});
 }
