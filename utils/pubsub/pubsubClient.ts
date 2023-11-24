@@ -16,3 +16,13 @@ export function publishMessage(topicName: string, data: PubSubMessage, msgType: 
   return topic.publishMessage(message);
 
 }
+
+export async function createTopicNameInGcloud(userId: string, topicName: string) {  
+  try {
+    const [topic] = await pubsub.createTopic(topicName);
+    console.log(`[createTopicNameInGcloud] Topic ${topic.name} created.`);
+    return topic;
+} catch (error) {
+    console.error('[createTopicNameInGcloud] Failed to create topic name in gcloud:', error);
+    return null;
+}}

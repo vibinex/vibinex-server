@@ -13,6 +13,7 @@ export interface DbUser {
 	code_url?: Array<string>,
 	social_url?: Array<string>,
 	repos?: Array<number>,
+	topic_name?: string,
 }
 
 export const getUserByProvider = async (provider: string, providerAccountId: string) => {
@@ -30,6 +31,24 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 		return user_auth_search_result.rows[0];
 	}
 	return undefined;
+}
+
+export const getUserById = async (userId: string) => {
+	const user_search_by_id_q = `SELECT *
+	FROM users
+	WHERE id = '${userId}'`
+	const user_search_by_id_result = await conn.query(user_search_by_id_q).catch(err => {
+		console.error(`[getUserById] Could not get the user for user id: ${userId}`, { pg_query: user_search_by_id_q }, err);
+		throw new Error("Error in running the query on the database", err);
+	});;
+	if (user_search_by_id_result.rows.length === 0) {
+		throw new Error('No topic found');
+	}
+	if (user_search_by_id_result.rowCount > 1) {
+		console.warn("[getUser] Multiple users exist with same id", { userId });
+	}
+	
+	return user_search_by_id_result.rows[0];
 }
 
 export const getUserByAlias = async (alias_email: string): Promise<DbUser[] | undefined> => {
