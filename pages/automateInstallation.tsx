@@ -1,5 +1,22 @@
-import React, { useState } from 'react';
-import '../styles/loadingStyles.css';
+import React, { useState, CSSProperties } from 'react';
+
+const spinnerStyle: CSSProperties = {
+    border: '5px solid rgba(0,0,0,.3)',
+    borderTop: '5px solid #3498db',
+    borderRadius: '50%',
+    width: '50px',
+    height: '50px',
+    animation: 'spin 1s ease-in-out infinite',
+};
+
+const errorSymbolStyle: CSSProperties = {
+    width: '50px',
+    height: '50px',
+    backgroundColor: '#f44336',
+    borderRadius: '50%',
+    position: 'relative',
+    display: 'inline-block',
+};
 
 const AutomateInstallation: React.FC = () => {
     const [status, setStatus] = useState<string>('');
@@ -31,8 +48,8 @@ const AutomateInstallation: React.FC = () => {
             <button onClick={handleButtonClick} disabled={isLoading}>
                 {isLoading ? 'Processing...' : 'Start Process'}
             </button>
-            {isLoading && <div id="spinner"></div>}
-            {error && <div id="error-symbol"></div>}
+            {isLoading && <div style={spinnerStyle}></div>}
+            {error && <div style={errorSymbolStyle}></div>}
             {status && <p>Status: {status}</p>}
             {command && <p>{command}</p>}
         </div>
