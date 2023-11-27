@@ -1,0 +1,41 @@
+#spinner {
+    border: 5px solid rgba(0,0,0,.3);
+    border-radius: 50%;
+    border-top: 5px solid #3498db; /* Primary color for the spinner */
+    width: 50px;
+    height: 50px;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#error-symbol {
+    width: 50px;
+    height: 50px;
+    background-color: #f44336; /* Error color */
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+}
+
+#error-symbol::before,
+#error-symbol::after {
+    content: '';
+    position: absolute;
+    width: 5px; /* Width of the cross */
+    height: 30px; /* Height of the cross */
+    background-color: #fff;
+    top: 50%;
+    left: 50%;
+}
+
+#error-symbol::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+#error-symbol::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}

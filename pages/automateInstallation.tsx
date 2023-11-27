@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './LoadingStyles.css';
+import '../styles/loadingStyles.css';
 
 const AutomateInstallation: React.FC = () => {
     const [status, setStatus] = useState<string>('');
@@ -13,7 +13,7 @@ const AutomateInstallation: React.FC = () => {
         try {
             const response = await fetch('/api/dpu/pubsub');
             const data = await response.json();
-            setStatus(data.message);
+            setStatus(data.message); //Currently we don't set any message in data but as soon as we merge Tapish's code, we will be setting this value and based on that only we'll process further.
 
             if (data.success) {
                 setCommand('Please run these commands: docker pull dpu:v1.0.3 & docker run dpu:v1.0.3');
