@@ -11,9 +11,13 @@ const AutomateInstallation: React.FC = () => {
         setIsLoading(true);
         setError(false);
         try {
-            const response = await fetch('/api/start-process');
+            const response = await fetch('/api/dpu/pubsub');
             const data = await response.json();
             setStatus(data.message);
+
+            if (data.success) {
+                setCommand('Please run these commands: docker pull dpu:v1.0.3 & docker run dpu:v1.0.3');
+            }
         } catch (error) {
             console.error('Error starting process:', error);
             setStatus('Failed to start process');
