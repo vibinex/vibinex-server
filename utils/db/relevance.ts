@@ -155,22 +155,22 @@ export const createTopicName = async (user_id: string, provider: string, org_nam
 	});
 	if (!userData) {
 		console.error('[createTopicName]user data not found in db');
-		return;
+		return null;
 	}
 	const auth_info = userData.auth_info;
 	if (!auth_info){
 		console.error(` [createTopicName] auth_info is null for user with user_id: ${user_id}`);
-		return;
+		return null;
 	}
 	const provider_data = auth_info[provider];
 	if (!provider_data) {
 		console.error(`[createTopicName] no auth_info present for the user with id: ${user_id} for provider: ${provider}`);
-		return;
+		return null;
 	}
 	const provider_id = Object.keys(provider_data)[0];
 	if (!provider_id) {
 		console.error('[createTopicName] could not find provider_id');
-		return;
+		return null;
 	}
 
 	let topicName = `${org_name}-${userData.name?.replace(' ', '-')}-${provider_id}`;
@@ -181,10 +181,10 @@ export const saveTopicNameInUsersTable = async (userId: string, topicName: strin
 	console.log(`[saveTopicNameInUsersTable] saving topic name: ${topicName} in users table in db for user_id:  ${userId}`); //TODO: To be removed
 	const query = `
     Update users 
-    set topic_name = ${topicName} 
-    WHERE id = ${userId}'
+    set topic_name = $1 
+    WHERE id = $2'
   `;
-	await conn.query(query).catch(error => {
+	await conn.query(query, [topicName, userId]).catch(error => {
 		console.error(`[saveTopicNameInUsersTable] Unable to insert topic name in db`, { pg_query: query }, error);
 	});
 }

@@ -12,13 +12,13 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
     const topicName = await createTopicName(jsonBody.user_id, jsonBody.provider, jsonBody.org_name);
     if (!topicName){
-        console.error(`[pubsubHanlder] error in creating topic name`);
+        console.error(`[pubsubHandler] error in creating topic name`);
         res.status(500).json({"error": "topicName creation error"});
         return;
     }
     const topic = await createTopicNameInGcloud(jsonBody.user_id, topicName)
     if (!topic){
-        console.error(`[pubsubHanlder] error in creating topic in google cloud`);
+        console.error(`[pubsubHandler] error in creating topic in google cloud`);
         res.status(500).json({"error": "topic creation error in gcloud"});
         return;
     }
