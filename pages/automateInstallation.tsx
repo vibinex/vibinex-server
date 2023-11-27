@@ -1,4 +1,7 @@
-import React, { useState, CSSProperties } from 'react';
+import React, { useState, CSSProperties, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
+import { getAuthUserId } from '../utils/auth';
 
 const spinnerStyle: CSSProperties = {
     border: '5px solid rgba(0,0,0,.3)',
@@ -19,16 +22,37 @@ const errorSymbolStyle: CSSProperties = {
 };
 
 const AutomateInstallation: React.FC = () => {
+    const session: Session | null = useSession().data; 
+
+    const [userId, setUserId] = useState<string | null>(null);
+    const [orgName, setOrgName] = useState<string>('');
+    const [provider, setProvider] = useState<string>('');
     const [status, setStatus] = useState<string>('');
     const [command, setCommand] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
 
+    useEffect(() => {
+        const fetchedUserId = getAuthUserId(session);
+        setUserId(fetchedUserId);
+    }, []);
+
     const handleButtonClick = async () => {
+        if (!userId) {
+            setStatus('User ID not found.');
+            return;
+        }
+
         setIsLoading(true);
         setError(false);
         try {
-            const response = await fetch('/api/dpu/pubsub');
+            const response = await fetch('/api/start-process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId, orgName, provider }),
+            });
             const data = await response.json();
             setStatus(data.message); //Currently we don't set any message in data but as soon as we merge Tapish's code, we will be setting this value and based on that only we'll process further.
 
@@ -45,6 +69,18 @@ const AutomateInstallation: React.FC = () => {
 
     return (
         <div>
+            <input
+                type="text"
+                placeholder="Organization Name"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+            />
+            <input
+                type="text"
+                placeholder="Provider"
+                value={provider}
+                onChange={(e) => setProvider(e.target.value)}
+            />
             <button onClick={handleButtonClick} disabled={isLoading}>
                 {isLoading ? 'Processing...' : 'Start Process'}
             </button>
