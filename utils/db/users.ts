@@ -33,7 +33,7 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 	return undefined;
 }
 
-export const getUserById = async (userId: string) => {
+export const getUserById = async (userId: string) => { //This function is not used anywhere currently in the code but letting it be, since we might use it in near future.
 	const user_search_by_id_q = `SELECT *
 	FROM users
 	WHERE id = $1`

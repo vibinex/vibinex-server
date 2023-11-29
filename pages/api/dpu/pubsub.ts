@@ -5,12 +5,12 @@ import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
 const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // To be removed, only used for testing the functions
     console.info("[pubsubHandler] pub sub setup info in db...");
     const jsonBody = req.body;
-    if (!jsonBody.user_id || !jsonBody.provider || !jsonBody.org_name) {
+    if (!jsonBody.user_id) {
         console.error("[pubsubHandler] Invalid request body");
         res.status(400).json({"error": "Invalid request body"});
         return;
     }
-    const topicName = await createTopicName(jsonBody.user_id, jsonBody.provider, jsonBody.org_name);
+    const topicName = await createTopicName(jsonBody.user_id);
     if (!topicName){
         console.error(`[pubsubHandler] error in creating topic name`);
         res.status(500).json({"error": "topicName creation error"});

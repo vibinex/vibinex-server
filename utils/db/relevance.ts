@@ -1,6 +1,7 @@
 import { error } from 'console';
 import conn from '.';
 import { getUserByAlias, getUserById, DbUser } from './users';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface HunkInfo {
 	author: string,
@@ -146,34 +147,13 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
 	});
 }
 
-export const createTopicName = async (user_id: string, provider: string, org_name: string) => {
-	console.log(`[createTopicName] creating topic name for user with id: ${user_id} and provider: ${provider} for org: ${org_name}`); 
-	let userData : DbUser | undefined;
-	userData = await getUserById(user_id).catch((error) => {
-		console.error('[createTopicName] Failed to get user data from db:', error);
-		return null;
-	});
-	if (!userData) {
-		console.error('[createTopicName]user data not found in db');
+export const createTopicName = async (user_id: string) => {
+	console.info(`[createTopicName] creating topic name for user with id: ${user_id}`); 
+	let topicName = uuidv4();
+	if (!topicName) {
+		console.error(`[createTopicName] could not create topic name`);
 		return null;
 	}
-	const auth_info = userData.auth_info;
-	if (!auth_info){
-		console.error(` [createTopicName] auth_info is null for user with user_id: ${user_id}`);
-		return null;
-	}
-	const provider_data = auth_info[provider];
-	if (!provider_data) {
-		console.error(`[createTopicName] no auth_info present for the user with id: ${user_id} for provider: ${provider}`);
-		return null;
-	}
-	const provider_id = Object.keys(provider_data)[0];
-	if (!provider_id) {
-		console.error('[createTopicName] could not find provider_id');
-		return null;
-	}
-
-	let topicName = `${org_name}-${userData.name?.replace(' ', '-')}-${provider_id}`;
 	return topicName;
 }
 
