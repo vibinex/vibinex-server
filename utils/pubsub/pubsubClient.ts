@@ -2,6 +2,12 @@ import { PubSub } from '@google-cloud/pubsub';
 import PubSubMessage from '../../types/PubSubMessage';
 import { CloudBuildClient } from "@google-cloud/cloudbuild";
 
+interface CloudBuildStatus {
+  success: boolean;
+  message: string;
+  buildDetails?: any;
+}
+
 // Set up authentication and initialize PubSub client
 const pubsub = new PubSub({ projectId: process.env.PROJECT_ID });
 
@@ -28,7 +34,7 @@ export async function createTopicNameInGcloud(userId: string, topicName: string)
     return null;
 }}
 
-export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: string): Promise<void> {
+export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: string): Promise<CloudBuildStatus> {
   console.info(`[triggerBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
 
   const client = new CloudBuildClient();
@@ -38,7 +44,7 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 
   if (!projectId || !triggerId) {
     console.error('[triggerBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
-    return;
+    return { success: false, message: 'Missing projectId or triggerId in environment variables.' };;
   }
 
   // Build the substitutions object using environment variables
@@ -55,7 +61,7 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
       _SERVER_URL: process.env.SERVER_URL || ''
   };
 
-  client.runBuildTrigger({
+  return client.runBuildTrigger({
       projectId,
       triggerId,
       source: {
@@ -66,11 +72,15 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
   })
   .then(([operation]) => operation.promise())
   .then(([build]) => {
-      console.info('[triggerBuildUsingGcloudApi] Build triggered with variables from environment.');
-      console.info('[triggerBuildUsingGcloudApi] Build details: ', build);
+    console.info('[triggerBuildUsingGcloudApi] Build triggered with variables from environment.');
+    if (build.status === 'SUCCESS') {
+      return { success: true, message: 'Build completed successfully.', buildDetails: build };
+    } else {
+        return { success: false, message: `Build failed with status: ${build.status}`, buildDetails: build };
+    }
   })
   .catch((error) => {
       console.error('[triggerBuildUsingGcloudApi] Error triggering build: ', error);
-      return;
+      return { success: false, message: `Error triggering build: ${error.message}` };
   });
 }
