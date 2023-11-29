@@ -149,7 +149,7 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
 
 export const createTopicName = async (user_id: string) => {
 	console.info(`[createTopicName] creating topic name for user with id: ${user_id}`); 
-	let topicName = uuidv4();
+	let topicName = "topic-" + uuidv4();
 	if (!topicName) {
 		console.error(`[createTopicName] could not create topic name`);
 		return null;
