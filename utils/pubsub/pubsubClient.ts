@@ -2,7 +2,7 @@ import { PubSub } from '@google-cloud/pubsub';
 import PubSubMessage from '../../types/PubSubMessage';
 import { CloudBuildClient } from "@google-cloud/cloudbuild";
 
-interface CloudBuildStatus {
+export interface CloudBuildStatus {
   success: boolean;
   message: string;
   buildDetails?: any;
@@ -39,7 +39,7 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 
   const client = new CloudBuildClient();
 
-  const projectId: string | undefined = process.env.GCP_PROJECT_ID;
+  const projectId: string | undefined = process.env.PROJECT_ID;
   const triggerId: string | undefined = process.env.CLOUD_BUILD_TRIGGER_ID;
 
   if (!projectId || !triggerId) {
