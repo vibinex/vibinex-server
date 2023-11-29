@@ -25,7 +25,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
     await saveTopicNameInUsersTable(jsonBody.user_id, topicName).catch((error) => {
         console.error("[pubsubHandler] Unable to save topic name in db, ", error);
     });
-    console.log("[pubsubHandler] topic name created successfully and saved in db: ", topicName);
+    console.info("[pubsubHandler] topic name created successfully and saved in db: ", topicName);
     return res.status(200).json({"success": "topic name created and saved successfully"});
 }
 
