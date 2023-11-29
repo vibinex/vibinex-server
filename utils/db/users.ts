@@ -40,7 +40,7 @@ export const getUserById = async (userId: string) => { //This function is not us
 	const user_search_by_id_result = await conn.query(user_search_by_id_q, [userId]).catch(err => {
 		console.error(`[getUserById] Could not get the user for user id: ${userId}`, { pg_query: user_search_by_id_q }, err);
 		throw new Error("Error in running the query on the database", err);
-	});;
+	});
 	if (user_search_by_id_result.rows.length === 0) {
 		throw new Error('No user found');
 	}
