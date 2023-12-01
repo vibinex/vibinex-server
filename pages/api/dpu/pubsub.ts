@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
-import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
+import { CloudBuildStatus, createTopicNameInGcloud, triggerBuildUsingGcloudApi } from '../../../utils/pubsub/pubsubClient';
 
 const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // To be removed, only used for testing the functions
     console.info("[pubsubHandler] pub sub setup info in db...");
@@ -26,6 +26,8 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
         console.error("[pubsubHandler] Unable to save topic name in db, ", error);
     });
     console.info("[pubsubHandler] topic name created successfully and saved in db: ", topicName);
+    let buildStatus : CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.user_id, topicName);
+    console.info("[pubsubHandler] build status: ", buildStatus);
     return res.status(200).json({"success": "topic name created and saved successfully"});
 }
 
