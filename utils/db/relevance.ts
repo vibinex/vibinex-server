@@ -1,5 +1,7 @@
+import { error } from 'console';
 import conn from '.';
-import { getUserByAlias } from './users';
+import { getUserByAlias, getUserById, DbUser } from './users';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface HunkInfo {
 	author: string,
@@ -142,5 +144,27 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
     `;
 	await conn.query(query).catch(err => {
 		console.error(`[saveTopicName] Unable to insert topic name in db`, { pg_query: query }, err)
+	});
+}
+
+export const createTopicName = async (user_id: string) => {
+	console.info(`[createTopicName] creating topic name for user with id: ${user_id}`); 
+	let topicName = uuidv4();
+	if (!topicName) {
+		console.error(`[createTopicName] could not create topic name`);
+		return null;
+	}
+	return topicName;
+}
+
+export const saveTopicNameInUsersTable = async (userId: string, topicName: string) => {
+	console.log(`[saveTopicNameInUsersTable] saving topic name: ${topicName} in users table in db for user_id:  ${userId}`); //TODO: To be removed
+	const query = `
+    Update users 
+    set topic_name = $1 
+    WHERE id = $2
+  `;
+	await conn.query(query, [topicName, userId]).catch(error => {
+		console.error(`[saveTopicNameInUsersTable] Unable to insert topic name in db`, { pg_query: query }, error);
 	});
 }
