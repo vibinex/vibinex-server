@@ -66,7 +66,7 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
       triggerId,
       source: {
           projectId,
-          branchName: 'tr/docs-ci', // or your specific branch
+          branchName: 'main',
           substitutions,
       },
   })
