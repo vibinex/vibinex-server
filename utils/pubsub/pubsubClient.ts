@@ -2,9 +2,9 @@ import { PubSub } from '@google-cloud/pubsub';
 import PubSubMessage from '../../types/PubSubMessage';
 import fetch from 'node-fetch';
 export interface CloudBuildStatus {
-  success: boolean;
-  message: string;
-  buildDetails?: any;
+	success: boolean;
+	message: string;
+	buildDetails?: any;
 }
 
 interface AccessTokenApiResponse {
