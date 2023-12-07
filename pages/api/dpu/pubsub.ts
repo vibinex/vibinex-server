@@ -34,12 +34,12 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
             return;
         }
         topicName = gcloudTopic;
-    }
-    try {
-        await saveTopicNameInUsersTable(jsonBody.user_id, topicName);
-    } catch (error) {
-        console.error("[pubsubHandler] Unable to save topic name in db, ", error);
-        return res.status(500).json({ "error": "Internal server error" });
+        try {
+            await saveTopicNameInUsersTable(jsonBody.user_id, topicName);
+        } catch (error) {
+            console.error("[pubsubHandler] Unable to save topic name in db, ", error);
+            return res.status(500).json({ "error": "Internal server error" });
+        }
     }
     console.info("[pubsubHandler] topic name created successfully and saved in db: ", topicName);
 
