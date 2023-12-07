@@ -12,6 +12,29 @@ interface AccessTokenApiResponse {
 	token_type: string;
 	access_token: string;
 }
+
+interface CloudBuildApiResponse {
+    metadata: {
+        "@type": string;
+        build: {
+            id: string;
+            status: string;
+            source: {
+                gitSource: {
+                    url: string;
+                    revision: string;
+                };
+            };
+            createTime: string;
+            timeout: string;
+            projectId: string;
+            buildTriggerId: string;
+            queueTtl: string;
+            name: string;
+        };
+    };
+}
+
 // Set up authentication and initialize PubSub client
 const pubsub = new PubSub({ projectId: process.env.PROJECT_ID });
 
@@ -32,7 +55,7 @@ export async function createTopicNameInGcloud(userId: string, topicName: string)
 	try {
 		const [topic] = await pubsub.createTopic(topicName);
 		console.log(`[createTopicNameInGcloud] Topic ${topic.name} created.`);
-		return topic;
+		return topic.toString();
 	} catch (error) {
 		console.error('[createTopicNameInGcloud] Failed to create topic name in gcloud:', error);
 		return null;
@@ -104,7 +127,10 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
         console.error('[triggerBuildUsingGcloudApi] Error triggering build: ', response.statusText);
         return {success: false, message: 'Error triggering build', buildDetails: response};
     }
+	const resData = (await response.json()) as CloudBuildApiResponse;
+	const buildDetails = resData.metadata.build;
+	console.debug(`[triggerBuildUsinggcloudAPi] ${buildDetails.buildTriggerId} ${buildDetails.status} ${buildDetails.id}`);
 	console.info(`[triggerBuildUsingGcloudApi] build triggered for topic_name: ${topic_name} and user_id: ${user_id}`);
-	return {success: true, message: response.statusText, buildDetails: response};
+	return {success: true, message: response.statusText, buildDetails: buildDetails};
 
 }
