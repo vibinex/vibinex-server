@@ -43,10 +43,20 @@ steps:
   - 'CLARITY_ID=${_CLARITY_ID}'
   - 'TOPIC_NAME=${_TOPIC_NAME}'
   - 'SUBSCRIPTION_NAME=${_SUBSCRIPTION_NAME}'
+  - 'GITHUB_APP_ID=${_GITHUB_APP_ID}'
+  - 'GITHUB_APP_CLIENT_ID=${_GITHUB_APP_CLIENT_ID}'
+  - 'GITHUB_APP_CLIENT_SECRET=${_GITHUB_APP_CLIENT_SECRET}'
+  - 'CLOUD_BUILD_TRIGGER_ID=${_CLOUD_BUILD_TRIGGER_ID}'
+  - 'GITHUB_BASE_URL=${_GITHUB_BASE_URL}'
+  - 'BITBUCKET_BASE_URL=${_BITBUCKET_BASE_URL}'
+  - 'GCP_CREDENTIALS=${_GCP_CREDENTIALS}'
+  - 'SERVER_URL=${_SERVER_URL}'
+  - 'CLOUD_BUILD_TRIGGER_ID=${_CLOUD_BUILD_TRIGGER_ID}'
+  - 'CLOUD_BUILD_LOCATION=${_CLOUD_BUILD_LOCATION}'
+  - 'CLOUD_BUILD_BRANCH_NAME=${_CLOUD_BUILD_BRANCH_NAME}'
 - name: node:18.13.0
   entrypoint: npm
   args: ["run", "build"]
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy']
-timeout: '1600s'
