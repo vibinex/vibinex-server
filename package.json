@@ -36,7 +36,6 @@
     "eslint-config-next": "13.0.6",
     "next": "13.3.1",
     "next-auth": "4.22.1",
-    "node-fetch": "^3.3.2",
     "pg": "^8.11.3",
     "react": "18.2.0",
     "react-calendly": "^4.1.1",

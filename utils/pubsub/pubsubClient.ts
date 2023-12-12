@@ -1,6 +1,6 @@
 import { PubSub } from '@google-cloud/pubsub';
 import PubSubMessage from '../../types/PubSubMessage';
-import fetch from 'node-fetch';
+import axios from 'axios';
 export interface CloudBuildStatus {
 	success: boolean;
 	message: string;
@@ -63,16 +63,16 @@ export async function createTopicNameInGcloud(userId: string, topicName: string)
 
 async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string>{
 	console.info(`[getAccessTokenFromMetaServerForGcloudApi] getting access token from meta server for gcloud trigger api`)
-	const response = await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
-		headers: { 'Metadata-Flavor': 'Google' }
+	const response = await axios.get('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
+    headers: { 'Metadata-Flavor': 'Google' }
 	});
 
-	if (!response.ok) {
+	if (!response.data) {
 		console.error('[getAccessTokenFromMetaServerForGcloudApi] Failed to retrieve access token');
 		return response.statusText;
 	}
 
-	const data = (await response.json()) as AccessTokenApiResponse;
+	const data = response.data as AccessTokenApiResponse;
 	console.info(`[getAccessTokenFromMetaServerForGcloudApi] retreived access token from meta server for gcloud trigger api, data: ${data}`);
 	return data.access_token;
 }
@@ -82,11 +82,12 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 
 	const projectId: string | undefined = process.env.PROJECT_ID;
 	const triggerId: string | undefined = process.env.CLOUD_BUILD_TRIGGER_ID;
-	const location: string = 'asia-south1';
+	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
+	const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
 
-	if (!projectId || !triggerId) {
+	if (!projectId || !triggerId || !location || !triggerBranchName) {
 		console.error('[triggerBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
-		return { success: false, message: 'Missing projectId or triggerId in environment variables.' };;
+		return { success: false, message: 'Missing projectId, triggerId, trigger location or trigger branch name in environment variables.' };
 	}
 
 	// Build the substitutions object using environment variables
@@ -106,31 +107,28 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 	const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
     const url = `https://cloudbuild.googleapis.com/v1/projects/${projectId}/locations/${location}/triggers/${triggerId}:run`;
 
-    const response = await fetch(url, {
-        method: 'POST',
+	const response = await axios.post(url, {
+        projectId,
+        triggerId,
+        source: {
+            projectId,
+            substitutions,
+            branchName: triggerBranchName
+        }
+    }, {
         headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            projectId,
-			triggerId,
-            source: {
-                projectId,
-                substitutions,
-				branchName: 'main'
-            }
-        })
     });
 
-    if (!response.ok) {
+    if (!response.data) {
         console.error('[triggerBuildUsingGcloudApi] Error triggering build: ', response.statusText);
-        return {success: false, message: 'Error triggering build', buildDetails: response};
+        return { success: false, message: 'Error triggering build', buildDetails: response };
     }
-	const resData = (await response.json()) as CloudBuildApiResponse;
-	const buildDetails = resData.metadata.build;
-	console.debug(`[triggerBuildUsinggcloudAPi] ${buildDetails.buildTriggerId} ${buildDetails.status} ${buildDetails.id}`);
-	console.info(`[triggerBuildUsingGcloudApi] build triggered for topic_name: ${topic_name} and user_id: ${user_id}`);
-	return {success: true, message: response.statusText, buildDetails: buildDetails};
 
+    const buildDetails = response.data.metadata.build;
+    console.debug(`[triggerBuildUsinggcloudAPi] ${buildDetails.buildTriggerId} ${buildDetails.status} ${buildDetails.id}`);
+    console.info(`[triggerBuildUsingGcloudApi] build triggered for topic_name: ${topic_name} and user_id: ${user_id}`);
+    return { success: true, message: response.statusText, buildDetails: buildDetails };
 }
