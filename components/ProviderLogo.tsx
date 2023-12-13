@@ -1,7 +1,8 @@
 import Image from "next/image";
 import type { RepoProvider } from "../utils/providerAPI";
+import React from "react";
 
-const ProviderLogo = (provider: RepoProvider, theme: "light" | "dark") => {
+const ProviderLogo: React.FC<{ provider: RepoProvider, theme: "light" | "dark" }> = ({ provider, theme }) => {
 	return (
 		<Image
 			loading="lazy"

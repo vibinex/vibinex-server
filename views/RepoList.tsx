@@ -57,7 +57,7 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 						<tr key={repoAddr}>
 							<TableCell>{repoName}</TableCell>
 							<TableCell>{repoOwner}</TableCell>
-							<TableCell className="text-center">{ProviderLogo(repoProvider, "dark")}</TableCell>
+							<TableCell className="text-center"><ProviderLogo provider={repoProvider} theme="dark" /></TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => setConfig(repo_id, 'auto_assign', !config.auto_assign)} disabled={loading} /></TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => setConfig(repo_id, 'comment', !config.comment)} disabled={loading} /></TableCell>
 							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repoAddr}`}>Link</Link></TableCell>
