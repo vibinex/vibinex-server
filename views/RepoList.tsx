@@ -1,25 +1,17 @@
 import axios from "axios";
 import type { Session } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
-import { useState, type ReactElement } from "react";
+import { useState } from "react";
 import SwitchSubmit from "../components/SwitchSubmit";
 import { TableCell, TableHeaderCell } from "../components/Table";
 import type { DbRepoSerializable, RepoIdentifier } from "../types/repository";
 import { getRepos } from "../utils/db/repos";
-import type { RepoProvider } from "../utils/providerAPI";
 import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
+import ProviderLogo from "../components/ProviderLogo";
 
 const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 	const [loading, setLoading] = useState(false); // while loading user can't send another api request to change setting
 	const [repoList, setRepoList] = useState(props.repoList);
-
-	const repoProviderLogo: { [key in RepoProvider]: ReactElement } = {
-		"github": <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/github.svg" alt="github" className="mx-auto" />,
-		"bitbucket": <Image loading="lazy" height={24} width={24} src="/bitbucket-dark.svg" alt="bitbucket" className="mx-auto" />,
-		"gitlab": <Image loading="lazy" height={24} width={24} src="https://authjs.dev/img/providers/gitlab.svg" alt="gitlab" className="mx-auto" />
-	}
-	const providerToLogo = (provider: RepoProvider) => (provider in repoProviderLogo) ? repoProviderLogo[provider] : provider;
 
 	const setConfig = (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
 		setLoading(true);
@@ -65,7 +57,7 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 						<tr key={repoAddr}>
 							<TableCell>{repoName}</TableCell>
 							<TableCell>{repoOwner}</TableCell>
-							<TableCell className="text-center">{providerToLogo(repoProvider)}</TableCell>
+							<TableCell className="text-center">{ProviderLogo(repoProvider, "dark")}</TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => setConfig(repo_id, 'auto_assign', !config.auto_assign)} disabled={loading} /></TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => setConfig(repo_id, 'comment', !config.comment)} disabled={loading} /></TableCell>
 							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repoAddr}`}>Link</Link></TableCell>
