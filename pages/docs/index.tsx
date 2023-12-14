@@ -9,6 +9,10 @@ import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
 import { MdContentCopy } from "react-icons/md";
+import * as Accordion from '@radix-ui/react-accordion';
+import { Code } from '@radix-ui/themes';
+import * as Progress from '@radix-ui/react-progress';
+
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -16,9 +20,34 @@ const verifySetup = [
 	"Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow."
 ]
 
+interface RadioButtonsProps {
+	options: { value: string; label: string }[];
+	selectedOption: string;
+	onSelect: (value: string) => void;
+}
+
+const RadioButtons: React.FC<RadioButtonsProps> = ({ options, selectedOption, onSelect }) => {
+	return (
+	  <div>
+		{options.map((option, index) => (
+		  <label key={index}>
+			<input
+			  type="radio"
+			  value={option.value}
+			  checked={selectedOption === option.value}
+			  onChange={() => onSelect(option.value)}
+			/>
+			{option.label}
+		  </label>
+		))}
+	  </div>
+	);
+};
+
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
+	const [progress, setProgress] = React.useState(43);
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
@@ -36,7 +65,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 
 		githubAppInstallLink?.addEventListener('click', handleGitHubAppClick);
 		authoriseBitbucketOauth?.addEventListener('click', handleAuthoriseBitbucketOauthButton);
-
+		setProgress(43); // TODO - set progress using api output
 		return () => {
 			githubAppInstallLink?.removeEventListener('click', handleGitHubAppClick);
 			authoriseBitbucketOauth?.removeEventListener('click', handleAuthoriseBitbucketOauthButton);
@@ -44,176 +73,100 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	}, [rudderEventMethods, session]);
 
 
-	const docs = [
-		{
-			heading: "Github",
-			flag: true,
-			content: [
-				{
-					subHeading: "Sign up with github",
-					article: <span className="text-blue-500 cursor-pointer" onClick={() => login(
-						getAndSetAnonymousIdFromLocalStorage(),
-						(rudderEventMethods || null),
-						'github'
-					)}>Sign in on Vibinex using GitHub</span>
-				},
-				{ subHeading: "Install GitHub App", article: <>Install <Link id="github-app-install" href="https://github.com/apps/vibinex-code-review" target='_blank' className="text-blue-500">Repo Profiler Github App</Link> from Github Marketplace in your org/personal account. Make sure you have the permissions required to install the app.</> },
-				{
-					subHeading: "Setup GitHub Action",
-					article: <>
-						Add this code in a file named &quot;repo-profiler.yml&quot; present on the following path - &quot;.github/workflows/repo-profiler.yml&quot; inside the repository.
-						<pre className="bg-gray-100 rounded-md p-3 ml-4 mb-4 font-mono whitespace-pre-wrap relative">
-							<button
-								className="absolute top-0 right-0 border-none p-2"
-								onClick={() => {
-									const codeElement = document.getElementById("githubWorkflowCode");
-									const workflowText = codeElement?.textContent
-									navigator.clipboard.writeText(workflowText ?? "");
-								}}
-							>
-								<MdContentCopy />
-							</button>
-							<code id="githubWorkflowCode">
-								{`on:
-  repository_dispatch:
-    types: repo_profile_execution
-jobs:
-  profile:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Repository Profiler
-        uses: Alokit-Innovations/repo-profiler@main`}
-							</code>
-						</pre>
-					</>
+	const [selectedProvider, setSelectedProvider] = useState<string>('');
+	const providerOptions = [
+		{ value: 'github', label: 'Github' },
+		{ value: 'bitbucket', label: 'Bitbucket' },
+	];
 
-				},
-			]
-		},
-		{
-			heading: "Bitbucket",
-			flag: false,
-			content: [
-				{
-					subHeading: "Sign up with Bitbucket", article: <span className="text-blue-500 cursor-pointer" onClick={() => login(
-						getAndSetAnonymousIdFromLocalStorage(),
-						(rudderEventMethods || null),
-						'bitbucket'
-					)}>Sign in on Vibinex using Bitbucket</span>
-				},
-				{
-					subHeading: "Install OAuth consumer", article: <>
-						<Button
-							id='authorise-bitbucket-oauth-consumer'
-							variant="contained"
-							href={bitbucket_auth_url}
-							target='_blank'
-						>
-							Authorize Bitbucket OAuth Consumer
-						</Button>
-						<small className='block ml-4'>Note: You will need the permissions required to install an OAuth consumer</small>
-					</>
-				},
-				{
-					subHeading: "Code for setup",
-					article: <>
-						For each repository, add this Bitbucket Pipeline code in: `bitbucket-pipelines.yml`:
-						<pre className="bg-gray-100 ml-4 p-3 rounded-md font-mono whitespace-pre-wrap relative" >
-							<button
-								className="absolute top-0 right-0 border-none p-2"
-								onClick={() => {
-									const codeElement = document.getElementById("bitbucketWorkflowCode");
-									const workflowText = codeElement?.textContent
-									navigator.clipboard.writeText(workflowText ?? "");
-								}}
-							>
-								<MdContentCopy />
-							</button>
-							<code id="bitbucketWorkflowCode">
-								{`image: atlassian/default-image:4
-pipelines:
-  branches
-    '**':
-    - step:
-      name: 'Run devprofiler'
-      script:
-        - pipe: docker://tapish303/repo-profiler-pipe:latest`}
-							</code>
-						</pre>
-						<small className='block ml-4'>Note: If this is your first pipeline, you may need to enable pipelines in your workspace.</small>
-					</>
-				},
-			]
-		},
-	]
+	const [selectedInstallation, setSelectedInstallation] = useState<string>('');
+	const installationOptions = [
+		{ value: 'individual', label: 'Individual' },
+		{ value: 'project', label: 'Project' },
+	];
 
-	const [heading, setHeading] = useState('Github')
-	const [list, setList] = useState(docs);
-	// const [sublist, setSublist] = useState(docs[0].content)
-	const [article, setArticle] = useState(docs[0].content);
+	const [selectedHosting, setSelectedHosting] = useState<string>('');
+	const hostingOptions = [
+		{ value: 'cloud', label: 'Vibinex Cloud' },
+		{ value: 'selfhosting', label: 'Self-hosting' },
+	];
+
+	const github_app_url = "https://github.com/apps/vibinex-code-review";
+	const triggerContent = () => {
+		if (selectedProvider === 'github') {
+			return (
+			<><Button
+				id='github-app-install'
+				variant="contained"
+				href={github_app_url}
+				target='_blank'
+			> Install Github App </Button>
+			<small className='block ml-4'>Note: You will need the permissions required to install a Github App</small></>);
+		} else if (selectedProvider == 'bitbucket') {
+			return (
+			<><Button
+				id='authorise-bitbucket-oauth-consumer'
+				variant="contained"
+				href={bitbucket_auth_url}
+				target='_blank'
+			> Authorise Bitbucket OAuth Consumer </Button>
+			<small className='block ml-4'>Note: You will need the permissions required to install an OAuth consumer</small></>);
+		} else {
+			return <></>;
+		}
+	};
+
+	const selfhostingCode = "docker pull gcr.io/vibi-prod/dpu\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=insert_install_id"; // TODO - install id
+	const buildInstructionContent = () => {
+		if (selectedHosting === 'selfhosting') {
+			return (<Code size="2">{selfhostingCode}</Code>);
+		} else if (selectedHosting === 'cloud') {
+			return (<><Button variant="contained" target='_blank'>Build</Button>
+			<Progress.Root className="ProgressRoot" value={progress}>
+				 <Progress.Indicator 
+				 className="ProgressIndicator"
+				 style={{ transform: `translateX(-${100 - progress}%)` }}
+				 />
+			</Progress.Root></>);
+		} else {
+			return <></>
+		}
+	}
 
 	return (
 		<div>
 			<MainAppBar />
 
 			{/* Center content */}
-			<section className='sm:w-[75%] w-[90%] m-auto sm:mt-10 mb-10 sm:flex p-2'>
-				<div className='mr-10 sm:border-r-2 p-4 sm:border-[gray] sm:block flex'>
-					{list.map((item, index) => {
-						return (
-							<div key={item.heading}>
-								<h1 onClick={() => {
-									setArticle(item.content);
-									setHeading(item.heading);
-									let temp = list;
-									temp[index].flag = !item.flag;
-									setList([...temp]);
-								}}
-									className={`cursor-pointer sm:mt-6 p-3 rounded-md sm:ml-0 ml-8 text-1xl font-semibold ${(heading === item.heading) ? "text-primary-main" : null}`}>
-									{item.heading}
-								</h1>
-
-								{/* Can also show subheading in tree structure if needed */}
-								{/* {item.flag ? (
-									item.content.map((item, index) => {
-										return (
-											<div>
-												<h1 className='ml-6 text-sm mt-2 border-l-2 border-[gray] pl-2'>{item.subHeading}</h1>
-											</div>
-										)
-									})
-								) : null} */}
-							</div>
-						)
-					})}
-				</div>
-
-				<div>
-					<h1 className='text-2xl mb-2 font-bold'>Getting started with {heading}</h1>
-					<ol>
-						{article.map((item, index) => {
-							return (
-								<li key={item.subHeading} className='mt-4 font-sans'>
-									{index + 1}.  {item.article}
-								</li>
-							)
-						})}
-					</ol>
-
-					<h2 className='text-xl mt-4 mb-2 font-semibold'>Verify your setup</h2>
-					Once you have set up your repositories, installed the browser extension and signed in, you can verify if everything is correctly set up.
-					<ol>
-						{verifySetup.map((checkItem, index) => (<li key={index} className='mt-2 ml-1'>
-							{index + 1}. {checkItem}
-						</li>))}
-					</ol>
-				</div>
-			</section>
+			<Accordion.Root type="single" defaultValue="instruction-1">
+				<Accordion.Item value="instruction-1">
+					<Accordion.AccordionTrigger>Login using the target provider</Accordion.AccordionTrigger>
+				</Accordion.Item>
+				<Accordion.Item value="instruction-2">
+					<Accordion.AccordionTrigger>Configure your DPU</Accordion.AccordionTrigger>
+					<Accordion.AccordionContent>
+						Provider: <RadioButtons options={providerOptions} selectedOption={selectedProvider} onSelect={setSelectedProvider} />
+						Installation Type: <RadioButtons options={installationOptions} selectedOption={selectedInstallation} onSelect={setSelectedInstallation} />
+						Hosting: <RadioButtons options={hostingOptions} selectedOption={selectedHosting} onSelect={setSelectedHosting} />
+					</Accordion.AccordionContent>
+				</Accordion.Item>
+				<Accordion.Item value="instruction-3">
+					<Accordion.AccordionTrigger>Set up DPU</Accordion.AccordionTrigger>
+					<Accordion.AccordionContent>{buildInstructionContent()}</Accordion.AccordionContent>
+				</Accordion.Item>
+				<Accordion.Item value="instruction-4">
+					<Accordion.AccordionTrigger>Set up triggers</Accordion.AccordionTrigger>
+					<Accordion.AccordionContent>{triggerContent()}</Accordion.AccordionContent>
+				</Accordion.Item>
+				<Accordion.Item value="instruction-5">
+					<Accordion.AccordionTrigger>Install browser extension</Accordion.AccordionTrigger>
+					<Accordion.AccordionContent>
+						<a href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1">
+							<Button variant={'text'}>Link</Button>
+						</a>
+					</Accordion.AccordionContent>
+				</Accordion.Item>
+			</Accordion.Root>
 
 			<Footer />
 		</div>

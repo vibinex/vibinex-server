@@ -14,9 +14,9 @@
     "create-env": "printenv > .env"
   },
   "dependencies": {
+    "@google-cloud/cloudbuild": "4.1.0",
     "@google-cloud/pubsub": "^3.7.1",
     "@google-cloud/storage": "^6.9.0",
-    "@google-cloud/cloudbuild": "4.1.0",
     "@mdx-js/loader": "^2.3.0",
     "@mdx-js/react": "^2.3.0",
     "@next/mdx": "^13.4.4",
@@ -25,7 +25,10 @@
     "@nivo/core": "^0.80.0",
     "@nivo/radar": "^0.80.0",
     "@nivo/voronoi": "^0.80.0",
+    "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-progress": "^1.0.3",
     "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/themes": "^2.0.2",
     "@rudderstack/rudder-sdk-node": "^2.0.2",
     "@types/mdx": "^2.0.5",
     "@types/node": "18.11.14",
