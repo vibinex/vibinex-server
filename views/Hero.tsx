@@ -56,13 +56,13 @@ const Hero = (props: { ctaLink: string }) => {
 						Book demo
 					</Button>
 				</div>
-				<div className="mt-20">
+				<div className="mt-20 w-full relative">
 					{/*Overlay*/}
-					<div className='absolute h-full w-full bg-black/50 z-10' />
+					<div className='absolute bg-black/50 z-10 h-full w-full' />
 					<p>Supported Providers:</p>
 					<div className="flex gap-4 mt-2 justify-center">
-						<ProviderLogo provider="github" theme="light" className="w-10 h-12 mx-0" />
-						<ProviderLogo provider="bitbucket" theme="dark" className="w-10 h-12 mx-0" />
+						<ProviderLogo provider="github" theme="light" className="w-10 h-12" />
+						<ProviderLogo provider="bitbucket" theme="dark" className="w-10 h-12" />
 					</div>
 				</div>
 			</section>

@@ -10,7 +10,7 @@ const ProviderLogo: React.FC<{ provider: RepoProvider, theme: "light" | "dark", 
 			src={`/${provider}${theme === 'dark' ? "-dark" : ""}.svg`}
 			alt={provider}
 			title={provider}
-			className={`mx-auto ${className}`}
+			className={className}
 		/>
 	)
 }
