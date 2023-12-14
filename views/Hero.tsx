@@ -2,7 +2,6 @@ import React from "react";
 import { useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import Button from "../components/Button";
-import Link from "next/link";
 import RudderContext from "../components/RudderContext";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
