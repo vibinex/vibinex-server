@@ -124,7 +124,7 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 
     if (!response.data) {
         console.error('[triggerBuildUsingGcloudApi] Error triggering build: ', response.statusText);
-        return { success: false, message: 'Error triggering build', buildDetails: response };
+        return { success: false, message: 'Error triggering build', buildDetails: response.statusText };
     }
 
     const buildDetails = response.data.metadata.build;

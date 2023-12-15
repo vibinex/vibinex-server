@@ -11,6 +11,8 @@ import { MdContentCopy } from "react-icons/md";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import { Code } from '@radix-ui/themes';
 import * as Progress from '@radix-ui/react-progress';
+import axios from 'axios';
+import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
 
 
 const verifySetup = [
@@ -46,7 +48,6 @@ const RadioButtons: React.FC<RadioButtonsProps> = ({ options, selectedOption, on
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
-	const [progress, setProgress] = React.useState(43);
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
@@ -64,7 +65,6 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 
 		githubAppInstallLink?.addEventListener('click', handleGitHubAppClick);
 		authoriseBitbucketOauth?.addEventListener('click', handleAuthoriseBitbucketOauthButton);
-		setProgress(43); // TODO - set progress using api output
 		return () => {
 			githubAppInstallLink?.removeEventListener('click', handleGitHubAppClick);
 			authoriseBitbucketOauth?.removeEventListener('click', handleAuthoriseBitbucketOauthButton);
@@ -120,19 +120,50 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			return <></>;
 		}
 	};
-
-	const selfhostingCode = "docker pull gcr.io/vibi-prod/dpu\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=insert_install_id"; // TODO - install id
+	const [progress, setProgress] = React.useState(43);
+	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 	const buildInstructionContent = () => {
+		const handleBuildButtonClick = async () => {
+			setIsButtonDisabled(true);
+			setProgress(10); // Reset progress to 0 when the button is clicked
+
+			axios.post('/api/dpu/pubsub', {
+				user_id: getAuthUserId(session),
+			}).then((response) => {
+				console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
+				setBuildStatus(response.data);
+				if (response.data.success) {
+					setProgress(100);
+				}
+			}).catch((e) => {
+				setBuildStatus({ success: false, message: 'API request failed' });
+				console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
+			}).finally(() => {
+				setIsButtonDisabled(false);
+			});
+		}
+		const selfhostingCode = "docker pull gcr.io/vibi-prod/dpu\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=insert_install_id"; // TODO - install id	
 		if (selectedHosting === 'selfhosting') {
 			return (<Code size="2">{selfhostingCode}</Code>);
 		} else if (selectedHosting === 'cloud') {
-			return (<><Button variant="contained" target='_blank'>Build</Button>
-			<Progress.Root className="ProgressRoot" value={progress}>
-				 <Progress.Indicator 
-				 className="ProgressIndicator"
-				 style={{ transform: `translateX(-${100 - progress}%)` }}
-				 />
-			</Progress.Root></>);
+			return (<>
+			<Button variant="contained" target='_blank' onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
+				Build</Button>
+			<Progress.Root className="relative overflow-hidden bg-green rounded-full w-[300px] h-[25px]"
+				style={{ transform: 'translateZ(0)', }}
+				value={progress}
+			>
+				<Progress.Indicator 
+					className="bg-blue w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)]"
+					style={{ transform: `translateX(${progress}%)` }}
+				/>
+			</Progress.Root>
+			{buildStatus && buildStatus.success ? (
+            <span>Build succeeded!</span>
+          ) : buildStatus? (
+            <span>Build failed! Error: {buildStatus.message}</span>
+          ): (<></>)}</>);
 		} else {
 			return <></>
 		}
