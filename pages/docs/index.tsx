@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { useSession } from 'next-auth/react'
 import type { Session } from 'next-auth'
 import Button from "../../components/Button";
-import Link from "next/link";
 import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
 import { MdContentCopy } from "react-icons/md";
-import * as Accordion from '@radix-ui/react-accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import { Code } from '@radix-ui/themes';
 import * as Progress from '@radix-ui/react-progress';
 
@@ -94,23 +93,29 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const github_app_url = "https://github.com/apps/vibinex-code-review";
 	const triggerContent = () => {
 		if (selectedProvider === 'github') {
-			return (
-			<><Button
-				id='github-app-install'
-				variant="contained"
-				href={github_app_url}
-				target='_blank'
-			> Install Github App </Button>
-			<small className='block ml-4'>Note: You will need the permissions required to install a Github App</small></>);
-		} else if (selectedProvider == 'bitbucket') {
-			return (
-			<><Button
-				id='authorise-bitbucket-oauth-consumer'
-				variant="contained"
-				href={bitbucket_auth_url}
-				target='_blank'
-			> Authorise Bitbucket OAuth Consumer </Button>
-			<small className='block ml-4'>Note: You will need the permissions required to install an OAuth consumer</small></>);
+			return (<>
+				<Button
+					id='github-app-install'
+					variant="contained"
+					href={github_app_url}
+					target='_blank'
+				>
+					Install Github App
+				</Button>
+				<small className='block ml-4'>Note: You will need the permissions required to install a Github App</small>
+			</>);
+		} else if (selectedProvider === 'bitbucket') {
+			return (<>
+				<Button
+					id='authorise-bitbucket-oauth-consumer'
+					variant="contained"
+					href={bitbucket_auth_url}
+					target='_blank'
+				>
+					Authorise Bitbucket OAuth Consumer
+				</Button>
+				<small className='block ml-4'>Note: You will need the permissions required to install an OAuth consumer</small>
+			</>);
 		} else {
 			return <></>;
 		}
@@ -138,35 +143,35 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			<MainAppBar />
 
 			{/* Center content */}
-			<Accordion.Root type="single" defaultValue="instruction-1">
-				<Accordion.Item value="instruction-1">
-					<Accordion.AccordionTrigger>Login using the target provider</Accordion.AccordionTrigger>
-				</Accordion.Item>
-				<Accordion.Item value="instruction-2">
-					<Accordion.AccordionTrigger>Configure your DPU</Accordion.AccordionTrigger>
-					<Accordion.AccordionContent>
+			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-4 py-2'>
+				<AccordionItem value="instruction-1">
+					<AccordionTrigger>Login using the target provider</AccordionTrigger>
+				</AccordionItem>
+				<AccordionItem value="instruction-2">
+					<AccordionTrigger>Configure your DPU</AccordionTrigger>
+					<AccordionContent>
 						Provider: <RadioButtons options={providerOptions} selectedOption={selectedProvider} onSelect={setSelectedProvider} />
 						Installation Type: <RadioButtons options={installationOptions} selectedOption={selectedInstallation} onSelect={setSelectedInstallation} />
 						Hosting: <RadioButtons options={hostingOptions} selectedOption={selectedHosting} onSelect={setSelectedHosting} />
-					</Accordion.AccordionContent>
-				</Accordion.Item>
-				<Accordion.Item value="instruction-3">
-					<Accordion.AccordionTrigger>Set up DPU</Accordion.AccordionTrigger>
-					<Accordion.AccordionContent>{buildInstructionContent()}</Accordion.AccordionContent>
-				</Accordion.Item>
-				<Accordion.Item value="instruction-4">
-					<Accordion.AccordionTrigger>Set up triggers</Accordion.AccordionTrigger>
-					<Accordion.AccordionContent>{triggerContent()}</Accordion.AccordionContent>
-				</Accordion.Item>
-				<Accordion.Item value="instruction-5">
-					<Accordion.AccordionTrigger>Install browser extension</Accordion.AccordionTrigger>
-					<Accordion.AccordionContent>
+					</AccordionContent>
+				</AccordionItem>
+				<AccordionItem value="instruction-3">
+					<AccordionTrigger>Set up DPU</AccordionTrigger>
+					<AccordionContent>{buildInstructionContent()}</AccordionContent>
+				</AccordionItem>
+				<AccordionItem value="instruction-4">
+					<AccordionTrigger>Set up triggers</AccordionTrigger>
+					<AccordionContent>{triggerContent()}</AccordionContent>
+				</AccordionItem>
+				<AccordionItem value="instruction-5">
+					<AccordionTrigger>Install browser extension</AccordionTrigger>
+					<AccordionContent>
 						<a href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1">
 							<Button variant={'text'}>Link</Button>
 						</a>
-					</Accordion.AccordionContent>
-				</Accordion.Item>
-			</Accordion.Root>
+					</AccordionContent>
+				</AccordionItem>
+			</Accordion>
 
 			<Footer />
 		</div>
