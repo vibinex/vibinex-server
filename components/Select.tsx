@@ -8,7 +8,7 @@ import {
 
 interface SelectProps {
 	optionsType: string,
-	options: { value: string; label: string }[],
+	options: { value: string, label: string, disabled?: boolean }[],
 	onValueChange: (value: string) => void;
 	defaultValue?: string,
 	className?: string,
@@ -23,7 +23,7 @@ const Select: React.FC<SelectProps> = ({ optionsType, options, onValueChange, de
 				</SelectTrigger>
 				<SelectContent>
 					{options.map((option, index) => (
-						<SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+						<SelectItem key={index} value={option.value} disabled={option.disabled}>{option.label}</SelectItem>
 					))}
 				</SelectContent>
 			</SelectBase>

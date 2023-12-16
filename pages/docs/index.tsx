@@ -51,8 +51,8 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 
 	const [selectedProvider, setSelectedProvider] = useState<string>('');
 	const providerOptions = [
-		{ value: 'github', label: 'Github' },
-		{ value: 'bitbucket', label: 'Bitbucket' },
+		{ value: 'github', label: 'Github', disabled: false }, // TODO: @tapishr Replace the disabled flag with the actual status based on auth
+		{ value: 'bitbucket', label: 'Bitbucket', disabled: false },
 	];
 
 	const [selectedInstallation, setSelectedInstallation] = useState<string>('');
