@@ -120,7 +120,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			<MainAppBar />
 
 			{/* Center content */}
-			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-4 py-2'>
+			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
 				<AccordionItem value="instruction-1">
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
 				</AccordionItem>
@@ -142,11 +142,11 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 						</div>
 					</AccordionContent>
 				</AccordionItem>
-				<AccordionItem value="instruction-3">
+				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>{buildInstructionContent()}</AccordionContent>
 				</AccordionItem>
-				<AccordionItem value="instruction-4">
+				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>
 					<AccordionTrigger>Set up triggers</AccordionTrigger>
 					<AccordionContent>{triggerContent()}</AccordionContent>
 				</AccordionItem>
