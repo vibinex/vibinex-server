@@ -101,7 +101,8 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 		_GITHUB_APP_ID: process.env.GITHUB_APP_ID || '',
 		_GITHUB_BASE_URL: process.env.GITHUB_BASE_URL || '',
 		_INSTALL_ID: topic_name || '',
-		_SERVER_URL: process.env.SERVER_URL || ''
+		_SERVER_URL: process.env.SERVER_URL || '',
+		_USER_ID: user_id
 	};
 
 	const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
