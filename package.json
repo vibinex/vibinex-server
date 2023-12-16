@@ -27,6 +27,7 @@
     "@nivo/voronoi": "^0.80.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/themes": "^2.0.2",
     "@rudderstack/rudder-sdk-node": "^2.0.2",

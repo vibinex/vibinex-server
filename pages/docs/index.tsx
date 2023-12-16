@@ -11,6 +11,7 @@ import { MdContentCopy } from "react-icons/md";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import { Code } from '@radix-ui/themes';
 import * as Progress from '@radix-ui/react-progress';
+import Select from '../../components/Select';
 
 
 const verifySetup = [
@@ -18,30 +19,6 @@ const verifySetup = [
 	"When you view the list of pull requests, the relevant ones will get highlighted in yellow, with details that help you choose where to start",
 	"Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow."
 ]
-
-interface RadioButtonsProps {
-	options: { value: string; label: string }[];
-	selectedOption: string;
-	onSelect: (value: string) => void;
-}
-
-const RadioButtons: React.FC<RadioButtonsProps> = ({ options, selectedOption, onSelect }) => {
-	return (
-	  <div>
-		{options.map((option, index) => (
-		  <label key={index}>
-			<input
-			  type="radio"
-			  value={option.value}
-			  checked={selectedOption === option.value}
-			  onChange={() => onSelect(option.value)}
-			/>
-			{option.label}
-		  </label>
-		))}
-	  </div>
-	);
-};
 
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
@@ -149,10 +126,20 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 				</AccordionItem>
 				<AccordionItem value="instruction-2">
 					<AccordionTrigger>Configure your DPU</AccordionTrigger>
-					<AccordionContent>
-						Provider: <RadioButtons options={providerOptions} selectedOption={selectedProvider} onSelect={setSelectedProvider} />
-						Installation Type: <RadioButtons options={installationOptions} selectedOption={selectedInstallation} onSelect={setSelectedInstallation} />
-						Hosting: <RadioButtons options={hostingOptions} selectedOption={selectedHosting} onSelect={setSelectedHosting} />
+					<AccordionContent className='flex flex-col gap-2 pl-4'>
+						<div className='flex justify-between'>
+							<label className='font-semibold text-sm'>Provider:</label>
+							<Select optionsType="Provider" options={providerOptions} onValueChange={setSelectedProvider} defaultValue={selectedProvider} className='w-1/2' />
+						</div>
+						<div className='flex justify-between'>
+							<label className='font-semibold text-sm'>Installation Type:</label>
+							<Select optionsType='Installation Type' options={installationOptions} onValueChange={setSelectedInstallation} defaultValue={selectedInstallation} className='w-1/2' />
+						</div>
+
+						<div className='flex justify-between'>
+							<label className='font-semibold text-sm'>Hosting:</label>
+							<Select optionsType='Hosting option' options={hostingOptions} onValueChange={setSelectedHosting} defaultValue={selectedHosting} className='w-1/2' />
+						</div>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-3">
