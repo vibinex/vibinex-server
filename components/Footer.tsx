@@ -37,6 +37,14 @@ const Footer = (props: { className?: string }) => {
 						<Link href={'https://www.instagram.com/vibinex/'}><BsInstagram size={35} /></Link>
 						<Link href={'https://twitter.com/Vibinex'}><BsTwitter size={35} /></Link>
 					</div>
+
+					<Link href="https://www.producthunt.com/posts/vibinex-code-review?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-vibinex&#0045;code&#0045;review" target="_blank"
+						className="block mt-5 w-60 h-14 border border-white rounded-lg m-auto">
+						<img
+							src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=394365&theme=dark"
+							alt="Vibinex&#0032;Code&#0045;Review - A&#0032;distributed&#0032;process&#0032;for&#0032;reviewing&#0032;pull&#0032;requests | Product Hunt"
+							className="w-full h-full" width="250" height="54" />
+					</Link>
 				</div>
 
 				{/* legal */}
