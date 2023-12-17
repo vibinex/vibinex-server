@@ -25,7 +25,19 @@ module.exports = {
 					activeDisabled: '#2196F355',
 					inactive: '#C4C4C4',
 					inactiveDisabled: '#C4C4C455',
-				}
+				},
+				muted: {
+					DEFAULT: "hsl(var(--muted))",
+					foreground: "hsl(var(--muted-foreground))",
+				},
+				accent: {
+					DEFAULT: "hsl(var(--accent))",
+					foreground: "hsl(var(--accent-foreground))",
+				},
+				popover: {
+					DEFAULT: "hsl(var(--popover))",
+					foreground: "hsl(var(--popover-foreground))",
+				},
 			},
 			fontFamily: {
 				custom: ['Raleway', 'Roboto', 'sans-serif'],
