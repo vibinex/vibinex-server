@@ -47,7 +47,23 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
     
     const buildStatus : CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.user_id, topicName);
     console.info("[pubsubHandler] build status: ", buildStatus);
-    return res.status(200).json(buildStatus);
+    if (!buildStatus.success) {
+        console.error('[pubsubHandler] Error triggering build:', buildStatus.message);
+        return res.status(500).json({ "error": buildStatus.message, success: false });
+    }
+
+    const buildId = buildStatus.buildDetails?.id;
+    if (!buildId) {
+        console.error('[pubsubHandler] No build ID found in buildDetails');
+        return res.status(500).json({ error: 'No build ID found', success: false });
+    }
+    const finalBuildStatus = await pollBuildStatus(projectId, location, buildId);
+    if (finalBuildStatus === 'SUCCESS') {
+        return res.status(200).json({ message: 'Build completed successfully', success: true });
+    } else {
+        console.error(`[pubsubHandler] Build failed with status: ${finalBuildStatus}`);
+        return res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
+    }
 }
 
 export default pubsubHandler;
