@@ -33,7 +33,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
             res.status(500).json({"error": "Internal server error"});
             return;
         }
-        topicName = gcloudTopic;
+        topicName = generated_topic;
         try {
             await saveTopicNameInUsersTable(jsonBody.user_id, topicName);
         } catch (error) {
