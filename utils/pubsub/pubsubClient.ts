@@ -66,7 +66,6 @@ async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string>{
 	const response = await axios.get('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
     headers: { 'Metadata-Flavor': 'Google' }
 	});
-
 	if (!response.data) {
 		console.error('[getAccessTokenFromMetaServerForGcloudApi] Failed to retrieve access token');
 		return response.statusText;

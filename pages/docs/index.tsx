@@ -104,9 +104,10 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 		const handleBuildButtonClick = async () => {
 			setIsButtonDisabled(true);
 			setProgress(10); // Reset progress to 0 when the button is clicked
-
+			setBuildStatus(null);
+			const user_id = '6ee91d1a-9ef1-49de-a4ab-281f0bac87f7';
 			axios.post('/api/dpu/pubsub', {
-				user_id: getAuthUserId(session),
+				user_id: user_id, //getAuthUserId(session),
 			}).then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
 				setBuildStatus(response.data);
@@ -116,6 +117,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			}).catch((e) => {
 				setBuildStatus({ success: false, message: 'API request failed' });
 				console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
+				setProgress(0);
 			}).finally(() => {
 				setIsButtonDisabled(false);
 			});
@@ -127,20 +129,22 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			return (<>
 			<Button variant="contained" target='_blank' onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
 				Build</Button>
-			<Progress.Root className="relative overflow-hidden bg-green rounded-full w-[300px] h-[25px]"
+			<Progress.Root className="relative overflow-hidden bg-black rounded-full w-[300px] h-[25px]"
 				style={{ transform: 'translateZ(0)', }}
 				value={progress}
 			>
 				<Progress.Indicator 
-					className="bg-blue w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)]"
+					className="bg-white w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)]"
 					style={{ transform: `translateX(${progress}%)` }}
 				/>
 			</Progress.Root>
-			{buildStatus && buildStatus.success ? (
-            <span>Build succeeded!</span>
-          ) : buildStatus? (
-            <span>Build failed! Error: {buildStatus.message}</span>
-          ): (<></>)}</>);
+			{buildStatus === null ? (
+				<></>
+			) : buildStatus.success ? (
+				<span>Build succeeded!</span>
+			) : (
+				<span>Build failed! Error: {buildStatus.message}</span>
+			)}</>);
 		} else {
 			return <></>
 		}
