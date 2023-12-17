@@ -35,6 +35,10 @@ interface CloudBuildApiResponse {
     };
 }
 
+interface BuildStatusResponse {
+	status: string;
+}
+
 // Set up authentication and initialize PubSub client
 const pubsub = new PubSub({ projectId: process.env.PROJECT_ID });
 
@@ -131,4 +135,40 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
     console.debug(`[triggerBuildUsinggcloudAPi] ${buildDetails.buildTriggerId} ${buildDetails.status} ${buildDetails.id}`);
     console.info(`[triggerBuildUsingGcloudApi] build triggered for topic_name: ${topic_name} and user_id: ${user_id}`);
     return { success: true, message: response.statusText, buildDetails: buildDetails };
+}
+
+export async function pollBuildStatus(projectId: string, location: string, buildId: string): Promise<string> { //Instead of constant status polling from client[-side, I decided to do the polling in the api itself to avoid setting up websocket or another functionality for polling from client side. We can discuss on it whether we want user to see each and every build status or simply a success or failure response?!
+    const url = `https://cloudbuild.googleapis.com/v1/projects/${projectId}/locations/${location}/builds/${buildId}`;
+    let attempts = 0;
+    const maxAttempts = 30; // we can adjust this as per our maximum build time
+    const delay = 10000; // Delay between attempts
+
+	const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
+    while (attempts < maxAttempts) {
+        const response = await axios.get(url, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+
+        if (!response.data) {
+            console.error('[pollBuildStatus] Failed to fetch build status:', response.statusText);
+            return 'ERROR';
+        }
+
+        const data: BuildStatusResponse = await response.data;
+        if (['SUCCESS', 'FAILURE', 'INTERNAL_ERROR', 'TIMEOUT', 'CANCELLED', 'EXPIRED', 'STATUS_UNKNOWN'].includes(data.status)) {
+            return data.status; // These above states are considered as Final state
+        }
+
+        // In-progress states
+        if (['PENDING', 'QUEUED', 'WORKING'].includes(data.status)) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+            attempts++;
+            continue;
+        }
+
+        console.error(`[pollBuildStatus] Unexpected build status: ${data.status}`);
+        return 'ERROR';
+    }
+	console.error('[pollBuildStatus] Build status check exceeded maximum attempts');
+    return 'TIMEOUT'; // Indicate a timeout in build status check
 }
