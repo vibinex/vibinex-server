@@ -33,9 +33,9 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	res.write(
 		`<script>
-			location.href="/u"
+			location.href="/docs"
 		</script>\
-		If you are not automatically redirected, <a href="/u">click here</a>`
+		If you are not automatically redirected, <a href="/docs">click here</a>`
 	);
 	res.end();
 }
