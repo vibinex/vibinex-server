@@ -26,6 +26,7 @@ const verifySetup = [
 const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
+	console.log("[Docs] session = ", session)
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
@@ -69,11 +70,22 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	];
 
 	const github_app_url = "https://github.com/apps/vibinex-code-review";
-
+	const user_id = getAuthUserId(session);//'6ee91d1a-9ef1-49de-a4ab-281f0bac87f7';
 	const CodeWithCopyButton = () => {
 		const [isCopied, setIsCopied] = useState(false);
 		const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-	
+		const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
+		axios.post('/api/dpu/pubsub', {
+			user_id: user_id, //getAuthUserId(session),
+		}).then((response) => {
+			if (response.data.install_id) {
+				setSelfHostingCode(`docker pull gcr.io/vibi-prod/dpu\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.install_id}`);
+			}
+			console.log("[Docs/index.tsx] topic name ", response.data.install_id);
+		}).catch((error) => {
+			console.error(`[Docs/index.tsx] Unable to get topic name for user ${user_id} - ${error.message}`);
+		})
+		
 		const handleCopyClick = () => {
 		  setIsButtonDisabled(true);
 		};
@@ -82,27 +94,17 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 		  setIsCopied(true);
 		  setIsButtonDisabled(false);
 		};
-		let selfhostingCode = "Topic generation failed, please try refreshing the page and selecting configuration again";
-		const user_id = '6ee91d1a-9ef1-49de-a4ab-281f0bac87f7';
-		axios.post('/api/dpu/pubsub', {
-			user_id: user_id, //getAuthUserId(session),
-		}).then((response) => {
-			console.log('[CodeWithCopyButton] /api/dpu/pubsub response:', response.data);			
-			if (response.data.install_id) {
-				selfhostingCode = `docker pull gcr.io/vibi-prod/dpu\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.install_id} `;
-			}
-		}).catch((e) => {
-			console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
-		});
+		
 	
 		return (
 			<div style={{ position: 'relative' }}>
-			<CopyToClipboard text={selfhostingCode} onCopy={handleCopy}>
+			<Code size="2">{selfHostingCode}</Code>
+			<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
 			  <button
 				style={{
 				  position: 'absolute',
-				  top: '5px',
-				  right: '5px',
+				  top: '0px',
+				  right: '0px',
 				  cursor: 'pointer',
 				  background: 'none',
 				  border: 'none',
@@ -149,28 +151,28 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	const [progress, setProgress] = React.useState(43);
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
   	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
+	const handleBuildButtonClick = async () => {
+		setIsButtonDisabled(true);
+		setProgress(10); // Reset progress to 0 when the button is clicked
+		setBuildStatus(null);
+		axios.post('/api/dpu/trigger', {
+			user_id: user_id, //getAuthUserId(session),
+		}).then((response) => {
+			console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
+			setBuildStatus(response.data);
+			if (response.data.success) {
+				setProgress(100);
+			}
+		}).catch((e) => {
+			setBuildStatus({ success: false, message: 'API request failed' });
+			console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
+			setProgress(0);
+		}).finally(() => {
+			setIsButtonDisabled(false);
+		});
+	}
+	
 	const buildInstructionContent = () => {
-		const handleBuildButtonClick = async () => {
-			setIsButtonDisabled(true);
-			setProgress(10); // Reset progress to 0 when the button is clicked
-			setBuildStatus(null);
-			const user_id = '6ee91d1a-9ef1-49de-a4ab-281f0bac87f7';
-			axios.post('/api/dpu/trigger', {
-				user_id: user_id, //getAuthUserId(session),
-			}).then((response) => {
-				console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
-				setBuildStatus(response.data);
-				if (response.data.success) {
-					setProgress(100);
-				}
-			}).catch((e) => {
-				setBuildStatus({ success: false, message: 'API request failed' });
-				console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
-				setProgress(0);
-			}).finally(() => {
-				setIsButtonDisabled(false);
-			});
-		}
 		if (selectedHosting === 'selfhosting') {
 			return (<CodeWithCopyButton />);
 		} else if (selectedHosting === 'cloud') {
@@ -250,11 +252,12 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 
 Docs.getInitialProps = async () => {
 	const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
-	const redirectUri = 'https://vibinex.com/api/bitbucket/callbacks/install';
+	const redirectUri = 'https://vibi-test-394606.el.r.appspot.com/api/bitbucket/callbacks/install';
 	const scopes = 'repository';
 	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
 
 	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
+	console.debug(`[getInitialProps] url: `, url)
 	return {
 		bitbucket_auth_url: url
 	}
