@@ -208,6 +208,58 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
 				<AccordionItem value="instruction-1">
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
+					<AccordionContent>
+						<div className='flex justify-between'>
+							{session?.user?.auth_info?.github ? (
+								// If GitHub info is present in the session
+								<>
+								<Button
+									variant="contained"
+									onClick={() => {
+									// Handle GitHub login action
+									// ...
+									}}
+								>
+									Login with GitHub
+								</Button>
+								<MdContentCopy style={{ color: 'green' }} />
+								</>
+							) : (
+								// If GitHub info is not present in the session
+								<Button
+								variant="contained"
+								href="/api/auth/signin"  // Redirect to sign-in
+								>
+								Login with GitHub
+								</Button>
+							)}
+							</div>
+							<div className='flex justify-between'>
+							{session?.user?.auth_info?.bitbucket ? (
+								// If Bitbucket info is present in the session
+								<>
+								<Button
+									variant="contained"
+									onClick={() => {
+									// Handle Bitbucket login action
+									// ...
+									}}
+								>
+									Login with Bitbucket
+								</Button>
+								<MdContentCopy style={{ color: 'green' }} />
+								</>
+							) : (
+								// If Bitbucket info is not present in the session
+								<Button
+								variant="contained"
+								href="/api/auth/signin"  // Redirect to sign-in
+								>
+								Login with Bitbucket
+								</Button>
+							)}
+							</div>
+					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-2">
 					<AccordionTrigger>Configure your DPU</AccordionTrigger>
