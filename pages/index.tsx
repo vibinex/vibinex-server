@@ -11,6 +11,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initi
 import JoinSlack from '../views/JoinSlack'
 import { useSession } from 'next-auth/react'
 import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
+import ProductDemo from '../views/Demo'
 
 export default function Home() {
 	const session: Session | null = useSession().data;
@@ -30,8 +31,9 @@ export default function Home() {
 		<div className='overflow-hidden'>
 			<Navbar transparent={true} />
 			<Hero ctaLink={'/u'} />
-			<WhyUs />
+			<ProductDemo />
 			<Features />
+			<WhyUs />
 			<TrustUs />
 			<JoinSlack />
 			<Footer />
