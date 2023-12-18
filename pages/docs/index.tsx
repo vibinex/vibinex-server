@@ -14,6 +14,7 @@ import * as Progress from '@radix-ui/react-progress';
 import Select from '../../components/Select';
 import axios from 'axios';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 
 const verifySetup = [
@@ -68,6 +69,54 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 	];
 
 	const github_app_url = "https://github.com/apps/vibinex-code-review";
+
+	const CodeWithCopyButton = () => {
+		const [isCopied, setIsCopied] = useState(false);
+		const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+	
+		const handleCopyClick = () => {
+		  setIsButtonDisabled(true);
+		};
+	
+		const handleCopy = () => {
+		  setIsCopied(true);
+		  setIsButtonDisabled(false);
+		};
+		let selfhostingCode = "Topic generation failed, please try refreshing the page and selecting configuration again";
+		const user_id = '6ee91d1a-9ef1-49de-a4ab-281f0bac87f7';
+		axios.post('/api/dpu/pubsub', {
+			user_id: user_id, //getAuthUserId(session),
+		}).then((response) => {
+			console.log('[CodeWithCopyButton] /api/dpu/pubsub response:', response.data);			
+			if (response.data.install_id) {
+				selfhostingCode = `docker pull gcr.io/vibi-prod/dpu\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.install_id} `;
+			}
+		}).catch((e) => {
+			console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
+		});
+	
+		return (
+			<div style={{ position: 'relative' }}>
+			<CopyToClipboard text={selfhostingCode} onCopy={handleCopy}>
+			  <button
+				style={{
+				  position: 'absolute',
+				  top: '5px',
+				  right: '5px',
+				  cursor: 'pointer',
+				  background: 'none',
+				  border: 'none',
+				}}
+				onClick={handleCopyClick}
+				disabled={isButtonDisabled}
+			  >
+				<MdContentCopy />
+			  </button>
+			</CopyToClipboard>
+			{isCopied && <span style={{ position: 'absolute', top: '0', right: '50%', transform: 'translate(50%, -100%)', color: 'green' }}>Copied!</span>}
+		  </div>
+		);
+	  };
 	const triggerContent = () => {
 		if (selectedProvider === 'github') {
 			return (<>
@@ -106,7 +155,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			setProgress(10); // Reset progress to 0 when the button is clicked
 			setBuildStatus(null);
 			const user_id = '6ee91d1a-9ef1-49de-a4ab-281f0bac87f7';
-			axios.post('/api/dpu/pubsub', {
+			axios.post('/api/dpu/trigger', {
 				user_id: user_id, //getAuthUserId(session),
 			}).then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
@@ -122,9 +171,8 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 				setIsButtonDisabled(false);
 			});
 		}
-		const selfhostingCode = "docker pull gcr.io/vibi-prod/dpu\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=insert_install_id"; // TODO - install id	
 		if (selectedHosting === 'selfhosting') {
-			return (<Code size="2">{selfhostingCode}</Code>);
+			return (<CodeWithCopyButton />);
 		} else if (selectedHosting === 'cloud') {
 			return (<>
 			<Button variant="contained" target='_blank' onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
