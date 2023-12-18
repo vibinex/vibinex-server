@@ -162,19 +162,15 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 				<AccordionItem value="instruction-2">
 					<AccordionTrigger>Configure your DPU</AccordionTrigger>
 					<AccordionContent className='flex flex-col gap-2 pl-4'>
-						<div className='flex justify-between'>
-							<label className='font-semibold text-sm'>Provider:</label>
-							<Select optionsType="Provider" options={providerOptions} onValueChange={setSelectedProvider} defaultValue={selectedProvider} className='w-1/2' />
-						</div>
-						<div className='flex justify-between'>
-							<label className='font-semibold text-sm'>Installation Type:</label>
-							<Select optionsType='Installation Type' options={installationOptions} onValueChange={setSelectedInstallation} defaultValue={selectedInstallation} className='w-1/2' />
-						</div>
-
-						<div className='flex justify-between'>
-							<label className='font-semibold text-sm'>Hosting:</label>
-							<Select optionsType='Hosting option' options={hostingOptions} onValueChange={setSelectedHosting} defaultValue={selectedHosting} className='w-1/2' />
-						</div>
+						<label className='flex justify-between font-semibold text-sm'>Provider:
+							<Select optionsType="Provider" options={providerOptions} onValueChange={setSelectedProvider} defaultValue={selectedProvider} className='w-1/2 font-normal' />
+						</label>
+						<label className='flex justify-between font-semibold text-sm'>Installation Type:
+							<Select optionsType='Installation Type' options={installationOptions} onValueChange={setSelectedInstallation} defaultValue={selectedInstallation} className='w-1/2 font-normal' />
+						</label>
+						<label className='font-semibold text-sm w-full flex justify-between'>Hosting:
+							<Select optionsType='Hosting option' options={hostingOptions} onValueChange={setSelectedHosting} defaultValue={selectedHosting} className='w-1/2 font-normal' />
+						</label>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>

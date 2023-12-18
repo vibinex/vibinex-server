@@ -22,8 +22,8 @@ const Select: React.FC<SelectProps> = ({ optionsType, options, onValueChange, de
 					<SelectValue placeholder={`Select ${optionsType.toLowerCase()}`} />
 				</SelectTrigger>
 				<SelectContent>
-					{options.map((option, index) => (
-						<SelectItem key={index} value={option.value} disabled={option.disabled}>{option.label}</SelectItem>
+					{options.map((option) => (
+						<SelectItem key={option.value} value={option.value} disabled={option.disabled}>{option.label}</SelectItem>
 					))}
 				</SelectContent>
 			</SelectBase>
