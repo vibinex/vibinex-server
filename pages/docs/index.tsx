@@ -215,14 +215,10 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 								<>
 								<Button
 									variant="contained"
-									onClick={() => {
-									// Handle GitHub login action
-									// ...
-									}}
+									disabled={true}
 								>
 									Login with GitHub
 								</Button>
-								<MdContentCopy style={{ color: 'green' }} />
 								</>
 							) : (
 								// If GitHub info is not present in the session
@@ -240,14 +236,10 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 								<>
 								<Button
 									variant="contained"
-									onClick={() => {
-									// Handle Bitbucket login action
-									// ...
-									}}
+									disabled={true}
 								>
 									Login with Bitbucket
 								</Button>
-								<MdContentCopy style={{ color: 'green' }} />
 								</>
 							) : (
 								// If Bitbucket info is not present in the session
