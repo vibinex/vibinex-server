@@ -25,7 +25,26 @@ module.exports = {
 					activeDisabled: '#2196F355',
 					inactive: '#C4C4C4',
 					inactiveDisabled: '#C4C4C455',
-				}
+				},
+				success: {
+					DEFAULT: "#11BB00",
+				},
+				error: {
+					DEFAULT: "#BB1100",
+					dark: "#FF5252",
+				},
+				muted: {
+					DEFAULT: "hsl(var(--muted))",
+					foreground: "hsl(var(--muted-foreground))",
+				},
+				accent: {
+					DEFAULT: "hsl(var(--accent))",
+					foreground: "hsl(var(--accent-foreground))",
+				},
+				popover: {
+					DEFAULT: "hsl(var(--popover))",
+					foreground: "hsl(var(--popover-foreground))",
+				},
 			},
 			fontFamily: {
 				custom: ['Raleway', 'Roboto', 'sans-serif'],
@@ -33,7 +52,21 @@ module.exports = {
 			},
 			spacing: {
 				'screen-1/2': "50vh"
-			}
+			},
+			keyframes: {
+				"accordion-down": {
+					from: { height: "0" },
+					to: { height: "var(--radix-accordion-content-height)" },
+				},
+				"accordion-up": {
+					from: { height: "var(--radix-accordion-content-height)" },
+					to: { height: "0" },
+				},
+			},
+			animation: {
+				"accordion-down": "accordion-down 0.2s ease-out",
+				"accordion-up": "accordion-up 0.2s ease-out",
+			},
 		},
 	},
 	plugins: [
