@@ -10,6 +10,7 @@ import RudderContext from '../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
 import AppBar from '../components/AppBar';
+import VibinexDarkLogo from '../public/vibinex-dark-logo.png';
 
 const Navbar = (props: { transparent: boolean }) => {
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
@@ -81,8 +82,9 @@ const Navbar = (props: { transparent: boolean }) => {
 		<AppBar position='fixed' offset={!props.transparent} className='mx-auto p-4 justify-between items-center max-w-7xl'
 			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-transparent text-primary-light')}
 		>
-			<Link href='/'>
-				<h1 className='font-bold text-4xl'>
+			<Link href='/' className='flex items-center'>
+				<Image src={VibinexDarkLogo} alt="Vibinex logo" className="inline w-10 mr-2"></Image>
+				<h1 className='font-bold text-3xl sm:text-4xl font-sans tracking-widest'>
 					Vibinex
 				</h1>
 			</Link>
