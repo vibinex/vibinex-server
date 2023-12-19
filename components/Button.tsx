@@ -20,8 +20,8 @@ const Button = (props: PropsWithChildren<{
 		}
 	}
 	const variantClasses = {
-		'contained': "bg-primary-main text-secondary-main disabled:bg-action-inactive disabled:hover:bg-transparent hover:bg-primary-dark ",
-		'outlined': "border-secondary-main border-2 rounded ",
+		'contained': "bg-primary-main text-secondary-main disabled:bg-action-inactive disabled:hover:bg-transparent hover:bg-primary-main/80 hover:text-secondary-main/80 ",
+		'outlined': "border-secondary-main text-secondary-main border-2 rounded hover:border-secondary-main/80 hover:text-secondary-main/80 ",
 		'text': "",
 	}
 
