@@ -83,7 +83,7 @@ const Navbar = (props: { transparent: boolean }) => {
 			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-transparent text-primary-light')}
 		>
 			<Link href='/' className='flex items-center'>
-				<Image src={VibinexDarkLogo} alt="Vibinex logo" className="inline w-10 mr-2"></Image>
+				<Image src={VibinexDarkLogo} alt="Vibinex logo" className="inline w-10 mr-2" priority></Image>
 				<h1 className='font-bold text-3xl sm:text-4xl font-sans tracking-widest'>
 					Vibinex
 				</h1>
