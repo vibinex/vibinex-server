@@ -26,6 +26,13 @@ module.exports = {
 					inactive: '#C4C4C4',
 					inactiveDisabled: '#C4C4C455',
 				},
+				success: {
+					DEFAULT: "#11BB00",
+				},
+				error: {
+					DEFAULT: "#BB1100",
+					dark: "#FF5252",
+				},
 				muted: {
 					DEFAULT: "hsl(var(--muted))",
 					foreground: "hsl(var(--muted-foreground))",

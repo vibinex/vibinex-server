@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useSession } from 'next-auth/react'
-import type { Session } from 'next-auth'
+import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import Button from "../../components/Button";
 import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
@@ -10,11 +10,9 @@ import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
 import { MdContentCopy } from "react-icons/md";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import { Code } from '@radix-ui/themes';
-import * as Progress from '@radix-ui/react-progress';
 import Select from '../../components/Select';
 import axios from 'axios';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
-
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -97,27 +95,24 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			return <></>;
 		}
 	};
-	const [progress, setProgress] = React.useState(43);
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
+	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 	const buildInstructionContent = () => {
 		const handleBuildButtonClick = async () => {
 			setIsButtonDisabled(true);
-			setProgress(10); // Reset progress to 0 when the button is clicked
 			setBuildStatus(null);
-			const user_id = '6ee91d1a-9ef1-49de-a4ab-281f0bac87f7';
+			const user_id = '6ee91d1a-9ef1-49de-a4ab-281f0bac87f7'; // TODO: replace hard coded user id with the actual user id
 			axios.post('/api/dpu/pubsub', {
 				user_id: user_id, //getAuthUserId(session),
 			}).then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
 				setBuildStatus(response.data);
 				if (response.data.success) {
-					setProgress(100);
+					return;
 				}
 			}).catch((e) => {
 				setBuildStatus({ success: false, message: 'API request failed' });
 				console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
-				setProgress(0);
 			}).finally(() => {
 				setIsButtonDisabled(false);
 			});
@@ -126,25 +121,19 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 		if (selectedHosting === 'selfhosting') {
 			return (<Code size="2">{selfhostingCode}</Code>);
 		} else if (selectedHosting === 'cloud') {
-			return (<>
-			<Button variant="contained" target='_blank' onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
-				Build</Button>
-			<Progress.Root className="relative overflow-hidden bg-black rounded-full w-[300px] h-[25px]"
-				style={{ transform: 'translateZ(0)', }}
-				value={progress}
-			>
-				<Progress.Indicator 
-					className="bg-white w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)]"
-					style={{ transform: `translateX(${progress}%)` }}
-				/>
-			</Progress.Root>
-			{buildStatus === null ? (
-				<></>
-			) : buildStatus.success ? (
-				<span>Build succeeded!</span>
-			) : (
-				<span>Build failed! Error: {buildStatus.message}</span>
-			)}</>);
+			return (
+				<div className="flex items-center gap-4">
+					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isButtonDisabled} className='text-lg px-6 py-2'>
+						Build
+					</Button>
+					{buildStatus === null ? (
+						isButtonDisabled ? <div className="border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin"></div> : null
+					)
+						: buildStatus.success ? (<span className='text-success'>Build succeeded!</span>)
+							: (<span className='text-error'>Build failed! Error: {buildStatus.message}</span>)
+					}
+				</div>
+			);
 		} else {
 			return <></>
 		}
