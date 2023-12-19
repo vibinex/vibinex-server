@@ -41,20 +41,19 @@ const Hero = (props: { ctaLink: string }) => {
 					<span className='text-primary-main font-bold block'>Confidence</span>
 				</h1>
 				<p className="text-xl sm:text-2xl text-gray-300">
-					Overlays <span className="text-primary-main">context</span> on the PR •
-					Accurate <span className="text-primary-main">reviewer</span> selection
+					Auto-assign the <span className="text-primary-main">right reviewers</span>, spotlight code <span className="text-primary-main">relevant to you</span>, and foster seamless collaboration for <span className="text-primary-main">efficient, bug-free</span> pull requests.
 				</p>
-				<p className="text-lg sm:text-lg mb-10 text-gray-300">
-					Code <span className="text-primary-main">privacy</span> by design • Open source
-				</p>
-				<div className="w-full flex space-x-4">
-					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] mt-5'>
+				<div className="w-full flex space-x-4 my-5">
+					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px]'>
 						Get Started
 					</Button>
-					<Button id="book-demo-btn" variant="outlined" href="https://calendly.com/avikalp-gupta/30min" target="_blank" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5'>
+					<Button id="book-demo-btn" variant="outlined" href="https://calendly.com/avikalp-gupta/30min" target="_blank" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px]'>
 						Book demo
 					</Button>
 				</div>
+				<p className="text-lg sm:text-lg mb-10 text-gray-300" title="100% privacy & data protection">
+					Your code <span className="text-primary-main">never leaves your systems</span> by design
+				</p>
 				<div className="mt-20 w-full relative">
 					{/*Overlay*/}
 					<div className='absolute bg-black/50 z-10 h-full w-full' />
