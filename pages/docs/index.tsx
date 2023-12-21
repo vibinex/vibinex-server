@@ -23,7 +23,7 @@ const verifySetup = [
 	"Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow."
 ]
 
-const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
+const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }, { image_name }: { image_name : string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
 	console.log("[Docs] session = ", session)
@@ -79,7 +79,7 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			user_id: user_id, //getAuthUserId(session),
 		}).then((response) => {
 			if (response.data.install_id) {
-				setSelfHostingCode(`docker pull gcr.io/vibi-prod/dpu\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.install_id}`);
+				setSelfHostingCode(`docker pull ${image_name}\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.install_id}`);
 			}
 			console.log("[Docs/index.tsx] topic name ", response.data.install_id);
 		}).catch((error) => {
@@ -255,11 +255,13 @@ Docs.getInitialProps = async () => {
 	const redirectUri = 'https://vibi-test-394606.el.r.appspot.com/api/bitbucket/callbacks/install';
 	const scopes = 'repository';
 	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
+	const image_name= process.env.DPU_IMAGE_NAME;
 
 	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
 	console.debug(`[getInitialProps] url: `, url)
 	return {
-		bitbucket_auth_url: url
+		bitbucket_auth_url: url,
+		image_name: image_name
 	}
 }
 
