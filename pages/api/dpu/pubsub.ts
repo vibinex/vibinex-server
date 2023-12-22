@@ -55,7 +55,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
     const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
     if (!projectId || !location) {
         console.error('[pubsubHandler] Environment variables for projectId and location must be set');
-        res.status(400).json({"error": "env variables must be set", success: false});
+        res.status(500).json({"error": "env variables must be set", success: false});
         return;
     }
     const buildId = buildStatus.buildDetails?.id;
