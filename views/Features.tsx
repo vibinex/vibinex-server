@@ -10,7 +10,7 @@ const FeatureList = [
 
 const Features = () => {
 	return (
-		<div id='features' className='w-full text-center py-12'>
+		<div id='features' className='w-full text-center py-12 bg-secondary-main'>
 			<h2 className='font-bold text-[2rem]'>Vibinex  <span className='text-[2rem] text-primary-main font-bold'>Features</span></h2>
 			<div className='sm:flex sm:w-[95%] w-[100%] m-auto'>
 				{FeatureList.map((item) => (

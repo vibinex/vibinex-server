@@ -41,7 +41,34 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
         })
     }
     console.info("[pubsubHandler] topic name created successfully and saved in db: ", topicName);
-    return res.status(200).json({"install_id": topicName});
+
+    //check if already a build exists in users table for the user, if yes? check status else continue
+    
+    const buildStatus : CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.user_id, topicName);
+    console.info("[pubsubHandler] build status: ", buildStatus);
+    if (!buildStatus.success) {
+        console.error('[pubsubHandler] Error triggering build:', buildStatus.message);
+        return res.status(500).json({ "error": buildStatus.message, success: false });
+    }
+    const projectId: string | undefined = process.env.PROJECT_ID;
+    const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
+    if (!projectId || !location) {
+        console.error('[pubsubHandler] Environment variables for projectId and location must be set');
+        res.status(500).json({"error": "env variables must be set", success: false});
+        return;
+    }
+    const buildId = buildStatus.buildDetails?.id;
+    if (!buildId) {
+        console.error('[pubsubHandler] No build ID found in buildDetails');
+        return res.status(500).json({ error: 'No build ID found', success: false });
+    }
+    const finalBuildStatus = await pollBuildStatus(projectId, location, buildId);
+    if (finalBuildStatus === 'SUCCESS') {
+        return res.status(200).json({ message: 'Build completed successfully', success: true });
+    } else {
+        console.error(`[pubsubHandler] Build failed with status: ${finalBuildStatus}`);
+        return res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
+    }
 }
 
 export default pubsubHandler;
