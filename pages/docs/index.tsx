@@ -24,6 +24,8 @@ const verifySetup = [
 const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
+	const userId = getAuthUserId(session);
+
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
@@ -122,7 +124,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} bitbucket_auth_url={bitbucket_auth_url}/>
+						<BuildInstruction selectedHosting={selectedHosting} bitbucket_auth_url={bitbucket_auth_url} userId={userId}/>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>

@@ -5,13 +5,15 @@ import axios from 'axios';
 import Button from '../Button';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
 import { getAuthUserId } from '../../utils/auth';
+import CodeWithCopyButton from './CodeWithCopyButton';
 
 interface BuildInstructionProps {
     selectedHosting: string;
     bitbucket_auth_url: string;
+    userId: string;
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bitbucket_auth_url }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bitbucket_auth_url, userId }) => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
     const session: Session | null = useSession().data;
@@ -54,8 +56,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bi
 
     const buildInstructionContent = () => {
         if (selectedHosting === 'selfhosting') {
-            const selfhostingCode = `docker pull gcr.io/vibi-prod/dpu\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=your-install-id`; // TODO; Install-id
-            return <pre>{selfhostingCode}</pre>;
+            return <CodeWithCopyButton userId={userId}/>;
         } else if (selectedHosting === 'cloud') {
             return (
                 <div className="flex items-center gap-4">
