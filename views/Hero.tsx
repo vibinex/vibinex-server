@@ -41,7 +41,7 @@ const Hero = (props: { ctaLink: string }) => {
 					<span className='text-primary-main font-bold block'>Confidence</span>
 				</h1>
 				<p className="text-xl sm:text-2xl text-gray-300">
-					Auto-assign the <span className="text-primary-main">right reviewers</span>, spotlight code <span className="text-primary-main">relevant to you</span>, and foster seamless collaboration for <span className="text-primary-main">efficient, bug-free</span> pull requests.
+					Auto-assign the <span className="text-primary-main">right reviewers</span>, highlight code <span className="text-primary-main">relevant to you</span>, and boost collaboration to ship <span className="text-primary-main">3x faster</span>.
 				</p>
 				<div className="w-full flex space-x-4 my-5">
 					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px]'>
