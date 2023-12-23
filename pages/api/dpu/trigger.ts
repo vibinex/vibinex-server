@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from "next";
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
-import { CloudBuildStatus, createTopicNameInGcloud, pollBuildStatus, triggerBuildUsingGcloudApi } from '../../../utils/pubsub/pubsubClient';
+import { CloudBuildStatus, createTopicNameInGcloud, triggerBuildUsingGcloudApi, pollBuildStatus } from '../../../utils/pubsub/pubsubClient';
 import { DbUser, getUserById } from '../../../utils/db/users';
 
-const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // To be removed, only used for testing the functions
+const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.info("[pubsubHandler] pub sub setup info in db...");
     const jsonBody = req.body;
     let topicName : string;
@@ -34,11 +34,12 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
             return;
         }
         topicName = generated_topic;
-        saveTopicNameInUsersTable(jsonBody.user_id, topicName)
-        .then(() => { console.info("[pubsubHandler] Topic saved in db"); })
-        .catch((error) => {
+        try {
+            await saveTopicNameInUsersTable(jsonBody.user_id, topicName);
+        } catch (error) {
             console.error("[pubsubHandler] Unable to save topic name in db, ", error);
-        })
+            return res.status(500).json({ "error": "Internal server error" });
+        }
     }
     console.info("[pubsubHandler] topic name created successfully and saved in db: ", topicName);
 
@@ -54,7 +55,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
     const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
     if (!projectId || !location) {
         console.error('[pubsubHandler] Environment variables for projectId and location must be set');
-        res.status(500).json({"error": "env variables must be set", success: false});
+        res.status(400).json({"error": "env variables must be set", success: false});
         return;
     }
     const buildId = buildStatus.buildDetails?.id;
@@ -64,11 +65,11 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
     }
     const finalBuildStatus = await pollBuildStatus(projectId, location, buildId);
     if (finalBuildStatus === 'SUCCESS') {
-        return res.status(200).json({ message: 'Build completed successfully', success: true });
+        return res.status(200).json({ message: 'Build completed successfully', success: true, install_id: topicName });
     } else {
         console.error(`[pubsubHandler] Build failed with status: ${finalBuildStatus}`);
         return res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
     }
 }
 
-export default pubsubHandler;
+export default triggerHandler;
