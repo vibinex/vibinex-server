@@ -21,7 +21,7 @@ const verifySetup = [
 	"Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow."
 ]
 
-const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
+const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
 	React.useEffect(() => {
@@ -60,6 +60,50 @@ const Docs = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
 			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
 				<AccordionItem value="instruction-1">
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
+					<AccordionContent>
+						<div className='flex justify-between'>
+							{session?.user?.auth_info?.github ? (
+								// If GitHub info is present in the session
+								<>
+								<Button
+									variant="contained"
+									disabled={true}
+								>
+									Login with GitHub
+								</Button>
+								</>
+							) : (
+								// If GitHub info is not present in the session
+								<Button
+								variant="contained"
+								href="/api/auth/signin"  // Redirect to sign-in
+								>
+								Login with GitHub
+								</Button>
+							)}
+							</div>
+							<div className='flex justify-between'>
+							{session?.user?.auth_info?.bitbucket ? (
+								// If Bitbucket info is present in the session
+								<>
+								<Button
+									variant="contained"
+									disabled={true}
+								>
+									Login with Bitbucket
+								</Button>
+								</>
+							) : (
+								// If Bitbucket info is not present in the session
+								<Button
+								variant="contained"
+								href="/api/auth/signin"  // Redirect to sign-in
+								>
+								Login with Bitbucket
+								</Button>
+							)}
+							</div>
+					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-2">
 					<AccordionTrigger>Configure your DPU</AccordionTrigger>
@@ -107,10 +151,13 @@ Docs.getInitialProps = async () => {
 	const redirectUri = 'https://vibinex.com/api/bitbucket/callbacks/install';
 	const scopes = 'repository';
 	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
+	const image_name= process.env.DPU_IMAGE_NAME;
 
 	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
+	console.debug(`[getInitialProps] url: `, url)
 	return {
-		bitbucket_auth_url: url
+		bitbucket_auth_url: url,
+		image_name: image_name
 	}
 }
 
