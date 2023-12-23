@@ -23,7 +23,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bi
         setIsButtonDisabled(true);
         setBuildStatus(null);
 
-        axios.post('/api/dpu/pubsub', {
+        axios.post('/api/dpu/trigger', {
             user_id: getAuthUserId(session), 
         })
         .then((response) => {
