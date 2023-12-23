@@ -12,6 +12,31 @@ import * as Form from '@radix-ui/react-form';
 import Button from "./Button";
 
 const LeadFormDialogWrapper = ({ children }: PropsWithChildren) => {
+	const isPersonalEmail = (email: string) => {
+		const personalDomains = [
+			'@gmail.com',
+			'@yahoo.com',
+			'@hotmail.com',
+			'@protonmail.com',
+			'@outlook.com',
+			'@icloud.com',
+			'@mail.com',
+			'@live.com',
+			'@me.com',
+			'@hushmail.com',
+			'@aim.com',
+			'@inbox.com',
+			'@qq.com',
+			'@naver.com',
+			'@yahoo.co.jp',
+			'@rediffmail.com',
+			'@yahoo.co.in',
+			'@trashmail.com',
+			'@guerrillamail.com',
+			'@sharklasers.com'
+		];
+		return personalDomains.some(domain => email.endsWith(domain));
+	}
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -42,12 +67,15 @@ const LeadFormDialogWrapper = ({ children }: PropsWithChildren) => {
 					</Form.Field>
 					<Form.Field className="grid mb-[10px]" name="Email">
 						<div className="flex items-baseline justify-between">
-							<Form.Label className="text-[15px] font-medium leading-[35px]">Your Email</Form.Label>
+							<Form.Label className="text-[15px] font-medium leading-[35px]">Company Email</Form.Label>
 							<Form.Message className="text-[13px] opacity-[0.8]" match="valueMissing">
 								Please enter your email
 							</Form.Message>
 							<Form.Message className="text-[13px] opacity-[0.8]" match="typeMismatch">
 								Please provide a valid email
+							</Form.Message>
+							<Form.Message className="text-[13px] opacity-[0.8]" match={(email) => isPersonalEmail(email)}>
+								Please do not provide a personal email
 							</Form.Message>
 						</div>
 						<Form.Control asChild>
@@ -94,7 +122,7 @@ const LeadFormDialogWrapper = ({ children }: PropsWithChildren) => {
 					</Form.Field>
 					<Form.Submit asChild>
 						<Button variant="contained" className="w-full mt-2 py-3 font-medium text-lg leading-none shadow-white/20 focus:shadow-[0_0_0_2px] focus:shadow-primary-text focus:outline-none">
-							Call me
+							Submit
 						</Button>
 					</Form.Submit>
 				</Form.Root>
