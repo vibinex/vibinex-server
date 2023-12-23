@@ -12,24 +12,30 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).json({"error": "Invalid request body"});
         return;
     }
-    const user_data: DbUser = await getUserById(jsonBody.user_id);
-    if (!user_data){
-        console.error(`[pubsubHandler] cannot get user_data`);
+    const user_data: DbUser = await getUserById(jsonBody.user_id).catch(err => {
+        console.error(`[pubsubHandler] error in getting user data`, err);
+        return;
+    });
+    if (!user_data) {
         res.status(500).json({"error": "Internal server error"});
         return;        
     }
     if (user_data.topic_name !== null && user_data.topic_name !== undefined){
         topicName = user_data.topic_name;       
     } else {
-        const generated_topic = await createTopicName(jsonBody.user_id);
-        if (!generated_topic){
-            console.error(`[pubsubHandler] error in creating topic name`);
+        const generated_topic = await createTopicName(jsonBody.user_id).catch(err => {
+            console.error(`[pubsubHandler] error in creating topic name`, err);
+            return;
+        });
+        if (!generated_topic) {
             res.status(500).json({"error": "Internal server error"});
             return;
         }
-        const gcloudTopic = await createTopicNameInGcloud(jsonBody.user_id, generated_topic)
-        if (!gcloudTopic){
-            console.error(`[pubsubHandler] error in creating topic in google cloud`);
+        const gcloudTopic = await createTopicNameInGcloud(jsonBody.user_id, generated_topic).catch(err => {
+            console.error(`[pubsubHandler] error in creating topic in google cloud`, err);
+            return;
+        })
+        if (!gcloudTopic) {
             res.status(500).json({"error": "Internal server error"});
             return;
         }
@@ -45,7 +51,10 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     //check if already a build exists in users table for the user, if yes? check status else continue
     
-    const buildStatus : CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.user_id, topicName);
+    const buildStatus: CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.user_id, topicName).catch(err => {
+        console.error(`[pubsubHandler] error in triggering build`, err);
+        return { success: false, message: 'Unable to trigger build using GCloud API' };
+    });
     console.info("[pubsubHandler] build status: ", buildStatus);
     if (!buildStatus.success) {
         console.error('[pubsubHandler] Error triggering build:', buildStatus.message);
@@ -63,7 +72,10 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         console.error('[pubsubHandler] No build ID found in buildDetails');
         return res.status(500).json({ error: 'No build ID found', success: false });
     }
-    const finalBuildStatus = await pollBuildStatus(projectId, location, buildId);
+    const finalBuildStatus = await pollBuildStatus(projectId, location, buildId).catch(err => {
+        console.error(`[pubsubHandler] error in polling build status`, err);
+        return 'ERROR';
+    });
     if (finalBuildStatus === 'SUCCESS') {
         return res.status(200).json({ message: 'Build completed successfully', success: true, install_id: topicName });
     } else {
