@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
-import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
+import { CloudBuildStatus, createTopicNameInGcloud, pollBuildStatus, triggerBuildUsingGcloudApi } from '../../../utils/pubsub/pubsubClient';
 import { DbUser, getUserById } from '../../../utils/db/users';
 
 const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // To be removed, only used for testing the functions
