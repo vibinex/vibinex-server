@@ -1,6 +1,6 @@
 {
   "name": "vibinex-website",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "private": false,
   "homepage": "https://vibinex.com",
   "description": "A plugin that works with GitHub, Bitbucket and GitLab to personalize and data-enrich their code review interfaces",
@@ -44,6 +44,7 @@
     "pg": "^8.11.3",
     "react": "18.2.0",
     "react-calendly": "^4.1.1",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
     "react-lite-youtube-embed": "^2.4.0",
@@ -57,6 +58,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@types/pg": "^8.6.6",
+    "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/uuid": "^9.0.1",
     "autoprefixer": "^10.4.13",
     "jest": "^29.3.1",

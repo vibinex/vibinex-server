@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import AppBar from '../components/AppBar'
 import LoginLogout from '../components/LoginLogout';
 import { PopupButton } from "react-calendly";
+import Image from 'next/image';
+import VibinexDarkLogo from '../public/vibinex-dark-logo.png';
+import Link from 'next/link';
 
 export default function MainAppBar() {
 	const [rootElement, setRootElement] = useState<HTMLElement>()
@@ -11,11 +14,12 @@ export default function MainAppBar() {
 
 	return (
 		<AppBar position='fixed' offset={true} className='mx-auto py-2 px-10 justify-between items-center max-w-7xl' backdropClassName='bg-primary-light'>
-			<a href="/" className="mr-16 h-full overflow-clip flex flex-row items-center">
-				<h1 className='font-bold text-3xl sm:text-4xl'>
+			<Link href="/" className="mr-16 h-full overflow-clip flex flex-row items-center">
+				<Image src={VibinexDarkLogo} alt="Vibinex logo" className="inline w-10 mr-2" priority></Image>
+				<h1 className='font-bold text-3xl sm:text-4xl font-sans tracking-wider'>
 					Vibinex
 				</h1>
-			</a>
+			</Link>
 			<span className='flex-grow'></span>
 			{(rootElement) ?
 				<PopupButton

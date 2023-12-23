@@ -54,6 +54,7 @@ steps:
   - 'CLOUD_BUILD_TRIGGER_ID=${_CLOUD_BUILD_TRIGGER_ID}'
   - 'CLOUD_BUILD_LOCATION=${_CLOUD_BUILD_LOCATION}'
   - 'CLOUD_BUILD_BRANCH_NAME=${_CLOUD_BUILD_BRANCH_NAME}'
+  - 'DPU_IMAGE_NAME=${_DPU_IMAGE_NAME}'
 - name: node:18.13.0
   entrypoint: npm
   args: ["run", "build"]
