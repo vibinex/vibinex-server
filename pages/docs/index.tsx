@@ -7,11 +7,11 @@ import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
-import BuildInstruction from '../../components/Setup/BuildInsruction';
-import TriggerContent from '../../components/Setup/TriggerContent';
-import ProviderSelector from '../../components/Setup/ProviderSelector';
-import HostingSelector from '../../components/Setup/HostingSelector';
-import InstallationSelector from '../../components/Setup/InstallationSelector';
+import BuildInstruction from '../../components/setup/BuildInsruction';
+import TriggerContent from '../../components/setup/TriggerContent';
+import ProviderSelector from '../../components/setup/ProviderSelector';
+import HostingSelector from '../../components/setup/HostingSelector';
+import InstallationSelector from '../../components/setup/InstallationSelector';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 
 const verifySetup = [
