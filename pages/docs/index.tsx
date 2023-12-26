@@ -156,6 +156,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 			console.debug('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
 			setBuildStatus(response.data);
 			if (response.data.success) {
+				setIsButtonDisabled(true); //If we get the success as status of the build, then the trigger utton should be disabled after that. 
 				return;
 			}
 		}).catch((e) => {
