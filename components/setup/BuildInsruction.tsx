@@ -30,6 +30,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bi
             console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
             setBuildStatus(response.data);
             if (response.data.success) {
+                setIsButtonDisabled(true); //In case of build status being success, the button should be disabled for the user
                 return;
             }
         })
