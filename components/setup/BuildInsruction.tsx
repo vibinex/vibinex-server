@@ -30,6 +30,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bi
             console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
             setBuildStatus(response.data);
             if (response.data.success) {
+                setIsButtonDisabled(true);
                 return;
             }
         })
@@ -38,7 +39,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bi
             setBuildStatus({ success: false, message: 'API request failed' });
         })
         .finally(() => {
-            setIsButtonDisabled(false);
+            // setIsButtonDisabled(false);
         });
     };
 
