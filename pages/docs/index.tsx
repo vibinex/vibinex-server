@@ -7,7 +7,6 @@ import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
-import { MdContentCopy } from "react-icons/md";
 import BuildInstruction from '../../components/Setup/BuildInsruction';
 import TriggerContent from '../../components/Setup/TriggerContent';
 import ProviderSelector from '../../components/Setup/ProviderSelector';
