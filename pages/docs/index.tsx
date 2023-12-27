@@ -7,13 +7,12 @@ import Footer from '../../components/Footer';
 import RudderContext from '../../components/RudderContext';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
-import { MdContentCopy } from "react-icons/md";
+import BuildInstruction from '../../components/setup/BuildInsruction';
+import TriggerContent from '../../components/setup/TriggerContent';
+import ProviderSelector from '../../components/setup/ProviderSelector';
+import HostingSelector from '../../components/setup/HostingSelector';
+import InstallationSelector from '../../components/setup/InstallationSelector';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
-import { Code } from '@radix-ui/themes';
-import Select from '../../components/Select';
-import axios from 'axios';
-import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -24,6 +23,8 @@ const verifySetup = [
 const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
+	const userId = getAuthUserId(session);
+
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
@@ -49,145 +50,8 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 
 
 	const [selectedProvider, setSelectedProvider] = useState<string>('');
-	const providerOptions = [
-		{ value: 'github', label: 'Github', disabled: false }, // TODO: @tapishr Replace the disabled flag with the actual status based on auth
-		{ value: 'bitbucket', label: 'Bitbucket', disabled: false },
-	];
-
 	const [selectedInstallation, setSelectedInstallation] = useState<string>('');
-	const installationOptions = [
-		{ value: 'individual', label: 'Individual' },
-		{ value: 'project', label: 'Project' },
-	];
-
 	const [selectedHosting, setSelectedHosting] = useState<string>('');
-	const hostingOptions = [
-		{ value: 'cloud', label: 'Vibinex Cloud' },
-		{ value: 'selfhosting', label: 'Self-hosting' },
-	];
-
-	const github_app_url = "https://github.com/apps/vibinex-code-review";
-	const user_id = getAuthUserId(session);
-	const CodeWithCopyButton = () => {
-		const [isCopied, setIsCopied] = useState(false);
-		const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-		const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
-		axios.post('/api/dpu/pubsub', {
-			user_id: user_id,
-		}).then((response) => {
-			if (response.data.install_id) {
-				setSelfHostingCode(`docker pull ${image_name}\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.install_id}`);
-			}
-			console.debug("[Docs/index.tsx] topic name ", response.data.install_id);
-		}).catch((error) => {
-			console.error(`[Docs/index.tsx] Unable to get topic name for user ${user_id} - ${error.message}`);
-		})
-		
-		const handleCopyClick = () => {
-		  setIsButtonDisabled(true);
-		};
-	
-		const handleCopy = () => {
-		  setIsCopied(true);
-		  setIsButtonDisabled(false);
-		};
-		
-	
-		return (
-			<div style={{ position: 'relative' }}>
-			<Code size="2">{selfHostingCode}</Code>
-			<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
-			  <button
-				style={{
-				  position: 'absolute',
-				  top: '0px',
-				  right: '0px',
-				  cursor: 'pointer',
-				  background: 'none',
-				  border: 'none',
-				}}
-				onClick={handleCopyClick}
-				disabled={isButtonDisabled}
-			  >
-				<MdContentCopy />
-			  </button>
-			</CopyToClipboard>
-			{isCopied && <span style={{ position: 'absolute', top: '0', right: '50%', transform: 'translate(50%, -100%)', color: 'green' }}>Copied!</span>}
-		  </div>
-		);
-	  };
-	const triggerContent = () => {
-		if (selectedProvider === 'github') {
-			return (<>
-				<Button
-					id='github-app-install'
-					variant="contained"
-					href={github_app_url}
-					target='_blank'
-				>
-					Install Github App
-				</Button>
-				<small className='block ml-4'>Note: You will need the permissions required to install a Github App</small>
-			</>);
-		} else if (selectedProvider === 'bitbucket') {
-			return (<>
-				<Button
-					id='authorise-bitbucket-oauth-consumer'
-					variant="contained"
-					href={bitbucket_auth_url}
-					target='_blank'
-				>
-					Authorise Bitbucket OAuth Consumer
-				</Button>
-				<small className='block ml-4'>Note: You will need the permissions required to install an OAuth consumer</small>
-			</>);
-		} else {
-			return <></>;
-		}
-	};
-	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
- 	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
-	const handleBuildButtonClick = async () => {
-		setIsButtonDisabled(true);
-		setBuildStatus(null);
-		axios.post('/api/dpu/trigger', {
-			user_id: user_id,
-		}).then((response) => {
-			console.debug('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
-			setBuildStatus(response.data);
-			if (response.data.success) {
-				setIsButtonDisabled(true); //If we get success as a status of the build, then the trigger button should be disabled after that. 
-				return;
-			}
-		}).catch((e) => {
-			setBuildStatus({ success: false, message: 'API request failed' });
-			console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', e.message);
-		}).finally(() => {
-			setIsButtonDisabled(false);
-		});
-	}
-	
-	const buildInstructionContent = () => {
-		if (selectedHosting === 'selfhosting') {
-			return (<CodeWithCopyButton />);
-		} else if (selectedHosting === 'cloud') {
-			return (
-				<div className="flex items-center gap-4">
-					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isButtonDisabled} className='text-lg px-6 py-2'>
-						Build
-					</Button>
-					{buildStatus === null ? (
-						isButtonDisabled ? <div className="border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin"></div> : null
-					)
-						: buildStatus.success ? (<span className='text-success'>Build succeeded!</span>)
-							: (<span className='text-error'>Build failed! Error: {buildStatus.message}</span>)
-					}
-				</div>
-			);
-		} else {
-			return <></>
-		}
-	}
 
 	return (
 		<div>
@@ -246,23 +110,27 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 					<AccordionTrigger>Configure your DPU</AccordionTrigger>
 					<AccordionContent className='flex flex-col gap-2 pl-4'>
 						<label className='flex justify-between font-semibold text-sm'>Provider:
-							<Select optionsType="Provider" options={providerOptions} onValueChange={setSelectedProvider} defaultValue={selectedProvider} className='w-1/2 font-normal' />
+							<ProviderSelector selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider}/>
 						</label>
 						<label className='flex justify-between font-semibold text-sm'>Installation Type:
-							<Select optionsType='Installation Type' options={installationOptions} onValueChange={setSelectedInstallation} defaultValue={selectedInstallation} className='w-1/2 font-normal' />
+							<InstallationSelector selectedInstallation={selectedInstallation} setSelectedInstallation={setSelectedInstallation}/>
 						</label>
 						<label className='font-semibold text-sm w-full flex justify-between'>Hosting:
-							<Select optionsType='Hosting option' options={hostingOptions} onValueChange={setSelectedHosting} defaultValue={selectedHosting} className='w-1/2 font-normal' />
+							<HostingSelector selectedHosting={selectedHosting} setSelectedHosting={setSelectedHosting}/>
 						</label>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
-					<AccordionContent>{buildInstructionContent()}</AccordionContent>
+					<AccordionContent>
+						<BuildInstruction selectedHosting={selectedHosting} bitbucket_auth_url={bitbucket_auth_url} userId={userId}/>
+					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>
 					<AccordionTrigger>Set up triggers</AccordionTrigger>
-					<AccordionContent>{triggerContent()}</AccordionContent>
+					<AccordionContent>
+						<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url}/>
+					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-5">
 					<AccordionTrigger>Install browser extension</AccordionTrigger>
