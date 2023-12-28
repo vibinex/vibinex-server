@@ -55,7 +55,7 @@ export function publishMessage(topicName: string, data: PubSubMessage, msgType: 
 
 }
 
-export async function createTopicNameInGcloud(userId: string, topicName: string) {  
+export async function createTopicNameInGcloud(topicName: string) {  
 	try {
 		const [topic] = await pubsub.createTopic(topicName);
 		console.log(`[createTopicNameInGcloud] Topic ${topic.name} created.`);

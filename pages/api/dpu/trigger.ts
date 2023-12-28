@@ -31,11 +31,9 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(500).json({"error": "Internal server error"});
             return;
         }
-        const gcloudTopic = await createTopicNameInGcloud(jsonBody.user_id, generated_topic).catch(err => {
-            console.error(`[pubsubHandler] error in creating topic in google cloud`, err);
-            return;
-        })
-        if (!gcloudTopic) {
+        const gcloudTopic = await createTopicNameInGcloud(generated_topic)
+        if (!gcloudTopic){
+            console.error(`[pubsubHandler] error in creating topic in google cloud`);
             res.status(500).json({"error": "Internal server error"});
             return;
         }
