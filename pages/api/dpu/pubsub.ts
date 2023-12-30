@@ -30,12 +30,15 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
             res.status(500).json({"error": "Internal server error"});
             return;
         }
-        saveTopicNameInUsersTable(jsonBody.user_id, generated_topic)
-        .then(() => { console.info("[pubsubHandler] Topic saved in db"); })
+        await saveTopicNameInUsersTable(jsonBody.user_id, generated_topic)
+        .then(() => { 
+            console.info("[pubsubHandler] Topic saved in db"); 
+            res.status(200).json({"install_id": generated_topic});
+        })
         .catch((error) => {
             console.error("[pubsubHandler] Unable to save topic name in db, ", error);
+            res.status(500).json({"error": "Internal server error"});
         })
-        res.status(200).json({"install_id": generated_topic});
         return;
     }
     const topicName = user_data.topic_name;
