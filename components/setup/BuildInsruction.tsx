@@ -23,7 +23,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
         setBuildStatus(null);
 
         axios.post('/api/dpu/trigger', {
-            user_id: getAuthUserId(session), 
+            userId: getAuthUserId(session), 
         })
         .then((response) => {
             console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
