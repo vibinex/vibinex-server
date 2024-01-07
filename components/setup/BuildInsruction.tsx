@@ -9,11 +9,10 @@ import CodeWithCopyButton from './CodeWithCopyButton';
 
 interface BuildInstructionProps {
     selectedHosting: string;
-    bitbucket_auth_url: string;
     userId: string;
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bitbucket_auth_url, userId }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId }) => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
     const session: Session | null = useSession().data;
