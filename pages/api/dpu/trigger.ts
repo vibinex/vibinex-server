@@ -7,31 +7,31 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.info("[triggerHandler] pub sub setup info in db...");
     const jsonBody = req.body;
     let topicName : string;
-    if (!jsonBody.user_id) {
+    if (!jsonBody.userId) {
         console.error("[triggerHandler] Invalid request body");
         res.status(400).json({"error": "Invalid request body"});
         return;
     }
-    const user_data: DbUser = await getUserById(jsonBody.user_id).catch(err => {
+    const userData: DbUser = await getUserById(jsonBody.userId).catch(err => {
         console.error(`[triggerHandler] error in getting user data`, err);
         return;
     });
-    if (!user_data) {
+    if (!userData) {
         res.status(500).json({"error": "Internal server error"});
         return;        
     }
-    if (user_data.topic_name !== null && user_data.topic_name !== undefined){
-        topicName = user_data.topic_name;       
+    if (userData.topic_name !== null && userData.topic_name !== undefined) {
+        topicName = userData.topic_name;       
     } else {
-        const generated_topic = await createTopicName(jsonBody.user_id).catch(err => {
+        const generatedTopic = await createTopicName(jsonBody.userId).catch(err => {
             console.error(`[triggerHandler] error in creating topic name`, err);
             return;
         });
-        if (!generated_topic) {
+        if (!generatedTopic) {
             res.status(500).json({"error": "Internal server error"});
             return;
         }
-        const gcloudTopic = await createTopicNameInGcloud(generated_topic).catch(err => {
+        const gcloudTopic = await createTopicNameInGcloud(generatedTopic).catch(err => {
             console.error(`[triggerHandler] error in creating topic in google cloud`, err);
             return;
         })
@@ -39,9 +39,9 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(500).json({"error": "Internal server error"});
             return;
         }
-        topicName = generated_topic;
+        topicName = generatedTopic;
         try {
-            await saveTopicNameInUsersTable(jsonBody.user_id, topicName);
+            await saveTopicNameInUsersTable(jsonBody.userId, topicName);
         } catch (error) {
             console.error("[triggerHandler] Unable to save topic name in db, ", error);
             return res.status(500).json({ "error": "Internal server error" });
@@ -51,7 +51,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     //check if already a build exists in users table for the user, if yes? check status else continue
     
-    const buildStatus: CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.user_id, topicName).catch(err => {
+    const buildStatus: CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
         console.error(`[triggerHandler] error in triggering build`, err);
         return { success: false, message: 'Unable to trigger build using GCloud API' };
     });
@@ -77,7 +77,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         return 'ERROR';
     });
     if (finalBuildStatus === 'SUCCESS') {
-        return res.status(200).json({ message: 'Build completed successfully', success: true, install_id: topicName });
+        return res.status(200).json({ message: 'Build completed successfully', success: true });
     } else {
         console.error(`[triggerHandler] Build failed with status: ${finalBuildStatus}`);
         return res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
