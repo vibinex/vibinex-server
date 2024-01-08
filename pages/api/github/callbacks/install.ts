@@ -1,9 +1,34 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
 import constructHtml from '../../../../utils/serverSideHTML';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]';
+import { getAuthUserId } from '../../../../utils/auth';
+import { getUserById, type DbUser } from '../../../../utils/db/users';
 
 const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-	const topicName = process.env.TOPIC_NAME;
+	const session = await getServerSession(req, res, authOptions).catch((err) => {
+		console.error('[github/installHandler] Failed to get session', err);
+		return null;
+	});
+	if (!session) {
+		res.status(500).send(constructHtml("Internal Server Error", "error")); // TODO: user is not logged in - redirect to login page with the correct callback URL
+		return;
+	}
+	const userId = getAuthUserId(session);
+	const userData: DbUser = await getUserById(userId);
+	if (!userData) {
+		console.error(`[github/installHandler] cannot get user data`);
+		res.status(500).send(constructHtml("Internal Server Error", "error"));
+		return;
+	}
+	if (!userData.topic_name) {
+		console.error(`[github/installHandler] user topic name not set`);
+		res.status(400).send(constructHtml("Set up your DPU first", "error")); // TODO: alternatively, we can create the topic name here itself
+		return;
+	}
+	const topicName = userData.topic_name
+	console.log('[github/installHandler] topicName', topicName);
 	if (!topicName) {
 		console.error('[github/installHandler] TOPIC_NAME not set');
 		res.status(500).send(constructHtml("Internal Server Error", "error"));
