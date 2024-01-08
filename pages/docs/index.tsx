@@ -69,7 +69,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 						<div className='flex gap-2'>
 							<Button
 								variant="contained"
-								disabled={!!session?.user?.auth_info?.github}
+								disabled={!!session?.user?.auth_info?.github} // used double NOT to convert truthy value to 'true'
 								href="/api/auth/signin"  // Redirect to sign-in
 								className='px-4 py-2'
 							>
@@ -78,7 +78,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 							</Button>
 							<Button
 								variant="contained"
-								disabled={!!session?.user?.auth_info?.bitbucket}
+								disabled={!!session?.user?.auth_info?.bitbucket} // used double NOT to convert truthy value to 'true'
 								href="/api/auth/signin"  // Redirect to sign-in
 								className='px-4 py-2'
 							>
