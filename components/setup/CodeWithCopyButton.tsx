@@ -19,6 +19,7 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId }) => {
             }
             console.log("[CodeWithCopyButton] topic name ", response.data.installId);
         }).catch((error) => {
+            setSelfHostingCode(`Unable to get topic name for user\nPlease refresh this page and try again.`);
             console.error(`[CodeWithCopyButton] Unable to get topic name for user ${userId} - ${error.message}`);
         });
     }, [userId]);
