@@ -9,11 +9,10 @@ import CodeWithCopyButton from './CodeWithCopyButton';
 
 interface BuildInstructionProps {
     selectedHosting: string;
-    bitbucket_auth_url: string;
     userId: string;
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bitbucket_auth_url, userId }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId }) => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
     const session: Session | null = useSession().data;
@@ -24,17 +23,17 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, bi
         setBuildStatus(null);
 
         axios.post('/api/dpu/trigger', {
-            user_id: getAuthUserId(session), 
+            userId: getAuthUserId(session), 
         })
         .then((response) => {
-            console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
+            console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
             setBuildStatus(response.data);
             if (response.data.success) {
                 return;
             }
         })
         .catch((error) => {
-            console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', error);
+            console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
             setIsButtonDisabled(false);
             setBuildStatus({ success: false, message: 'API request failed' });
         })

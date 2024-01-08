@@ -123,7 +123,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} bitbucket_auth_url={bitbucket_auth_url} userId={userId}/>
+						<BuildInstruction selectedHosting={selectedHosting} userId={userId} />
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>

@@ -13,13 +13,11 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId }) => {
     const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
 
     useEffect(() => {
-        axios.post('/api/dpu/pubsub', {
-            user_id: userId,
-        }).then((response) => {
-            if (response.data.install_id) {
-                setSelfHostingCode(`docker pull gcr.io/vibi-prod/dpu\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.install_id}`);
+        axios.post('/api/dpu/pubsub', { userId }).then((response) => {
+            if (response.data.installId) {
+                setSelfHostingCode(`docker pull gcr.io/vibi-prod/dpu\n\ndocker run gcr.io/vibi-prod/dpu -e INSTALL_ID=${response.data.installId}`);
             }
-            console.log("[CodeWithCopyButton] topic name ", response.data.install_id);
+            console.log("[CodeWithCopyButton] topic name ", response.data.installId);
         }).catch((error) => {
             console.error(`[CodeWithCopyButton] Unable to get topic name for user ${userId} - ${error.message}`);
         });
