@@ -4,14 +4,10 @@ import Select from '../Select';
 interface ProviderSelectorProps {
     selectedProvider: string;
     setSelectedProvider: (provider: string) => void;
+    providerOptions: { value: string, label: string, disabled?: boolean }[];
 }
 
-const ProviderSelector: React.FC<ProviderSelectorProps> = ({ selectedProvider, setSelectedProvider }) => {
-    const providerOptions = [
-        { value: 'github', label: 'Github', disabled: false },
-        { value: 'bitbucket', label: 'Bitbucket', disabled: false },
-    ];
-
+const ProviderSelector: React.FC<ProviderSelectorProps> = ({ providerOptions, selectedProvider, setSelectedProvider }) => {
     return (
         <Select
             optionsType="Provider"
