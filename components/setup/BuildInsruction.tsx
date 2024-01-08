@@ -26,14 +26,14 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
             userId: getAuthUserId(session), 
         })
         .then((response) => {
-            console.log('[handleBuildButtonClick] /api/dpu/pubsub response:', response.data);
+            console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
             setBuildStatus(response.data);
             if (response.data.success) {
                 return;
             }
         })
         .catch((error) => {
-            console.error('[handleBuildButtonClick] /api/dpu/pubsub request failed:', error);
+            console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
             setIsButtonDisabled(false);
             setBuildStatus({ success: false, message: 'API request failed' });
         })
