@@ -14,7 +14,7 @@ const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, bitbu
                     <Button
                         id='github-app-install'
                         variant="contained"
-                        href="https://github.com/apps/vibinex-code-review"
+                        href="https://github.com/apps/vibinex-dpu"
                         target='_blank'
                     >
                         Install Github App
