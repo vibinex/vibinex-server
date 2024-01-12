@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
+import React, { useEffect, useState } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import Button from "../../components/Button";
-import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
+import ProviderLogo from '../../components/ProviderLogo';
 import RudderContext from '../../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
-import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
 import BuildInstruction from '../../components/setup/BuildInsruction';
-import TriggerContent from '../../components/setup/TriggerContent';
-import ProviderSelector from '../../components/setup/ProviderSelector';
 import HostingSelector from '../../components/setup/HostingSelector';
 import InstallationSelector from '../../components/setup/InstallationSelector';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
-import ProviderLogo from '../../components/ProviderLogo';
+import ProviderSelector from '../../components/setup/ProviderSelector';
+import TriggerContent from '../../components/setup/TriggerContent';
+import { getAuthUserId, getAuthUserName } from '../../utils/auth';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
+import MainAppBar from '../../views/MainAppBar';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -22,9 +21,17 @@ const verifySetup = [
 ]
 
 const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
+	const [session, setSession] = useState<Session | null>(null);
 	const { rudderEventMethods } = React.useContext(RudderContext);
-	const session: Session | null = useSession().data;
-	const userId = getAuthUserId(session);
+
+	useEffect(() => {
+		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
+			const sessionVal = await res.json();
+			setSession(sessionVal);
+		}).catch((err) => {
+			console.error(`[LoginLogout] Error in getting session`, err);
+		});
+	}, [])
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -105,7 +112,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} userId={userId} />
+						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} />
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>
