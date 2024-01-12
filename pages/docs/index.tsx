@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
+import React, { useEffect, useState } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import Button from "../../components/Button";
-import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
+import ProviderLogo from '../../components/ProviderLogo';
 import RudderContext from '../../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
-import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
 import BuildInstruction from '../../components/setup/BuildInsruction';
-import TriggerContent from '../../components/setup/TriggerContent';
-import ProviderSelector from '../../components/setup/ProviderSelector';
 import HostingSelector from '../../components/setup/HostingSelector';
 import InstallationSelector from '../../components/setup/InstallationSelector';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
-import ProviderLogo from '../../components/ProviderLogo';
+import ProviderSelector from '../../components/setup/ProviderSelector';
+import TriggerContent from '../../components/setup/TriggerContent';
+import { getAuthUserId, getAuthUserName } from '../../utils/auth';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
+import MainAppBar from '../../views/MainAppBar';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
