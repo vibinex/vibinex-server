@@ -12,9 +12,9 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).json({"error": "Invalid request body"});
         return;
     }
-    const user_data: DbUser = await getUserById(jsonBody.user_id).catch(err => {
+    const user_data: DbUser | null = await getUserById(jsonBody.user_id).catch(err => {
         console.error(`[pubsubHandler] error in getting user data`, err);
-        return;
+        return null;
     });
     if (!user_data) {
         res.status(500).json({"error": "Internal server error"});

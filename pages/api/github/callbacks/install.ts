@@ -31,12 +31,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).send(constructHtml("Set up your DPU first", "error")); // TODO: alternatively, we can create the topic name here itself
 		return;
 	}
-	const topicName = userData.topic_name
-	if (!topicName) {
-		console.error('[github/installHandler] TOPIC_NAME not set');
-		res.status(500).send(constructHtml("Internal Server Error", "error"));
-		return;
-	}
+	const topicName = userData.topic_name;
 	if (!req.query.installation_id) {
 		console.error('[github/installHandler] Installation code not provided for topic: ', topicName);
 		res.status(400).send(constructHtml("Bad Request: GitHub did not send a valid installation ID", "error"));
