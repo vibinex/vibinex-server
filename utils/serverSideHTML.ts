@@ -50,7 +50,9 @@ const constructHtml = (text: string, type: 'info' | 'error' = 'info') => {
 						display: inline-block;
 						position: absolute;
 						top: 35%;
-						left: 45%;
+						left: 50%;
+						transform: translate(-50%,0%);
+						-ms-transform: translate(-50%,0%);
 						width: 70px;
 						height: 70px;
 						background-color: #f44336;
