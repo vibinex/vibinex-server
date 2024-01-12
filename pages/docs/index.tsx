@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import Button from "../../components/Button";
@@ -22,9 +22,17 @@ const verifySetup = [
 ]
 
 const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
+	const [session, setSession] = useState<Session | null>(null);
 	const { rudderEventMethods } = React.useContext(RudderContext);
-	const session: Session | null = useSession().data;
-	const userId = getAuthUserId(session);
+
+	useEffect(() => {
+		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
+			const sessionVal = await res.json();
+			setSession(sessionVal);
+		}).catch((err) => {
+			console.error(`[LoginLogout] Error in getting session`, err);
+		});
+	}, [])
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -105,7 +113,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} userId={userId} />
+						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} />
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>

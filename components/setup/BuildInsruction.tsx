@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
-import type { Session } from 'next-auth';
 import axios from 'axios';
-import Button from '../Button';
+import React, { useState } from 'react';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
-import { getAuthUserId } from '../../utils/auth';
+import Button from '../Button';
 import CodeWithCopyButton from './CodeWithCopyButton';
 
 interface BuildInstructionProps {
@@ -15,16 +12,12 @@ interface BuildInstructionProps {
 const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId }) => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
-    const session: Session | null = useSession().data;
-
 
     const handleBuildButtonClick = () => {
         setIsButtonDisabled(true);
         setBuildStatus(null);
 
-        axios.post('/api/dpu/trigger', {
-            userId: getAuthUserId(session), 
-        })
+        axios.post('/api/dpu/trigger', { userId })
         .then((response) => {
             console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
             setBuildStatus(response.data);
