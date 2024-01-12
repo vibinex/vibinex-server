@@ -23,7 +23,7 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 	const user_auth_search_result = await conn.query(user_auth_search_q).catch(err => {
 		console.error(`[getUserByProvider] Could not get the ${provider} user for account id: ${providerAccountId}`, { pg_query: user_auth_search_q }, err);
 		throw new Error("Error in running the query on the database", err);
-	});;
+	});
 	if (user_auth_search_result.rowCount) {
 		if (user_auth_search_result.rowCount > 1) {
 			console.warn("[getUser] Multiple users exist with same auth", { provider, providerAccountId });
@@ -33,10 +33,10 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 	return undefined;
 }
 
-export const getUserById = async (userId: string) => { //This function is not used anywhere currently in the code but letting it be, since we might use it in near future.
+export const getUserById = async (userId: string): Promise<DbUser> => {
 	const user_search_by_id_q = `SELECT *
-	FROM users
-	WHERE id = $1`
+		FROM users
+		WHERE id = $1`
 	const user_search_by_id_result = await conn.query(user_search_by_id_q, [userId]).catch(err => {
 		console.error(`[getUserById] Could not get the user for user id: ${userId}`, { pg_query: user_search_by_id_q }, err);
 		throw new Error("Error in running the query on the database", err);

@@ -87,7 +87,7 @@ export const authOptions = {
 		async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
 			let path: string;
 			if (url.startsWith("/")) path = url;
-			else if (new URL(url).origin === baseUrl) path = new URL(url).pathname;
+			else if (new URL(url).origin === baseUrl) path = new URL(url).pathname + new URL(url).search;
 			else path = "/";
 
 			if (path === "/") return `${baseUrl}/u`;
