@@ -27,7 +27,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).send(constructHtml("Set up your DPU first", "error")); // TODO: alternatively, we can create the topic name here itself
 		return;
 	}
-	const topicName = userData.topic_name
+	const topicName = userData.topic_name;
 	console.log('[github/installHandler] topicName', topicName);
 	if (!topicName) {
 		console.error('[github/installHandler] TOPIC_NAME not set');
