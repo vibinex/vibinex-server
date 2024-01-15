@@ -1,41 +1,39 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
-import constructHtml from '../../../../utils/serverSideHTML';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]';
 import { getAuthUserId } from '../../../../utils/auth';
 import { getUserById, type DbUser } from '../../../../utils/db/users';
+import { publishMessage } from '../../../../utils/pubsub/pubsubClient';
+import constructHtml from '../../../../utils/serverSideHTML';
+import { getURLWithParams } from '../../../../utils/url_utils';
+import { authOptions } from '../../auth/[...nextauth]';
 
 const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-	const session = await getServerSession(req, res, authOptions).catch((err) => {
-		console.error('[github/installHandler] Failed to get session', err);
-		return null;
-	});
+	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
-		res.status(500).send(constructHtml("Internal Server Error", "error")); // TODO: user is not logged in - redirect to login page with the correct callback URL
+		res.status(500).send(constructHtml(
+			`Please <a href="${getURLWithParams('/api/auth/signin', { callbackUrl: req.url })}">sign in</a> on Vibinex`,
+			"error"
+		));
 		return;
 	}
 	const userId = getAuthUserId(session);
-	const userData: DbUser = await getUserById(userId);
+	const userData: DbUser | null = await getUserById(userId).catch((err) => {
+		console.error('[github/installHandler] Error in getting user data', err);
+		return null;
+	});
 	if (!userData) {
-		console.error(`[github/installHandler] cannot get user data`);
-		res.status(500).send(constructHtml("Internal Server Error", "error"));
+		console.error(`[github/installHandler] userData is empty`);
+		res.status(500).send(constructHtml("User data not found. Please ensure your account is set up correctly.", "error"));
 		return;
 	}
 	if (!userData.topic_name) {
-		console.error(`[github/installHandler] user topic name not set`);
+		console.error(`[github/installHandler] user topic name not set.`);
 		res.status(400).send(constructHtml("Set up your DPU first", "error")); // TODO: alternatively, we can create the topic name here itself
 		return;
 	}
 	const topicName = userData.topic_name;
-	console.log('[github/installHandler] topicName', topicName);
-	if (!topicName) {
-		console.error('[github/installHandler] TOPIC_NAME not set');
-		res.status(500).send(constructHtml("Internal Server Error", "error"));
-		return;
-	}
 	if (!req.query.installation_id) {
-		console.error('[github/installHandler] Installation code not provided');
+		console.error('[github/installHandler] Installation code not provided for topic: ', topicName);
 		res.status(400).send(constructHtml("Bad Request: GitHub did not send a valid installation ID", "error"));
 		return;
 	}
