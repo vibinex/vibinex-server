@@ -129,6 +129,17 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 						</a>
 					</AccordionContent>
 				</AccordionItem>
+				<AccordionItem value="verify-setup">
+					<AccordionTrigger>Verify your setup</AccordionTrigger>
+					<AccordionContent>
+						Once you have set up your repositories, installed the browser extension and signed in, you can verify if everything is correctly set up.
+						<ol>
+							{verifySetup.map((checkItem, index) => (<li key={checkItem} className='mt-2 ml-1'>
+								{`${index + 1}. ${checkItem}`}
+							</li>))}
+						</ol>
+					</AccordionContent>
+				</AccordionItem>
 			</Accordion>
 
 			<Footer />
