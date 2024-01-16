@@ -13,6 +13,7 @@ import TriggerContent from '../../components/setup/TriggerContent';
 import { getAuthUserId, getAuthUserName } from '../../utils/auth';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import MainAppBar from '../../views/MainAppBar';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -21,6 +22,7 @@ const verifySetup = [
 ]
 
 const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
+	const [loading, setLoading] = useState(true);
 	const [session, setSession] = useState<Session | null>(null);
 	const { rudderEventMethods } = React.useContext(RudderContext);
 
@@ -30,6 +32,8 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 			setSession(sessionVal);
 		}).catch((err) => {
 			console.error(`[LoginLogout] Error in getting session`, err);
+		}).finally(() => {
+			setLoading(false);
 		});
 	}, [])
 
@@ -67,6 +71,8 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 	return (
 		<div>
 			<MainAppBar />
+			{(loading) ? <LoadingOverlay type='loading' /> :
+				(!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
 
 			{/* Center content */}
 			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
