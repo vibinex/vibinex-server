@@ -1,4 +1,5 @@
 import React from 'react'
+import FamewallEmbed from 'react-famewall'
 import type { Session } from 'next-auth'
 import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
@@ -35,6 +36,7 @@ export default function Home() {
 			<Features />
 			<WhyUs />
 			<TrustUs />
+			<FamewallEmbed wallUrl="vibinex" />
 			<JoinSlack />
 			<Footer />
 		</div>
