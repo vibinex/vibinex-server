@@ -30,8 +30,6 @@ export const hasValidAuthInfo = (session: Session | null, provider: AuthProvider
 	const authInfo = session?.user?.auth_info;
 	if (!authInfo || !authInfo[provider]) return false;
 	const providerAuthInfos = Object.values(authInfo[provider]);
-	console.log(`[${provider}] Expired ats: ${providerAuthInfos.map(info => info.expires_at)}`);
-	console.log(`[${provider}] Current time: ${Date.now() / 1000}`);
 	switch (provider) {
 		case 'github':
 			return providerAuthInfos.length > 0
