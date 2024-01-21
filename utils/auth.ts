@@ -25,3 +25,19 @@ export const getAuthUserId = (session: Session | null) => session?.user?.id ? se
 export const getAuthUserName = (session: Session | null) => session?.user?.name ? session?.user?.name : "User";
 export const getAuthUserImage = (session: Session | null) => session?.user?.image ? session?.user?.image : "/dummy-profile-pic-female-300n300.jpeg";
 export const getAuthUserEmail = (session: Session | null) => session?.user?.email ? session?.user?.email : "";
+
+export const hasValidAuthInfo = (session: Session | null, provider: AuthProviderType) => {
+	const authInfo = session?.user?.auth_info;
+	if (!authInfo || !authInfo[provider]) return false;
+	const providerAuthInfos = Object.values(authInfo[provider]);
+	console.log(`[${provider}] Expired ats: ${providerAuthInfos.map(info => info.expires_at)}`);
+	console.log(`[${provider}] Current time: ${Date.now() / 1000}`);
+	switch (provider) {
+		case 'github':
+			return providerAuthInfos.length > 0
+		case 'bitbucket':
+			return providerAuthInfos.map(info => info.expires_at).filter(expiryTime => expiryTime && expiryTime > Date.now() / 1000).length > 0;
+		default:
+			throw new Error(`[${provider}] Unsupported provider`);
+	}
+}
