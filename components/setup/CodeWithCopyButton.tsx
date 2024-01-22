@@ -16,8 +16,8 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId }) => {
 		axios.post('/api/dpu/pubsub', { userId }).then((response) => {
 			if (response.data.installId) {
 				setSelfHostingCode(`
-				docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n\n
-				docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
+docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
 				`);
 			}
 			console.log("[CodeWithCopyButton] topic name ", response.data.installId);
