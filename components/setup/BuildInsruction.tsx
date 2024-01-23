@@ -47,7 +47,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     const renderDockerInstructions = () => {
         return <div>
         <CodeWithCopyButton userId={userId}/>
-        <p className="text-xs">Minimum config required for running docker image:</p>
+        <p className="text-xs mt-2">Minimum config required for running docker image:</p>
         <ul className="text-xs">
             <li>RAM: 2 GB</li>
             <li>CPU: 2v or 4v CPU</li>
