@@ -44,9 +44,21 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
         }
     };
 
+    const renderDockerInstructions = () => {
+        return <div>
+        <CodeWithCopyButton userId={userId}/>
+        <p className="text-xs mt-2">Minimum config required for running docker image:</p>
+        <ul className="text-xs">
+            <li>RAM: 2 GB</li>
+            <li>CPU: 2v or 4v CPU</li>
+            <li>Storage: Depends on codebase size, maximum supported - 20 GB</li>
+        </ul>
+    </div>
+    }
+
     const buildInstructionContent = () => {
         if (selectedHosting === 'selfhosting') {
-            return <CodeWithCopyButton userId={userId}/>;
+            return renderDockerInstructions();
         } else if (selectedHosting === 'cloud') {
             return (
                 <div className="flex items-center gap-4">
