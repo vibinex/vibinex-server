@@ -1,24 +1,30 @@
 import React from 'react'
+import Image from 'next/image'
+import BillNoteLogo from '../public/BillNote-F.jpg'
+import SupplyNoteLogo from '../public/SupplyNote-logo.png'
+import VyapLogo from '../public/Vyap-Logo.png'
 
 const data = [
-	{ logo: '/ablejobs.svg', heading: 'Ablejobs'},
-	{ logo: '/blance.png', heading: 'Blance'},
-	{ logo: '/supplynote.svg', heading: 'SupplyNote'},
+	{ logo: BillNoteLogo, heading: 'BillNote'},
+	{ logo: SupplyNoteLogo, heading: 'SupplyNote'},
+	{ logo: VyapLogo, heading: 'Vyap'},
 ]
 
 const TrustedBy = () => {
 	return (
-		<div id='trusted_by' className='w-full text-center py-12 bg-secondary-main'>
+		<div id='trusted_by' className='w-full text-center py-12'>
 			<h2 className='font-bold text-[2rem]'>Trusted by</h2>
 			<div className='md:w-2/3 w-[90%] mt-3 p-4 flex flex-col md:flex-row md:justify-center items-center gap-8 mx-auto'>
 				{data.map((item) => (
-					<div key={item.heading} className="flex flex-row md:flex-col md:p-5 p-3 rounded-lg border-2 md:mt-7 m-auto border-primary-main w-full md:w-1/3 md:h-96 md:gap-4">
-						<div className='w-10 md:w-3/4 xl:w-1/2 md:mx-auto'>
-                            <img src={`${item.logo}`} alt={item.heading} className='m-auto' />
-                        </div>
-						<div className='mx-auto w-full'>
-							<h2 className='font-semibold text-[1.5rem]'>{item.heading}</h2>
-						</div>
+					<div className='sm:w-[50%] w-[100%] mt-8 rounded-md sm:ml-6' key={item.heading}>
+						<Image 
+							priority 
+							src={item.logo} 
+							alt={item.heading} 
+							className='rounded-md object-left-bottom object-cover w-full px-8' 
+							style={{objectFit: "contain"}}
+						/>
+						<h3 className='font-bold text-[1.3rem] mt-4'>{item.heading}</h3>
 					</div>
 				))}
 			</div>
