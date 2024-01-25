@@ -1,5 +1,4 @@
 import React from 'react'
-import FamewallEmbed from 'react-famewall'
 import type { Session } from 'next-auth'
 import Footer from '../components/Footer'
 import Navbar from '../views/Navbar'
@@ -13,6 +12,7 @@ import JoinSlack from '../views/JoinSlack'
 import { useSession } from 'next-auth/react'
 import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
 import ProductDemo from '../views/Demo'
+import Testimonials from '../views/Testimonials'
 
 export default function Home() {
 	const session: Session | null = useSession().data;
@@ -36,7 +36,7 @@ export default function Home() {
 			<Features />
 			<WhyUs />
 			<TrustUs />
-			<FamewallEmbed wallUrl="vibinex" />
+			<Testimonials />
 			<JoinSlack />
 			<Footer />
 		</div>
