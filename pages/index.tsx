@@ -33,10 +33,10 @@ export default function Home() {
 			<Navbar transparent={true} />
 			<Hero ctaLink={'/u'} />
 			<ProductDemo />
+			<TrustedBy />
 			<Features />
 			<WhyUs />
 			<TrustUs />
-			<TrustedBy />
 			<JoinSlack />
 			<Footer />
 		</div>
