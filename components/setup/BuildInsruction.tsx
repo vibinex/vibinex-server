@@ -6,10 +6,22 @@ import CodeWithCopyButton from './CodeWithCopyButton';
 
 interface BuildInstructionProps {
     selectedHosting: string;
+    selectedProvider: string;
+    selectedInstallationType: string;
     userId: string;
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId }) => {
+interface RenderDockerInstructionsProps {
+    selectedInstallationType: string;
+    selectedProvider: string;
+}
+
+interface AdditionalInstructionsProps {
+    selectedInstallationType: string;
+    selectedProvider: string;
+}
+
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType }) => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 
@@ -44,9 +56,10 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
         }
     };
 
-    const renderDockerInstructions = () => {
+    const renderDockerInstructions = ({selectedInstallationType, selectedProvider}: RenderDockerInstructionsProps) => {
         return <div>
-        <CodeWithCopyButton userId={userId}/>
+        <AdditionalInstructions selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
+        <CodeWithCopyButton userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
         <p className="text-xs mt-2">Minimum config required for running docker image:</p>
         <ul className="text-xs">
             <li>RAM: 2 GB</li>
@@ -56,9 +69,38 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     </div>
     }
 
+    const AdditionalInstructions: React.FC<AdditionalInstructionsProps> = ({ selectedInstallationType, selectedProvider }) => {
+        if (selectedInstallationType === "individual" && selectedProvider === "github") {
+            return (
+                <>
+                <p className="text-xs mt-2">Additional instructions for Individual GitHub setup:</p>
+                <ul className="text-xs">
+                    <li>Kindly generate your Github Personal Access Token of type Fine-Grained only using the instructions provided by Github.
+                        <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token" target="_blank" rel="noopener noreferrer">
+                            Link to the Github Docs
+                        </a>
+                    </li>
+                    <li>Make sure you provide specified permissions to your Github Personal Access Token. 
+                        <span className="text-xs mt-2">
+                            Permissions:
+                            <ul className="text-xs">
+                            <li>Read access to email addresses</li>
+                            <li>Read access to code, commit statuses, deployments, issues, merge queues, metadata</li>
+                            <li> Read and Write access to pull requests, repository hooks, and workflows</li>
+                            </ul>
+                        </span>
+                        </li>
+                </ul>
+                </>
+            );
+        } else {
+            return null;
+        }
+    }
+
     const buildInstructionContent = () => {
         if (selectedHosting === 'selfhosting') {
-            return renderDockerInstructions();
+            return renderDockerInstructions({selectedInstallationType: selectedInstallationType, selectedProvider: selectedProvider});
         } else if (selectedHosting === 'cloud') {
             return (
                 <div className="flex items-center gap-4">

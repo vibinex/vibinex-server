@@ -5,9 +5,11 @@ import { MdContentCopy } from "react-icons/md";
 
 interface CodeWithCopyButtonProps {
 	userId: string;
+	selectedProvider: string;
+	selectedInstallationType: string;
 }
 
-const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId }) => {
+const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId, selectedInstallationType, selectedProvider }) => {
 	const [isCopied, setIsCopied] = useState<boolean>(false);
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
@@ -15,10 +17,17 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId }) => {
 	useEffect(() => {
 		axios.post('/api/dpu/pubsub', { userId }).then((response) => {
 			if (response.data.installId) {
-				setSelfHostingCode(`
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
-				`);
+				if (selectedInstallationType == 'individual' && selectedProvider == 'github'){
+					setSelfHostingCode(`
+	docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+	docker run -e INSTALL_ID=${response.data.installId} -e PROVIDER=<your_provider_here> -e GITHUB_PAT=<Your github personal access token (fine-grained type)> asia.gcr.io/vibi-prod/dpu/dpu
+					`);
+				} else {
+					setSelfHostingCode(`
+	docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+	docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
+					`);
+				}
 			}
 			console.log("[CodeWithCopyButton] topic name ", response.data.installId);
 		}).catch((error) => {
