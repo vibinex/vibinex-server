@@ -110,7 +110,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 					diffObj[key] = user[key];
 				}
 				break;
-			case 'aliases':
+			case 'aliases': {
 				// this only adds additional aliases. Create a separate function to
 				// replace or delete aliases, so that old aliases are not lost by mistake
 				const newAliases: string[] = [];
@@ -121,6 +121,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 				}
 				if (newAliases.length > 0) diffObj.aliases = currUser.aliases?.concat(newAliases);
 				break;
+			}
 			case 'auth_info':
 				if (!currUser.auth_info) {
 					diffObj.auth_info = user.auth_info;

@@ -53,11 +53,11 @@ const Banner = () => {
 				case "incompatible-device":
 					setBannerHeight(() => {
 						const bannerHeight = 12;
-						setBannerHTML((<>
+						setBannerHTML((
 							<p className='text-center text-sm sm:text-xl w-fit sm:max-w-1/2 h-fit my-auto p-1'>
 								Browser extensions are not supported on this device. Try Vibinex on a laptop or a desktop computer.
 							</p>
-						</>))
+						))
 						return `h-${bannerHeight}`;
 					})
 					break;
