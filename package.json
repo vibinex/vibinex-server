@@ -44,6 +44,7 @@
     "react-calendly": "^4.1.1",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "18.2.0",
+    "react-famewall": "^1.0.10",
     "react-icons": "^4.7.1",
     "react-lite-youtube-embed": "^2.4.0",
     "rudder-sdk-js": "^2.25.0",
