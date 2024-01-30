@@ -10,7 +10,7 @@ import HostingSelector from '../../components/setup/HostingSelector';
 import InstallationSelector from '../../components/setup/InstallationSelector';
 import ProviderSelector from '../../components/setup/ProviderSelector';
 import TriggerContent from '../../components/setup/TriggerContent';
-import { getAuthUserId, getAuthUserName, hasValidAuthInfo } from '../../utils/auth';
+import { getAuthUserId, getAuthUserName, hasValidAuthInfo, isAuthInfoExpired } from '../../utils/auth';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import MainAppBar from '../../views/MainAppBar';
 import LoadingOverlay from '../../components/LoadingOverlay';
@@ -81,10 +81,10 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
 					<AccordionContent className="flex items-center gap-2">
 						{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
-							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} />
+							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} disabled={isAuthInfoExpired(githubAuthInfo)} />
 						))}
 						{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
-							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} />
+							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} disabled={isAuthInfoExpired(bitbucketAuthInfo)} />
 						))}
 						<Button variant="contained" href="/api/auth/signin" className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
 					</AccordionContent>
