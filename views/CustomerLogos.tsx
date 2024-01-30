@@ -18,11 +18,11 @@ const Customers = () => {
 	return (
 		<div id='customers' className='w-full text-center py-12'>
 			<h2 className='px-4 font-bold text-[2rem] relative'>
-				Trusted by&nbsp;
+				{'Trusted by '}
 				<span className='relative text-transparent bg-clip-text bg-gradient-to-r from-primary-main to-[#6f117b]'>
 					fast-moving
 				</span>
-				&nbsp;teams
+				{' teams'}
 			</h2>
 			<div className='w-[90%] lg:w-2/3 mt-8 flex flex-row justify-center items-center place-content-between mx-auto flex-wrap lg:flex-nowrap'>
 				{data.map((item) => (
