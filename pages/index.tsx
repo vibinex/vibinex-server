@@ -12,7 +12,7 @@ import JoinSlack from '../views/JoinSlack'
 import { useSession } from 'next-auth/react'
 import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
 import ProductDemo from '../views/Demo'
-import Customers from '../views/TrustedBy'
+import Customers from '../views/CustomerLogos'
 
 export default function Home() {
 	const session: Session | null = useSession().data;
