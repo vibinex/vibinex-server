@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
+import React, { useEffect, useState } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import Button from "../../components/Button";
-import MainAppBar from '../../views/MainAppBar';
 import Footer from '../../components/Footer';
+import ProviderLogo from '../../components/ProviderLogo';
 import RudderContext from '../../components/RudderContext';
-import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
-import { getAuthUserId, getAuthUserName, login } from '../../utils/auth';
 import BuildInstruction from '../../components/setup/BuildInsruction';
-import TriggerContent from '../../components/setup/TriggerContent';
-import ProviderSelector from '../../components/setup/ProviderSelector';
 import HostingSelector from '../../components/setup/HostingSelector';
 import InstallationSelector from '../../components/setup/InstallationSelector';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
+import ProviderSelector from '../../components/setup/ProviderSelector';
+import TriggerContent from '../../components/setup/TriggerContent';
+import { getAuthUserId, getAuthUserName, hasValidAuthInfo } from '../../utils/auth';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
+import MainAppBar from '../../views/MainAppBar';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -21,9 +22,20 @@ const verifySetup = [
 ]
 
 const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
+	const [loading, setLoading] = useState(true);
+	const [session, setSession] = useState<Session | null>(null);
 	const { rudderEventMethods } = React.useContext(RudderContext);
-	const session: Session | null = useSession().data;
-	const userId = getAuthUserId(session);
+
+	useEffect(() => {
+		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
+			const sessionVal = await res.json();
+			setSession(sessionVal);
+		}).catch((err) => {
+			console.error(`[LoginLogout] Error in getting session`, err);
+		}).finally(() => {
+			setLoading(false);
+		});
+	}, [])
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -48,7 +60,10 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 		};
 	}, [rudderEventMethods, session]);
 
-
+	const providerOptions = [
+		{ value: 'github', label: 'Github', disabled: !hasValidAuthInfo(session, 'github') },
+		{ value: 'bitbucket', label: 'Bitbucket', disabled: !hasValidAuthInfo(session, 'bitbucket') },
+	];
 	const [selectedProvider, setSelectedProvider] = useState<string>('');
 	const [selectedInstallation, setSelectedInstallation] = useState<string>('');
 	const [selectedHosting, setSelectedHosting] = useState<string>('');
@@ -56,61 +71,41 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 	return (
 		<div>
 			<MainAppBar />
+			{(loading) ? <LoadingOverlay type='loading' /> :
+				(!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
 
 			{/* Center content */}
 			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
 				<AccordionItem value="instruction-1">
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
 					<AccordionContent>
-						<div className='flex justify-between'>
-							{session?.user?.auth_info?.github ? (
-								// If GitHub info is present in the session
-								<>
-								<Button
-									variant="contained"
-									disabled={true}
-								>
-									Login with GitHub
-								</Button>
-								</>
-							) : (
-								// If GitHub info is not present in the session
-								<Button
+						<div className='flex gap-2 flex-wrap'>
+							<Button
 								variant="contained"
+								disabled={hasValidAuthInfo(session, 'github')}
 								href="/api/auth/signin"  // Redirect to sign-in
-								>
+								className='px-4 py-2 flex-1 sm:flex-grow-0'
+							>
+								<ProviderLogo provider="github" theme="light" className='inline mr-2 w-6 h-6' />
 								Login with GitHub
-								</Button>
-							)}
-							</div>
-							<div className='flex justify-between'>
-							{session?.user?.auth_info?.bitbucket ? (
-								// If Bitbucket info is present in the session
-								<>
-								<Button
-									variant="contained"
-									disabled={true}
-								>
-									Login with Bitbucket
-								</Button>
-								</>
-							) : (
-								// If Bitbucket info is not present in the session
-								<Button
+							</Button>
+							<Button
 								variant="contained"
+								disabled={hasValidAuthInfo(session, 'bitbucket')}
 								href="/api/auth/signin"  // Redirect to sign-in
-								>
+								className='px-4 py-2 flex-1 sm:flex-grow-0'
+							>
+								<ProviderLogo provider="bitbucket" theme="light" className='inline mr-2 w-6 h-6' />
 								Login with Bitbucket
-								</Button>
-							)}
-							</div>
+							</Button>
+						</div>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-2">
 					<AccordionTrigger>Configure your DPU</AccordionTrigger>
 					<AccordionContent className='flex flex-col gap-2 pl-4'>
 						<label className='flex justify-between font-semibold text-sm'>Provider:
-							<ProviderSelector selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider}/>
+							<ProviderSelector providerOptions={providerOptions} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} />
 						</label>
 						<label className='flex justify-between font-semibold text-sm'>Installation Type:
 							<InstallationSelector selectedInstallation={selectedInstallation} setSelectedInstallation={setSelectedInstallation}/>
@@ -123,7 +118,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} userId={userId} />
+						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider} />
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>
@@ -138,6 +133,17 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 						<a href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1">
 							<Button variant={'text'}>Link</Button>
 						</a>
+					</AccordionContent>
+				</AccordionItem>
+				<AccordionItem value="verify-setup">
+					<AccordionTrigger>Verify your setup</AccordionTrigger>
+					<AccordionContent>
+						Once you have set up your repositories, installed the browser extension and signed in, you can verify if everything is correctly set up.
+						<ol>
+							{verifySetup.map((checkItem, index) => (<li key={checkItem} className='mt-2 ml-1'>
+								{`${index + 1}. ${checkItem}`}
+							</li>))}
+						</ol>
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>
