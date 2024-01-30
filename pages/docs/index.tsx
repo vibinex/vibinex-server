@@ -14,6 +14,7 @@ import { getAuthUserId, getAuthUserName, hasValidAuthInfo } from '../../utils/au
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import MainAppBar from '../../views/MainAppBar';
 import LoadingOverlay from '../../components/LoadingOverlay';
+import Chip from '../../components/Chip';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -78,27 +79,14 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
 				<AccordionItem value="instruction-1">
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
-					<AccordionContent>
-						<div className='flex gap-2 flex-wrap'>
-							<Button
-								variant="contained"
-								disabled={hasValidAuthInfo(session, 'github')}
-								href="/api/auth/signin"  // Redirect to sign-in
-								className='px-4 py-2 flex-1 sm:flex-grow-0'
-							>
-								<ProviderLogo provider="github" theme="light" className='inline mr-2 w-6 h-6' />
-								Login with GitHub
-							</Button>
-							<Button
-								variant="contained"
-								disabled={hasValidAuthInfo(session, 'bitbucket')}
-								href="/api/auth/signin"  // Redirect to sign-in
-								className='px-4 py-2 flex-1 sm:flex-grow-0'
-							>
-								<ProviderLogo provider="bitbucket" theme="light" className='inline mr-2 w-6 h-6' />
-								Login with Bitbucket
-							</Button>
-						</div>
+					<AccordionContent className="flex items-center gap-2">
+						{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
+							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} />
+						))}
+						{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
+							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} />
+						))}
+						<Button variant="contained" href="/api/auth/signin" className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-2">
