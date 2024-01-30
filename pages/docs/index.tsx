@@ -2,8 +2,9 @@ import type { Session } from 'next-auth';
 import React, { useEffect, useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
 import Button from "../../components/Button";
+import Chip from '../../components/Chip';
 import Footer from '../../components/Footer';
-import ProviderLogo from '../../components/ProviderLogo';
+import LoadingOverlay from '../../components/LoadingOverlay';
 import RudderContext from '../../components/RudderContext';
 import BuildInstruction from '../../components/setup/BuildInsruction';
 import HostingSelector from '../../components/setup/HostingSelector';
@@ -13,8 +14,6 @@ import TriggerContent from '../../components/setup/TriggerContent';
 import { getAuthUserId, getAuthUserName, hasValidAuthInfo, isAuthInfoExpired } from '../../utils/auth';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import MainAppBar from '../../views/MainAppBar';
-import LoadingOverlay from '../../components/LoadingOverlay';
-import Chip from '../../components/Chip';
 
 const verifySetup = [
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",

@@ -42,7 +42,7 @@ export const hasValidAuthInfo = (session: Session | null, provider: AuthProvider
 	}
 }
 
-export const isAuthInfoExpired = (providerAuthInfo: { expires_at?: number | undefined }): boolean => {
+export const isAuthInfoExpired = (providerAuthInfo: { expires_at?: number }): boolean => {
 	const currentTimeInSec = Date.now() / 1000;
 	const expiryTime = providerAuthInfo.expires_at;
 	return !!expiryTime && expiryTime < currentTimeInSec;
