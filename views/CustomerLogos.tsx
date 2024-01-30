@@ -7,28 +7,32 @@ import BlitzLogo from '../public/blitz_logo_black.png'
 import AbleJobsLogo from '../public/Able-Jobs-logo.png'
 
 const data = [
-	{ logo: BillNoteLogo, heading: 'BillNote'},
-	{ logo: BlitzLogo, heading: 'Blitz' },
-	{ logo: AbleJobsLogo, heading: 'AbleJobs' },
-	{ logo: VyapLogo, heading: 'Vyap' },
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
+	{ logo: AbleJobsLogo, heading: 'AbleJobs' },
+	{ logo: BlitzLogo, heading: 'Blitz' },
+	{ logo: BillNoteLogo, heading: 'BillNote' },
+	{ logo: VyapLogo, heading: 'Vyap' },
 ]
 
 const Customers = () => {
 	return (
 		<div id='customers' className='w-full text-center py-12'>
-			<h2 className='font-bold text-[2rem]'>Trusted by</h2>
-			<div className='md:w-2/3 w-[90%] mt-3 p-4 flex flex-col md:flex-row md:justify-center items-center gap-8 mx-auto'>
+			<h2 className='px-4 font-bold text-[2rem] relative'>
+				Trusted by&nbsp;
+				<span className='relative text-transparent bg-clip-text bg-gradient-to-r from-primary-main to-[#6f117b]'>
+					fast-moving
+				</span>
+				&nbsp;teams
+			</h2>
+			<div className='w-[90%] lg:w-2/3 mt-8 flex flex-row justify-center items-center place-content-between mx-auto flex-wrap lg:flex-nowrap'>
 				{data.map((item) => (
-					<div className='sm:w-[50%] w-[100%] mt-8 rounded-md sm:ml-6' key={item.heading}>
-						<Image 
-							priority 
-							src={item.logo} 
-							alt={item.heading} 
-							className='rounded-md object-left-bottom object-cover w-full px-8' 
-							style={{objectFit: "contain"}}
-						/>
-					</div>
+					<Image
+						priority
+						src={item.logo}
+						alt={item.heading}
+						key={item.heading}
+						className='w-1/2 sm:w-1/5 lg:w-full h-20 sm:16 md:h-12 sm:mt-2 lg:ml-6 object-contain px-4 py-1'
+					/>
 				))}
 			</div>
 		</div>
