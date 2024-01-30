@@ -124,7 +124,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>
 					<AccordionTrigger>Set up triggers</AccordionTrigger>
 					<AccordionContent>
-						<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url}/>
+						<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation}/>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-5">
