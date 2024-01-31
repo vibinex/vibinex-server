@@ -80,11 +80,11 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
                         <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        style={{ color: 'black', fontWeight: 'bold' }}>
+                        style={{ color: 'blue', textDecoration: 'underline' }}>
                         Link to the Github Docs
                         </a> 
                     </li>
-                    <li>Make sure you provide specified permissions to your Github Personal Access Token.
+                    <li style={{ marginTop: '2px' }} >Make sure you provide specified permissions to your Github Personal Access Token.
                         <br/> 
                         <span className="text-xs mt-2">
                             Permissions:
