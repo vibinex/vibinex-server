@@ -17,15 +17,22 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId, selecte
 	useEffect(() => {
 		axios.post('/api/dpu/pubsub', { userId }).then((response) => {
 			if (response.data.installId) {
-				if (selectedInstallationType == 'individual' && selectedProvider == 'github'){
+				if (selectedInstallationType === 'individual' && selectedProvider === 'github'){
 					setSelfHostingCode(`
-	docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-	docker run -e INSTALL_ID=${response.data.installId} -e PROVIDER=<your_provider_here> -e GITHUB_PAT=<Your github personal access token (fine-grained type)> asia.gcr.io/vibi-prod/dpu/dpu
+docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+docker run -e INSTALL_ID=${response.data.installId} \n
+-e PROVIDER=<your_provider_here> \n
+-e GITHUB_PAT=<Your github personal access token (fine-grained type)> \n
+asia.gcr.io/vibi-prod/dpu/dpu
 					`);
+				} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket'){
+					setSelfHostingCode(`
+Coming Soon!
+					`)
 				} else {
 					setSelfHostingCode(`
-	docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-	docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
+docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
 					`);
 				}
 			}

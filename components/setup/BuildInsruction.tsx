@@ -58,7 +58,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 
     const renderDockerInstructions = ({selectedInstallationType, selectedProvider}: RenderDockerInstructionsProps) => {
         return <div>
-        <AdditionalInstructions selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
+        <InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
         <CodeWithCopyButton userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
         <p className="text-xs mt-2">Minimum config required for running docker image:</p>
         <ul className="text-xs">
@@ -69,24 +69,29 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     </div>
     }
 
-    const AdditionalInstructions: React.FC<AdditionalInstructionsProps> = ({ selectedInstallationType, selectedProvider }) => {
+    const InstructionsToGeneratePersonalAccessToken: React.FC<AdditionalInstructionsProps> = ({ selectedInstallationType, selectedProvider }) => {
         if (selectedInstallationType === "individual" && selectedProvider === "github") {
             return (
                 <>
-                <p className="text-xs mt-2">Additional instructions for Individual GitHub setup:</p>
+                <p className="text-xs mt-2">Instructions to generate your personal access token for Individual GitHub setup:</p>
                 <ul className="text-xs">
                     <li>Kindly generate your Github Personal Access Token of type Fine-Grained only using the instructions provided by Github.
-                        <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token" target="_blank" rel="noopener noreferrer">
-                            Link to the Github Docs
-                        </a>
+                        <br />
+                        <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ color: 'black', fontWeight: 'bold' }}>
+                        Link to the Github Docs
+                        </a> 
                     </li>
-                    <li>Make sure you provide specified permissions to your Github Personal Access Token. 
+                    <li>Make sure you provide specified permissions to your Github Personal Access Token.
+                        <br/> 
                         <span className="text-xs mt-2">
                             Permissions:
                             <ul className="text-xs">
                             <li>Read access to email addresses</li>
                             <li>Read access to code, commit statuses, deployments, issues, merge queues, metadata</li>
-                            <li> Read and Write access to pull requests, repository hooks, and workflows</li>
+                            <li> Read access to pull requests</li>
                             </ul>
                         </span>
                         </li>
@@ -100,7 +105,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 
     const buildInstructionContent = () => {
         if (selectedHosting === 'selfhosting') {
-            return renderDockerInstructions({selectedInstallationType: selectedInstallationType, selectedProvider: selectedProvider});
+            return renderDockerInstructions({ selectedInstallationType, selectedProvider });
         } else if (selectedHosting === 'cloud') {
             return (
                 <div className="flex items-center gap-4">
