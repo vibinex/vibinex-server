@@ -31,7 +31,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).send(constructHtml("Set up your DPU first", "error")); // TODO: alternatively, we can create the topic name here itself
 		return;
 	}
-	const topicName = userData.topic_name
+	const topicName = userData.topic_name;
 	if (!req.query.code) {
 		console.error(`[bitbucket/installHandler] Installation code not provided for topic: ${topicName}`);
 		res.status(400).send(constructHtml("Bad Request: Bitbucket did not send a valid auth code", "error"));

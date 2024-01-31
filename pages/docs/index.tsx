@@ -10,7 +10,7 @@ import HostingSelector from '../../components/setup/HostingSelector';
 import InstallationSelector from '../../components/setup/InstallationSelector';
 import ProviderSelector from '../../components/setup/ProviderSelector';
 import TriggerContent from '../../components/setup/TriggerContent';
-import { getAuthUserId, getAuthUserName } from '../../utils/auth';
+import { getAuthUserId, getAuthUserName, hasValidAuthInfo } from '../../utils/auth';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import MainAppBar from '../../views/MainAppBar';
 import LoadingOverlay from '../../components/LoadingOverlay';
@@ -61,8 +61,8 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 	}, [rudderEventMethods, session]);
 
 	const providerOptions = [
-		{ value: 'github', label: 'Github', disabled: !session?.user?.auth_info?.github },
-		{ value: 'bitbucket', label: 'Bitbucket', disabled: !session?.user?.auth_info?.bitbucket },
+		{ value: 'github', label: 'Github', disabled: !hasValidAuthInfo(session, 'github') },
+		{ value: 'bitbucket', label: 'Bitbucket', disabled: !hasValidAuthInfo(session, 'bitbucket') },
 	];
 	const [selectedProvider, setSelectedProvider] = useState<string>('');
 	const [selectedInstallation, setSelectedInstallation] = useState<string>('');
@@ -79,23 +79,23 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-1">
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
 					<AccordionContent>
-						<div className='flex gap-2'>
+						<div className='flex gap-2 flex-wrap'>
 							<Button
 								variant="contained"
-								disabled={!!session?.user?.auth_info?.github} // used double NOT to convert truthy value to 'true'
+								disabled={hasValidAuthInfo(session, 'github')}
 								href="/api/auth/signin"  // Redirect to sign-in
-								className='px-4 py-2'
+								className='px-4 py-2 flex-1 sm:flex-grow-0'
 							>
-								<ProviderLogo provider="github" theme="light" className='inline mr-2' />
+								<ProviderLogo provider="github" theme="light" className='inline mr-2 w-6 h-6' />
 								Login with GitHub
 							</Button>
 							<Button
 								variant="contained"
-								disabled={!!session?.user?.auth_info?.bitbucket} // used double NOT to convert truthy value to 'true'
+								disabled={hasValidAuthInfo(session, 'bitbucket')}
 								href="/api/auth/signin"  // Redirect to sign-in
-								className='px-4 py-2'
+								className='px-4 py-2 flex-1 sm:flex-grow-0'
 							>
-								<ProviderLogo provider="bitbucket" theme="light" className='inline mr-2' />
+								<ProviderLogo provider="bitbucket" theme="light" className='inline mr-2 w-6 h-6' />
 								Login with Bitbucket
 							</Button>
 						</div>
