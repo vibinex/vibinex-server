@@ -31,7 +31,7 @@ const Customers = () => {
 						src={item.logo}
 						alt={item.heading}
 						key={item.heading}
-						className='w-1/2 sm:w-1/5 lg:w-full h-20 sm:16 md:h-12 sm:mt-2 lg:ml-6 object-contain px-4 py-1'
+						className='w-1/2 sm:w-1/5 lg:w-full h-20 sm:h-16 md:h-12 sm:mt-2 lg:ml-6 object-contain px-4 py-1'
 					/>
 				))}
 			</div>
