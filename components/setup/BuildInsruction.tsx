@@ -6,10 +6,22 @@ import CodeWithCopyButton from './CodeWithCopyButton';
 
 interface BuildInstructionProps {
     selectedHosting: string;
+    selectedProvider: string;
+    selectedInstallationType: string;
     userId: string;
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId }) => {
+interface RenderDockerInstructionsProps {
+    selectedInstallationType: string;
+    selectedProvider: string;
+}
+
+interface InstructionsToGeneratePersonalAccessTokenProps {
+    selectedInstallationType: string;
+    selectedProvider: string;
+}
+
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType }) => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 
@@ -44,9 +56,10 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
         }
     };
 
-    const renderDockerInstructions = () => {
+    const renderDockerInstructions = ({selectedInstallationType, selectedProvider}: RenderDockerInstructionsProps) => {
         return <div>
-        <CodeWithCopyButton userId={userId}/>
+        <InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
+        <CodeWithCopyButton userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
         <p className="text-xs mt-2">Minimum config required for running docker image:</p>
         <ul className="text-xs">
             <li>RAM: 2 GB</li>
@@ -56,9 +69,43 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     </div>
     }
 
+    const InstructionsToGeneratePersonalAccessToken: React.FC<InstructionsToGeneratePersonalAccessTokenProps> = ({ selectedInstallationType, selectedProvider }) => {
+        if (selectedInstallationType === "individual" && selectedProvider === "github") {
+            return (
+                <>
+                <p className="text-xs mt-2">Instructions to generate your personal access token for Individual GitHub setup:</p>
+                <ul className="text-xs">
+                    <li>Kindly generate your Github Personal Access Token of type Fine-Grained only using the instructions provided by Github.
+                        <br />
+                        <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ color: 'blue', textDecoration: 'underline' }}>
+                        Link to the Github Docs
+                        </a> 
+                    </li>
+                    <li style={{ marginTop: '2px' }} >Make sure you provide specified permissions to your Github Personal Access Token.
+                        <br/> 
+                        <span className="text-xs mt-2">
+                            Permissions:
+                            <ul className="text-xs">
+                            <li>Read access to email addresses</li>
+                            <li>Read access to code, commit statuses, deployments, issues, merge queues, metadata</li>
+                            <li> Read access to pull requests</li>
+                            </ul>
+                        </span>
+                        </li>
+                </ul>
+                </>
+            );
+        } else {
+            return null;
+        }
+    }
+
     const buildInstructionContent = () => {
         if (selectedHosting === 'selfhosting') {
-            return renderDockerInstructions();
+            return renderDockerInstructions({ selectedInstallationType, selectedProvider });
         } else if (selectedHosting === 'cloud') {
             return (
                 <div className="flex items-center gap-4">
