@@ -30,6 +30,11 @@ const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, bitbu
                 </>
             );
         } else if (selectedProvider === 'bitbucket') {
+            if (selectedHosting == 'selfhosting' && selectedInstallationType == 'individual'){
+                return (
+                    <div>Coming Soon!</div>
+                )
+            }
             return (
                 <>
                     <Button
