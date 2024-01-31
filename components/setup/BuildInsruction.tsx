@@ -16,7 +16,7 @@ interface RenderDockerInstructionsProps {
     selectedProvider: string;
 }
 
-interface InstructionsToGeneratePersonalAccessToken {
+interface InstructionsToGeneratePersonalAccessTokenProps {
     selectedInstallationType: string;
     selectedProvider: string;
 }
@@ -69,7 +69,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     </div>
     }
 
-    const InstructionsToGeneratePersonalAccessToken: React.FC<InstructionsToGeneratePersonalAccessToken> = ({ selectedInstallationType, selectedProvider }) => {
+    const InstructionsToGeneratePersonalAccessToken: React.FC<InstructionsToGeneratePersonalAccessTokenProps> = ({ selectedInstallationType, selectedProvider }) => {
         if (selectedInstallationType === "individual" && selectedProvider === "github") {
             return (
                 <>
