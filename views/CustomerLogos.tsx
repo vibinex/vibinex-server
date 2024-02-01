@@ -4,12 +4,12 @@ import BillNoteLogo from '../public/BillNote-F.jpg'
 import SupplyNoteLogo from '../public/SupplyNote-logo.png'
 import VyapLogo from '../public/Vyap-Logo.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
-import AbleJobsLogo from '../public/Able-Jobs-logo.png'
+import AbleJobsLogo from '../public/able_logo.png'
 import CoverForceLogo from '../public/CoverForce-Logo.png'
 
 const data = [
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
-	{ logo: AbleJobsLogo, heading: 'AbleJobs' },
+	{ logo: AbleJobsLogo, heading: 'Able' },
 	{ logo: CoverForceLogo, heading: 'CoverForce', customClass: 'py-2' },
 	{ logo: BlitzLogo, heading: 'Blitz' },
 	{ logo: BillNoteLogo, heading: 'BillNote' },
