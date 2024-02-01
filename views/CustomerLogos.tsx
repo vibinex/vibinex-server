@@ -5,7 +5,7 @@ import SupplyNoteLogo from '../public/SupplyNote-logo.png'
 import VyapLogo from '../public/Vyap-Logo.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
 import AbleJobsLogo from '../public/Able-Jobs-logo.png'
-import CoverForceLogo from '../public/CoverForce Logo.png'
+import CoverForceLogo from '../public/CoverForce-Logo.png'
 
 const data = [
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
