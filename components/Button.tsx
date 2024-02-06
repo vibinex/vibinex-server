@@ -8,6 +8,8 @@ const Button = (props: PropsWithChildren<{
 	disabled?: boolean,
 	className?: string,
 	id?: string,
+	ref?: React.ForwardedRef<HTMLButtonElement>,
+	isNotBasic?: boolean,
 }>) => {
 
 	const clickBehaviour: MouseEventHandler = (event) => {
@@ -19,6 +21,7 @@ const Button = (props: PropsWithChildren<{
 			props.onClick(event);
 		}
 	}
+	const basicClass = 'inline-flex items-center justify-center relative cursor-pointer align-middle disabled:cursor-default box-border min-w-max py-1 px-4 rounded-md transition-all ';
 	const variantClasses = {
 		'contained': "bg-primary-main text-secondary-main disabled:bg-action-inactive disabled:hover:bg-transparent hover:bg-primary-dark ",
 		'outlined': "border-secondary-main border-2 rounded ",
@@ -26,7 +29,7 @@ const Button = (props: PropsWithChildren<{
 	}
 
 	return (
-		<button id={props.id} onClick={clickBehaviour} disabled={props.disabled} className={'inline-flex items-center justify-center relative cursor-pointer align-middle disabled:cursor-default box-border min-w-max py-1 px-4 rounded-md transition-all ' + variantClasses[props.variant] + props.className}>
+		<button ref={props.ref} id={props.id} onClick={clickBehaviour} disabled={props.disabled} className={(props.isNotBasic ? '': basicClass) + variantClasses[props.variant] + props.className}>
 			<span className="w-full font-semibold">
 				{props.children}
 			</span>
