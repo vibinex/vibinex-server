@@ -160,7 +160,7 @@ const CarouselContent = React.forwardRef<
       <div
         ref={ref}
         className={"flex " +
-          (orientation === "horizontal" ? "-ml-4 " : "-mt-4 flex-col ") +
+          (orientation === "horizontal" ? "-mx-4 " : "-mt-4 flex-col ") +
           className
         }
         {...props}
@@ -201,9 +201,9 @@ const CarouselPrevious = React.forwardRef<
     <Button
       ref={ref}
       variant={variant}
-      className={"absolute h-8 w-8 rounded-full " +
+      className={"relative align-middle h-8 w-8 rounded-full " +
         (orientation === "horizontal"
-          ? "-left-12 top-1/2 -translate-y-1/2 "
+          ? "-left-8 top-4 "
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90 ") +
         className
       }
@@ -229,9 +229,9 @@ const CarouselNext = React.forwardRef<
     <Button
       ref={ref}
       variant={variant}
-      className={"absolute h-8 w-8 rounded-full " +
+      className={"relative align-middle h-8 w-8 rounded-full " +
         (orientation === "horizontal"
-          ? "-right-12 top-1/2 -translate-y-1/2 "
+          ? "-right-12 top-4 "
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90 ") +
         className
       }
