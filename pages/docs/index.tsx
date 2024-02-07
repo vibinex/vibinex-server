@@ -16,7 +16,7 @@ import MainAppBar from '../../views/MainAppBar';
 import LoadingOverlay from '../../components/LoadingOverlay';
 
 const verifySetup = [
-	"In case of self-hosting for Github provider, please visit https://vibinex.com/u to cross-check if correct repositories have been processed by vibinex-DPU. If not, then please setup the DPU again.",
+	"In case of self-hosting for Github provider, please visit <a href='https://vibinex.com/u'>https://vibinex.com/u</a> to cross-check if correct repositories have been processed by vibinex-DPU. If not, then please setup the DPU again.",
 	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
 	"When you view the list of pull requests, the relevant ones will get highlighted in yellow, with details that help you choose where to start",
 	"Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow."
