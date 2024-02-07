@@ -22,7 +22,7 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId, selecte
 docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
 docker run -e INSTALL_ID=${response.data.installId} \\
 -e PROVIDER=<your_provider_here> \\
--e GITHUB_PAT=<Your github personal access token (fine-grained type)> \\
+-e GITHUB_PAT=<Your gh cli token> \\
 asia.gcr.io/vibi-prod/dpu/dpu
 					`);
 				} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket'){
