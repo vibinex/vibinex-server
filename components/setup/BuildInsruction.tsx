@@ -16,7 +16,7 @@ interface RenderDockerInstructionsProps {
     selectedProvider: string;
 }
 
-interface AdditionalInstructionsProps {
+interface InstructionsToGeneratePersonalAccessTokenProps {
     selectedInstallationType: string;
     selectedProvider: string;
 }
@@ -69,32 +69,30 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     </div>
     }
 
-    const InstructionsToGeneratePersonalAccessToken: React.FC<AdditionalInstructionsProps> = ({ selectedInstallationType, selectedProvider }) => {
+    const InstructionsToGeneratePersonalAccessToken: React.FC<InstructionsToGeneratePersonalAccessTokenProps> = ({ selectedInstallationType, selectedProvider }) => {
         if (selectedInstallationType === "individual" && selectedProvider === "github") {
             return (
                 <>
-                <p className="text-xs mt-2">Instructions to generate your personal access token for Individual GitHub setup:</p>
+                <p className="text-xs mt-2">Instructions to generate your gh cli token for Individual GitHub setup:</p>
                 <ul className="text-xs">
-                    <li>Kindly generate your Github Personal Access Token of type Fine-Grained only using the instructions provided by Github.
+                    <li>Kindly install gh cli if you don't have it installed already using the instructions provided by Github.
                         <br />
-                        <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token" 
+                        <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         style={{ color: 'blue', textDecoration: 'underline' }}>
                         Link to the Github Docs
                         </a> 
                     </li>
-                    <li style={{ marginTop: '2px' }} >Make sure you provide specified permissions to your Github Personal Access Token.
+                    <li style={{ marginTop: '2px' }} >Once you have gh cli setup in your machine, follow the below steps to generate your gh cli token.
                         <br/> 
                         <span className="text-xs mt-2">
-                            Permissions:
                             <ul className="text-xs">
-                            <li>Read access to email addresses</li>
-                            <li>Read access to code, commit statuses, deployments, issues, merge queues, metadata</li>
-                            <li> Read access to pull requests</li>
+                            <li>Complete github authentication<code>gh auth login</code></li>
+                            <li>Generate token<code>gh repo view</code></li>
                             </ul>
                         </span>
-                        </li>
+                    </li>
                 </ul>
                 </>
             );

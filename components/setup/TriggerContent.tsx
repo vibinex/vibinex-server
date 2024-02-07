@@ -11,7 +11,7 @@ interface TriggerContentProps {
 const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, bitbucket_auth_url, selectedHosting, selectedInstallationType }) => {
     const triggerContent = () => {
         if (selectedProvider === 'github') {
-            if (selectedHosting == 'selfhosting' && selectedInstallationType == 'individual'){
+            if (selectedHosting === 'selfhosting' && selectedInstallationType === 'individual'){
                 return (
                     <div>You are all set!</div>
                 )
