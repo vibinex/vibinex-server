@@ -12,6 +12,7 @@ import JoinSlack from '../views/JoinSlack'
 import { useSession } from 'next-auth/react'
 import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
 import ProductDemo from '../views/Demo'
+import Customers from '../views/CustomerLogos'
 import Testimonials from '../views/Testimonials'
 
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
 			<Navbar transparent={true} />
 			<Hero ctaLink={'/u'} />
 			<ProductDemo />
+			<Customers />
 			<Features />
 			<WhyUs />
 			<TrustUs />

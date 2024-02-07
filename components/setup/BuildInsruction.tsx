@@ -75,7 +75,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
                 <>
                 <p className="text-xs mt-2">Instructions to generate your gh cli token for Individual GitHub setup:</p>
                 <ul className="text-xs">
-                    <li>Kindly install gh cli if you don't have it installed already using the instructions provided by Github.
+                    <li>Kindly install gh cli using the instructions provided by Github.
                         <br />
                         <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" 
                         target="_blank" 
