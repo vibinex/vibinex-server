@@ -88,8 +88,8 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
                         <br/> 
                         <span className="text-xs mt-2">
                             <ul className="text-xs">
-                            <li>Complete github authentication<code>gh auth login</code></li>
-                            <li>Generate token<code>gh repo view</code></li>
+                            <li>Complete github authentication: &nbsp;<code>gh auth login</code></li>
+                            <li>Generate token<code>gh repo view: &nbsp;</code></li>
                             </ul>
                         </span>
                     </li>
