@@ -83,7 +83,6 @@ export const createUser = async (user: DbUser) => {
 		})
 		.catch(err => {
 			console.error('[createUser] Insert user failed', { user, pg_query: insert_user_q }, err);
-			return;
 		});
 }
 
@@ -119,7 +118,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 						newAliases.push(alias);
 					}
 				}
-				if (newAliases.length > 0) diffObj.aliases = currUser.aliases?.concat(newAliases);
+				if (newAliases.length > 0) diffObj.aliases = (currUser.aliases ?? []).concat(newAliases);
 				break;
 			}
 			case 'auth_info':
@@ -186,7 +185,6 @@ export const updateUser = async (userId: string, user: DbUser) => {
 		})
 		.catch(err => {
 			console.error('[updateUser] Update user failed', { pg_query: update_user_q }, { userId, user }, err);
-			return;
 		});
 }
 
