@@ -59,11 +59,12 @@ export async function createTopicNameInGcloud(topicName: string) {
 	try {
 		const [topic] = await pubsub.createTopic(topicName);
 		console.log(`[createTopicNameInGcloud] Topic ${topic.name} created.`);
-		return topic.toString();
+        return topic.name;
 	} catch (error) {
 		console.error('[createTopicNameInGcloud] Failed to create topic name in gcloud:', error);
 		return null;
-}}
+    }
+}
 
 async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string>{
 	console.info(`[getAccessTokenFromMetaServerForGcloudApi] getting access token from meta server for gcloud trigger api`)
@@ -76,7 +77,7 @@ async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string>{
 	}
 
 	const data = response.data as AccessTokenApiResponse;
-	console.info(`[getAccessTokenFromMetaServerForGcloudApi] retreived access token from meta server for gcloud trigger api, data: ${data}`);
+    console.info(`[getAccessTokenFromMetaServerForGcloudApi] retreived access token from meta server for gcloud trigger api, data: ${JSON.stringify(data)}`);
 	return data.access_token;
 }
 
@@ -95,16 +96,16 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 
 	// Build the substitutions object using environment variables
 	const substitutions: { [key: string]: string } = {
-		_BITBUCKET_BASE_URL: process.env.BITBUCKET_BASE_URL || '',
-		_BITBUCKET_CLIENT_ID: process.env.BITBUCKET_CLIENT_ID || '',
-		_BITBUCKET_CLIENT_SECRET: process.env.BITBUCKET_CLIENT_SECRET || '',
-		_GCP_CREDENTIALS: process.env.GCP_CREDENTIALS || '',
-		_GITHUB_APP_CLIENT_ID: process.env.GITHUB_APP_CLIENT_ID || '',
-		_GITHUB_APP_CLIENT_SECRET: process.env.GITHUB_APP_CLIENT_SECRET || '',
-		_GITHUB_APP_ID: process.env.GITHUB_APP_ID || '',
-		_GITHUB_BASE_URL: process.env.GITHUB_BASE_URL || '',
-		_INSTALL_ID: topic_name || '',
-		_SERVER_URL: process.env.SERVER_URL || '',
+        _BITBUCKET_BASE_URL: process.env.BITBUCKET_BASE_URL ?? '',
+        _BITBUCKET_CLIENT_ID: process.env.BITBUCKET_CLIENT_ID ?? '',
+        _BITBUCKET_CLIENT_SECRET: process.env.BITBUCKET_CLIENT_SECRET ?? '',
+        _GCP_CREDENTIALS: process.env.GCP_CREDENTIALS ?? '',
+        _GITHUB_APP_CLIENT_ID: process.env.GITHUB_APP_CLIENT_ID ?? '',
+        _GITHUB_APP_CLIENT_SECRET: process.env.GITHUB_APP_CLIENT_SECRET ?? '',
+        _GITHUB_APP_ID: process.env.GITHUB_APP_ID ?? '',
+        _GITHUB_BASE_URL: process.env.GITHUB_BASE_URL ?? '',
+        _INSTALL_ID: topic_name ?? '',
+        _SERVER_URL: process.env.SERVER_URL ?? '',
 		_USER_ID: user_id
 	};
 
