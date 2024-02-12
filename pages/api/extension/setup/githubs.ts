@@ -11,6 +11,7 @@ interface SuccessResponse {
 }
 
 export default async function githubSetupRepos(req: NextApiRequest, res: NextApiResponse<ErrorResponse | SuccessResponse>) {
+	console.log("[githubSetupRepos]");
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
@@ -20,6 +21,7 @@ export default async function githubSetupRepos(req: NextApiRequest, res: NextApi
 	}
 	getGithubReposFromDbForUserId(user_id, org, 'github')
 	.then((repos: string[]) => {
+		console.log("[githubSetupRepos] repos: ", repos);
 		res.status(200).json({ repos: repos });
 	})
 	.catch((error: Error) => {
