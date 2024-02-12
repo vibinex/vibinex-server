@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getGithubReposFromDbForUserId } from '../../../utils/db/setup';
+import { getGithubReposFromDbForUserId } from '../../../../utils/db/setup';
 
 interface ErrorResponse {
 	error: string;
