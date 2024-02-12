@@ -1,6 +1,5 @@
-import { error } from 'console';
 import conn from '.';
-import { getUserByAlias, getUserById, DbUser } from './users';
+import { getUserByAlias } from './users';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface HunkInfo {
