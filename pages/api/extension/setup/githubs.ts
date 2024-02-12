@@ -15,11 +15,11 @@ export default async function githubSetupRepos(req: NextApiRequest, res: NextApi
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
-	const { user_id, org } = req.body;
-	if (!user_id || !org) {
+	const { userId, org } = req.body;
+	if (!userId || !org) {
 		return res.status(400).json({ error: 'Bad Request', message: 'Both user_id and org are required in the request body' });
 	}
-	getGithubReposFromDbForUserId(user_id, org, 'github')
+	getGithubReposFromDbForUserId(userId, org, 'github')
 	.then((repos: string[]) => {
 		console.log("[githubSetupRepos] repos: ", repos);
 		res.status(200).json({ repos: repos });
