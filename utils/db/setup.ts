@@ -5,7 +5,7 @@ export const getGithubReposFromDbForUserId = async (userId: string, org: string,
 	const query = `SELECT repos.repo_name
         FROM repos
         JOIN users ON users.topic_name = repos.install_id
-        WHERE users.user_id = $1 AND repos.repo_owner = $2 AND repos.repo_provider = $3;
+        WHERE users.id = $1 AND repos.repo_owner = $2 AND repos.repo_provider = $3;
     `;
 	const result = await conn.query(query, [userId, org, provider]).catch(err => {
 		console.error(`[getGithubreposFromDbForUserId] Could not get the github repos for user with id ${userId} for org ${org}`, { pg_query: query }, err);
