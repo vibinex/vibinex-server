@@ -1,16 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getGithubReposFromDbForUserId } from '../../../../utils/db/setup';
 
-interface ErrorResponse {
-	error: string;
-	message: string;
-}
-
-interface SuccessResponse {
-	repos: string[];
-}
-
-export default async function githubSetupRepos(req: NextApiRequest, res: NextApiResponse<ErrorResponse | SuccessResponse>) {
+export default async function githubSetupRepos(req: NextApiRequest, res: NextApiResponse) {
+	// For cors prefetch options request
+	if (req.method == "OPTIONS") {
+		res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Authorization");
+		res.status(200).send("Ok");
+		return;
+	}
+	// For normal requests
+	console.info("[extension/setup/github] Getting setup repos info for ", req.body.org);
+	
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
