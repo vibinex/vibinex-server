@@ -23,7 +23,7 @@ export default async function githubSetupRepos(req: NextApiRequest, res: NextApi
 		res.status(200).json({ repos: repos });
 	})
 	.catch((error: Error) => {
-		console.error('Error fetching repositories from database:', error);
+		console.error('Error fetching repositories from database for user_id: ' + userId + ' and org: ' + org, error);
 		res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred while fetching repositories from the database' });
 	});
 }

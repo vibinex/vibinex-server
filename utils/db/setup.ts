@@ -9,7 +9,7 @@ export const getGithubReposFromDbForUserId = async (user_id: string, org: string
     `;
 	const result = await conn.query(query, [user_id, org, provider]).catch(err => {
 		console.error(`[getGithubreposFromDbForUserId] Could not get the github repos for user with id ${user_id} for org ${org}`, { pg_query: query }, err);
-		throw new Error("Error in running the query on the database", err);
+		throw new Error("Error in running the query on the database" + err.message);
 	});
 	if (result.rows.length === 0) {
 		throw new Error('No repos found');
