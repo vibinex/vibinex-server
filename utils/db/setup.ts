@@ -1,14 +1,14 @@
 import conn from '.';
 
-export const getGithubReposFromDbForUserId = async (user_id: string, org: string, provider: string): Promise<string[]> => {
-	console.log(`[getGithubReposFromDbForUserId] Getting github repos from db for ${user_id} and org ${org}`);
+export const getGithubReposFromDbForUserId = async (userId: string, org: string, provider: string): Promise<string[]> => {
+	console.log(`[getGithubReposFromDbForUserId] Getting github repos from db for ${userId} and org ${org}`);
 	const query = `SELECT repos.repo_name
         FROM repos
         JOIN users ON users.topic_name = repos.install_id
         WHERE users.user_id = $1 AND repos.repo_owner = $2 AND repos.repo_provider = $3;
     `;
-	const result = await conn.query(query, [user_id, org, provider]).catch(err => {
-		console.error(`[getGithubreposFromDbForUserId] Could not get the github repos for user with id ${user_id} for org ${org}`, { pg_query: query }, err);
+	const result = await conn.query(query, [userId, org, provider]).catch(err => {
+		console.error(`[getGithubreposFromDbForUserId] Could not get the github repos for user with id ${userId} for org ${org}`, { pg_query: query }, err);
 		throw new Error("Error in running the query on the database" + err.message);
 	});
 	if (result.rows.length === 0) {
