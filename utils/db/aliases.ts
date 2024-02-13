@@ -24,3 +24,27 @@ export const saveUserAliasesToDb = async (repo_name: string, repo_owner: string,
         throw new Error("Error saving aliases to the database");
     })
 };
+
+export const getUserAliasesFromDb = async (repo_name: string, repo_owner: string, repo_provider: string) => {
+    let handleColumn = repo_provider === 'github' ? 'github' : 'bitbucket';
+
+    const query = `
+        SELECT a.git_alias, a.${handleColumn}
+        FROM aliases a
+        INNER JOIN repos r ON a.git_alias = ANY(r.aliases)
+        WHERE r.repo_name = $1
+            AND r.repo_owner = $2
+            AND r.repo_provider = $3;
+    `;
+    try {
+        const { rows } = await conn.query(query, [repo_name, repo_owner, repo_provider]);
+        const aliases = rows.map(row => ({
+            git_alias: row.git_alias,
+            [handleColumn]: row[handleColumn]
+        }));
+        return aliases;
+    } catch (error) {
+        console.error(`Error getting aliases for repo ${repo_name} and owner ${repo_owner}:`, error);
+        throw new Error("Error getting aliases from the database");
+    }
+};
