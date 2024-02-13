@@ -6,9 +6,9 @@ const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const jsonBody = req.body;
     
     // Validate the JSON body
-    if (!jsonBody || jsonBody.repo_name || jsonBody.repo_owner || jsonBody.repo_provider
+    if (!jsonBody || !jsonBody.repo_name || !jsonBody.repo_owner || !jsonBody.repo_provider
         || !Array.isArray(jsonBody.aliases)) {
-        console.error("[aliasesHandler] Invalid request body");
+        console.error("[aliasesHandler] Invalid request body", jsonBody);
         res.status(400).json({ "error": "Invalid request body" });
         return;
     }
