@@ -15,7 +15,7 @@ const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Save users to the database
     await saveUserAliasesToDb(
-        jsonBody.repo_name, jsonBody.repo_owner, jsonBody.repo_provider, jsonBody.git_user_ids
+        jsonBody.repo_name, jsonBody.repo_owner, jsonBody.repo_provider, jsonBody.aliases
     ).then(() => {
         console.info("[aliasesHandler] Aliases saved to DB successfully");
         res.status(200).send("OK");
