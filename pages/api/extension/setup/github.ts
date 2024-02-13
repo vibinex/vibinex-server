@@ -14,7 +14,7 @@ export default async function githubSetupRepos(req: NextApiRequest, res: NextApi
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
-	const { user_id: userId, org } = req.body;
+	const { userId, org } = req.body;
 	if (!userId || !org) {
 		return res.status(400).json({ error: 'Bad Request', message: 'Both user_id and org are required in the request body' });
 	}
