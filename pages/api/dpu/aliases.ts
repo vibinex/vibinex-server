@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { saveUserAliasesToDb } from '../../../utils/db/aliases';
 
 const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    console.info("[newEndpointHandler] Processing new endpoint request...");
+    console.info("[aliasesHandler] Saving git aliases to db...");
     const jsonBody = req.body;
     
     // Validate the JSON body
@@ -21,8 +21,8 @@ const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(200).send("OK");
         return;
     }).catch((error) => {
-        console.error("[aliasesHandler] Unable to save users to DB, error: ", error);
-        res.status(500).json({ "error": "Unable to save users to DB" });
+        console.error("[aliasesHandler] Unable to save aliases to DB, error: ", error);
+        res.status(500).json({ "error": "Unable to save aliases to DB" });
         return;
     });
 };
