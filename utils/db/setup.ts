@@ -1,7 +1,7 @@
 import conn from '.';
 
-export const getGithubReposFromDbForUserId = async (userId: string, org: string, provider: string): Promise<string[]> => {
-	console.log(`[getGithubReposFromDbForUserId] Getting github repos from db for ${userId} and org ${org}`);
+export const getSetupReposFromDbForUserId = async (userId: string, org: string, provider: string): Promise<string[]> => {
+	console.log(`[getSetupReposFromDbForUserId] Getting setup repos from db for ${userId} and org ${org} and provider ${provider}`);
 	const query = `SELECT repos.repo_name
         FROM repos
         JOIN users ON users.topic_name = repos.install_id
