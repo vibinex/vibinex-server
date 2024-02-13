@@ -7,15 +7,15 @@ const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     
     // Validate the JSON body
     if (!jsonBody || jsonBody.repo_name || jsonBody.repo_owner || jsonBody.repo_provider
-        || !Array.isArray(jsonBody.git_user_ids)) {
-        console.error("[aliasesHandler] Invalid request body", jsonBody);
+        || !Array.isArray(jsonBody.aliases)) {
+        console.error("[aliasesHandler] Invalid request body");
         res.status(400).json({ "error": "Invalid request body" });
         return;
     }
 
     // Save users to the database
     await saveUserAliasesToDb(
-        jsonBody.repo_name, jsonBody.repo_owner, jsonBody.repo_provider, jsonBody.git_user_ids
+        jsonBody.repo_name, jsonBody.repo_owner, jsonBody.repo_provider, jsonBody.aliases
     ).then(() => {
         console.info("[aliasesHandler] Aliases saved to DB successfully");
         res.status(200).send("OK");
