@@ -129,16 +129,18 @@ export const getUserRepositories = async (session: Session) => {
 				continue;
 			}
 			switch (repoProvider) {
-				case 'github':
+				case 'github': {
 					const userReposPromiseGitHub = getUserRepositoriesForGitHub(providerAuthInfo['access_token'], authId)
 					allUserReposPromises.push(userReposPromiseGitHub);
 					break;
-				case 'bitbucket':
+				}
+				case 'bitbucket': {
 					const access_key_refreshed: string | null = await bitbucketAccessToken(authId, session.user.id!);
 					const access_key = access_key_refreshed ?? providerAuthInfo['access_token']; // decision: continue with old access key if the refresh operation fails
 					const userReposPromiseBitbucket = getUserRepositoriesForBitbucket(access_key, authId);
 					allUserReposPromises.push(userReposPromiseBitbucket);
 					break;
+				}
 				default:
 					break;
 			}
