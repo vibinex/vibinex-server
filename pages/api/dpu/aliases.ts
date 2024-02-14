@@ -1,7 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getUserAliasesFromDb, saveUserAliasesToDb } from '../../../utils/db/aliases';
 
-export const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+    if (req.method === 'GET') {
+        // Handle GET request
+        await aliasesGetHandler(req, res);
+      } else if (req.method === 'POST') {
+        // Handle POST request
+        await aliasesPostHandler(req, res);
+      } else {
+        // Handle other request methods
+        res.status(405).end(); // Method Not Allowed
+      }
+}
+
+const aliasesPostHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.info("[aliasesHandler] Saving git aliases to db...");
     const jsonBody = req.body;
     
@@ -27,7 +40,7 @@ export const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) 
     });
 };
 
-export const aliasesGetHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const aliasesGetHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.info("[aliasesGetHandler] Retrieving aliases from DB...");
 
     // Extract query parameters
@@ -52,3 +65,5 @@ export const aliasesGetHandler = async (req: NextApiRequest, res: NextApiRespons
         res.status(500).json({ "error": "Unable to retrieve aliases from DB" });
     }
 };
+
+export default aliasesHandler;
