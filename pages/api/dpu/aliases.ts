@@ -54,16 +54,18 @@ const aliasesGetHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     // Retrieve aliases from the database
-    try {
-        const aliases = await getUserAliasesFromDb(
-            repo_name as string, repo_owner as string, repo_provider as string
-        );
+    await getUserAliasesFromDb(
+        repo_name as string, repo_owner as string, repo_provider as string
+    ).then((aliases) => {
         console.info("[aliasesGetHandler] Aliases retrieved successfully");
         res.status(200).json({ aliases });
-    } catch (error) {
+        return;
+    })
+    .catch((error) => {
         console.error("[aliasesGetHandler] Unable to retrieve aliases from DB, error: ", error);
         res.status(500).json({ "error": "Unable to retrieve aliases from DB" });
-    }
+        return;
+    });
 };
 
 export default aliasesHandler;
