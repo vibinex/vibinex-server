@@ -1,7 +1,6 @@
 import conn from '.'; // Assuming you have imported the database connection
 
-interface SetupReposArgs {
-    user_id: string;
+export interface SetupReposArgs {
     repo_owner: string;
     repo_provider: string;
     repo_names: string[];
@@ -13,7 +12,7 @@ interface SetupResponse {
 }
 
 const saveSetupReposInDb = async (args: SetupReposArgs): Promise<SetupResponse> => {
-    const { user_id, repo_owner, repo_provider, repo_names, install_id } = args;
+    const { repo_owner, repo_provider, repo_names, install_id } = args;
     const query = `SELECT EXISTS(SELECT 1 FROM repos WHERE repo_owner = $1 AND repo_provider = $2)`
 
     return conn.query(query, [repo_owner, repo_provider])
