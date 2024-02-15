@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { saveTopicName } from '../../../utils/db/relevance';
+import { SetupReposArgs } from '../../../utils/db/setupRepos';
+import saveSetupReposInDb from '../../../utils/db/setupRepos';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[setupHandler]Saving setup info in db...");
@@ -11,9 +13,13 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	const allTopicPromises = [];
 	for (const ownerInfo of jsonBody.info) {
-		const saveTopicPromises = saveTopicName(ownerInfo.owner,
-			ownerInfo.provider,
-			jsonBody.installationId, ownerInfo.repos)
+		let setupReposArgs: SetupReposArgs = {
+			repo_owner: ownerInfo.owner,
+			repo_provider:  ownerInfo.provider,
+			repo_names: ownerInfo.repos,
+			install_id: jsonBody.installationId
+		}
+		const saveTopicPromises = saveSetupReposInDb(setupReposArgs)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
 			});
