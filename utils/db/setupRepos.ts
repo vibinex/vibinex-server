@@ -4,7 +4,7 @@ export interface SetupReposArgs {
     repo_owner: string;
     repo_provider: string;
     repo_names: string[];
-    install_id: string[];
+    install_id: string;
 }
 
 interface SetupResponse {
@@ -39,10 +39,10 @@ const saveSetupReposInDb = async (args: SetupReposArgs): Promise<SetupResponse> 
 };
 
 
-const addOrganization = async (repo_owner: string, repo_provider: string, repo_names: string[], install_id: string[]) => {
+const addOrganization = async (repo_owner: string, repo_provider: string, repo_names: string[], install_id: string) => {
     await conn.query('BEGIN');
     const query = `INSERT INTO repos (repo_name, repo_owner, repo_provider, install_id) VALUES ($1, $2, $3, $4)`
-    await Promise.all(repo_names.map(repo_name => conn.query(query, [repo_name, repo_owner, repo_provider, install_id])
+    await Promise.all(repo_names.map(repo_name => conn.query(query, [repo_name, repo_owner, repo_provider, [install_id]])
         .catch(error => {
             console.error(`[addOrganisation] Could not add repos data in repos table for: ${repo_provider}/${repo_owner}`, { pg_query: query }, error);
             throw new Error('Failed to insert repos data');
@@ -51,7 +51,7 @@ const addOrganization = async (repo_owner: string, repo_provider: string, repo_n
 };
 
 // Function to handle setup for a single repository and remove extra repositories
-const handleRepoSetupAndRemoveExtra = async (repo_names: string[], repo_owner: string, repo_provider: string, install_id: string[]) => {
+const handleRepoSetupAndRemoveExtra = async (repo_names: string[], repo_owner: string, repo_provider: string, install_id: string) => {
     await Promise.all(repo_names.map(repo_name => handleRepoSetup(repo_name, repo_owner, repo_provider, install_id)
         .catch(error => {
             console.error('Error in handleRepoSetup:', error);
@@ -64,7 +64,7 @@ const handleRepoSetupAndRemoveExtra = async (repo_names: string[], repo_owner: s
 };
 
 // Function to handle setup for a single repository
-const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provider: string, install_id: string[]) => {
+const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provider: string, install_id: string) => {
     await conn.query('BEGIN');
     const query = `SELECT install_id FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3`
     const existingInstallationsResult = await conn.query(query, [repo_name, repo_owner, repo_provider]).catch(err => {
@@ -87,7 +87,7 @@ const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provi
 };
 
 // Function to remove extra repositories associated with the install_id that are not present in the incoming data
-const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: string, repo_provider: string, install_id: string[]) => {
+const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: string, repo_provider: string, install_id: string) => {
     await conn.query('BEGIN');
     const query = `SELECT repo_name FROM repos WHERE repo_owner = $1 AND repo_provider = $2 AND $3 = ANY(install_id)`
 
