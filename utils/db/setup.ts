@@ -4,7 +4,7 @@ export const getSetupReposFromDbForUserId = async (userId: string, org: string, 
 	console.log(`[getSetupReposFromDbForUserId] Getting setup repos from db for ${userId} and org ${org} and provider ${provider}`);
 	const query = `SELECT repos.repo_name
         FROM repos
-        JOIN users ON users.topic_name = repos.install_id
+        JOIN users ON users.topic_name = ANY(repos.install_id)
         WHERE users.id = $1 AND repos.repo_owner = $2 AND repos.repo_provider = $3;
     `;
 	const result = await conn.query(query, [userId, org, provider]).catch(err => {
