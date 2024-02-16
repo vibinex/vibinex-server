@@ -1,4 +1,4 @@
-import conn from '.'; // Assuming you have imported the database connection
+import conn from '.';
 
 export interface SetupReposArgs {
     repo_owner: string;
@@ -74,54 +74,83 @@ const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provi
     await conn.query('BEGIN').catch(err => {
         console.error(`[handleRepoSetup] Could not start db transaction: ${repo_provider}/${repo_owner} for install_id ${install_id}`, { pg_query: query }, err);
         throw new Error('Failed to begin transaction');
-    })
-    const query = `SELECT install_id FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3`
+    });
+
+    const query = `SELECT install_id FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3`;
     const existingInstallationsResult = await conn.query(query, [repo_name, repo_owner, repo_provider]).catch(err => {
         console.error(`[handleRepoSetup] Could not get the install-id for repository: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
-		throw new Error("Error in getting install-id from db", err);
+        throw new Error("Error in getting install-id from db");
     });
-    const existingInstallations = existingInstallationsResult.rows[0]?.install_id || [];
 
-    if (!existingInstallations.includes(install_id)) {
-        existingInstallations.push(install_id);
-        const updateQuery = 'UPDATE repos SET install_id = $1 WHERE repo_name = $2 AND repo_owner = $3 AND repo_provider = $4';
-        await conn.query(updateQuery, [existingInstallations, repo_name, repo_owner, repo_provider])
-        .catch(err => {
-            console.error(`[handleRepoSetup] Could not update the install-id array for repository: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
-            throw new Error('Failed to update install-id array for repo', err);
-        });
+    const existingInstallations = existingInstallationsResult.rows.map(row => row.install_id);
+
+    // Iterate over each row
+    for (const installations of existingInstallations) {
+        // Check if the install_id is already present in the array
+        if (!installations.includes(install_id)) {
+            installations.push(install_id);
+            const updateQuery = 'UPDATE repos SET install_id = $1 WHERE repo_name = $2 AND repo_owner = $3 AND repo_provider = $4';
+            await conn.query(updateQuery, [installations, repo_name, repo_owner, repo_provider])
+                .catch(err => {
+                    console.error(`[handleRepoSetup] Could not update the install-id array for repository: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
+                    throw new Error('Failed to update install-id array for repo');
+                });
+        }
     }
 
     await conn.query('COMMIT').catch(err => {
         console.error(`[handleRepoSetup] Could not commit DB transaction: ${repo_provider}/${repo_owner} for install_id ${install_id}`, { pg_query: query }, err);
         throw new Error('Failed to commit db transaction');
-    })
+    });
 };
 
-// Function to remove extra repositories associated with the install_id that are not present in the incoming data
 const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: string, repo_provider: string, install_id: string) => {
     await conn.query('BEGIN').catch(err => {
         console.error(`[removeExtraRepositories] Could not start db transaction: ${repo_provider}/${repo_owner} for install_id ${install_id}`, { pg_query: query }, err);
         throw new Error('Failed to begin db transaction');
-    })
-    const query = `SELECT repo_name FROM repos WHERE repo_owner = $1 AND repo_provider = $2 AND $3 = ANY(install_id)`
+    });
+
+    const query = `SELECT repo_name FROM repos WHERE repo_owner = $1 AND repo_provider = $2 AND $3 = ANY(install_id)`;
 
     const existingReposResult = await conn.query(query, [repo_owner, repo_provider, install_id]).catch(err => {
         console.error(`[removeExtraRepositories] Could not get existing repositories from db for: ${repo_provider}/${repo_owner} for install_id: ${install_id}`, { pg_query: query }, err);
-        throw new Error('Failed to get existing repos from db', err);
-    })
+        throw new Error('Failed to get existing repos from db');
+    });
+
     const existingRepos = existingReposResult.rows.map(row => row.repo_name);
     const extraRepos = existingRepos.filter(repo => !incomingRepoNames.includes(repo));
 
-    await Promise.all(extraRepos.map(repo_name => conn.query('DELETE FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3 AND $4 = ANY(install_id)', [repo_name, repo_owner, repo_provider, install_id])
-        .catch(err => {
-            console.error(`[removeExtraRepositories] Could not delete extra repositories from db for: ${repo_provider}/${repo_owner} for install_id: ${install_id}`, { pg_query: query }, err);
-            throw new Error('Failed to delete repo');
-        })));
+    for (const repo_name of extraRepos) {
+        // Check if the current extra repo is the only one associated with the install_id
+        const singleRepoQuery = `SELECT install_id FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3`;
+        const singleRepoResult = await conn.query(singleRepoQuery, [repo_name, repo_owner, repo_provider]).catch(err => {
+            console.error(`[removeExtraRepositories] Error checking if repo is the only one: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: singleRepoQuery }, err);
+            throw new Error('Failed to check if repo is the only one associated with install_id');
+        });
+
+        const install_ids = singleRepoResult.rows[0]?.install_id || [];
+        if (install_ids.length === 1 && install_ids.includes(install_id)) {
+            // If the repo is the only one associated with the install_id, delete it
+            await conn.query('DELETE FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3 AND $4 = ANY(install_id)', [repo_name, repo_owner, repo_provider, install_id])
+                .catch(err => {
+                    console.error(`[removeExtraRepositories] Could not delete extra repo from db: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
+                    throw new Error('Failed to delete extra repo');
+                });
+        } else {
+            // If the repo has multiple associations or doesn't include our install_id, just remove our install_id
+            const updatedInstallIds = install_ids.filter((id: String) => id !== install_id);
+            await conn.query('UPDATE repos SET install_id = $1 WHERE repo_name = $2 AND repo_owner = $3 AND repo_provider = $4', [updatedInstallIds, repo_name, repo_owner, repo_provider])
+                .catch(err => {
+                    console.error(`[removeExtraRepositories] Could not remove install_id from extra repo: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
+                    throw new Error('Failed to remove install_id from extra repo');
+                });
+        }
+    }
+
     await conn.query('COMMIT').catch(err => {
         console.error(`[removeExtraRepositories] Could not commit DB transaction: ${repo_provider}/${repo_owner} for install_id ${install_id}`, { pg_query: query }, err);
         throw new Error('Failed to commit db transaction');
-    })
+    });
 };
 
 export default saveSetupReposInDb;
