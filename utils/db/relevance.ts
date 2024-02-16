@@ -117,7 +117,7 @@ export const getFileData = async (provider: string, owner: string, reponame: str
 	return files;
 }
 
-export const getTopicNameFromDB = async (owner: string, repoName: string, provider: string): Promise<string> => {
+export const getTopicNameFromDB = async (owner: string, repoName: string, provider: string): Promise<string[]> => {
 	console.log(`[getTopicNameFromDB] Getting topic name from db ${provider}/${owner}/${repoName}`); //TODO: To be removed
 	const query = `
     SELECT install_id 
