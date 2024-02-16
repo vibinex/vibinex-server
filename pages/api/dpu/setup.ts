@@ -19,11 +19,11 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			repo_names: ownerInfo.repos,
 			install_id: jsonBody.installationId
 		}
-		const saveTopicPromises = saveSetupReposInDb(setupReposArgs)
+		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
 			});
-		allTopicPromises.push(saveTopicPromises);
+		allTopicPromises.push(saveSetupReposPromises);
 	}
 	await Promise.all(allTopicPromises).then((values) => {
 		console.info("[setupHandler] All setup info saved succesfully...")
