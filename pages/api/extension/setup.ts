@@ -23,7 +23,11 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 		res.status(200).json({ repos: repos });
 	})
 	.catch((error: Error) => {
+<<<<<<< HEAD
 		console.error('Error fetching repositories from database for user_id: ' + userId + ' , org: ' + org + ' and provider: ' + provider, error);
+=======
+		console.error('[extension/setup] Error fetching repositories from database for user_id: ' + userId + ' , org: ' + org + ' and provider: ' + provider, error);
+>>>>>>> mkp/setup-repo-api-github
 		res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred while fetching repositories from the database' });
 	});
 }
