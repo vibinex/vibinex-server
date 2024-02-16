@@ -22,7 +22,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 		
 	console.info("[webookHandler] Received github webhook event for ", name);
-	const topicName: string | null = await getTopicNameFromDB(owner, name, provider).catch((error) => {
+	const topicName: string[] | null = await getTopicNameFromDB(owner, name, provider).catch((error) => {
 		console.error('[webhookHandler] Failed to get topic name from db:', error);
 		return null;
 	});
@@ -43,30 +43,32 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).json({ error: 'Unable to get repoConfig from db' });
 		return;
 	}
-	const data = {
-		repositoryProvider: 'github',
-		eventPayload: jsonBody,
-		repoConfig: repoConfig,
-		eventType: event_type
-	};
-	
-	const msgType = 'webhook_callback';
-	const topicName_str = topicName;
-	
-	console.debug(`[webookHandler] data = ${JSON.stringify(jsonBody)}`)
-	console.debug(`[webookHandler] topicname = ${topicName}`)
-	console.debug(`[webookHandler] repoConfig = ${JSON.stringify(repoConfig)}`)
-	
-	const result: string | null = await publishMessage(topicName_str, data, msgType)
-	.catch((error) => {
-		console.error('[webookHandler] Failed to publish message:', error);
-		return null;
-	});
-	if (result == null) {
-		res.status(500).json({ error: 'Internal Server Error' });
-		return;
+	// Publish message to Pub/Sub for each install_id (topic name)
+	for (const installId of topicName) {
+		const data = {
+			repositoryProvider: 'github',
+			eventPayload: jsonBody,
+			repoConfig: repoConfig,
+			eventType: event_type
+		};
+
+		const msgType = 'webhook_callback';
+
+		console.debug(`[webookHandler] data = ${JSON.stringify(jsonBody)}`);
+		console.debug(`[webookHandler] installId = ${installId}`);
+		console.debug(`[webookHandler] repoConfig = ${JSON.stringify(repoConfig)}`);
+
+		const result: string | null = await publishMessage(installId, data, msgType)
+		.catch((error) => {
+			console.error('[webookHandler] Failed to publish message:', error);
+			return null;
+		});
+		if (result == null) {
+			res.status(500).json({ error: 'Internal Server Error' });
+			return;
+		}
+		console.info("[webookHandler] Sent message to pubsub for ", installId, result);
 	}
-	console.info("[webookHandler] Sent message to pubsub for ", topicName, result);
 	res.status(200).send("Success");
 }
 
