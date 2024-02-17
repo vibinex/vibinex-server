@@ -11,7 +11,7 @@ import { getAuthUserId, getAuthUserName } from '../utils/auth';
 import { getUserLocation, isUserInIndia } from '../utils/location';
 
 const monthlyBasePriceUSD = 5;
-const monthlyBasePriceINR = 200;
+const monthlyBasePriceINR = 250;
 
 const pricingPlan = [
 	{
