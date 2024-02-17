@@ -92,7 +92,7 @@ const Pricing = () => {
 				<div className='flex m-auto w-4/5 md:w-1/2 justify-center rounded-xl mt-8 bg-gray-100'>
 					{heading.map((item) => {
 						return (
-							<div
+							<button
 								key={item.name}
 								onClick={() => { setIsYearly(item.name === 'Yearly'); rudderEventMethods?.track(getAuthUserId(session), "pricing-changed", { type: "button", eventStatusFlag: 1, isYearly: isYearly, name: getAuthUserName(session) }, getAndSetAnonymousIdFromLocalStorage()) }}
 								className={`text-center p-4 w-full rounded-xl cursor-pointer ${item.flag ? null : 'bg-primary-main border-2 border-primary-dark'}`}>
@@ -101,7 +101,7 @@ const Pricing = () => {
 									<span className='font-light text-sm whitespace-nowrap'>
 										{' (2 months free)'}
 									</span> : null}</h2>
-							</div>
+							</button>
 						)
 					})}
 				</div>
@@ -119,9 +119,9 @@ const Pricing = () => {
 									</div>
 
 									<ul className='mt-3.5 grow'>
-										{item.features.map((feature, index) => {
+										{item.features.map((feature) => {
 											return (
-												<li key={index} className='text-lg ml-1 mb-2'>
+												<li key={feature} className='text-lg ml-1 mb-2'>
 													<AiOutlineCheckCircle className='text-primary-main w-5 inline mr-1' size={20} />
 													{feature}
 												</li>
