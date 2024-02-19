@@ -83,19 +83,25 @@ const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provi
     });
 
     const existingInstallations = existingInstallationsResult.rows.map(row => row.install_id);
+    console.log("[handleRepoSetup] existingInstallations: ", existingInstallations)
 
     // Iterate over each row
-    for (const installations of existingInstallations) {
-        // Check if the install_id is already present in the array
-        if (!installations.includes(install_id)) {
-            installations.push(install_id);
-            const updateQuery = 'UPDATE repos SET install_id = $1 WHERE repo_name = $2 AND repo_owner = $3 AND repo_provider = $4';
-            await conn.query(updateQuery, [installations, repo_name, repo_owner, repo_provider])
-                .catch(err => {
-                    console.error(`[handleRepoSetup] Could not update the install-id array for repository: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
-                    throw new Error('Failed to update install-id array for repo');
-                });
+    if (existingInstallations && existingInstallations.length > 0) {
+        for (const installations of existingInstallations) {
+            // Check if the install_id is already present in the array
+            if (!installations.includes(install_id)) {
+                installations.push(install_id);
+                const updateQuery = 'UPDATE repos SET install_id = $1 WHERE repo_name = $2 AND repo_owner = $3 AND repo_provider = $4';
+                await conn.query(updateQuery, [installations, repo_name, repo_owner, repo_provider])
+                    .catch(err => {
+                        console.error(`[handleRepoSetup] Could not update the install-id array for repository: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
+                        throw new Error('Failed to update install-id array for repo');
+                    });
+            }
         }
+    } else {
+        console.error(`[handleRepoSetup] something is wrong, installation_ids array is empty for: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query });
+        throw new Error("Error in getting install-id from db");
     }
 
     await conn.query('COMMIT').catch(err => {
