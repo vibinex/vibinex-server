@@ -42,10 +42,12 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(500).json({ error: 'Unable to get repoConfig from db' });
 		return;
 	}
+	let failedCount = 0;
+
 	// Publish message to Pub/Sub for each install_id (topic name)
 	for (const installId of topicName) {
 		const data = {
-			repositoryProvider: 'github',
+			repositoryProvider: 'bitbucket',
 			eventPayload: jsonBody,
 			repoConfig: repoConfig,
 			eventType: eventHeader
@@ -60,15 +62,21 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		const result: string | null = await publishMessage(installId, data, msgType)
 		.catch((error) => {
 			console.error('[webookHandler] Failed to publish message:', error);
+			failedCount++;
 			return null;
 		});
-		if (result == null) {
-			res.status(500).json({ error: 'Internal Server Error' });
-			return;
-		}
+
+		if (result === null) continue;
+
 		console.info("[webookHandler] Sent message to pubsub for ", installId, result);
 	}
-	res.status(200).send("Success");
+
+	// Determine the response status code based on the number of failures
+	if (failedCount > 0) {
+		res.status(500).json({ error: `Failed to publish ${failedCount} messages to Pub/Sub` });
+	} else {
+		res.status(200).send("Success");
+	}
 }
 
 export default webhookHandler;

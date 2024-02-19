@@ -11,7 +11,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).json({ "error": "Invalid request body" });
 		return;
 	}
-	const allTopicPromises = [];
+	const allSetupReposPromises = [];
 	for (const ownerInfo of jsonBody.info) {
 		let setupReposArgs: SetupReposArgs = {
 			repo_owner: ownerInfo.owner,
@@ -23,9 +23,9 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
 			});
-		allTopicPromises.push(saveSetupReposPromises);
+		allSetupReposPromises.push(saveSetupReposPromises);
 	}
-	await Promise.all(allTopicPromises).then((values) => {
+	await Promise.all(allSetupReposPromises).then((values) => {
 		console.info("[setupHandler] All setup info saved succesfully...")
 		res.status(200).send("Ok");
 		return;
