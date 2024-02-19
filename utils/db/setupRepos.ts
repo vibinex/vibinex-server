@@ -100,13 +100,12 @@ const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provi
             }
         }
     } else {
-        //If no installation exist that means add that repo into repos table with the upcoming install)id
+        //If no installation exist that means add that repo into repos table with the upcoming install_id
         const query = `INSERT INTO repos (repo_name, repo_owner, repo_provider, install_id) VALUES ($1, $2, $3, $4)`
         await conn.query(query, [repo_name, repo_owner, repo_provider, [install_id]]).catch(err => {
-            console.error(`[handleRepoSetup] could not insert repo into rpeos table: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
+            console.error(`[handleRepoSetup] could not insert repo into repos table: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
             throw new Error("Error in inserting repo in db");
         })
-
     }
 
     await conn.query('COMMIT').catch(err => {
