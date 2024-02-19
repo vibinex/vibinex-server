@@ -4,7 +4,8 @@ import { getSetupReposFromDbForUserId } from '../../../utils/db/setup';
 export default async function setupRepos(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
 	if (req.method == "OPTIONS") {
-		res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Authorization");
+		res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+		res.setHeader("Access-Control-Allow-Origin", "*");
 		res.status(200).send("Ok");
 		return;
 	}
