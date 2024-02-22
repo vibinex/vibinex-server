@@ -12,17 +12,25 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(401).json({ message: 'Unauthenticated' });
 	}
     if (method === 'GET') {
-        const user_id = session.user.id
+        const user_id = session.user.id;
         if (!user_id) {
-            
-            throw new Error("User ID is required for the getting alias provider map.");
+            res.status(500).json({error: "No user id in session"});
+            return;
         }
-        const aliasProviderMap = await getGitEmailAliases(user_id);
-        res.status(200).json({ aliasProviderMap });
+        const aliasProviderMap = await getGitEmailAliases(user_id)
+        .then(() => {
+            res.status(200).json({ aliasProviderMap });
+        }).catch((error) => {
+            res.status(500).json({error: error});
+        });
     } else if (method === 'POST') {
         const aliasProviderMap: AliasProviderMap = body.aliasProviderMap;
-        await saveGitAliasMap(aliasProviderMap);
-        res.status(200).send('Git alias map saved successfully.');
+        await saveGitAliasMap(aliasProviderMap)
+        .then(() => {
+            res.status(200).send('Git alias map saved successfully.');
+        }).catch((error) => {
+            res.status(500).json({error: error});
+        });
     } else {
         res.status(405).send('Method Not Allowed');
     }
@@ -31,7 +39,6 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const getGitEmailAliases = async (userId: string): Promise<AliasProviderMap> => {
     // Validate that userId is provided
-    console.error("[getGitEmailAliases] userId = ", userId);
     if (!userId) {
         throw new Error("User ID is required to fetch Git email aliases.");
     }

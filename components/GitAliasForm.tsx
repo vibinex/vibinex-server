@@ -2,11 +2,8 @@ import { useState, useEffect } from "react";
 import { AliasProviderMap, HandleMap, AliasMap } from "../types/AliasMap";
 import axios from "axios";
 
-type GitAliasFormProps = {
-  userId: string;
-};
 
-const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
+const GitAliasForm: React.FC = () => {
   const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [handleInputValues, setHandleInputValues] = useState<{ [key: string]: { github: string; bitbucket: string } }>({});
@@ -14,20 +11,18 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(`[GitAliasForm] userId = ${userId}`);
         const response = await axios.get(`/api/alias`);
         if (!response.data || !response.data.aliasProviderMap) {
           throw new Error('Failed to fetch Git email aliases');
         }
-        console.log(`[GitAliasForm] map dummy change = ${JSON.stringify(response.data.aliasProviderMap)}`);
-        setGitAliasMap(response.data.aliasProviderMap); // Corrected setting of state
+        setGitAliasMap(response.data.aliasProviderMap);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching Git email aliases:", error);
       }
     };
     fetchData();
-  }, [userId]);
+  }, []);
 
   const handleInputChange = (alias: string, provider: string, value: string) => {
     setHandleInputValues(prevState => ({
@@ -42,42 +37,33 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      // Collect input values and construct gitAliasMap
       if (!gitAliasMap) {
         throw new Error('No new value to submit');
       }
       const updatedProviderMaps = gitAliasMap.providerMaps.map(providerMap => {
         const updatedHandleMaps = providerMap.handleMaps.map(handleMap => {
-          const inputValue = handleInputValues[providerMap.alias]?.[handleMap.provider as keyof typeof handleInputValues['']];
-  
-          // Ensure inputValue is a string
+          const inputValue = handleInputValues[providerMap.alias]?.[handleMap.provider as keyof typeof handleInputValues['']];  
           const updatedHandles = inputValue ? [inputValue.toString()] : [];
           return { ...handleMap, handles: updatedHandles };
         });
         return { ...providerMap, handleMaps: updatedHandleMaps };
       });
   
-      const updatedGitAliasMap = { providerMaps: updatedProviderMaps };
-  
-      // Send updatedGitAliasMap to the server
+      const updatedGitAliasMap = { providerMaps: updatedProviderMaps };  
       const response = await axios.post('/api/alias', { aliasProviderMap: updatedGitAliasMap }, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-  
       if (!response) {
         throw new Error('Failed to save Git alias map');
       }
-  
       alert("Git aliases updated successfully!");
     } catch (error) {
       console.error("Error saving Git aliases:", error);
       alert("An error occurred while saving Git aliases. Please try again.");
     }
   };
-  
-  
 
   return (
     <form onSubmit={handleSubmit}>
