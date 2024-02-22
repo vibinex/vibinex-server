@@ -49,7 +49,6 @@ export const getUserAliasesFromRepo = async (repo_name: string, repo_owner: stri
 };
 
 export const getGitEmailAliasesFromDB = async (user_id: string): Promise<AliasProviderMap> =>  {
-    console.error("[getGitEmailAliasesFromDB] user_id = ", user_id);
     const query = `
     SELECT 
         git_alias,
@@ -98,7 +97,6 @@ export const getGitEmailAliasesFromDB = async (user_id: string): Promise<AliasPr
 }
 
 export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) => {
-    console.error(`[saveGitAliasMapToDB] hmap = ${aliasProviderMap}`)
     const values: string[] = [];
     for (const aliasMap of aliasProviderMap.providerMaps) {
         const { alias, handleMaps } = aliasMap;
