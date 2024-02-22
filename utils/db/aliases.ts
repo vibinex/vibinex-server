@@ -62,7 +62,7 @@ export const getGitEmailAliasesFromDB = async (user_id: string): Promise<AliasPr
         WHERE install_id = (
             SELECT topic_name
             FROM users
-            WHERE user_id = $1
+            WHERE id = $1
         )
     )
     GROUP BY git_alias;
@@ -95,6 +95,7 @@ export const getGitEmailAliasesFromDB = async (user_id: string): Promise<AliasPr
 }
 
 export const saveGitAliasMapToDB = async (hMap: HandleMap) => {
+    console.error(`[saveGitAliasMapToDB] hmap = ${hMap}`)
     try {
         // Construct the values array for multiple inserts or updates
         const columnName = hMap.provider;

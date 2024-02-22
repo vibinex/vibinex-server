@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AliasProviderMap } from "../types/AliasMap";
+import axios from "axios";
 
 type GitAliasFormProps = {
   userId: string;
@@ -14,13 +15,14 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
     const fetchData = async () => {
       try {
         console.log(`[GitAliasForm] userId = ${userId}`)
-        const response = await fetch(`/api/aliases?user_id=${userId}`);
+        const response = await axios.get(`/api/alias?user_id=${userId}`);
         console.log(`[GitAliasForm] response = ${JSON.stringify(response)}`)
-        if (!response.ok) {
+        if (!response) {
           throw new Error('Failed to fetch Git email aliases');
         }
-        const data: { aliasProviderMap: AliasProviderMap } = await response.json();
-        setGitAliasMap(data.aliasProviderMap);
+        const aliasData: { aliasProviderMap: AliasProviderMap } = JSON.parse(response.data);
+        console.log(`[GitAliasForm] aliasData = ${aliasData}`);
+        setGitAliasMap(aliasData.aliasProviderMap);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching Git email aliases:", error);
@@ -32,14 +34,14 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/aliases', {
+      const response = await axios.post('/api/alias', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(gitAliasMap),
       });
-      if (!response.ok) {
+      if (!response) {
         throw new Error('Failed to save Git alias map');
       }
       alert("Git aliases updated successfully!");

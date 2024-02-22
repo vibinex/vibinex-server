@@ -2,26 +2,30 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getGitEmailAliasesFromDB, saveGitAliasMapToDB } from "../../utils/db/aliases";
 import { AliasProviderMap, HandleMap, AliasMap } from "../../types/AliasMap";
 import { log } from "console";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "./auth/[...nextauth]";
 
 const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { method, query, body } = req;
-    console.error(`[aliasHandler] method = ${method}, query = ${query} body = ${body}`);
-    
-    try {
-        if (method === 'GET') {
-            const user_id = query.user_id as string;
-            if (!user_id) {
-                throw new Error("User ID is required for the GET method.");
-            }
-            const aliasProviderMap = await getGitEmailAliases(user_id);
-            res.status(200).json({ aliasProviderMap });
-        } else if (method === 'POST') {
-            const aliasmap: AliasProviderMap = JSON.parse(body);
-            await saveGitAliasMap(aliasmap);
-            res.status(200).send('Git alias map saved successfully.');
-        } else {
-            res.status(405).send('Method Not Allowed');
+    console.log(`[aliasHandler] method = ${method}, query = ${query} body = ${body}`);
+    const session = await getServerSession(req, res, authOptions);
+	if (!session) {
+		return res.status(401).json({ message: 'Unauthenticated' });
+	}
+    if (method === 'GET') {
+        const user_id = session.user.id
+        if (!user_id) {
+            throw new Error("User ID is required for the getting alias provider map.");
         }
+        const aliasProviderMap = await getGitEmailAliases(user_id);
+        res.status(200).json({ aliasProviderMap });
+    } else if (method === 'POST') {
+        const aliasmap: AliasProviderMap = JSON.parse(body);
+        await saveGitAliasMap(aliasmap);
+        res.status(200).send('Git alias map saved successfully.');
+    } else {
+        res.status(405).send('Method Not Allowed');
+    }
     } catch (error) {
         console.error('Error handling alias request:', error);
         res.status(500).send('Internal Server Error');
