@@ -6,7 +6,7 @@ import { authOptions } from "./auth/[...nextauth]";
 
 const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { method, query, body } = req;
-    console.log(`[aliasHandler] method = ${method}, query = ${query} body = ${body}`);
+    console.log(`[aliasHandler] method = ${method}, query = ${query} body = ${JSON.stringify(body)}`);
     const session = await getServerSession(req, res, authOptions);
 	if (!session) {
 		return res.status(401).json({ message: 'Unauthenticated' });
@@ -20,8 +20,8 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         const aliasProviderMap = await getGitEmailAliases(user_id);
         res.status(200).json({ aliasProviderMap });
     } else if (method === 'POST') {
-        const aliasmap: AliasProviderMap = JSON.parse(body);
-        await saveGitAliasMap(aliasmap);
+        const aliasProviderMap: AliasProviderMap = body.aliasProviderMap;
+        await saveGitAliasMap(aliasProviderMap);
         res.status(200).send('Git alias map saved successfully.');
     } else {
         res.status(405).send('Method Not Allowed');

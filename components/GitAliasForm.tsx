@@ -9,6 +9,7 @@ type GitAliasFormProps = {
 const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
   const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [handleInputValues, setHandleInputValues] = useState<{ [key: string]: { github: string; bitbucket: string } }>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,45 +29,55 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
     fetchData();
   }, [userId]);
 
-  const handleInputChange = (provider: string, aliasIndex: number, value: string) => {
-    setGitAliasMap(prevState => {
-      if (!prevState) return null;
-      const updatedProviderMaps = prevState.providerMaps.map((providerMap, index) => {
-        if (index !== aliasIndex) return providerMap;
-        const updatedHandleMaps = providerMap.handleMaps.map(handleMap => {
-          if (handleMap.provider === provider) {
-            const existingHandleIndex = handleMap.handles.indexOf(value);
-            const updatedHandles = existingHandleIndex !== -1 ?
-              handleMap.handles.filter(handle => handle !== value) :
-              [...handleMap.handles, value];
-            return { ...handleMap, handles: updatedHandles };
-          }
-          return handleMap;
-        });
-        return { ...providerMap, handleMaps: updatedHandleMaps };
-      });
-      return { ...prevState, providerMaps: updatedProviderMaps };
-    });
+  const handleInputChange = (alias: string, provider: string, value: string) => {
+    setHandleInputValues(prevState => ({
+      ...prevState,
+      [alias]: {
+        ...prevState[alias],
+        [provider]: value
+      }
+    }));
   };
-  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/alias', gitAliasMap, {
+      // Collect input values and construct gitAliasMap
+      if (!gitAliasMap) {
+        throw new Error('No new value to submit');
+      }
+      const updatedProviderMaps = gitAliasMap.providerMaps.map(providerMap => {
+        const updatedHandleMaps = providerMap.handleMaps.map(handleMap => {
+          const inputValue = handleInputValues[providerMap.alias]?.[handleMap.provider as keyof typeof handleInputValues['']];
+  
+          // Ensure inputValue is a string
+          const updatedHandles = inputValue ? [inputValue.toString()] : [];
+          return { ...handleMap, handles: updatedHandles };
+        });
+        return { ...providerMap, handleMaps: updatedHandleMaps };
+      });
+  
+      const updatedGitAliasMap = { providerMaps: updatedProviderMaps };
+  
+      // Send updatedGitAliasMap to the server
+      const response = await axios.post('/api/alias', { aliasProviderMap: updatedGitAliasMap }, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
+  
       if (!response) {
         throw new Error('Failed to save Git alias map');
       }
+  
       alert("Git aliases updated successfully!");
     } catch (error) {
       console.error("Error saving Git aliases:", error);
       alert("An error occurred while saving Git aliases. Please try again.");
     }
   };
+  
+  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -100,8 +111,8 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
                 <div>
                   <input
                     type="text"
-                    value=""
-                    onChange={(e) => handleInputChange('github', providerMapIndex, e.target.value)}
+                    value={handleInputValues[providerMap.alias]?.github || ''}
+                    onChange={(e) => handleInputChange(providerMap.alias, 'github', e.target.value)}
                     className="mb-2 w-full"
                   />
                 </div>
@@ -116,8 +127,8 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
                 <div>
                   <input
                     type="text"
-                    value=""
-                    onChange={(e) => handleInputChange('bitbucket', providerMapIndex, e.target.value)}
+                    value={handleInputValues[providerMap.alias]?.bitbucket || ''}
+                    onChange={(e) => handleInputChange(providerMap.alias, 'bitbucket', e.target.value)}
                     className="mb-2 w-full"
                   />
                 </div>
@@ -136,7 +147,6 @@ const GitAliasForm: React.FC<GitAliasFormProps> = ({ userId }) => {
       )}
     </form>
   );
-   
 };
 
 export default GitAliasForm;
