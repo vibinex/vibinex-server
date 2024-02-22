@@ -1,6 +1,5 @@
 import conn from '.';
-import { AliasMap, AliasProviderMap, HandleMap } from '../../types/AliasMap';
-import { supportedProviders } from '../providerAPI';
+import { AliasMap, AliasProviderMap } from '../../types/AliasMap';
 
 export const saveUserAliasesToRepo = async (repo_name: string, repo_owner: string, repo_provider: string, aliases: string[]) => {
     // Filter out empty strings and null values
