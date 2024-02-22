@@ -52,70 +52,99 @@ export const getUserAliasesFromRepo = async (repo_name: string, repo_owner: stri
 export const getGitEmailAliasesFromDB = async (user_id: string): Promise<AliasProviderMap> =>  {
     console.error("[getGitEmailAliasesFromDB] user_id = ", user_id);
     const query = `
-    SELECT git_alias,
-        ARRAY_AGG(github) AS github_handles,
-        ARRAY_AGG(bitbucket) AS bitbucket_handles
-    FROM aliases
-    WHERE git_alias IN (
-        SELECT UNNEST(aliases)
-        FROM repos
-        WHERE install_id = (
-            SELECT topic_name
-            FROM users
-            WHERE id = $1
-        )
-    )
-    GROUP BY git_alias;
+    SELECT 
+        git_alias,
+        COALESCE(
+            ARRAY(SELECT DISTINCT github FROM unnest(github) AS github WHERE github IS NOT NULL),
+            ARRAY[]::text[]
+        ) AS github_handles,
+        COALESCE(
+            ARRAY(SELECT DISTINCT bitbucket FROM unnest(bitbucket) AS bitbucket WHERE bitbucket IS NOT NULL),
+            ARRAY[]::text[]
+        ) AS bitbucket_handles
+    FROM (
+        SELECT 
+            repo_alias AS git_alias,
+            a.github,
+            a.bitbucket
+        FROM 
+            (SELECT unnest(r.aliases) AS repo_alias FROM repos r
+            LEFT JOIN users u ON u.topic_name = ANY(r.install_id)
+            WHERE u.id = $1 OR u.id IS NULL) AS repo_aliases
+        LEFT JOIN 
+            aliases a ON repo_aliases.repo_alias = a.git_alias
+        GROUP BY 
+            repo_alias, a.github, a.bitbucket
+    ) AS final_result;
     `;
     const { rows } = await conn.query(query, [user_id]).catch(err => {
         console.error(`[getGitEmailAliasesFromDB] Error getting aliases for user ${user_id}:`, err);
         throw new Error("Error getting aliases from the database");
     })
-    console.info(`[getGitEmailAliasesFromDB] Got aliases for user: ${user_id}`);
-    const aliasesMap = new Map();
-
+    console.info(`[getGitEmailAliasesFromDB] Got aliases for user: ${user_id}, rows = ${rows}`);
+    const providerMaps: AliasMap[] = [];
     // Loop through each row and populate the map
-    const githubHandles: AliasMap[] = [];
-    const bitbucketHandles: AliasMap[] = [];
     rows.forEach(row => {
-        if (row.github_handles) {
-            const githubMap: AliasMap = { alias: row.git_alias, handles: row.github_handles};
-            githubHandles.push(githubMap);
-        }
-        if (row.bitbucket_handles) {
-            const bitbucketMap: AliasMap = { alias: row.git_alias, handles: row.bitbucket_handles};
-            bitbucketHandles.push(bitbucketMap);
-        }
+        const aliasMap: AliasMap = {
+            alias: row.git_alias,
+            handleMaps: [
+                { provider: 'github', handles: row.github_handles },
+                { provider: 'bitbucket', handles: row.bitbucket_handles }
+            ]
+        };        
+        providerMaps.push(aliasMap);
     });
-    const aliasProvider: AliasProviderMap = { aliases: [
-        {provider: supportedProviders[0], handles: githubHandles},
-        {provider: supportedProviders[1], handles: bitbucketHandles}
-    ]};
+    const aliasProvider: AliasProviderMap = { providerMaps: providerMaps};
     return aliasProvider;
 }
 
-export const saveGitAliasMapToDB = async (hMap: HandleMap) => {
-    console.error(`[saveGitAliasMapToDB] hmap = ${hMap}`)
-    try {
-        // Construct the values array for multiple inserts or updates
-        const columnName = hMap.provider;
-        const values = hMap.handles.map(
-            (alias_map) => 
-            `('${alias_map.alias}', ARRAY(SELECT DISTINCT UNNEST(${columnName} || ${JSON.stringify(alias_map.handles)})))`).join(', ');
+export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) => {
+    console.error(`[saveGitAliasMapToDB] hmap = ${aliasProviderMap}`)
+    const values: string[] = [];
+    for (const aliasMap of aliasProviderMap.providerMaps) {
+        const { alias, handleMaps } = aliasMap;
+        let githubHandle = null;
+        let bitbucketHandle = null;
 
-        // Query to insert or update multiple rows
-        const query = `
-            INSERT INTO aliases (git_alias, ${columnName})
-            VALUES ${values}
-            ON CONFLICT (git_alias) DO UPDATE SET ${columnName} = ARRAY(SELECT DISTINCT UNNEST(EXCLUDED.${columnName} || ${columnName}));
-        `;
+        for (const handleMap of handleMaps) {
+            if (handleMap.provider === 'github' && handleMap.handles.length > 0) {
+                githubHandle = handleMap.handles.join("','");
+            } else if (handleMap.provider === 'bitbucket' && handleMap.handles.length > 0) {
+                bitbucketHandle = handleMap.handles.join("','");
+            }
+        }
 
-        // Execute the query
-        await conn.query(query);
-        console.info(`[saveGitAliasMapToDB] Saved ${hMap.handles.length} entries for ${hMap.provider}.`);
-    } catch (error) {
-        console.error(`[saveGitAliasMapToDB] Error saving entries to the database:`, error);
-        // Handle the error as per your application's requirements
+        if (githubHandle !== null || bitbucketHandle !== null) {
+            values.push(`('${alias}', ${githubHandle !== null ? `ARRAY['${githubHandle}']` : 'NULL'}, ${bitbucketHandle !== null ? `ARRAY['${bitbucketHandle}']` : 'NULL'})`);
+        }
     }
-}
+
+    if (values.length <= 0) {
+        console.info(`[saveGitAliasMapToDB] No new values to insert.`);
+    }
+    const valuesClause = values.join(', ');
+    const query = `
+        INSERT INTO aliases (git_alias, github, bitbucket)
+        VALUES ${valuesClause}
+        ON CONFLICT (git_alias) DO UPDATE SET 
+            github = (
+                SELECT ARRAY(SELECT DISTINCT UNNEST(aliases.github || excluded.github))
+                FROM aliases
+                WHERE aliases.git_alias = excluded.git_alias
+            ),
+            bitbucket = (
+                SELECT ARRAY(SELECT DISTINCT UNNEST(aliases.bitbucket || excluded.bitbucket))
+                FROM aliases
+                WHERE aliases.git_alias = excluded.git_alias
+            );
+    `;
+
+    await conn.query(query)
+    .then(() => {
+        console.info(`[saveGitAliasMapToDB] Saved entries.`);
+    })
+    .catch((error) => {
+        console.error(`[saveGitAliasMapToDB] Error saving entries to the database:`, error);
+    });
+};
 

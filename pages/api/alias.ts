@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getGitEmailAliasesFromDB, saveGitAliasMapToDB } from "../../utils/db/aliases";
 import { AliasProviderMap, HandleMap, AliasMap } from "../../types/AliasMap";
-import { log } from "console";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./auth/[...nextauth]";
 
@@ -15,6 +14,7 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (method === 'GET') {
         const user_id = session.user.id
         if (!user_id) {
+            
             throw new Error("User ID is required for the getting alias provider map.");
         }
         const aliasProviderMap = await getGitEmailAliases(user_id);
@@ -25,10 +25,6 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(200).send('Git alias map saved successfully.');
     } else {
         res.status(405).send('Method Not Allowed');
-    }
-    } catch (error) {
-        console.error('Error handling alias request:', error);
-        res.status(500).send('Internal Server Error');
     }
 }
 
@@ -49,10 +45,7 @@ const saveGitAliasMap = async (aliasProviderMap: AliasProviderMap): Promise<void
     if (!aliasProviderMap) {
         throw new Error("Alias Provider map is required to save Git email aliases.");
     }
-    const hMapArray = aliasProviderMap.aliases;
-    hMapArray.forEach(async (hMap) => {
-        await saveGitAliasMapToDB(hMap);
-    });
+    await saveGitAliasMapToDB(aliasProviderMap);
 }
 
 

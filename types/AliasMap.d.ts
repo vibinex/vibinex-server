@@ -1,13 +1,13 @@
-type AliasMap = {
-	alias: string,
-    handles: String[],
+type HandleMap = {
+	provider: string,
+    handles: string[],
 }
 
-export type HandleMap = {
-    provider: string,
-    handles: AliasMap[],
+export type AliasMap = {
+    alias: string,
+    handleMaps: HandleMap[],
 }
 
 export type AliasProviderMap = {
-    aliases: HandleMap[],
+    providerMaps: AliasMap[],
 }
