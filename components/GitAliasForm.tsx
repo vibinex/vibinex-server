@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AliasProviderMap, HandleMap, AliasMap } from "../types/AliasMap";
+import { AliasProviderMap, AliasMap } from "../types/AliasMap";
 import axios from "axios";
 
 
