@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUserAliasesFromDb, saveUserAliasesToDb } from '../../../utils/db/aliases';
+import { getUserAliasesFromRepo, saveUserAliasesToRepo } from '../../../utils/db/aliases';
 
 const aliasesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'GET') {
@@ -27,7 +27,7 @@ const aliasesPostHandler = async (req: NextApiRequest, res: NextApiResponse) => 
     }
 
     // Save users to the database
-    await saveUserAliasesToDb(
+    await saveUserAliasesToRepo(
         jsonBody.repo_name, jsonBody.repo_owner, jsonBody.repo_provider, jsonBody.aliases
     ).then(() => {
         console.info("[aliasesPostHandler] Aliases saved to DB successfully");
@@ -54,7 +54,7 @@ const aliasesGetHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     // Retrieve aliases from the database
-    await getUserAliasesFromDb(
+    await getUserAliasesFromRepo(
         repo_name as string, repo_owner as string, repo_provider as string
     ).then((aliases) => {
         console.info("[aliasesGetHandler] Aliases retrieved successfully");
