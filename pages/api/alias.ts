@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getGitEmailAliasesFromDB, saveGitAliasMapToDB } from "../../utils/db/aliases";
-import { AliasProviderMap, HandleMap, AliasMap } from "../../types/AliasMap";
+import { AliasProviderMap } from "../../types/AliasMap";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./auth/[...nextauth]";
 
