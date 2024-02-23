@@ -36,15 +36,13 @@ export const getUserAliasesFromDb = async (repo_name: string, repo_owner: string
             AND r.repo_owner = $2
             AND r.repo_provider = $3;
     `;
-    try {
-        const { rows } = await conn.query(query, [repo_name, repo_owner, repo_provider]);
-        const aliases = rows.map(row => ({
-            git_alias: row.git_alias,
-            [handleColumn]: row[handleColumn]
-        }));
-        return aliases;
-    } catch (error) {
-        console.error(`Error getting aliases for repo ${repo_name} and owner ${repo_owner}:`, error);
+    const { rows } = await conn.query(query, [repo_name, repo_owner, repo_provider]).catch(err => {
+        console.error(`[getUserAliasesFromDb] Error getting aliases for repo ${repo_name} and owner ${repo_owner}:`, err);
         throw new Error("Error getting aliases from the database");
-    }
+    })
+    const aliases = rows.map(row => ({
+        git_alias: row.git_alias,
+        [handleColumn]: row[handleColumn]
+    }));
+    return aliases;
 };
