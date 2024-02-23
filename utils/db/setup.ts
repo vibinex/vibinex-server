@@ -1,6 +1,6 @@
 import conn from '.';
 
-export const getSetupReposFromDbForOrg = async (owner: string, provider: string): Promise<string[]> => {
+export const getSetupReposFromDbForOwner = async (owner: string, provider: string): Promise<string[]> => {
 	console.log(`[getSetupReposFromDbForOrg] Getting setup repos from db for org ${owner} and provider ${provider}`);
 	const query = `SELECT repos.repo_name
         FROM repos
