@@ -83,7 +83,6 @@ const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provi
     });
 
     const existingInstallations = existingInstallationsResult.rows.map(row => row.install_id);
-    console.log("[handleRepoSetup] existingInstallations: ", existingInstallations)
 
     // Iterate over each row
     if (existingInstallations && existingInstallations.length > 0) {
@@ -139,22 +138,12 @@ const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: 
         });
 
         const install_ids = singleRepoResult.rows[0]?.install_id || [];
-        if (install_ids.length === 1 && install_ids.includes(install_id)) {
-            // If the repo is the only one associated with the install_id, delete it
-            await conn.query('DELETE FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3 AND $4 = ANY(install_id)', [repo_name, repo_owner, repo_provider, install_id])
-                .catch(err => {
-                    console.error(`[removeExtraRepositories] Could not delete extra repo from db: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
-                    throw new Error('Failed to delete extra repo');
-                });
-        } else {
-            // If the repo has multiple associations or doesn't include our install_id, just remove our install_id
-            const updatedInstallIds = install_ids.filter((id: String) => id !== install_id);
-            await conn.query('UPDATE repos SET install_id = $1 WHERE repo_name = $2 AND repo_owner = $3 AND repo_provider = $4', [updatedInstallIds, repo_name, repo_owner, repo_provider])
-                .catch(err => {
-                    console.error(`[removeExtraRepositories] Could not remove install_id from extra repo: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
-                    throw new Error('Failed to remove install_id from extra repo');
-                });
-        }
+        const updatedInstallIds = install_ids.filter((id: String) => id !== install_id);
+        await conn.query('UPDATE repos SET install_id = $1 WHERE repo_name = $2 AND repo_owner = $3 AND repo_provider = $4', [updatedInstallIds, repo_name, repo_owner, repo_provider])
+        .catch(err => {
+            console.error(`[removeExtraRepositories] Could not remove install_id from extra repo: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
+            throw new Error('Failed to remove install_id from extra repo');
+        });
     }
 
     await conn.query('COMMIT').catch(err => {
