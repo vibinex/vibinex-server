@@ -17,7 +17,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	}
 	const { owner, provider } = req.body;
 	if (!owner || !provider) {
-		return res.status(400).json({ error: 'Bad Request', message: 'Both the arguments org, and provider are required in the request body' });
+		return res.status(400).json({ error: 'Bad Request', message: 'Both the arguments owner, and provider are required in the request body' });
 	}
 	getSetupReposFromDbForOrg(owner, provider)
 	.then((repos: string[]) => {
