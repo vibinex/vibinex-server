@@ -1,6 +1,6 @@
-import { GetServerSideProps } from "next";
-import { getServerSession, type Session } from "next-auth";
-import { useSession } from "next-auth/react";
+import { GetServerSideProps, NextPage } from "next";
+import { getServerSession } from "next-auth";
+import type { Session } from "next-auth/core/types";
 import { useContext, useEffect } from "react";
 import Button from "../components/Button";
 import Footer from "../components/Footer";
@@ -10,18 +10,17 @@ import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { updateUser } from "../utils/db/users";
 import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
+import { getURLWithParams } from "../utils/url_utils";
 import MainAppBar from "../views/MainAppBar";
 import RepoList, { getRepoList } from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { getURLWithParams } from "../utils/url_utils";
 
 type ProfileProps = {
-	session: Session,
+	sessionObj: Session,
 	repoList: DbRepoSerializable[],
 }
 
-const Profile = ({ repoList }: ProfileProps) => {
-	const session: Session | null = useSession().data;
+const Profile: NextPage<ProfileProps> = ({ sessionObj: session, repoList }) => {
 	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -80,7 +79,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 
 	return {
 		props: {
-			session,
+			sessionObj: session,
 			repoList
 		}
 	}
