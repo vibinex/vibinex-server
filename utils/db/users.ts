@@ -16,7 +16,7 @@ export interface DbUser {
 	topic_name?: string,
 }
 
-export const getUserByProvider = async (provider: string, providerAccountId: string) => {
+export const getUserByProvider = async (provider: string, providerAccountId: string): Promise<DbUser> => {
 	const user_auth_search_q = `SELECT *
 		FROM users
 		WHERE (auth_info -> '${provider}' -> '${providerAccountId}') IS NOT NULL`
@@ -24,13 +24,13 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 		console.error(`[getUserByProvider] Could not get the ${provider} user for account id: ${providerAccountId}`, { pg_query: user_auth_search_q }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
-	if (user_auth_search_result.rowCount) {
-		if (user_auth_search_result.rowCount > 1) {
-			console.warn("[getUser] Multiple users exist with same auth", { provider, providerAccountId });
-		}
-		return user_auth_search_result.rows[0];
+	if (!user_auth_search_result.rowCount || user_auth_search_result.rowCount === 0) {
+		throw new Error('No user found');
 	}
-	return undefined;
+	if (user_auth_search_result.rowCount > 1) {
+		console.warn("[getUser] Multiple users exist with same auth", { provider, providerAccountId });
+	}
+	return user_auth_search_result.rows[0];
 }
 
 export const getUserById = async (userId: string): Promise<DbUser> => {
