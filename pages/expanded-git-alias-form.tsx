@@ -1,7 +1,11 @@
 import GitAliasForm from "../components/GitAliasForm";
+import MainAppBar from "../views/MainAppBar";
 
 const ExpandedGitAliasFormPage: React.FC = () => {
-  return <GitAliasForm expanded={true} />;
+  return <>
+    <MainAppBar />
+    <GitAliasForm expanded={true} />;
+  </>
 };
 
 export default ExpandedGitAliasFormPage;
