@@ -77,16 +77,21 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
         <div>Loading...</div>
       ) : gitAliasMap ? (
         <>
+          {!expanded && (
+            <div className="bg-blue-200 text-blue-800 p-4 rounded-md mb-4 text-center">
+              <p className="font-bold">Please map aliases:</p>
+            </div>
+          )}
           {/* Header */}
-          <div className="grid grid-cols-3 border-b border-gray-300">
+          <div className="grid grid-cols-3 border-b text-blue-800">
             <div className="p-4">
-              <h3>Alias</h3>
+              <h3 className="text-center font-bold">Alias</h3>
             </div>
             <div className="p-4">
-              <h3>github</h3>
+              <h3 className="text-center font-bold">Github</h3>
             </div>
             <div className="p-4">
-              <h3>bitbucket</h3>
+              <h3 className="text-center font-bold">Bitbucket</h3>
             </div>
           </div>
 
