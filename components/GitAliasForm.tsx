@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AliasProviderMap, AliasMap } from "../types/AliasMap";
 import axios from "axios";
-
+import Chip from "./Chip"; // Import the Chip component
 
 const GitAliasForm: React.FC = () => {
   const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
@@ -104,7 +104,7 @@ const GitAliasForm: React.FC = () => {
                 </div>
                 {/* Display additional handles beneath the input field if available */}
                 {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string, handleIndex: number) => (
-                  <div key={handleIndex}>{handle}</div>
+                  <Chip key={handleIndex} name={handle} avatar={"/github-dark.svg"} disabled={false} />
                 ))}
               </div>
   
@@ -120,7 +120,7 @@ const GitAliasForm: React.FC = () => {
                 </div>
                 {/* Display additional handles beneath the input field if available */}
                 {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string, handleIndex: number) => (
-                  <div key={handleIndex}>{handle}</div>
+                  <Chip key={handleIndex} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
                 ))}
               </div>
             </div>
