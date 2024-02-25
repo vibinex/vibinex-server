@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { AliasProviderMap, AliasMap } from "../types/AliasMap";
 import axios from "axios";
-import Chip from "./Chip"; // Import the Chip component
+import { useRouter } from 'next/router';
+import Chip from "./Chip";
 
-const GitAliasForm: React.FC = () => {
+const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
   const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [handleInputValues, setHandleInputValues] = useState<{ [key: string]: { github: string; bitbucket: string } }>({});
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,14 +44,14 @@ const GitAliasForm: React.FC = () => {
       }
       const updatedProviderMaps = gitAliasMap.providerMaps.map(providerMap => {
         const updatedHandleMaps = providerMap.handleMaps.map(handleMap => {
-          const inputValue = handleInputValues[providerMap.alias]?.[handleMap.provider as keyof typeof handleInputValues['']];  
+          const inputValue = handleInputValues[providerMap.alias]?.[handleMap.provider as keyof typeof handleInputValues['']];
           const updatedHandles = inputValue ? [inputValue.toString()] : [];
           return { ...handleMap, handles: updatedHandles };
         });
         return { ...providerMap, handleMaps: updatedHandleMaps };
       });
-  
-      const updatedGitAliasMap = { providerMaps: updatedProviderMaps };  
+
+      const updatedGitAliasMap = { providerMaps: updatedProviderMaps };
       const response = await axios.post('/api/alias', { aliasProviderMap: updatedGitAliasMap }, {
         headers: {
           'Content-Type': 'application/json',
@@ -63,6 +65,10 @@ const GitAliasForm: React.FC = () => {
       console.error("Error saving Git aliases:", error);
       alert("An error occurred while saving Git aliases. Please try again.");
     }
+  };
+
+  const expandForm = () => {
+    router.push('/expanded-git-alias-form');
   };
 
   return (
@@ -83,50 +89,58 @@ const GitAliasForm: React.FC = () => {
               <h3>bitbucket</h3>
             </div>
           </div>
-  
+
           {/* Rows */}
-          {gitAliasMap.providerMaps.map((providerMap: AliasMap, providerMapIndex) => (
-            <div key={providerMapIndex} className="grid grid-cols-3 border-b border-gray-300">
-              {/* Alias column */}
-              <div className="p-4">
-                <div>{providerMap.alias}</div>
-              </div>
-  
-              {/* github column */}
-              <div className="p-4">
-                <div>
-                  <input
-                    type="text"
-                    value={handleInputValues[providerMap.alias]?.github || ''}
-                    onChange={(e) => handleInputChange(providerMap.alias, 'github', e.target.value)}
-                    className="mb-2 w-full"
-                  />
+          {gitAliasMap.providerMaps.map((providerMap: AliasMap, providerMapIndex) => {
+            const hasHandles = providerMap.handleMaps && providerMap.handleMaps.some(handleMap => handleMap.handles.length > 0);
+            return expanded || !hasHandles ? (
+              <div key={providerMapIndex} className="grid grid-cols-3 border-b border-gray-300">
+                {/* Alias column */}
+                <div className="p-4">
+                  <div>{providerMap.alias}</div>
                 </div>
-                {/* Display additional handles beneath the input field if available */}
-                {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string, handleIndex: number) => (
-                  <Chip key={handleIndex} name={handle} avatar={"/github-dark.svg"} disabled={false} />
-                ))}
-              </div>
-  
-              {/* bitbucket column */}
-              <div className="p-4">
-                <div>
-                  <input
-                    type="text"
-                    value={handleInputValues[providerMap.alias]?.bitbucket || ''}
-                    onChange={(e) => handleInputChange(providerMap.alias, 'bitbucket', e.target.value)}
-                    className="mb-2 w-full"
-                  />
+
+                {/* github column */}
+                <div className="p-4">
+                  <div>
+                    <input
+                      type="text"
+                      value={handleInputValues[providerMap.alias]?.github || ''}
+                      onChange={(e) => handleInputChange(providerMap.alias, 'github', e.target.value)}
+                      className="mb-2 w-full"
+                    />
+                  </div>
+                  {/* Display additional handles beneath the input field if available */}
+                  {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string, handleIndex: number) => (
+                    <Chip key={handleIndex} name={handle} avatar={"/github-dark.svg"} disabled={false} />
+                  ))}
                 </div>
-                {/* Display additional handles beneath the input field if available */}
-                {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string, handleIndex: number) => (
-                  <Chip key={handleIndex} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
-                ))}
+
+                {/* bitbucket column */}
+                <div className="p-4">
+                  <div>
+                    <input
+                      type="text"
+                      value={handleInputValues[providerMap.alias]?.bitbucket || ''}
+                      onChange={(e) => handleInputChange(providerMap.alias, 'bitbucket', e.target.value)}
+                      className="mb-2 w-full"
+                    />
+                  </div>
+                  {/* Display additional handles beneath the input field if available */}
+                  {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string, handleIndex: number) => (
+                    <Chip key={handleIndex} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-          {/* Submit Button */}
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mt-4">Submit</button>
+            ) : null;
+          })}
+          {/* Buttons */}
+          <div className="mt-4">
+            <button type="submit" className={`bg-blue-500 text-white px-4 py-2 rounded ${expanded ? 'w-full block mb-4' : ''}`}>Submit</button>
+            {!expanded && (
+              <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded mt-4 ml-4 w-full" onClick={expandForm}>Expand</button>
+            )}
+          </div>
         </>
       ) : (
         <div>No data available</div>
