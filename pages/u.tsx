@@ -4,6 +4,7 @@ import type { Session } from "next-auth/core/types";
 import { useContext, useEffect } from "react";
 import Button from "../components/Button";
 import Footer from "../components/Footer";
+import GitAliasForm from "../components/GitAliasForm";
 import RudderContext from "../components/RudderContext";
 import type { DbRepoSerializable } from "../types/repository";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
@@ -42,6 +43,7 @@ const Profile: NextPage<ProfileProps> = ({ sessionObj: session, repoList }) => {
 		<div className="flex flex-col min-h-screen">
 			<MainAppBar />
 			<div className="max-w-[80%] mx-auto flex-grow">
+				<GitAliasForm expanded={false} />
 				<RepoList repoList={repoList} />
 				<Button id='add-repository' variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
 			</div>
