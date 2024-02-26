@@ -4,6 +4,7 @@ import type { Session } from "next-auth/core/types";
 import { useContext, useEffect } from "react";
 import Button from "../components/Button";
 import Footer from "../components/Footer";
+import GitAliasForm from "../components/GitAliasForm";
 import RudderContext from "../components/RudderContext";
 import type { DbRepoSerializable } from "../types/repository";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
@@ -14,8 +15,6 @@ import { getURLWithParams } from "../utils/url_utils";
 import MainAppBar from "../views/MainAppBar";
 import RepoList, { getRepoList } from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { getURLWithParams } from "../utils/url_utils";
-import GitAliasForm from "../components/GitAliasForm";
 
 type ProfileProps = {
 	sessionObj: Session,
