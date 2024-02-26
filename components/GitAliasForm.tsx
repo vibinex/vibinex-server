@@ -70,7 +70,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 
 	const expandForm = (e: React.MouseEvent) => {
 		e.preventDefault();
-		router.push('/expanded-git-alias-form');
+		router.push('/settings');
 	};
 
 	return (
