@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { AliasProviderMap, AliasMap } from "../types/AliasMap";
 import axios from "axios";
 import { useRouter } from 'next/router';
-import Chip from "./Chip";
+import { useEffect, useState } from "react";
+import { AliasMap, AliasProviderMap } from "../types/AliasMap";
 import Button from "./Button";
+import Chip from "./Chip";
 
 const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
