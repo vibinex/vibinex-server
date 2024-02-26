@@ -14,7 +14,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`/api/alias`);
-        if (!response.data || !response.data.aliasProviderMap) {
+        if (!response.data?.aliasProviderMap) {
           throw new Error('Failed to fetch Git email aliases');
         }
         setGitAliasMap(response.data.aliasProviderMap);
@@ -96,10 +96,10 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
           </div>
 
           {/* Rows */}
-          {gitAliasMap.providerMaps.map((providerMap: AliasMap, providerMapIndex) => {
+          {gitAliasMap.providerMaps.map((providerMap: AliasMap) => {
             const hasHandles = providerMap.handleMaps && providerMap.handleMaps.some(handleMap => handleMap.handles.length > 0);
             return expanded || !hasHandles ? (
-              <div key={providerMapIndex} className="grid grid-cols-3 border-b border-gray-300">
+              <div key={providerMap.alias} className="grid grid-cols-3 border-b border-gray-300">
                 {/* Alias column */}
                 <div className="p-4">
                   <div>{providerMap.alias}</div>
@@ -116,8 +116,8 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
                     />
                   </div>
                   {/* Display additional handles beneath the input field if available */}
-                  {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string, handleIndex: number) => (
-                    <Chip key={handleIndex} name={handle} avatar={"/github-dark.svg"} disabled={false} />
+                  {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string) => (
+                    <Chip key={handle} name={handle} avatar={"/github-dark.svg"} disabled={false} />
                   ))}
                 </div>
 
@@ -132,8 +132,8 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
                     />
                   </div>
                   {/* Display additional handles beneath the input field if available */}
-                  {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string, handleIndex: number) => (
-                    <Chip key={handleIndex} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
+                  {providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string) => (
+                    <Chip key={handle} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
                   ))}
                 </div>
               </div>

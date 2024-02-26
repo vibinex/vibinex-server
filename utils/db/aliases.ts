@@ -112,7 +112,9 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
         }
 
         if (githubHandle !== null || bitbucketHandle !== null) {
-            values.push(`('${alias}', ${githubHandle !== null ? `ARRAY['${githubHandle}']` : 'NULL'}, ${bitbucketHandle !== null ? `ARRAY['${bitbucketHandle}']` : 'NULL'})`);
+            const gh_value = githubHandle !== null ? `ARRAY['${githubHandle}']` : 'NULL';
+            const bb_value = bitbucketHandle !== null ? `ARRAY['${bitbucketHandle}']` : 'NULL';
+            values.push(`('${alias}', ${gh_value}, ${bb_value})`);
         }
     }
 
