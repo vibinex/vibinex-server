@@ -13,7 +13,7 @@ type ButtonProps = PropsWithChildren<{
 const Button = (props: ButtonProps) => {
 	const { variant, href, onClick, disabled, id, target, className, children, ...otherProps } = props;
 	const clickBehaviour: MouseEventHandler = (event) => {
-		const targetVal = (target) ? target : '_self';
+		const targetVal = (target) ?? '_self';
 		if (href) {
 			window.open(href, targetVal);
 		}
