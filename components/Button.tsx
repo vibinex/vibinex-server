@@ -1,13 +1,13 @@
 import { ButtonHTMLAttributes, MouseEventHandler, PropsWithChildren } from "react";
 
 type ButtonProps = PropsWithChildren<{
-    variant: 'contained' | 'text' | 'outlined',
-    href?: string,
-    target?: string,
-    onClick?: MouseEventHandler,
-    disabled?: boolean,
-    className?: string,
-    id?: string,
+	variant: 'contained' | 'text' | 'outlined',
+	href?: string,
+	target?: string,
+	onClick?: MouseEventHandler,
+	disabled?: boolean,
+	className?: string,
+	id?: string,
 }> & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button = (props: ButtonProps) => {
