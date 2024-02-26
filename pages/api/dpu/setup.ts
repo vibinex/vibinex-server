@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { saveTopicName } from '../../../utils/db/relevance';
+import { SetupReposArgs } from '../../../utils/db/setupRepos';
+import saveSetupReposInDb from '../../../utils/db/setupRepos';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[setupHandler]Saving setup info in db...");
@@ -9,17 +11,21 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).json({ "error": "Invalid request body" });
 		return;
 	}
-	const allTopicPromises = [];
+	const allSetupReposPromises = [];
 	for (const ownerInfo of jsonBody.info) {
-		const saveTopicPromises = saveTopicName(ownerInfo.owner,
-			ownerInfo.provider,
-			jsonBody.installationId, ownerInfo.repos)
+		let setupReposArgs: SetupReposArgs = {
+			repo_owner: ownerInfo.owner,
+			repo_provider:  ownerInfo.provider,
+			repo_names: ownerInfo.repos,
+			install_id: jsonBody.installationId
+		}
+		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
 			});
-		allTopicPromises.push(saveTopicPromises);
+		allSetupReposPromises.push(saveSetupReposPromises);
 	}
-	await Promise.all(allTopicPromises).then((values) => {
+	await Promise.all(allSetupReposPromises).then((values) => {
 		console.info("[setupHandler] All setup info saved succesfully...")
 		res.status(200).send("Ok");
 		return;

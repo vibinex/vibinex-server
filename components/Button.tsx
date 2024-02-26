@@ -1,24 +1,26 @@
-import { MouseEventHandler, PropsWithChildren } from "react";
+import { ButtonHTMLAttributes, MouseEventHandler, PropsWithChildren } from "react";
 
-const Button = (props: PropsWithChildren<{
+type ButtonProps = PropsWithChildren<{
 	variant: 'contained' | 'text' | 'outlined',
 	href?: string,
 	target?: string,
-	onClick?: Function,
+	onClick?: MouseEventHandler,
 	disabled?: boolean,
 	className?: string,
 	id?: string,
 	ref?: React.ForwardedRef<HTMLButtonElement>,
 	isNotBasic?: boolean,
-}>) => {
+}> & ButtonHTMLAttributes<HTMLButtonElement>;
 
+const Button = (props: ButtonProps) => {
+	const { variant, href, onClick, disabled, id, target, className, children, ...otherProps } = props;
 	const clickBehaviour: MouseEventHandler = (event) => {
-		const target = (props.target) ? props.target : '_self';
-		if (props.href) {
-			window.open(props.href, target);
+		const targetVal = (target) ?? '_self';
+		if (href) {
+			window.open(href, targetVal);
 		}
-		else if (props.onClick) {
-			props.onClick(event);
+		else if (onClick) {
+			onClick(event);
 		}
 	}
 	const basicClass = 'inline-flex items-center justify-center relative cursor-pointer align-middle disabled:cursor-default box-border min-w-max py-1 px-4 rounded-md transition-all ';
@@ -29,9 +31,11 @@ const Button = (props: PropsWithChildren<{
 	}
 
 	return (
-		<button ref={props.ref} id={props.id} onClick={clickBehaviour} disabled={props.disabled} className={(props.isNotBasic ? '': basicClass) + variantClasses[props.variant] + props.className}>
+		<button ref={props.ref} id={id} onClick={clickBehaviour} disabled={disabled} 
+			className={(props.isNotBasic ? '': basicClass) + variantClasses[variant] + className}
+			{...otherProps}>
 			<span className="w-full font-semibold">
-				{props.children}
+				{children}
 			</span>
 		</button>
 	)

@@ -16,7 +16,7 @@ export interface DbUser {
 	topic_name?: string,
 }
 
-export const getUserByProvider = async (provider: string, providerAccountId: string) => {
+export const getUserByProvider = async (provider: string, providerAccountId: string): Promise<DbUser> => {
 	const user_auth_search_q = `SELECT *
 		FROM users
 		WHERE (auth_info -> '${provider}' -> '${providerAccountId}') IS NOT NULL`
@@ -24,13 +24,13 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 		console.error(`[getUserByProvider] Could not get the ${provider} user for account id: ${providerAccountId}`, { pg_query: user_auth_search_q }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
-	if (user_auth_search_result.rowCount) {
-		if (user_auth_search_result.rowCount > 1) {
-			console.warn("[getUser] Multiple users exist with same auth", { provider, providerAccountId });
-		}
-		return user_auth_search_result.rows[0];
+	if (!user_auth_search_result.rowCount || user_auth_search_result.rowCount === 0) {
+		throw new Error('No user found');
 	}
-	return undefined;
+	if (user_auth_search_result.rowCount > 1) {
+		console.warn("[getUser] Multiple users exist with same auth", { provider, providerAccountId });
+	}
+	return user_auth_search_result.rows[0];
 }
 
 export const getUserById = async (userId: string): Promise<DbUser> => {
@@ -83,7 +83,6 @@ export const createUser = async (user: DbUser) => {
 		})
 		.catch(err => {
 			console.error('[createUser] Insert user failed', { user, pg_query: insert_user_q }, err);
-			return;
 		});
 }
 
@@ -110,7 +109,7 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 					diffObj[key] = user[key];
 				}
 				break;
-			case 'aliases':
+			case 'aliases': {
 				// this only adds additional aliases. Create a separate function to
 				// replace or delete aliases, so that old aliases are not lost by mistake
 				const newAliases: string[] = [];
@@ -119,8 +118,9 @@ export const createUpdateUserObj = async (userId: string, user: DbUser) => {
 						newAliases.push(alias);
 					}
 				}
-				if (newAliases.length > 0) diffObj.aliases = currUser.aliases?.concat(newAliases);
+				if (newAliases.length > 0) diffObj.aliases = (currUser.aliases ?? []).concat(newAliases);
 				break;
+			}
 			case 'auth_info':
 				if (!currUser.auth_info) {
 					diffObj.auth_info = user.auth_info;
@@ -185,7 +185,6 @@ export const updateUser = async (userId: string, user: DbUser) => {
 		})
 		.catch(err => {
 			console.error('[updateUser] Update user failed', { pg_query: update_user_q }, { userId, user }, err);
-			return;
 		});
 }
 
