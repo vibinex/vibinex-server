@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "./auth/[...nextauth]";
 
 const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method, query, body } = req;
+    const { method, body } = req;
     const session = await getServerSession(req, res, authOptions);
 	if (!session) {
 		return res.status(401).json({ message: 'Unauthenticated' });
