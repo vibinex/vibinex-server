@@ -24,7 +24,7 @@ const centralLimit = (type: 'avg' | 'median' | 'mode' | 'decay_avg' = 'avg', arr
 				const half_len = arr.length / 2;
 				return (arr[half_len] + arr[half_len - 1]) / 2
 			}
-		case 'mode':
+		case 'mode': {
 			const counts = countArrayElements(arr);
 			let max_count = 0;
 			let modes: Array<number> = [];
@@ -44,6 +44,7 @@ const centralLimit = (type: 'avg' | 'median' | 'mode' | 'decay_avg' = 'avg', arr
 				console.debug(`The array is multimodal. Max frequency: ${max_count}; modes: ${modes.toString()}`);
 				return null;
 			}
+		}
 		default:
 			throw new Error(`Type not implemented: ${type}`);
 	}

@@ -44,15 +44,15 @@ export const authOptions = {
 	callbacks: {
 		async signIn({ user, account, profile }: SignInParam) {
 			// search for the user in the users table
-			let db_user: DbUser | undefined;
+			let dbUser: DbUser | undefined;
 			if (account) {
 				// first search based on auth_info
-				db_user = await getUserByProvider(account.provider, account.providerAccountId);
+				dbUser = await getUserByProvider(account.provider, account.providerAccountId);
 			}
-			if (!db_user && user.email) {
+			if (!dbUser && user.email) {
 				// then search based on aliases: ask if they want to merge accounts
 				const alias_users = await getUserByAlias(user.email);
-				if (alias_users?.length == 1) db_user = alias_users[0];
+				if (alias_users?.length == 1) dbUser = alias_users[0];
 				else if (alias_users && alias_users?.length > 1) {
 					// FIXME: show user the list of accounts and let them choose
 					// Not allowing sign in when this happens
@@ -60,27 +60,27 @@ export const authOptions = {
 				}
 			}
 
-			if (!db_user) {
+			if (!dbUser) {
 				// finally, if user is not found, create a new account
-				db_user = createUserUpdateObj(user, account, profile);
-				await createUser(db_user).catch(err => {
+				dbUser = createUserUpdateObj(user, account, profile);
+				await createUser(dbUser).catch(err => {
 					console.error("[signIn] Could not create user", err);
 				})
 
 				// signup event
-				account && getUserByProvider(account.provider, account.providerAccountId).then(db_user => {
-					rudderStackEvents.track(db_user.id.toString(), uuidv4(), "signup", { ...db_user, eventStatusFlag: 1 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.
+				account && getUserByProvider(account.provider, account.providerAccountId).then(dbUserFromDb => {
+					rudderStackEvents.track(dbUserFromDb.id ?? "", uuidv4(), "signup", { ...dbUserFromDb, eventStatusFlag: 1 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.
 				}).catch(err => {
-					console.error("[signup] Rudderstack event failed: Could not get user id", db_user, err);
+					console.error("[signup] Rudderstack event failed: Could not get user id", dbUser, err);
 				});
 			} else {
-				const existingAuth = (account) ? Object.keys(db_user.auth_info!).includes(account.provider) && Object.keys(db_user.auth_info![account.provider]).includes(account.providerAccountId) : false;
+				const existingAuth = (account) ? Object.keys(dbUser.auth_info!).includes(account.provider) && Object.keys(dbUser.auth_info![account.provider]).includes(account.providerAccountId) : false;
 				// if user is found, update the db entry
-				const updateObj: DbUser = createUserUpdateObj(user, account, profile, db_user);
-				await updateUser(db_user.id!, updateObj).catch(err => {
+				const updateObj: DbUser = createUserUpdateObj(user, account, profile, dbUser);
+				await updateUser(dbUser.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
-				rudderStackEvents.track(db_user.id!.toString(), uuidv4(), "login", { ...updateObj, newAuth: !existingAuth });
+				rudderStackEvents.track(dbUser.id!.toString(), uuidv4(), "login", { ...updateObj, newAuth: !existingAuth });
 			}
 			return true;
 		},

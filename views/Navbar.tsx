@@ -11,6 +11,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initi
 import { getAuthUserId, getAuthUserName } from '../utils/auth';
 import AppBar from '../components/AppBar';
 import VibinexDarkLogo from '../public/vibinex-dark-logo.png';
+import Button from '../components/Button';
 
 const Navbar = (props: { transparent: boolean }) => {
 	const chromeExtensionLink = "https://chrome.google.com/webstore/detail/vibinex/jafgelpkkkopeaefadkdjcmnicgpcncc";
@@ -109,7 +110,7 @@ const Navbar = (props: { transparent: boolean }) => {
 				</li>
 			</ul>
 			{/* Mobile Button */}
-			<div onClick={changeNavbar}
+			<Button onClick={changeNavbar} variant='text'
 				className={
 					'block sm:hidden z-10' + (scrollDown || !props.transparent ? ' text-secondary-dark' : ' text-primary-light')
 				}
@@ -119,7 +120,7 @@ const Navbar = (props: { transparent: boolean }) => {
 				) : (
 					<AiOutlineMenu size={20} />
 				)}
-			</div>
+			</Button>
 			{/* Mobile Menu */}
 			<div
 				className={
@@ -128,13 +129,13 @@ const Navbar = (props: { transparent: boolean }) => {
 				}
 			>
 				<ul>
-					<li onClick={changeNavbar} id="docs-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li id="docs-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
 						<Link href='/docs'>Docs</Link>
 					</li>
-					<li onClick={changeNavbar} id="contribute-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li id="contribute-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
 						<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
 					</li>
-					<li onClick={changeNavbar} id='pricing-link' className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li id='pricing-link' className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
 						<Link href='/pricing'>Pricing</Link>
 					</li>
 					<li id='login-logout-link' className='p-4 text-secondary-main hover:text-secondary-light'>
