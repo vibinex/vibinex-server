@@ -48,7 +48,7 @@ export const getUserAliasesFromRepo = async (repo_name: string, repo_owner: stri
     return aliases;
 };
 
-export const getGitEmailAliasesFromDB = async (user_id: string): Promise<AliasProviderMap> =>  {
+export const getGitEmailAliasesFromDB = async (userId: string): Promise<AliasProviderMap> =>  {
     const query = `
     SELECT 
         git_alias,
@@ -75,11 +75,11 @@ export const getGitEmailAliasesFromDB = async (user_id: string): Promise<AliasPr
             repo_alias, a.github, a.bitbucket
     ) AS final_result;
     `;
-    const { rows } = await conn.query(query, [user_id]).catch(err => {
-        console.error(`[getGitEmailAliasesFromDB] Error getting aliases for user ${user_id}:`, err);
+    const { rows } = await conn.query(query, [userId]).catch(err => {
+        console.error(`[getGitEmailAliasesFromDB] Error getting aliases for user ${userId}:`, err);
         throw new Error("Error getting aliases from the database");
     })
-    console.info(`[getGitEmailAliasesFromDB] Got aliases for user: ${user_id}, rows = ${rows}`);
+    console.info(`[getGitEmailAliasesFromDB] Got aliases for user: ${userId}, rows = ${rows}`);
     const providerMaps: AliasMap[] = [];
     // Loop through each row and populate the map
     rows.forEach(row => {
