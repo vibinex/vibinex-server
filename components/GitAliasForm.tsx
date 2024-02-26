@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
 import { AliasMap, AliasProviderMap } from "../types/AliasMap";
 import Button from "./Button";
@@ -9,7 +8,6 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [handleInputValues, setHandleInputValues] = useState<{ [key: string]: { github: string; bitbucket: string } }>({});
-	const router = useRouter();
 
 	useEffect(() => {
 		const fetchData = async () => {
