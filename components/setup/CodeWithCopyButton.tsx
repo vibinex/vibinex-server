@@ -41,7 +41,7 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 			setSelfHostingCode(`Unable to get topic name for user\nPlease refresh this page and try again.`);
 			console.error(`[CodeWithCopyButton] Unable to get topic name for user ${userId} - ${error.message}`);
 		});
-	}, [userId]);
+	}, [userId, selectedInstallationType, selectedProvider]);
 
 	const handleCopyClick = () => {
 		setIsButtonDisabled(true);
