@@ -11,12 +11,12 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(401).json({ message: 'Unauthenticated' });
 	}
     if (method === 'GET') {
-        const user_id = session.user.id;
-        if (!user_id) {
+        const userId = session.user.id;
+        if (!userId) {
             res.status(500).json({error: "No user id in session"});
             return;
         }
-        await getGitEmailAliases(user_id)
+        await getGitEmailAliases(userId)
         .then((aliasProviderMap) => {
             res.status(200).json({ aliasProviderMap });
         }).catch((error) => {
