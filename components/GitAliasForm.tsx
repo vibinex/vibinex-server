@@ -79,7 +79,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
         <>
           {!expanded && (
             <div className="bg-blue-200 text-blue-800 p-4 rounded-md mb-4 text-center">
-              <p className="font-bold">Please map aliases:</p>
+              <p className="font-bold">Please enter Github/Bitbucket usernames and click Submit:</p>
             </div>
           )}
           {/* Header */}
