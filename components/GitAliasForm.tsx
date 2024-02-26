@@ -68,11 +68,6 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 		}
 	};
 
-	const expandForm = (e: React.MouseEvent) => {
-		e.preventDefault();
-		router.push('/settings');
-	};
-
 	return (
 		<form onSubmit={handleSubmit}>
 			{loading ? (
@@ -145,7 +140,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 					<div className="mt-4 flex gap-2">
 						<Button variant="contained" type="submit" className={`${expanded ? 'w-full block mb-4' : ''}`}>Submit</Button>
 						{!expanded && (
-							<Button variant="outlined" className="flex-grow" onClick={expandForm}>View all aliases</Button>
+							<Button variant="outlined" className="flex-grow" href="/settings">View all aliases</Button>
 						)}
 					</div>
 				</>
