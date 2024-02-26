@@ -1,7 +1,7 @@
 import conn from '.';
 import { AliasMap, AliasProviderMap } from '../../types/AliasMap';
 
-export const saveUserAliasesToRepo = async (repo_name: string, repo_owner: string, repo_provider: string, aliases: string[]) => {
+export const saveUserAliasesToRepo = async (repoName: string, repoOwner: string, repoProvider: string, aliases: string[]) => {
     // Filter out empty strings and null values
     const filteredAliases = aliases.filter(alias => alias && alias.trim() !== "");
 
@@ -16,18 +16,18 @@ export const saveUserAliasesToRepo = async (repo_name: string, repo_owner: strin
         SET aliases = array(
             SELECT DISTINCT unnest(aliases || '${aliasesString}')
         )
-        WHERE repo_name = '${repo_name}'
-            AND repo_owner = '${repo_owner}'
-            AND repo_provider = '${repo_provider}'
+        WHERE repo_name = '${repoName}'
+            AND repo_owner = '${repoOwner}'
+            AND repo_provider = '${repoProvider}'
     `;
     await conn.query(query).catch(err => {
-        console.error(`[saveUserAliasesToDb] Error saving aliases for repo ${repo_name} and owner ${repo_owner}:`, err);
+        console.error(`[saveUserAliasesToDb] Error saving aliases for repo ${repoName} and owner ${repoOwner}:`, err);
         throw new Error("Error saving aliases to the database");
     })
 };
 
-export const getUserAliasesFromRepo = async (repo_name: string, repo_owner: string, repo_provider: string) => {
-    let handleColumn = repo_provider === 'github' ? 'github' : 'bitbucket';
+export const getUserAliasesFromRepo = async (repoName: string, repoOwner: string, repoProvider: string) => {
+    let handleColumn = repoProvider === 'github' ? 'github' : 'bitbucket';
 
     const query = `
         SELECT a.git_alias, a.${handleColumn}
@@ -37,8 +37,8 @@ export const getUserAliasesFromRepo = async (repo_name: string, repo_owner: stri
             AND r.repo_owner = $2
             AND r.repo_provider = $3;
     `;
-    const { rows } = await conn.query(query, [repo_name, repo_owner, repo_provider]).catch(err => {
-        console.error(`[getUserAliasesFromDb] Error getting aliases for repo ${repo_name} and owner ${repo_owner}:`, err);
+    const { rows } = await conn.query(query, [repoName, repoOwner, repoProvider]).catch(err => {
+        console.error(`[getUserAliasesFromDb] Error getting aliases for repo ${repoName} and owner ${repoOwner}:`, err);
         throw new Error("Error getting aliases from the database");
     })
     const aliases = rows.map(row => ({
@@ -112,9 +112,9 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
         }
 
         if (githubHandle !== null || bitbucketHandle !== null) {
-            const gh_value = githubHandle !== null ? `ARRAY['${githubHandle}']` : 'NULL';
-            const bb_value = bitbucketHandle !== null ? `ARRAY['${bitbucketHandle}']` : 'NULL';
-            values.push(`('${alias}', ${gh_value}, ${bb_value})`);
+            const ghValue = githubHandle !== null ? `ARRAY['${githubHandle}']` : 'NULL';
+            const bbValue = bitbucketHandle !== null ? `ARRAY['${bitbucketHandle}']` : 'NULL';
+            values.push(`('${alias}', ${ghValue}, ${bbValue})`);
         }
     }
 
