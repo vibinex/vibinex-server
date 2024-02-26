@@ -19,7 +19,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			});
 		allTopicPromises.push(saveTopicPromises);
 	}
-	await Promise.all(allTopicPromises).then((values) => {
+	await Promise.all(allTopicPromises).then(() => {
 		console.info("[setupHandler] All setup info saved succesfully...")
 		res.status(200).send("Ok");
 		return;
