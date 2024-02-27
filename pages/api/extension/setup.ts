@@ -10,7 +10,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 		return;
 	}
 	// For normal requests
-	console.info("[extension/setup] Getting setup repos info for ", req.body.org);
+	console.info("[extension/setup] Getting setup repos info for ", req.body.owner);
 	
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
