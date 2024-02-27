@@ -15,7 +15,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
-	const { org, userId, provider } = req.body;
+	const { owner, userId, provider } = req.body;
 	if (!userId || !org || !provider) {
 		return res.status(400).json({ error: 'Bad Request', message: 'All the three arguments user_id, org, and provider are required in the request body' });
 	}
