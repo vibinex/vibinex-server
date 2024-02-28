@@ -215,6 +215,6 @@ export const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) =
 	});
   
 	Promise.all(tasks)
-		.then(() => console.info(`[updateAliasesTableFromUsersTableOnLogin] All aliases have been updated successfully`))
-		.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] An error occurred while updating aliases`, error));
-  };
+	.then(() => console.info(`[updateAliasesTableFromUsersTableOnLogin] All aliases have been updated successfully`))
+	.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] An error occurred while updating aliases`, error));
+};

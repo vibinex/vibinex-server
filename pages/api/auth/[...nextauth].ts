@@ -3,7 +3,8 @@ import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
 import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
-import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
+import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser, createUpdateUserObj } from "../../../utils/db/users";
+import { updateAliasesTableFromUsersTableOnLogin } from "../../../utils/db/aliases";
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
@@ -80,6 +81,17 @@ export const authOptions = {
 				await updateUser(dbUser.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
+				const updatedUserObj = await createUpdateUserObj(dbUser.id!, updateObj).catch(err => {
+					console.error(`[createUpdateUserObj] Something went wrong`, err);
+				});
+				if (!updatedUserObj || Object.keys(updatedUserObj).length == 0) {
+					console.info(`[signIn] Could not create updated user obj`)
+					return false; //Not sure what to return here
+				};
+				await updateAliasesTableFromUsersTableOnLogin(updatedUserObj).catch(err => {
+					console.error(`[updateAliasesTableFromUsersTableOnLogin] could not update aliases table from users table on login for userId: ${updatedUserObj.id}`, err);
+				})
+		
 				rudderStackEvents.track(dbUser.id!.toString(), uuidv4(), "login", { ...updateObj, newAuth: !existingAuth });
 			}
 			return true;
