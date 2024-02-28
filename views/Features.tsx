@@ -9,25 +9,26 @@ const FeatureList = [
 	{
 		src: RelevanceComment,
 		text: 'Accurate reviewer assignment',
-		description: "When you raise a pull request, you see a list \
-		of the team-members who are best suited to review it, along \
-		with the percentage relevance of the reviewer to the pull request.\
-		They are also automatically assigned as reviewers in the PR. \
-		Individually assigning the reviewers leads to faster response."
+		description: "When you raise a pull request, you see a list " +
+			"of the team-members who are best suited to review it, along " +
+			"with the percentage relevance of the reviewer to the pull request." +
+			"They are also automatically assigned as reviewers in the PR. " +
+			"Individually assigning the reviewers leads to faster response."
 	},
 	{
 		src: HunkLevelHighlight,
 		text: 'Personalized file & line highlighting',
-		description: 'The browser extension automatically highlights the \
-		parts of the pull request file-changes that you had last contributed to.\
-		You can use this to navigate the pull request by remembering the context \
-		of the highlighted code and starting your review from the PR from there.' },
+		description: 'The browser extension automatically highlights the ' +
+			'parts of the pull request file-changes that you had last contributed to. ' +
+			'You can use this to navigate the pull request by remembering the context ' +
+			'of the highlighted code and starting your review from the PR from there.'
+	},
 	{
 		src: PRprioritization,
 		text: 'Pull request prioritization',
-		description: 'For engineers who like to stay on top of all the \
-		changes in their modules, Vibinex highlights the pull requests \
-		of the repository that affect the code that you have personally worked on.'
+		description: 'For engineers who like to stay on top of all the ' +
+			'changes in their modules, Vibinex highlights the pull requests ' +
+			'of the repository that affect the code that you have personally worked on.'
 	},
 ]
 
