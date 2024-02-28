@@ -167,13 +167,9 @@ const calculateAuthDiff = (currAuthInfo: AuthInfo, newAuthInfo?: AuthInfo) => {
  * @param userId The id of the user in the database, that needs to be updated
  * @param user updated user object (please only include fields that have changed)
  */
-export const updateUser = async (userId: string, user: DbUser) => {
-	const diffObj = await createUpdateUserObj(userId, user).catch(err => {
-		console.error(`[createUpdateUserObj] Something went wrong`, err);
-	});
-	if (!diffObj || Object.keys(diffObj).length == 0) return;
+export const updateUser = async (userId: string, user: DbUser, updatedUserObj: DbUser) => {
 	const update_user_q = `UPDATE users
-		SET ${Object.entries(diffObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")}
+		SET ${Object.entries(updatedUserObj).map(([key, value]) => `${key} = ${convert(value)}`).join(", ")}
 		WHERE id = ${convert(userId)} `;
 	conn.query(update_user_q)
 		.then(update_user_result => {
