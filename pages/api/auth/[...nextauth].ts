@@ -88,6 +88,7 @@ export const authOptions = {
 					console.info(`[signIn] Could not create updated user obj`)
 					return false; //Not sure what to return here
 				};
+				console.log('[signIn] updatedUserObj; ', updatedUserObj);
 				await updateAliasesTableFromUsersTableOnLogin(updatedUserObj).catch(err => {
 					console.error(`[updateAliasesTableFromUsersTableOnLogin] could not update aliases table from users table on login for userId: ${updatedUserObj.id}`, err);
 				})

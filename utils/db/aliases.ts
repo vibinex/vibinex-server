@@ -189,6 +189,7 @@ const processProviderInfoForAliasPopulation = async (alias: string, handle: stri
   };
   
 export const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) => {
+	console.log(`[updateAliasesTableFromUsersTableOnLogin] userObj: ${userObj}`);
 	const { aliases, auth_info } = userObj;
 	const providers = ['github', 'bitbucket'];
 
