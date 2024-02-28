@@ -4,7 +4,6 @@ import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
 import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser, createUpdateUserObj } from "../../../utils/db/users";
-import { updateAliasesTableFromUsersTableOnLogin } from "../../../utils/db/aliases";
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";

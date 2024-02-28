@@ -148,18 +148,17 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
     });
 };
 
-// Function to process and update alias information in the database
 const processProviderInfoForAliasPopulation = async (alias: string, handle: string, provider: string) => {
 	const column = provider === 'github' ? 'github' : 'bitbucket';
   
 	// Check if the alias exists and update or insert accordingly
-	await conn.query('SELECT alias FROM aliases WHERE alias = $1', [alias])
+	await conn.query('SELECT git_alias FROM aliases WHERE git_alias = $1', [alias])
 	.then(async (result) => {
 		if (result.rows.length > 0) {
 			// Alias exists, update it
 			const query = `
 			UPDATE aliases SET ${column} = array_append(${column}, $1) 
-			WHERE alias = $2 AND NOT (${column} @> ARRAY[$1]::TEXT[])
+			WHERE git_alias = $2 AND NOT (${column} @> ARRAY[$1]::TEXT[])
 			`
 			await conn.query(query, [handle, alias])
 			.then(() => {
@@ -171,7 +170,7 @@ const processProviderInfoForAliasPopulation = async (alias: string, handle: stri
 		} else {
 			// Alias does not exist, insert a new one
 			const query = `
-			INSERT INTO aliases (alias, ${column}) VALUES ($1, ARRAY[$2]::TEXT[])
+			INSERT INTO aliases (git_alias, ${column}) VALUES ($1, ARRAY[$2]::TEXT[])
 			`
 			await conn.query(query, [alias, handle])
 			.then(() => {
@@ -188,12 +187,12 @@ const processProviderInfoForAliasPopulation = async (alias: string, handle: stri
 	})
   };
   
-export const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) => {
+export const updateAliasesTableOnUserLogin = async (userObj: DbUser) => {
 	const { aliases, auth_info } = userObj;
 	const providers = ['github', 'bitbucket'];
 
 	if (!aliases || !auth_info) {
-		console.info(`[updateAliasesTableFromUsersTableOnLogin] Both aliases and auth_info should be defined for user: ${userObj}`);
+		console.info(`[updateAliasesTableOnUserLogin] Both aliases and auth_info should be defined for user: ${userObj}`);
 		return;
 	}
 
@@ -204,9 +203,9 @@ export const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) =
 					const handle = account.handle;
 					if (handle && typeof handle === 'string') {
 						return processProviderInfoForAliasPopulation(alias, handle, provider)
-						.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] Error updating alias ${alias} for provider ${provider}`, error));
+						.catch(error => console.error(`[updateAliasesTableOnUserLogin] Error updating alias ${alias} for provider ${provider}`, error));
 					} else {
-						console.info(`[updateAliasesTableFromUsersTableOnLogin] Provider handle is not defined for user: ${userObj.id} with  provider: ${provider}`);
+						console.info(`[updateAliasesTableOnUserLogin] Provider handle is not defined for user: ${userObj.id} with  provider: ${provider}`);
 					}
 				});
 			}
@@ -215,6 +214,6 @@ export const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) =
 	});
   
 	Promise.all(tasks)
-	.then(() => console.info(`[updateAliasesTableFromUsersTableOnLogin] All aliases have been updated successfully`))
-	.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] An error occurred while updating aliases`, error));
+	.then(() => console.info(`[updateAliasesTableOnUserLogin] All aliases have been updated successfully`))
+	.catch(error => console.error(`[updateAliasesTableOnUserLogin] An error occurred while updating aliases`, error));
 };
