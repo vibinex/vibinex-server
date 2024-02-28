@@ -1,5 +1,6 @@
 import conn from '.';
 import { AliasMap, AliasProviderMap } from '../../types/AliasMap';
+import { DbUser } from './users';
 
 export const saveUserAliasesToRepo = async (repoName: string, repoOwner: string, repoProvider: string, aliases: string[]) => {
     // Filter out empty strings and null values
@@ -147,3 +148,64 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
     });
 };
 
+// Function to process and update alias information in the database
+const processProviderInfoForAliasPopulation = async (alias: Array<string>, handle: string, provider: string) => {
+	const column = provider === 'github' ? 'github' : 'bitbucket';
+  
+	// Check if the alias exists and update or insert accordingly
+	await conn.query('SELECT alias FROM aliases WHERE alias = $1', [alias])
+	.then(async (result) => {
+		if (result.rows.length > 0) {
+			// Alias exists, update it
+			const query = `
+			UPDATE aliases SET ${column} = array_append(${column}, $1) 
+			WHERE alias = $2 AND NOT (${column} @> ARRAY[$1]::TEXT[])
+			`
+			await conn.query(query, [handle, alias])
+			.then(() => {
+				console.info(`[processProviderInfoForAliasPopulation] Aliases are updated in aliases table.`);
+			})
+			.catch((error) => {
+				console.error(`[processProviderInfoForAliasPopulation] Error updating aliases to the database:`, error);
+			});
+		} else {
+			// Alias does not exist, insert a new one
+			const query = `
+			INSERT INTO aliases (alias, ${column}) VALUES ($1, ARRAY[$2]::TEXT[])
+			`
+			await conn.query(query, [alias, handle])
+			.then(() => {
+				console.info(`[processProviderInfoForAliasPopulation] New aliases are inserted in aliases table.`);
+			})
+			.catch((error) => {
+				console.error(`[processProviderInfoForAliasPopulation] Error inserting aliases to the database:`, error);
+			});
+
+		}
+	})
+	.catch(error => {
+		console.error(`[processProviderInfoForAliasPopulation] Failed to process provider info for alias: ${alias}`, error);
+	})
+  };
+  
+  const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) => {
+	const { aliases, auth_info: authInfo } = userObj;
+	const providers = ['github', 'bitbucket'];
+  
+	const tasks = aliases.flatMap(alias => {
+		return Object.entries(authInfo).flatMap(([provider, accounts]) => {
+			if (providers.includes(provider)) {
+				return Object.values(accounts).map(account => {
+					const handle = account.handle;
+					return processProviderInfoForAliasPopulation(alias, handle, provider)
+					.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] Error updating alias ${alias} for provider ${provider}`, error));
+				});
+			}
+			return [];
+		});
+	});
+  
+	Promise.all(tasks)
+		.then(() => console.info(`[updateAliasesTableFromUsersTableOnLogin] All aliases have been updated successfully`))
+		.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] An error occurred while updating aliases`, error));
+  };
