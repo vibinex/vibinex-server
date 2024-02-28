@@ -76,7 +76,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 			console.error(`[createUpdateUserObj] Something went wrong`, err);
 		});
 		if (!updatedUserObj || Object.keys(updatedUserObj).length == 0) return;
-		updateUser(session.user.id!, { aliases: aliases }, updatedUserObj).catch(err => {
+		updateUser(session.user.id!, { aliases: aliases }).catch(err => {
 			console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 		})
 		updateAliasesTableFromUsersTableOnLogin(updatedUserObj).catch(err => {
