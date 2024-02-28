@@ -81,17 +81,6 @@ export const authOptions = {
 				await updateUser(dbUser.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
 				})
-				const updatedUserObj = await createUpdateUserObj(dbUser.id!, updateObj).catch(err => {
-					console.error(`[createUpdateUserObj] Something went wrong`, err);
-				});
-				if (!updatedUserObj || Object.keys(updatedUserObj).length == 0) {
-					console.info(`[signIn] Could not create updated user obj`)
-					return false; //Not sure what to return here
-				};
-				await updateAliasesTableFromUsersTableOnLogin(updatedUserObj).catch(err => {
-					console.error(`[updateAliasesTableFromUsersTableOnLogin] could not update aliases table from users table on login for userId: ${updatedUserObj.id}`, err);
-				})
-		
 				rudderStackEvents.track(dbUser.id!.toString(), uuidv4(), "login", { ...updateObj, newAuth: !existingAuth });
 			}
 			return true;
