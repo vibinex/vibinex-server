@@ -3,7 +3,7 @@ import NextAuth, { Account, Profile, Session, TokenSet, User } from "next-auth"
 import GithubProvider, { GithubProfile } from "next-auth/providers/github"
 import GitlabProvider, { GitLabProfile } from "next-auth/providers/gitlab";
 import type { BitbucketProfile, BitbucketEmailsResponse } from "../../../types/bitbucket"
-import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser, createUpdateUserObj } from "../../../utils/db/users";
+import { getUserByAlias, getUserByProvider, DbUser, createUser, updateUser } from "../../../utils/db/users";
 import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
