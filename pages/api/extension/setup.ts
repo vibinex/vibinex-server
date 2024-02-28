@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getSetupReposFromDbForOrg } from '../../../utils/db/setup';
+import { getSetupReposFromDbForOwner } from '../../../utils/db/setup';
 
 export default async function setupRepos(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
@@ -10,7 +10,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 		return;
 	}
 	// For normal requests
-	console.info("[extension/setup] Getting setup repos info for ", req.body.org);
+	console.info("[extension/setup] Getting setup repos info for ", req.body.owner);
 	
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
@@ -19,7 +19,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	if (!owner || !provider) {
 		return res.status(400).json({ error: 'Bad Request', message: 'Both the arguments owner, and provider are required in the request body' });
 	}
-	getSetupReposFromDbForOrg(owner, provider)
+	getSetupReposFromDbForOwner(owner, provider)
 	.then((repos: string[]) => {
 		res.status(200).json({ repos: repos });
 	})
