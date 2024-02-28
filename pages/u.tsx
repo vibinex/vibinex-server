@@ -8,13 +8,14 @@ import GitAliasForm from "../components/GitAliasForm";
 import RudderContext from "../components/RudderContext";
 import type { DbRepoSerializable } from "../types/repository";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
-import { updateUser } from "../utils/db/users";
+import { updateUser, createUpdateUserObj } from "../utils/db/users";
 import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getURLWithParams } from "../utils/url_utils";
 import MainAppBar from "../views/MainAppBar";
 import RepoList, { getRepoList } from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
+import { updateAliasesTableFromUsersTableOnLogin } from "../utils/db/aliases";
 
 type ProfileProps = {
 	sessionObj: Session,
@@ -70,9 +71,16 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 		};
 	}
 
-	getEmailAliases(session).then((aliases) => {
-		updateUser(session.user.id!, { aliases: aliases }).catch(err => {
+	getEmailAliases(session).then(async (aliases) => {
+		const updatedUserObj = await createUpdateUserObj(session.user.id!, { aliases: aliases }).catch(err => {
+			console.error(`[createUpdateUserObj] Something went wrong`, err);
+		});
+		if (!updatedUserObj || Object.keys(updatedUserObj).length == 0) return;
+		updateUser(session.user.id!, { aliases: aliases }, updatedUserObj).catch(err => {
 			console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
+		})
+		updateAliasesTableFromUsersTableOnLogin(updatedUserObj).catch(err => {
+			console.error(`[updateAliasesTableFromUsersTableOnLogin] could not update aliases table from users table on login for userId: ${session.user.id}`, err);
 		})
 	})
 

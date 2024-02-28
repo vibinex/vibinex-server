@@ -149,7 +149,7 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
 };
 
 // Function to process and update alias information in the database
-const processProviderInfoForAliasPopulation = async (alias: Array<string>, handle: string, provider: string) => {
+const processProviderInfoForAliasPopulation = async (alias: string, handle: string, provider: string) => {
 	const column = provider === 'github' ? 'github' : 'bitbucket';
   
 	// Check if the alias exists and update or insert accordingly
@@ -188,17 +188,26 @@ const processProviderInfoForAliasPopulation = async (alias: Array<string>, handl
 	})
   };
   
-  const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) => {
-	const { aliases, auth_info: authInfo } = userObj;
+export const updateAliasesTableFromUsersTableOnLogin = async (userObj: DbUser) => {
+	const { aliases, auth_info } = userObj;
 	const providers = ['github', 'bitbucket'];
-  
+
+	if (!aliases || !auth_info) {
+		console.info(`[updateAliasesTableFromUsersTableOnLogin] Both aliases and auth_info should be defined for user: ${userObj}`);
+		return;
+	}
+
 	const tasks = aliases.flatMap(alias => {
-		return Object.entries(authInfo).flatMap(([provider, accounts]) => {
+		return Object.entries(auth_info).flatMap(([provider, accounts]) => {
 			if (providers.includes(provider)) {
 				return Object.values(accounts).map(account => {
 					const handle = account.handle;
-					return processProviderInfoForAliasPopulation(alias, handle, provider)
-					.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] Error updating alias ${alias} for provider ${provider}`, error));
+					if (handle && typeof handle === 'string') {
+						return processProviderInfoForAliasPopulation(alias, handle, provider)
+						.catch(error => console.error(`[updateAliasesTableFromUsersTableOnLogin] Error updating alias ${alias} for provider ${provider}`, error));
+					} else {
+						console.info(`[updateAliasesTableFromUsersTableOnLogin] Provider handle is not defined for user: ${userObj.id} with  provider: ${provider}`);
+					}
 				});
 			}
 			return [];
