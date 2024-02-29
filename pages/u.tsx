@@ -8,7 +8,7 @@ import GitAliasForm from "../components/GitAliasForm";
 import RudderContext from "../components/RudderContext";
 import type { DbRepoSerializable } from "../types/repository";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
-import { updateUser, createUpdateUserObj, getUserById } from "../utils/db/users";
+import { updateUser } from "../utils/db/users";
 import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getURLWithParams } from "../utils/url_utils";
