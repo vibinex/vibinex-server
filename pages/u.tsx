@@ -71,7 +71,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 		};
 	}
 
-	getEmailAliases(session).then(async (aliases) => {
+	getEmailAliases(session).then((aliases) => {
 		updateUser(session.user.id!, { aliases: aliases }).catch(err => {
 			console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 		})
