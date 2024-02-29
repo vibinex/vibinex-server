@@ -13,7 +13,7 @@ type ButtonProps = PropsWithChildren<{
 }> & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button = (props: ButtonProps) => {
-	const { variant, href, onClick, disabled, id, target, className, children, ...otherProps } = props;
+	const { variant, href, onClick, disabled, id, target, className, children, ref, isNotBasic, ...otherProps } = props;
 	const clickBehaviour: MouseEventHandler = (event) => {
 		const targetVal = (target) ?? '_self';
 		if (href) {
@@ -31,8 +31,8 @@ const Button = (props: ButtonProps) => {
 	}
 
 	return (
-		<button ref={props.ref} id={id} onClick={clickBehaviour} disabled={disabled} 
-			className={(props.isNotBasic ? '': basicClass) + variantClasses[variant] + className}
+		<button ref={ref} id={id} onClick={clickBehaviour} disabled={disabled}
+			className={(isNotBasic ? '' : basicClass) + variantClasses[variant] + className}
 			{...otherProps}>
 			<span className="w-full font-semibold">
 				{children}
