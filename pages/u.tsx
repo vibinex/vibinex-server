@@ -15,7 +15,7 @@ import { getURLWithParams } from "../utils/url_utils";
 import MainAppBar from "../views/MainAppBar";
 import RepoList, { getRepoList } from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { updateAliasesTableOnUserLogin } from "../utils/db/aliases";
+import { updateAliasesForUser } from "../utils/db/aliases";
 
 type ProfileProps = {
 	sessionObj: Session,
@@ -75,8 +75,8 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 		updateUser(session.user.id!, { aliases: aliases }).catch(err => {
 			console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 		})
-		updateAliasesTableOnUserLogin(aliases, session.user.id!).catch(err => {
-			console.error(`[Profile/updateAliasesTableOnUserLogin] could not update aliases table from users table on login for userId: ${session.user.id}`, err);
+		updateAliasesForUser(aliases, session.user.id!).catch(err => {
+			console.error(`[Profile/updateAliasesForUser] could not update aliases table from users table on login for userId: ${session.user.id}`, err);
 		})
 	})
 
