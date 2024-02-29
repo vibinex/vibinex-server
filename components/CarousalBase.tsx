@@ -116,6 +116,7 @@ const Carousel = React.forwardRef<
 
 			return () => {
 				api?.off("select", onSelect)
+				api?.off("reInit", onSelect)
 			}
 		}, [api, onSelect])
 
@@ -133,16 +134,16 @@ const Carousel = React.forwardRef<
 			<CarouselContext.Provider
 				value={carouselContext}
 			>
-				<div
+				<section
 					ref={ref}
 					onKeyDownCapture={handleKeyDown}
 					className={"relative " + className}
-					role="region"
+					aria-label="carousel"
 					aria-roledescription="carousel"
 					{...props}
 				>
 					{children}
-				</div>
+				</section>
 			</CarouselContext.Provider>
 		)
 	}
