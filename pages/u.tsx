@@ -76,7 +76,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 			console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 		})
 		updateAliasesTableOnUserLogin(aliases, session.user.id!).catch(err => {
-			console.error(`[updateAliasesTableFromUsersTableOnLogin] could not update aliases table from users table on login for userId: ${session.user.id}`, err);
+			console.error(`[Profile/updateAliasesTableOnUserLogin] could not update aliases table from users table on login for userId: ${session.user.id}`, err);
 		})
 	})
 
