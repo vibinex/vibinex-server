@@ -161,7 +161,7 @@ const updateOrInsertAliasInAliasesTable = async (alias: string, provider: string
 	await conn.query(query, [alias, handle]).catch(error => {
 		console.error(`[updateOrInsertAliasInAliasesTable] Error saving entries to the database:`, error);
 	})
-	console.info(`Successfully updated ${provider} handle for alias ${alias} in aliases table in db.`);
+	console.info(`[updateOrInsertAliasInAliasesTable] Successfully updated ${provider} handle for alias ${alias} in aliases table in db.`);
 };
   
   
