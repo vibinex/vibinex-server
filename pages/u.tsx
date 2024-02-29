@@ -72,24 +72,10 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	}
 
 	getEmailAliases(session).then(async (aliases) => {
-		await updateUser(session.user.id!, { aliases: aliases }).catch(err => {
+		updateUser(session.user.id!, { aliases: aliases }).catch(err => {
 			console.error(`[Profile] Could not update aliases for user (userId: ${session.user.id})`, err)
 		})
-		let userObj = await createUpdateUserObj(session.user.id!, { aliases: aliases }).catch(err => {
-			console.error(`[createUpdateUserObj] Something went wrong`, err);
-		});
-		const length = Object.keys(userObj!);
-		if (!userObj || Object.keys(userObj).length == 0) {
-			//if updated user obj is an empty obj, then simply get the user from db
-			userObj = await getUserById(session.user.id!).catch((err) => {
-				console.error('[getEmailAliases] Error in getting user data from db', err);
-			});
-		}
-		if (!userObj) {
-			console.error(`[getEmailAliases] userData is not in db`);
-			return;
-		}
-		await updateAliasesTableOnUserLogin(userObj).catch(err => {
+		updateAliasesTableOnUserLogin(aliases, session.user.id!).catch(err => {
 			console.error(`[updateAliasesTableFromUsersTableOnLogin] could not update aliases table from users table on login for userId: ${session.user.id}`, err);
 		})
 	})
