@@ -16,9 +16,9 @@ interface CarouselProps extends CarouselBaseProps {
 const CarouselWrapper: React.FC<CarouselProps> = ({children, ...restprops}: CarouselProps) => {
   return (
     <Carousel {...restprops} className="w-full">
-      <CarouselContent>
-        {children.map((component, index) => (
-          <CarouselItem key={index}>
+      <CarouselContent className="w-full">
+        {children.map((component) => (
+          <CarouselItem key={component.key}>
             {component}
           </CarouselItem>
         ))}
