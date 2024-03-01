@@ -49,7 +49,7 @@ export const getUserAliasesFromRepo = async (repoName: string, repoOwner: string
     return aliases;
 };
 
-export const getGitEmailAliasesFromDB = async (userId: string): Promise<AliasProviderMap> =>  {
+export const getGitAliasesWithHandlesFromDB = async (userId: string): Promise<AliasProviderMap> => {
     const query = `
     SELECT 
         git_alias,
