@@ -1,5 +1,6 @@
 import conn from '.';
 import { AliasMap, AliasProviderMap } from '../../types/AliasMap';
+import { DbUser, getUserById } from './users';
 
 export const saveUserAliasesToRepo = async (repoName: string, repoOwner: string, repoProvider: string, aliases: string[]) => {
     // Filter out empty strings and null values
@@ -147,3 +148,54 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
     });
 };
 
+const updateOrInsertAliasInAliasesTable = async (alias: string, provider: string, handle: string) => {
+	const query = `
+		INSERT INTO aliases (git_alias, ${provider})
+		VALUES ($1, ARRAY[$2::text])
+		ON CONFLICT (git_alias) DO UPDATE
+		SET ${provider} = ARRAY(
+			SELECT DISTINCT unnest(aliases.${provider} || ARRAY[$2::text])
+		)
+		`;
+	
+	await conn.query(query, [alias, handle]).catch(error => {
+		console.error(`[updateOrInsertAliasInAliasesTable] Error saving entries to the database:`, error);
+	})
+	console.info(`[updateOrInsertAliasInAliasesTable] Successfully updated ${provider} handle for alias ${alias} in aliases table in db.`);
+};
+  
+  
+export const updateAliasesForUser = async (aliases: Array<string>, userId: string) => {
+	const userData: DbUser | null = await getUserById(userId).catch((err) => {
+		console.error(`[updateAliasesForUser/getUserById] Error in getting user data`, err);
+		return null;
+	});
+	if (!userData) {
+		console.error(`[updateAliasesForUser/getUserById] userData is empty for user with id: ${userId}`);
+		return;
+	}
+	const auth_info = userData.auth_info
+
+	if (!auth_info) {
+		console.error(`[updateAliasesForUser] Auth_info should be defined for user with id: ${userId}`);
+		return;
+	}
+
+	const tasks = [];
+	for (const alias of aliases) {
+		for (const [provider, accounts] of Object.entries(auth_info)) {
+			for (const account of Object.values(accounts)) {
+				const handle = account.handle;
+				if (handle) {
+					tasks.push(updateOrInsertAliasInAliasesTable(alias, provider, handle));
+				} else {
+					console.info(`[updateAliasesForUser/getUserById] handle is not present for provider: ${provider} for user with id: ${userId}`);
+				}
+			}
+		}
+	}
+  
+	Promise.all(tasks)
+	.then(() => console.info(`[updateAliasesForUser] All aliases have been updated successfully`))
+	.catch(error => console.error(`[updateAliasesForUser] An error occurred while updating aliases`, error));
+};
