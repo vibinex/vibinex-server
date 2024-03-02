@@ -1,6 +1,6 @@
 {
   "name": "vibinex-website",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "private": false,
   "homepage": "https://vibinex.com",
   "description": "A plugin that works with GitHub, Bitbucket and GitLab to personalize and data-enrich their code review interfaces",
@@ -35,6 +35,9 @@
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.9",
     "axios": "^1.2.2",
+    "embla-carousel-auto-scroll": "^8.0.0",
+    "embla-carousel-autoplay": "^8.0.0",
+    "embla-carousel-react": "^8.0.0",
     "eslint": "8.29.0",
     "eslint-config-next": "13.0.6",
     "next": "13.3.1",
