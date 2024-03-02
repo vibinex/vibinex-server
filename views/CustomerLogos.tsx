@@ -30,14 +30,15 @@ const Customers = () => {
 				{' teams'}
 			</h2>
 			<div className='w-full mt-8 flex flex-row justify-center items-center place-content-between mx-auto flex-wrap xl:flex-nowrap sm:gap-y-4'>
-				<CarouselWrapper opts={{ loop: true }} plugins={[AutoScroll({ playOnInit: true })]} showControls={false} itemClassNames="basis-1/2 sm:basis-1/3 md:basis-1/4 xl:basis-1/6 shrink min-w-fit">
+				<CarouselWrapper opts={{ loop: true }} plugins={[AutoScroll({ playOnInit: true })]} showControls={false} itemClassNames="!shrink !min-w-fit">
 				{data.map((item) => (
 					<Image
 						priority
 						src={item.logo}
 						alt={item.heading}
 						key={item.heading}
-						className={`${item.customClass ?? ''} h-16 md:h-12 ml-6 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit`}
+						title={item.heading}
+						className={`${item.customClass ?? ''} h-16 md:h-12 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit`}
 					/>
 				))}
 				</CarouselWrapper>
