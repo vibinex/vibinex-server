@@ -61,6 +61,8 @@ const Carousel = React.forwardRef<
 			},
 			plugins
 		)
+
+		// Arrow Buttons functionality
 		const [canScrollPrev, setCanScrollPrev] = React.useState(false)
 		const [canScrollNext, setCanScrollNext] = React.useState(false)
 
