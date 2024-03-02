@@ -33,8 +33,8 @@ export default function Home() {
 		<div className='overflow-hidden'>
 			<Navbar transparent={true} />
 			<Hero ctaLink={'/u'} />
-			<ProductDemo />
 			<Customers />
+			<ProductDemo />
 			<Features />
 			<WhyUs />
 			<TrustUs />
