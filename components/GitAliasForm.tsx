@@ -12,7 +12,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const response = await axios.get(`/api/alias`);
+				const response = await axios.get(`/api/alias`, { params: { expanded } });
 				if (!response.data?.aliasProviderMap) {
 					throw new Error('Failed to fetch Git email aliases');
 				}
@@ -70,13 +70,10 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 		<form onSubmit={handleSubmit}>
 			{loading ? (
 				<div>Loading...</div>
-			) : gitAliasMap ? (
+			) : (gitAliasMap?.providerMaps && gitAliasMap.providerMaps.length > 0) ? (
 				<>
-					{!expanded && (
-						<div className="bg-blue-200 text-blue-800 p-4 rounded-md mb-4 text-center">
-							<p className="font-bold">Please enter Github/Bitbucket usernames and click Submit:</p>
-						</div>
-					)}
+					<h3 className="font-bold mb-4">Please enter Github/Bitbucket usernames and click Submit:</h3>
+
 					{/* Header */}
 					<div className="grid grid-cols-3 border-b text-blue-800">
 						<div className="p-4">
@@ -91,49 +88,46 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 					</div>
 
 					{/* Rows */}
-					{gitAliasMap.providerMaps.map((providerMap: AliasMap) => {
-						const hasHandles = providerMap.handleMaps && providerMap.handleMaps.some(handleMap => handleMap.handles.length > 0);
-						return expanded || !hasHandles ? (
-							<div key={providerMap.alias} className="grid grid-cols-3 border-b border-gray-300">
-								{/* Alias column */}
-								<div className="p-4">
-									<div>{providerMap.alias}</div>
-								</div>
-
-								{/* github column */}
-								<div className="p-4">
-									<div>
-										<input
-											type="text"
-											value={handleInputValues[providerMap.alias]?.github || ''}
-											onChange={(e) => handleInputChange(providerMap.alias, 'github', e.target.value)}
-											className="mb-2 w-full"
-										/>
-									</div>
-									{/* Display additional handles beneath the input field if available */}
-									{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string) => (
-										<Chip key={handle} name={handle} avatar={"/github-dark.svg"} disabled={false} />
-									))}
-								</div>
-
-								{/* bitbucket column */}
-								<div className="p-4">
-									<div>
-										<input
-											type="text"
-											value={handleInputValues[providerMap.alias]?.bitbucket || ''}
-											onChange={(e) => handleInputChange(providerMap.alias, 'bitbucket', e.target.value)}
-											className="mb-2 w-full"
-										/>
-									</div>
-									{/* Display additional handles beneath the input field if available */}
-									{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string) => (
-										<Chip key={handle} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
-									))}
-								</div>
+					{gitAliasMap.providerMaps.map((providerMap: AliasMap) => (
+						<div key={providerMap.alias} className="grid grid-cols-3 border-b border-gray-300">
+							{/* Alias column */}
+							<div className="p-4">
+								<div>{providerMap.alias}</div>
 							</div>
-						) : null;
-					})}
+
+							{/* github column */}
+							<div className="p-4">
+								<div>
+									<input
+										type="text"
+										value={handleInputValues[providerMap.alias]?.github || ''}
+										onChange={(e) => handleInputChange(providerMap.alias, 'github', e.target.value)}
+										className="mb-2 w-full"
+									/>
+								</div>
+								{/* Display additional handles beneath the input field if available */}
+								{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string) => (
+									<Chip key={handle} name={handle} avatar={"/github-dark.svg"} disabled={false} />
+								))}
+							</div>
+
+							{/* bitbucket column */}
+							<div className="p-4">
+								<div>
+									<input
+										type="text"
+										value={handleInputValues[providerMap.alias]?.bitbucket || ''}
+										onChange={(e) => handleInputChange(providerMap.alias, 'bitbucket', e.target.value)}
+										className="mb-2 w-full"
+									/>
+								</div>
+								{/* Display additional handles beneath the input field if available */}
+								{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string) => (
+									<Chip key={handle} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
+								))}
+							</div>
+						</div>
+					))}
 					{/* Buttons */}
 					<div className="mt-4 flex gap-2">
 						<Button variant="contained" type="submit" className={`${expanded ? 'w-full block mb-4' : ''}`}>Submit</Button>
@@ -142,9 +136,13 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 						)}
 					</div>
 				</>
-			) : (
-				<div>No data available</div>
-			)}
+			) : expanded ? (
+				<div className="h-screen-1/2 text-primary-text flex flex-col items-center justify-center" >
+					<p className="font-bold text-lg">No aliases found</p>
+					<p>Please setup a repository from this account to view aliases</p>
+				</div>
+			) : null
+			}
 		</form>
 	);
 };

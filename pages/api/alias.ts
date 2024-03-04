@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getGitEmailAliasesFromDB, saveGitAliasMapToDB } from "../../utils/db/aliases";
+import { getGitAliasesWithHandlesFromDB, saveGitAliasMapToDB } from "../../utils/db/aliases";
 import { AliasProviderMap } from "../../types/AliasMap";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./auth/[...nextauth]";
 
 const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method, body } = req;
+    const { method, query, body } = req;
     const session = await getServerSession(req, res, authOptions);
 	if (!session) {
 		return res.status(401).json({ message: 'Unauthenticated' });
@@ -16,7 +16,13 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(500).json({error: "No user id in session"});
             return;
         }
-        await getGitEmailAliases(userId)
+        // check if query object has the expanded element and if it does, then check if it is true or false
+        if (query?.expanded && query?.expanded !== "true" && query?.expanded !== "false") {
+            res.status(400).json({ error: "Invalid parameters in query: `expanded` must be true or false." });
+            return;
+        }
+        const expanded: boolean = query?.expanded === "true";
+        await getGitEmailAliases(userId, expanded)
         .then((aliasProviderMap) => {
             res.status(200).json({ aliasProviderMap });
         }).catch((error) => {
@@ -36,14 +42,21 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 
-const getGitEmailAliases = async (userId: string): Promise<AliasProviderMap> => {
+const getGitEmailAliases = async (userId: string, expanded?: boolean): Promise<AliasProviderMap> => {
     // Validate that userId is provided
     if (!userId) {
         throw new Error("User ID is required to fetch Git email aliases.");
     }
 
     // Call the database function to get Git email aliases
-    return await getGitEmailAliasesFromDB(userId);
+    const allGitAliasMap = await getGitAliasesWithHandlesFromDB(userId);
+    if (expanded) return allGitAliasMap;
+    return {
+        providerMaps: allGitAliasMap.providerMaps.filter((providerMap) => {
+            const hasHandles = providerMap.handleMaps && providerMap.handleMaps.some(handleMap => handleMap.handles.length > 0);
+            return !hasHandles;
+        })
+    }
 }
 
 const saveGitAliasMap = async (aliasProviderMap: AliasProviderMap): Promise<void> => {
