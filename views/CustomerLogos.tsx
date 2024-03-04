@@ -1,6 +1,6 @@
 import AutoScroll from 'embla-carousel-auto-scroll'
 import Image from 'next/image'
-import CarouselWrapper from '../components/Carousal'
+import Carousel from '../components/Carousel'
 import BillNoteLogo from '../public/BillNote-logo.png'
 import CoverForceLogo from '../public/CoverForce-Logo.png'
 import SupplyNoteLogo from '../public/SupplyNote-logo.png'
@@ -30,7 +30,7 @@ const Customers = () => {
 				{' teams'}
 			</h2>
 			<div className='w-full mt-8 flex flex-row justify-center items-center place-content-between mx-auto flex-wrap xl:flex-nowrap sm:gap-y-4'>
-				<CarouselWrapper opts={{ loop: true }} plugins={[AutoScroll({ playOnInit: true })]} showControls={false} itemClassNames="!shrink !min-w-fit">
+				<Carousel opts={{ loop: true }} plugins={[AutoScroll({ playOnInit: true })]} controls='none' itemClassNames="!shrink !min-w-fit">
 				{data.map((item) => (
 					<Image
 						priority
@@ -41,7 +41,7 @@ const Customers = () => {
 						className={`${item.customClass ?? ''} h-16 md:h-12 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit`}
 					/>
 				))}
-				</CarouselWrapper>
+				</Carousel>
 			</div>
 		</div>
 	)

@@ -1,12 +1,9 @@
 "use client"
 
-import * as React from "react"
-import { LuArrowLeft, LuArrowRight } from "react-icons/lu"
+import React from "react"
 import useEmblaCarousel, {
 	type UseEmblaCarouselType,
 } from "embla-carousel-react"
-
-import Button from "./Button"
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -64,6 +61,8 @@ const Carousel = React.forwardRef<
 			},
 			plugins
 		)
+
+		// Arrow Buttons functionality
 		const [canScrollPrev, setCanScrollPrev] = React.useState(false)
 		const [canScrollNext, setCanScrollNext] = React.useState(false)
 
@@ -150,109 +149,8 @@ const Carousel = React.forwardRef<
 )
 Carousel.displayName = "Carousel"
 
-const CarouselContent = React.forwardRef<
-	HTMLDivElement,
-	React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-	const { carouselRef, orientation } = useCarousel()
-
-	return (
-		<div ref={carouselRef} className="overflow-hidden">
-			<div
-				ref={ref}
-				className={"flex " +
-					(orientation === "horizontal" ? "-mx-4 " : "-mt-4 flex-col ") +
-					className
-				}
-				{...props}
-			/>
-		</div>
-	)
-})
-CarouselContent.displayName = "CarouselContent"
-
-const CarouselItem = React.forwardRef<
-	HTMLDivElement,
-	React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-	const { orientation } = useCarousel()
-
-	return (
-		<div
-			ref={ref}
-			role="group"
-			aria-roledescription="slide"
-			className={className +
-				" min-w-0 shrink-0 grow-0 basis-full" +
-				(orientation === "horizontal" ? " pl-4 " : " pt-4 ")
-			}
-			{...props}
-		/>
-	)
-})
-CarouselItem.displayName = "CarouselItem"
-
-const CarouselPrevious = React.forwardRef<
-	HTMLButtonElement,
-	React.ComponentProps<typeof Button>
->(({ className, variant = "outlined", ...props }, ref) => {
-	const { orientation, scrollPrev, canScrollPrev } = useCarousel()
-
-	return (
-		<Button
-			ref={ref}
-			variant={variant}
-			className={"relative align-middle h-8 w-8 rounded-full " +
-				(orientation === "horizontal"
-					? "-left-8 top-4 "
-					: "-top-12 left-1/2 -translate-x-1/2 rotate-90 ") +
-				className
-			}
-			isNotBasic
-			disabled={!canScrollPrev}
-			onClick={scrollPrev}
-			{...props}
-		>
-			<LuArrowLeft className="h-4 w-4 mx-auto" />
-			<span className="sr-only">Previous slide</span>
-		</Button>
-	)
-})
-CarouselPrevious.displayName = "CarouselPrevious"
-
-const CarouselNext = React.forwardRef<
-	HTMLButtonElement,
-	React.ComponentProps<typeof Button>
->(({ className, variant = "outlined", ...props }, ref) => {
-	const { orientation, scrollNext, canScrollNext } = useCarousel()
-
-	return (
-		<Button
-			ref={ref}
-			variant={variant}
-			className={"relative align-middle h-8 w-8 rounded-full " +
-				(orientation === "horizontal"
-					? "-right-12 top-4 "
-					: "-bottom-12 left-1/2 -translate-x-1/2 rotate-90 ") +
-				className
-			}
-			isNotBasic
-			disabled={!canScrollNext}
-			onClick={scrollNext}
-			{...props}
-		>
-			<LuArrowRight className="h-4 w-4 mx-auto" />
-			<span className="sr-only">Next slide</span>
-		</Button>
-	)
-})
-CarouselNext.displayName = "CarouselNext"
-
 export {
 	type CarouselApi,
 	Carousel,
-	CarouselContent,
-	CarouselItem,
-	CarouselPrevious,
-	CarouselNext,
+	useCarousel,
 }

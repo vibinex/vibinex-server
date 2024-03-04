@@ -3,7 +3,7 @@ import Image from 'next/image'
 import RelevanceComment from '../public/relevanceComment.png'
 import PRprioritization from '../public/highlightPR.png'
 import HunkLevelHighlight from '../public/highlightFile.png'
-import CarouselWrapper from '../components/Carousal'
+import Carousel from '../components/Carousel'
 import Autoplay from 'embla-carousel-autoplay'
 
 const FeatureList = [
@@ -38,7 +38,7 @@ const Features = () => {
 		<div id='features' className='w-full text-center py-12 bg-secondary-main'>
 			<h2 className='font-bold text-[2rem]'>Vibinex  <span className='text-[2rem] text-primary-main font-bold'>Features</span></h2>
 			<div className='w-full lg:w-4/5 m-auto'>
-				<CarouselWrapper opts={{ loop: true }} plugins={[Autoplay({ playOnInit: true, delay: 3000 })]}>
+				<Carousel opts={{ loop: true }} plugins={[Autoplay({ playOnInit: true, delay: 3000 })]} controls='dots'>
 					{FeatureList.map((item) => (
 						<div className='flex flex-col lg:flex-row' key={item.text}>
 							<div className='grow lg:grow-0 lg:w-full mt-8 rounded-md lg:mx-0 pl-4'>
@@ -51,7 +51,7 @@ const Features = () => {
 							</div>
 						</div>
 					))}
-				</CarouselWrapper>
+				</Carousel>
 			</div>
 		</div>
 	)
