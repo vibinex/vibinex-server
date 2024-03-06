@@ -21,7 +21,7 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(400).json({ error: "Invalid parameters in query: `expanded` must be true or false." });
             return;
         }
-        const expanded: boolean = JSON.parse(String(query?.expanded) || "false");
+        const expanded: boolean = query?.expanded === "true";
         await getGitEmailAliases(userId, expanded)
         .then((aliasProviderMap) => {
             res.status(200).json({ aliasProviderMap });
