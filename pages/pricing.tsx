@@ -19,16 +19,14 @@ const pricingPlans = [
 		pricingName: 'Free',
 		duration: '',
 		pricing: 'for open source projects',
-		features: ['Access of all features', 'Unlimited team size', 'For both Github and Bitbucket'],
 		buttonText: 'Add a Repo',
 		link: '/docs'
 
 	},
 	{
-		pricingName: 'Standard',
+		pricingName: 'Solo',
 		duration: 'per month',
 		pricing: undefined, // will be populated by formula
-		features: ['Access of all features', 'Direct support through Slack', 'Free-of-cost setup assistance'],
 		buttonText: 'Start your 30 day trial',
 		link: '/u'
 	},
@@ -36,7 +34,6 @@ const pricingPlans = [
 		pricingName: 'Enterprise',
 		duration: '',
 		pricing: 'custom pricing',
-		features: ['Access of all features', 'On-call support', 'Free-of-cost setup assistance'],
 		buttonText: 'Contact Us',
 		link: 'https://api.whatsapp.com/send/?phone=918511557566&text&type=phone_number&app_absent=0'
 
@@ -83,6 +80,7 @@ const Pricing = () => {
 	)
 
 	const [pricingPlanIndex, setPricingPlanIndex] = useState<number>(0);
+	const [features, setFeatures] = useState<string[]>([]);
 	React.useEffect(() => {
 		if (selectedRepoType === 'public') {
 			setPricingPlanIndex(0);
@@ -91,6 +89,35 @@ const Pricing = () => {
 		} else if (selectedInstallation === 'project') {
 			setPricingPlanIndex(2);
 		}
+
+		const features: string[] = [];
+		if (selectedInstallation === 'project') {
+			features.push(...[
+				'PR comment with relevant reviewers',
+				'Auto-assign relevant reviewers',
+				'Personalized highlighting',
+			]);
+		} else {
+			features.push(...[
+				'Auto-assign relevant reviewers',
+				'Personalized highlighting',
+			])
+		}
+		if (selectedRepoType === 'private') {
+			if (selectedHosting === 'selfhosting') {
+				features.push('100% privacy of code')
+			}
+			features.push('Direct support through Slack')
+			if (selectedInstallation === 'project') {
+				features.push(...[
+					'On-call support',
+					'Free-of-cost setup assistance',
+				]);
+			}
+		} else if (selectedInstallation === 'project') {
+			features.push('Unlimited team size')
+		}
+		setFeatures(features);
 	}, [selectedRepoType, selectedInstallation, selectedHosting]);
 
 	const getPriceString = (term: string) => {
@@ -130,14 +157,14 @@ const Pricing = () => {
 				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after {readableDate(pricingStartDate)})</small></p>) : null}
 
 				<div className='m-auto md:grid w-4/5 mt-3 md:p-4 grid-cols-2 gap-5 h-fit'>
-					<div className='flex flex-col justify-between mt-8 p-3 md:p-5 h-full'>
+					<div className='flex flex-col gap-4 mt-8 p-3 md:p-5 h-full xl:w-2/3 mx-auto'>
 						<h3>Choose your configuration:</h3>
 						<SwitchSubmitWithText optionsList={repoTypeOptions} selectedOption={selectedRepoType} setSelectedOption={setSelectedRepoType} />
 						<SwitchSubmitWithText optionsList={installationOptions} selectedOption={selectedInstallation} setSelectedOption={setSelectedInstallation} />
 						<SwitchSubmitWithText optionsList={hostingOptions} selectedOption={selectedHosting} setSelectedOption={setSelectedHosting} />
 						<SwitchSubmitWithText optionsList={termOptions} selectedOption={term} setSelectedOption={onAnyPricingConfigClick(setTerm)} />
 					</div>
-					<div key={pricingPlans[pricingPlanIndex].buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
+					<div key={pricingPlans[pricingPlanIndex].buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full xl:w-2/3 m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
 						<h2 className='mx-auto font-semibold text-2xl text-center'>{pricingPlans[pricingPlanIndex].pricingName}</h2>
 
 						<div className='text-center h-16'>
@@ -146,7 +173,7 @@ const Pricing = () => {
 						</div>
 
 						<ul className='mt-3.5 grow'>
-							{pricingPlans[pricingPlanIndex].features.map((feature) => {
+							{features.map((feature) => {
 								return (
 									<li key={feature} className='text-lg ml-1 mb-2'>
 										<AiOutlineCheckCircle className='text-primary-main w-5 inline mr-1' size={20} />
