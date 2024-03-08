@@ -88,17 +88,23 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 		console.error(`[getReviewData] Could not get hunks for repository: ${provider}/${owner}/${repoName}`, { pg_query: review_query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
-	const filteredRows = result.rows.map(async (row) => {
-		const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
-			const hunk_author = obj["author"].toString();
-			return user_emails.has(hunk_author);
+	const filteredRows = result.rows
+		.filter((row) => row?.hunks?.blamevec && row?.pr_number)
+		.map((row) => {
+			const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
+				if (!obj && !("author" in obj)) {
+					console.error("[getReviewData/filteredBlamevec] blamevec obj missing keys, obj = ", obj);
+					return false;
+				}
+				const hunk_author = obj["author"].toString();
+				return user_emails.has(hunk_author);
+			});
+			const reviewData = {
+				review_id: row["pr_number"].toString(),
+				blamevec: filteredBlamevec
+			}
+			return reviewData;
 		});
-		const reviewData = {
-			review_id: row["pr_number"].toString(),
-			blamevec: filteredBlamevec
-		}
-		return reviewData;
-	});
 	return filteredRows;
 }
 
@@ -147,7 +153,7 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
 }
 
 export const createTopicName = async (user_id: string) => {
-	console.info(`[createTopicName] creating topic name for user with id: ${user_id}`); 
+	console.info(`[createTopicName] creating topic name for user with id: ${user_id}`);
 	let topicName = "topic-" + uuidv4();
 	if (!topicName) {
 		console.error(`[createTopicName] could not create topic name`);
