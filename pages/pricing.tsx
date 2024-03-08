@@ -149,13 +149,13 @@ const Pricing = () => {
 				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after {readableDate(pricingStartDate)})</small></p>) : null}
 
 				<div className='m-auto md:grid w-4/5 mt-3 md:p-4 grid-cols-2 gap-5 h-fit'>
-					<div className='flex flex-col gap-4 mt-8 p-3 md:p-5 h-full xl:w-2/3 mx-auto'>
+					<div className='flex flex-col gap-4 mt-8 p-3 md:p-5 h-full w-full lg:w-5/6 xl:w-4/5 mx-auto'>
 						<h3>Choose your configuration:</h3>
 						<SwitchSubmitWithText optionsList={repoTypeOptions} selectedOption={selectedRepoType} setSelectedOption={setSelectedRepoType} />
 						<SwitchSubmitWithText optionsList={installationOptions} selectedOption={selectedInstallation} setSelectedOption={setSelectedInstallation} />
 						<SwitchSubmitWithText optionsList={termOptions} selectedOption={term} setSelectedOption={onAnyPricingConfigClick(setTerm)} />
 					</div>
-					<div key={pricingPlans[pricingPlanIndex].buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full xl:w-2/3 m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
+					<div key={pricingPlans[pricingPlanIndex].buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full lg:w-5/6 xl:w-4/5 m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
 						<h2 className='mx-auto font-semibold text-2xl text-center'>{pricingPlans[pricingPlanIndex].pricingName}</h2>
 
 						<div className='text-center h-16'>
