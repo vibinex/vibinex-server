@@ -61,22 +61,17 @@ const Pricing = () => {
 		{ value: 'project', label: 'For your team' },
 		{ value: 'individual', label: 'For yourself' },
 	];
-	const [selectedHosting, setSelectedHosting] = useState<string>('selfhosting');
-	const hostingOptions = [
-		{ value: 'selfhosting', label: 'Self-hosting' },
-		{ value: 'cloud', label: 'Vibinex Cloud' },
-	];
 	const onAnyPricingConfigClick = React.useCallback(
 		(callback: (option: string) => void) => {
 			rudderEventMethods?.track(
 				getAuthUserId(session),
 				"pricing-changed",
-				{ type: "button", eventStatusFlag: 1, config: { term, selectedRepoType, selectedInstallation, selectedHosting }, name: getAuthUserName(session) },
+				{ type: "button", eventStatusFlag: 1, config: { term, selectedRepoType, selectedInstallation }, name: getAuthUserName(session) },
 				getAndSetAnonymousIdFromLocalStorage()
 			);
 			return callback;
 		},
-		[term, selectedRepoType, selectedInstallation, selectedHosting, session, rudderEventMethods]
+		[term, selectedRepoType, selectedInstallation, session, rudderEventMethods]
 	)
 
 	const [pricingPlanIndex, setPricingPlanIndex] = useState<number>(0);
@@ -104,9 +99,6 @@ const Pricing = () => {
 			])
 		}
 		if (selectedRepoType === 'private') {
-			if (selectedHosting === 'selfhosting') {
-				features.push('100% privacy of code')
-			}
 			features.push('Direct support through Slack')
 			if (selectedInstallation === 'project') {
 				features.push(...[
@@ -118,7 +110,7 @@ const Pricing = () => {
 			features.push('Unlimited team size')
 		}
 		setFeatures(features);
-	}, [selectedRepoType, selectedInstallation, selectedHosting]);
+	}, [selectedRepoType, selectedInstallation]);
 
 	const getPriceString = (term: string) => {
 		const isInIndia = isUserInIndia(location);
@@ -161,7 +153,6 @@ const Pricing = () => {
 						<h3>Choose your configuration:</h3>
 						<SwitchSubmitWithText optionsList={repoTypeOptions} selectedOption={selectedRepoType} setSelectedOption={setSelectedRepoType} />
 						<SwitchSubmitWithText optionsList={installationOptions} selectedOption={selectedInstallation} setSelectedOption={setSelectedInstallation} />
-						<SwitchSubmitWithText optionsList={hostingOptions} selectedOption={selectedHosting} setSelectedOption={setSelectedHosting} />
 						<SwitchSubmitWithText optionsList={termOptions} selectedOption={term} setSelectedOption={onAnyPricingConfigClick(setTerm)} />
 					</div>
 					<div key={pricingPlans[pricingPlanIndex].buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full xl:w-2/3 m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
