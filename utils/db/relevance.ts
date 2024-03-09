@@ -92,7 +92,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 		.filter((row) => row?.hunks?.blamevec && row?.pr_number)
 		.map((row) => {
 			const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
-				if (!obj && !("author" in obj)) {
+				if (!obj || !("author" in obj)) {
 					console.error("[getReviewData/filteredBlamevec] blamevec obj missing keys, obj = ", obj);
 					return false;
 				}
