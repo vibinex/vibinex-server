@@ -74,15 +74,11 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	res.status(200).json(formattedData);
 }
 
-const formatReviewResponse = async (queryRes: Promise<{ [key: string]: any }>[]) => {
+const formatReviewResponse = (queryRes: { review_id: string, blamevec: HunkInfo[] }[]) => {
 	const prs = new Map();
-	for (const promise of queryRes) {
-		const row = await promise;
-		const reviewId = row["review_id"].toString();
-		const blamevec = row["blamevec"];
-		const hunks = Array.isArray(blamevec) ? blamevec : [blamevec];
-		if (hunks.length) {
-			prs.set(reviewId, { "num_hunks_changed": hunks.length });
+	for (const pullRequestObj of queryRes) {
+		if (pullRequestObj.blamevec.length) {
+			prs.set(pullRequestObj.review_id, { "num_hunks_changed": pullRequestObj.blamevec.length });
 		}
 	}
 	const prsObj: { [key: string]: any } = {};
