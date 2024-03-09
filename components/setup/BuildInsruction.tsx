@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
 import Button from '../Button';
-import CodeWithCopyButton from './CodeWithCopyButton';
+import CodeWithCopyButton from './DpuSetup';
 
 interface BuildInstructionProps {
     selectedHosting: string;
