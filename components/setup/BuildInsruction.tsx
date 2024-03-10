@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
 import Button from '../Button';
-import CodeWithCopyButton from './CodeWithCopyButton';
+import DpuSetup from './DpuSetup';
 
 interface BuildInstructionProps {
     selectedHosting: string;
@@ -59,7 +59,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     const renderDockerInstructions = ({selectedInstallationType, selectedProvider}: RenderDockerInstructionsProps) => {
         return <div>
         <InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
-        <CodeWithCopyButton userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
+        <DpuSetup userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
         <p className="text-xs mt-2">Minimum config required for running docker image:</p>
         <ul className="text-xs">
             <li>RAM: 2 GB</li>
