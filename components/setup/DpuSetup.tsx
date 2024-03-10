@@ -24,6 +24,7 @@ const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, s
         if (selectedInstallationType === 'individual' && selectedProvider === 'github') {
             axios.get('/api/docs/getUserRepositories')
                 .then(response => {
+                    console.log(JSON.stringify(response.data));
                     setAllRepos(response.data); // Assuming the API returns an array of RepoIdentifiers
                 })
                 .catch(error => {
