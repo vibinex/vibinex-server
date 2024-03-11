@@ -36,7 +36,7 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 			repo_config rc ON r.id = rc.repo_id
 		WHERE 
 			rc.user_id = $1 AND
-			(repo_provider, repo_owner, repo_name) IN $2
+			(repo_provider, repo_owner, repo_name) IN ($2)
 		ORDER BY 
 			r.repo_provider, r.repo_owner, r.repo_name`;
 		const DbRepoSubsetPromise: Promise<{ rows: DbRepo[] }> = conn.query(repo_list_q, [userId, allReposFormattedAsTuples]).catch(err => {
