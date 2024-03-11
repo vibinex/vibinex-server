@@ -35,7 +35,7 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 		JOIN 
 			repo_config rc ON r.id = rc.repo_id
 		WHERE 
-			rc.user_id = ${userId} AND
+			rc.user_id = '${userId}' AND
 			(repo_provider, repo_owner, repo_name) IN (${allReposFormattedAsTuples})
 		ORDER BY 
 			r.repo_provider, r.repo_owner, r.repo_name;`;
