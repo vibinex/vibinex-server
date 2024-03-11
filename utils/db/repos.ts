@@ -35,11 +35,11 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 		JOIN 
 			repo_config rc ON r.id = rc.repo_id
 		WHERE 
-			rc.user_id = '${userId}' AND
-			(repo_provider, repo_owner, repo_name) IN (${allReposFormattedAsTuples})
+			rc.user_id = $1 AND
+			(repo_provider, repo_owner, repo_name) IN $2
 		ORDER BY 
-			r.repo_provider, r.repo_owner, r.repo_name;`;
-		const DbRepoSubsetPromise: Promise<{ rows: DbRepo[] }> = conn.query(repo_list_q).catch(err => {
+			r.repo_provider, r.repo_owner, r.repo_name`;
+		const DbRepoSubsetPromise: Promise<{ rows: DbRepo[] }> = conn.query(repo_list_q, [userId, allReposFormattedAsTuples]).catch(err => {
 			console.error(`[getRepos] Error in getting repository-list from the database`, { pg_query: repo_list_q }, err);
 			throw new Error(`Error in getting repository-list from the database. Batch: ${index}:${index + batchSize - 1}. Error: ${err.message}`);
 		});
