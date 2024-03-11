@@ -7,7 +7,10 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 	const userId = session.user.id;
 	if (!userId) {
 		console.error("[getRepos] No user id in session", session);
-		return;
+		return {
+			repos: [],
+			failureRate: 1.01
+		};
 	}
 	const batchSize = 50;
 	const allDbReposPromises = [];
