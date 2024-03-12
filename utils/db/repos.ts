@@ -65,12 +65,20 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 	return allDbRepos;
 }
 
-export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
-	const update_repo_config_q = `UPDATE repos 
-	SET config = jsonb_set(config::jsonb, '{${configType}}', to_jsonb(${convert(value)}))
-	WHERE repo_provider = ${convert(repo.repo_provider)}
-		AND repo_owner = ${convert(repo.repo_owner)}
-		AND repo_name = ${convert(repo.repo_name)}`;
+export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
+	const update_repo_config_q = `UPDATE repo_config
+	SET 
+		comment = CASE WHEN ${configType} = 'comment' THEN ${convert(value)} ELSE comment END,
+		auto_assign = CASE WHEN ${configType} = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
+	WHERE 
+		repo_id = (
+			SELECT id FROM public.repos 
+			WHERE repo_name = ${convert(repo.repo_name)}
+			AND repo_owner = ${convert(repo.repo_owner)}
+			AND repo_provider = ${convert(repo.repo_provider)}
+		)
+		AND user_id = ${convert(userId)};
+	`;
 	const queryIsSuccessful = await conn.query(update_repo_config_q)
 		.then((dbResponse) => {
 			if (dbResponse.rowCount == 0) {
@@ -87,8 +95,11 @@ export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assi
 
 export const getRepoConfig = async (repo: RepoIdentifier) => {
 	const get_repo_config_q = `
-        SELECT config 
-        FROM repos 
+		select json_build_object(
+			'auto_assign', rc.auto_assign,
+			'comment', rc.comment
+		) AS config
+		from repo_config rc
         WHERE repo_provider = $1
             AND repo_owner = $2
             AND repo_name = $3`;
