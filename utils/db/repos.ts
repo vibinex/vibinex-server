@@ -66,10 +66,7 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 }
 
 export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
-	let configTypeColumn = 'auto_assign';
-	if (configType == 'comment') {
-		configTypeColumn = 'comment_setting';
-	}
+	const configTypeColumn = configType === 'comment'? 'comment_setting' : 'auto_assign';
 	const update_repo_config_q = `UPDATE repo_config
 	SET 
 		comment = CASE WHEN ${configTypeColumn} = 'comment_setting' THEN ${convert(value)} ELSE comment_setting END,
