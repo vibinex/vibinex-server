@@ -100,7 +100,7 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
 	const get_repo_config_q = `
 		select json_build_object(
 			'auto_assign', rc.auto_assign,
-			'comment_setting', rc.comment_setting
+			'comment', rc.comment_setting
 		) AS config
 		from repo_config rc
         WHERE repo_provider = $1
