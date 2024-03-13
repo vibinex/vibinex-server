@@ -28,7 +28,7 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 			r.created_at AS created_at,
 			json_build_object(
 				'auto_assign', rc.auto_assign,
-				'comment', rc.comment
+				'comment', rc.comment_setting
 			) AS config
 		FROM 
 			repos r
@@ -66,10 +66,14 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 }
 
 export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
+	let configTypeColumn = 'auto_assign';
+	if (configType == 'comment') {
+		configTypeColumn = 'comment_setting';
+	}
 	const update_repo_config_q = `UPDATE repo_config
 	SET 
-		comment = CASE WHEN repo_config.${configType} = 'comment' THEN ${convert(value)} ELSE comment END,
-		auto_assign = CASE WHEN repo_config.${configType} = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
+		comment = CASE WHEN ${configTypeColumn} = 'comment_setting' THEN ${convert(value)} ELSE comment_setting END,
+		auto_assign = CASE WHEN ${configTypeColumn} = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
 	WHERE 
 		repo_id = (
 			SELECT id FROM public.repos 
@@ -96,7 +100,7 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
 	const get_repo_config_q = `
 		select json_build_object(
 			'auto_assign', rc.auto_assign,
-			'comment', rc.comment
+			'comment', rc.comment_setting
 		) AS config
 		from repo_config rc
         WHERE repo_provider = $1
