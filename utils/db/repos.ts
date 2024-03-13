@@ -69,8 +69,8 @@ export const setRepoConfig = async (repo: RepoIdentifier, userId: string, config
 	const configTypeColumn = configType === 'comment'? 'comment_setting' : 'auto_assign';
 	const update_repo_config_q = `UPDATE repo_config
 	SET 
-		comment = CASE WHEN ${configTypeColumn} = 'comment_setting' THEN ${convert(value)} ELSE comment_setting END,
-		auto_assign = CASE WHEN ${configTypeColumn} = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
+		comment_setting = CASE WHEN '${configTypeColumn}' = 'comment_setting' THEN ${convert(value)} ELSE comment_setting END,
+		auto_assign = CASE WHEN '${configTypeColumn}' = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
 	WHERE 
 		repo_id = (
 			SELECT id FROM public.repos 
