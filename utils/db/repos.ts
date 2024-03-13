@@ -68,8 +68,8 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
 	const update_repo_config_q = `UPDATE repo_config
 	SET 
-		comment = CASE WHEN ${configType} = 'comment' THEN ${convert(value)} ELSE comment END,
-		auto_assign = CASE WHEN ${configType} = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
+		comment = CASE WHEN repo_config.${configType} = 'comment' THEN ${convert(value)} ELSE comment END,
+		auto_assign = CASE WHEN repo_config.${configType} = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
 	WHERE 
 		repo_id = (
 			SELECT id FROM public.repos 
@@ -77,8 +77,7 @@ export const setRepoConfig = async (repo: RepoIdentifier, userId: string, config
 			AND repo_owner = ${convert(repo.repo_owner)}
 			AND repo_provider = ${convert(repo.repo_provider)}
 		)
-		AND user_id = ${convert(userId)};
-	`;
+		AND user_id = ${convert(userId)}`;
 	const queryIsSuccessful = await conn.query(update_repo_config_q)
 		.then((dbResponse) => {
 			if (dbResponse.rowCount == 0) {
