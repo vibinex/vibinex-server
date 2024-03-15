@@ -38,6 +38,25 @@ export const getRepos = async (allRepos: RepoIdentifier[]) => {
 	return allDbRepos;
 }
 
+export const getUserRepositoriesByTopic = async (topicId: string) => {
+	const getRepoQuery = `SELECT repo_name, repo_owner, repo_provider
+	FROM repos
+	WHERE ${convert(topicId)} = ANY(install_id)`;
+	const repos: RepoIdentifier[] = await conn.query(getRepoQuery)
+		.then((dbResponse) => {
+			return dbResponse.rows.map((row) => ({
+				repo_name: row.repo_name,
+				repo_owner: row.repo_owner,
+				repo_provider: row.repo_provider,
+			}));
+		})
+		.catch((err: Error) => {
+			console.error(`[db/getUserRepositoriesByTopic] Could not get repos for topic id ${topicId}`, err);
+			return [];
+		});
+	return repos;
+}
+
 export const setRepoConfig = async (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
 	const update_repo_config_q = `UPDATE repos 
 	SET config = jsonb_set(config::jsonb, '{${configType}}', to_jsonb(${convert(value)}))
