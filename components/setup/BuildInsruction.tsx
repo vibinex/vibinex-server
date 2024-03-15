@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { Session } from 'next-auth';
 import React, { useState } from 'react';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
 import Button from '../Button';
@@ -9,6 +10,7 @@ interface BuildInstructionProps {
     selectedProvider: string;
     selectedInstallationType: string;
     userId: string;
+    // session: Session;
 }
 
 interface RenderDockerInstructionsProps {
