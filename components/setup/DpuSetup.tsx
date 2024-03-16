@@ -1,49 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { MdContentCopy } from "react-icons/md";
 import { getUserRepositories } from '../../utils/providerAPI/getUserRepositories';
-import saveSetupReposInDb from '../../utils/db/setupRepos';
-import { SetupReposArgs } from '../../utils/db/setupRepos';
 import Button from '../Button';
 
 interface DpuSetupProps {
 	userId: string;
 	selectedProvider: string;
 	selectedInstallationType: string;
-	// session: Session;
+	session: Session | null;
+}
+
+interface SaveSetupReposApiBodyArgs {
+	owner: string,
+	provider: string,
+	repos: string [],
+	installationId: string
 }
 
 export type RepoIdentifier = { repo_provider: string, repo_owner: string, repo_name: string };
 
-async function filterProviderReposAndReturnInSetupArgsForm(session: Session, targetProvider: string, install_id: string): Promise<SetupReposArgs[] | null> {
+async function filterProviderRepos(session: Session, targetProvider: string) {
 	const allRepos = await getUserRepositories(session);
-
 	// Filter repos based on the targetProvider
 	const filteredRepos = allRepos.filter(repo => repo.repo_provider === targetProvider);
+	return filteredRepos;
+}
 
+function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: string) {
 	// Group by repo_owner and generate setup args
-	const setupArgsMap: Map<string, SetupReposArgs> = new Map();
-	filteredRepos.forEach(repo => {
+	const setupArgsMap: Map<string, SaveSetupReposApiBodyArgs> = new Map();
+	repos.forEach(repo => {
 		const key = repo.repo_owner;
 		if (!setupArgsMap.has(key)) {
 			setupArgsMap.set(key, {
-				repo_owner: repo.repo_owner,
-				repo_provider: targetProvider,
-				repo_names: [],
-				install_id
+				owner: repo.repo_owner,
+				provider: repo.repo_provider,
+				repos: [],
+				installationId: install_id
 			});
 		}
-		setupArgsMap.get(key)!.repo_names.push(repo.repo_name);
+		setupArgsMap.get(key)!.repos.push(repo.repo_name);
 	});
 
 	return Array.from(setupArgsMap.values());
 }
-
-const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, selectedProvider }) => {
+const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, selectedProvider, session }) => {
 	const [isCopied, setIsCopied] = useState<boolean>(false);
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
@@ -51,30 +56,19 @@ const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, s
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [selectAll, setSelectAll] = useState<boolean>(false);
 	const [submissionStatus, setSubmissionStatus] = useState<boolean>(false);
+	const [installId, setInstallId] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (selectedInstallationType === 'individual' && selectedProvider === 'github') {
-			// let providerReposForUser = filterProviderReposAndReturnInSetupArgsForm(session, 'github');
-
-			setAllRepos([{ 'repo_name': 'muskanPaliwal', 'repo_owner': 'alokitInnovations', 'repo_provider': 'github' }]);
-			// axios.get('/api/docs/getUserRepositories')
-			//     .then(response => {
-			//         setAllRepos(response.data); // Assuming the API returns an array of RepoIdentifiers
-			//     })
-			//     .catch(error => {
-			//         console.error("Error fetching repos:", error);
-			//     });
-		}
-		axios.post('/api/dpu/pubsub', { userId }).then((response) => {
+		axios.post('/api/dpu/pubsub', { userId }).then(async (response) => {
 			if (response.data.installId) {
+				setInstallId(response.data.installId);
 				if (selectedInstallationType === 'individual' && selectedProvider === 'github') {
-					setSelfHostingCode(`
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-docker run -e INSTALL_ID=${response.data.installId} \\
--e PROVIDER=<your_provider_here> \\
--e GITHUB_PAT=<Your gh cli token> \\
-asia.gcr.io/vibi-prod/dpu/dpu
-					`);
+					if (!session) {
+						console.error(`[DpuSetup] could not get session for userId: ${userId}`);
+						return null;
+					}
+					let providerReposForUser = await filterProviderRepos(session, 'github');
+					setAllRepos(providerReposForUser);
 				} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket') {
 					setSelfHostingCode(`
 Coming Soon!
@@ -86,7 +80,6 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 					`);
 				}
 			}
-			console.log("[DpuSetup] topic name ", response.data.installId);
 		}).catch((error) => {
 			setSelfHostingCode(`Unable to get topic name for user\nPlease refresh this page and try again.`);
 			console.error(`[DpuSetup] Unable to get topic name for user ${userId} - ${error.message}`);
@@ -120,18 +113,32 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 	};
 
 	const handleSubmit = () => {
-		// Call your backend Next.js API to submit selected repos
-		axios.post('/api/docs/getRepoList', { userId, selectedRepos })
-			.then(response => {
-				// Handle success
-				console.log("Repos submitted successfully:", response.data);
-				// Set selfHostingCode based on selected repos
-				setSelfHostingCode(`Your self hosting code here`);
+		if (!installId) {
+            console.error("[handleSubmit] InstallId is not available.");
+            return;
+        }
+		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
+		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId }).then((response) => {
+			if (response.status != 200){
+				console.error(`[DpuSetup/handleSubmit] something went wrong while saving repos data in db`);
+				return;
+			} else {
+				console.info(`[DpuSetup/handleSubmit] repos data saved successfully in db`);
+				setSelfHostingCode(`
+docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+docker run -e INSTALL_ID=${installId} \\
+-e PROVIDER=<your_provider_here> \\
+-e GITHUB_PAT=<Your gh cli token> \\
+asia.gcr.io/vibi-prod/dpu/dpu
+				`);
 				setSubmissionStatus(true);
-			})
-			.catch(error => {
-				console.error("Error submitting repos:", error);
-			});
+			}
+		})
+		.catch((error) => {
+			setSelfHostingCode(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
+			setSubmissionStatus(false);
+			console.error(`[DpuSetup] Unable to save selected repos in db for user ${userId} - ${error.message}`);
+		});
 	};
 
 	return (
@@ -169,7 +176,7 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 								checked={selectedRepos.includes(repo)}
 								onChange={(event) => handleCheckboxChange(event, repo)}
 							/>
-							<label htmlFor={JSON.stringify(repo)}>{repo.repo_name}</label>
+							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
 						</div>
 					))}
 					<div className='flex gap-2 py-2'>
