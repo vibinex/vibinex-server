@@ -38,10 +38,10 @@ export const getRepos = async (allRepos: RepoIdentifier[]) => {
 	return allDbRepos;
 }
 
-export const getUserRepositoriesByTopic = async (topicId: string) => {
+export const getUserRepositoriesByTopic = async (topicId: string, provider: string) => {
 	const getRepoQuery = `SELECT repo_name, repo_owner, repo_provider
 	FROM repos
-	WHERE ${convert(topicId)} = ANY(install_id)`;
+	WHERE repo_provider = ${convert(provider)} AND ${convert(topicId)} = ANY(install_id)`;
 	const repos: RepoIdentifier[] = await conn.query(getRepoQuery)
 		.then((dbResponse) => {
 			return dbResponse.rows.map((row) => ({
