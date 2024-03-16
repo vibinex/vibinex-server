@@ -10,7 +10,7 @@ interface BuildInstructionProps {
     selectedProvider: string;
     selectedInstallationType: string;
     userId: string;
-    // session: Session;
+    session: Session | null;
 }
 
 interface RenderDockerInstructionsProps {
@@ -23,7 +23,7 @@ interface InstructionsToGeneratePersonalAccessTokenProps {
     selectedProvider: string;
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType, session }) => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 
@@ -61,7 +61,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     const renderDockerInstructions = ({selectedInstallationType, selectedProvider}: RenderDockerInstructionsProps) => {
         return <div>
         <InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
-        <DpuSetup userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
+        <DpuSetup userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} />
         <p className="text-xs mt-2">Minimum config required for running docker image:</p>
         <ul className="text-xs">
             <li>RAM: 2 GB</li>
