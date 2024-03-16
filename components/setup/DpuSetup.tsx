@@ -121,7 +121,6 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId }).then((response) => {
 			if (response.status != 200){
 				console.error(`[DpuSetup/handleSubmit] something went wrong while saving repos data in db`);
-				return;
 			} else {
 				console.info(`[DpuSetup/handleSubmit] repos data saved successfully in db`);
 				setSelfHostingCode(`
@@ -168,7 +167,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 				<div>
 					<h4 className='my-2 font-semibold'>Select Repositories</h4>
 					{allRepos.map((repo, index) => (
-						<div key={index} className='flex items-center gap-2'>
+						<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
 							<input
 								type="checkbox"
 								id={JSON.stringify(repo)}
