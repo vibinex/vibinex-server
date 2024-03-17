@@ -161,4 +161,5 @@ export const removePreviousInstallations = async (install_id: string) => {
         console.error(`[removePreviousInstallations] Could not remove previous repos for ${install_id}`);
         throw new Error('Failed to remove previous repos');
     });
+    console.log(`[removePreviousInstallations] Previous installations removed for ${install_id}`);
 }
