@@ -21,6 +21,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 	const allSetupReposPromises = [];
+	console.log(`dpu/[setupHandler] ${JSON.stringify(jsonBody)}`);
 	for (const ownerInfo of jsonBody.info) {
 		let setupReposArgs: SetupReposArgs = {
 			repo_owner: ownerInfo.owner,
