@@ -47,7 +47,10 @@ export const authOptions = {
 			let dbUser: DbUser | undefined;
 			if (account) {
 				// first search based on auth_info
-				dbUser = await getUserByProvider(account.provider, account.providerAccountId);
+				dbUser = await getUserByProvider(account.provider, account.providerAccountId).catch(err => {
+					console.error(`[signIn] Could not get user by provider for ${account.provider} (Provider ID: ${account.providerAccountId})`, err);
+					return undefined;
+				});
 			}
 			if (!dbUser && user.email) {
 				// then search based on aliases: ask if they want to merge accounts
