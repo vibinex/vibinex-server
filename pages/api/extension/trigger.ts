@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt'
 import { getRepoConfig, getUserInfoFromDb } from '../../../utils/db/trigger';
+import { publishMessage } from '../../../utils/pubsub/pubsubClient';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
@@ -48,7 +49,11 @@ async function triggerDPU(url: string, userEmail: string) {
     const triggerBody = prepareBody(repoProvider, repoOwner, repoName, prNumber, repoConfig);
     // get topic id
     // publish
-    throw new Error('Function not implemented.');
+    await publishMessage(topicName, triggerBody, "manual_trigger")
+		.catch((error) => {
+			console.error(`[triggerDPU] Failed to publish message on ${topicName}:`, error);
+            throw new Error('Unable to publish message');
+		});
 }
 
 function parseURL(url: string) {
