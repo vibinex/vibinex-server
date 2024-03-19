@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt'
+import { getUserInfoFromDb } from '../../../utils/db/trigger';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
@@ -40,6 +41,7 @@ async function triggerDPU(url: string, userEmail: string) {
     // parse url for repo name, owner, pr, provider
     const {repoProvider, repoOwner, repoName, prNumber} = parseURL(url);
     // get user id
+    const {userId, topicName} = await getUserInfoFromDb(userEmail);
     // get repo config
     // prepare body
     // get topic id
