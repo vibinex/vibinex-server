@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt'
-import { getUserInfoFromDb } from '../../../utils/db/trigger';
+import { getRepoConfig, getUserInfoFromDb } from '../../../utils/db/trigger';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
@@ -43,7 +43,9 @@ async function triggerDPU(url: string, userEmail: string) {
     // get user id
     const {userId, topicName} = await getUserInfoFromDb(userEmail);
     // get repo config
+    const repoConfig = await getRepoConfig(repoProvider, repoName, repoOwner, userId);
     // prepare body
+    
     // get topic id
     // publish
     throw new Error('Function not implemented.');
