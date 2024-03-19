@@ -45,7 +45,7 @@ async function triggerDPU(url: string, userEmail: string) {
     // get repo config
     const repoConfig = await getRepoConfig(repoProvider, repoName, repoOwner, userId);
     // prepare body
-    
+    const triggerBody = prepareBody(repoProvider, repoOwner, repoName, prNumber, repoConfig);
     // get topic id
     // publish
     throw new Error('Function not implemented.');
@@ -89,4 +89,12 @@ function parseURL(url: string) {
     };
 }
 
-
+function prepareBody(repoProvider: string, repoOwner: string, repoName: string, prNumber: string, repoConfig: any) {
+    return {
+        repo_provider: repoProvider,
+        repo_owner: repoOwner,
+        repo_name: repoName,
+        pr_number: prNumber,
+        repo_config: repoConfig,
+    }
+}
