@@ -8,6 +8,7 @@ import VyapLogo from '../public/Vyap-Logo.png'
 import AbleJobsLogo from '../public/able_logo.png'
 import BlanceLogo from '../public/blance-full-logo-new.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
+import BugbaseLogo from '../public/Bugbase-logo-white.svg'
 
 const data = [
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
@@ -16,6 +17,7 @@ const data = [
 	{ logo: BlanceLogo, heading: 'Blance' },
 	{ logo: BlitzLogo, heading: 'Blitz' },
 	{ logo: BillNoteLogo, heading: 'BillNote' },
+	{ logo: BugbaseLogo, heading: 'Bugbase' },
 	{ logo: VyapLogo, heading: 'Vyap' },
 ]
 
@@ -31,16 +33,16 @@ const Customers = () => {
 			</h2>
 			<div className='w-full mt-8 flex flex-row justify-center items-center place-content-between mx-auto flex-wrap xl:flex-nowrap sm:gap-y-4'>
 				<Carousel opts={{ loop: true }} plugins={[AutoScroll({ playOnInit: true })]} controls='none' itemClassNames="!shrink !min-w-fit">
-				{data.map((item) => (
-					<Image
-						priority
-						src={item.logo}
-						alt={item.heading}
-						key={item.heading}
-						title={item.heading}
-						className={`${item.customClass ?? ''} h-16 md:h-12 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit`}
-					/>
-				))}
+					{data.map((item) => (
+						<Image
+							priority
+							src={item.logo}
+							alt={item.heading}
+							key={item.heading}
+							title={item.heading}
+							className={`${item.customClass ?? ''} h-16 md:h-12 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit mx-auto`}
+						/>
+					))}
 				</Carousel>
 			</div>
 		</div>
