@@ -8,6 +8,7 @@ import VyapLogo from '../public/Vyap-Logo.png'
 import AbleJobsLogo from '../public/able_logo.png'
 import BlanceLogo from '../public/blance-full-logo-new.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
+import BugbaseLogo from '../public/Bugbase-logo-white.svg'
 
 const data = [
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
@@ -16,6 +17,7 @@ const data = [
 	{ logo: BlanceLogo, heading: 'Blance' },
 	{ logo: BlitzLogo, heading: 'Blitz' },
 	{ logo: BillNoteLogo, heading: 'BillNote' },
+	{ logo: BugbaseLogo, heading: 'Bugbase' },
 	{ logo: VyapLogo, heading: 'Vyap' },
 ]
 
