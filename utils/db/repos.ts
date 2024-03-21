@@ -1,4 +1,4 @@
-import { Session } from 'next-auth';
+import type { Session } from 'next-auth';
 import conn from '.';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
 import { convert } from './converter';
