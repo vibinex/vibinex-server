@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+"use client";
+
 import axios from 'axios';
 import type { Session } from "next-auth";
+import React, { useEffect, useState } from 'react';
 
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { MdContentCopy } from "react-icons/md";
+import { RepoIdentifier } from '../../types/repository';
 import { getUserRepositories } from '../../utils/providerAPI/getUserRepositories';
 import Button from '../Button';
 
@@ -14,16 +17,14 @@ interface DpuSetupProps {
 	session: Session | null;
 }
 
-interface SaveSetupReposApiBodyArgs {
+interface SetupReposApiBodyArgs {
 	owner: string,
 	provider: string,
 	repos: string [],
 	installationId: string
 }
 
-export type RepoIdentifier = { repo_provider: string, repo_owner: string, repo_name: string };
-
-async function filterProviderRepos(session: Session, targetProvider: string) {
+async function getUserReposForProvider(session: Session, targetProvider: string) {
 	const allRepos = await getUserRepositories(session);
 	// Filter repos based on the targetProvider
 	const filteredRepos = allRepos.filter(repo => repo.repo_provider === targetProvider);
@@ -32,7 +33,7 @@ async function filterProviderRepos(session: Session, targetProvider: string) {
 
 function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: string) {
 	// Group by repo_owner and generate setup args
-	const setupArgsMap: Map<string, SaveSetupReposApiBodyArgs> = new Map();
+	const setupArgsMap: Map<string, SetupReposApiBodyArgs> = new Map();
 	repos.forEach(repo => {
 		const key = repo.repo_owner;
 		if (!setupArgsMap.has(key)) {
@@ -55,7 +56,7 @@ const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, s
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [selectAll, setSelectAll] = useState<boolean>(false);
-	const [submissionStatus, setSubmissionStatus] = useState<boolean>(false);
+	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
 	const [installId, setInstallId] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -65,9 +66,9 @@ const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, s
 				if (selectedInstallationType === 'individual' && selectedProvider === 'github') {
 					if (!session) {
 						console.error(`[DpuSetup] could not get session for userId: ${userId}`);
-						return null;
+						return;
 					}
-					let providerReposForUser = await filterProviderRepos(session, 'github');
+					let providerReposForUser = await getUserReposForProvider(session, 'github');
 					setAllRepos(providerReposForUser);
 				} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket') {
 					setSelfHostingCode(`
@@ -130,19 +131,19 @@ docker run -e INSTALL_ID=${installId} \\
 -e GITHUB_PAT=<Your gh cli token> \\
 asia.gcr.io/vibi-prod/dpu/dpu
 				`);
-				setSubmissionStatus(true);
+				setIsRepoSelectionDone(true);
 			}
 		})
 		.catch((error) => {
 			setSelfHostingCode(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
-			setSubmissionStatus(false);
+			setIsRepoSelectionDone(false);
 			console.error(`[DpuSetup] Unable to save selected repos in db for user ${userId} - ${error.message}`);
 		});
 	};
 
 	return (
 		<div className='relative'>
-			{submissionStatus ? (
+			{isRepoSelectionDone ? (
 				<>
 					<pre>{selfHostingCode}</pre>
 					<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
