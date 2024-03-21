@@ -36,7 +36,7 @@ const Hero = (props: { ctaLink: string }) => {
 	}, [rudderEventMethods, session]);
 	return (
 		<div className='flex items-center justify-center h-fit bg-black'>
-			<section className='p-5 text-primary-light my-auto pt-1 md:w-2/3 xl:w-1/2 text-center z-10'>
+			<section className='p-5 text-primary-light my-auto pt-1 md:w-2/3 xl:w-1/2 text-center'>
 				<h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 mt-8'>{'Merge PRs with'}
 					<span className='text-primary-main font-bold block'>Confidence</span>
 				</h1>
