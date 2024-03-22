@@ -75,7 +75,7 @@ const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provi
         console.error(`[handleRepoSetup] Could not start db transaction: ${repo_provider}/${repo_owner} for install_id ${install_id}`, { pg_query: query }, err);
         throw new Error('Failed to begin transaction');
     });
-
+    console.log(`[handleRepoSetup] repo_name: ${repo_name}, repo_owner: ${repo_owner}`);
     const query = `SELECT install_id FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3`;
     const existingInstallationsResult = await conn.query(query, [repo_name, repo_owner, repo_provider]).catch(err => {
         console.error(`[handleRepoSetup] Could not get the install-id for repository: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
@@ -120,14 +120,18 @@ const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: 
     });
 
     const query = `SELECT repo_name FROM repos WHERE repo_owner = $1 AND repo_provider = $2 AND $3 = ANY(install_id)`;
+    console.log(`[removeExtraRepositories] incomingRepos: ${incomingRepoNames}`);
 
     const existingReposResult = await conn.query(query, [repo_owner, repo_provider, install_id]).catch(err => {
+        console.log(`[removeExtraRepositories] existingRepos: ${existingReposResult}`);
         console.error(`[removeExtraRepositories] Could not get existing repositories from db for: ${repo_provider}/${repo_owner} for install_id: ${install_id}`, { pg_query: query }, err);
         throw new Error('Failed to get existing repos from db');
     });
 
     const existingRepos = existingReposResult.rows.map(row => row.repo_name);
     const extraRepos = existingRepos.filter(repo => !incomingRepoNames.includes(repo));
+    console.log(`[removeExtraRepositories] extraRepos: ${extraRepos}`);
+
 
     for (const repo_name of extraRepos) {
         // Check if the current extra repo is the only one associated with the install_id
