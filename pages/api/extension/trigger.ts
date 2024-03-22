@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt'
-import { getRepoConfig, getUserInfoFromDb } from '../../../utils/db/trigger';
+import { getUserRepoConfig, getUserInfoFromDb } from '../../../utils/db/trigger';
 import { publishMessage } from '../../../utils/pubsub/pubsubClient';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -44,7 +44,7 @@ async function triggerDPU(url: string, userEmail: string) {
     // get user id
     const {userId, topicName} = await getUserInfoFromDb(userEmail);
     // get repo config
-    const repoConfig = await getRepoConfig(repoProvider, repoName, repoOwner, userId);
+    const repoConfig = await getUserRepoConfig(repoProvider, repoName, repoOwner, userId);
     // prepare body
     const triggerBody = prepareBody(repoProvider, repoOwner, repoName, prNumber, repoConfig);
     // get topic id

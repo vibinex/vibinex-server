@@ -22,8 +22,8 @@ export const getUserInfoFromDb = async (email: string) => {
     };
 }
 
-export const getRepoConfig = async (provider: string, repoName: string, repoOwner: string, userId: string) => {
-    console.info(`[getRepoConfig] Getting repo config for user: ${userId} and repo: ${repoName}`);
+export const getUserRepoConfig = async (provider: string, repoName: string, repoOwner: string, userId: string) => {
+    console.info(`[getUserRepoConfig] Getting repo config for user: ${userId} and repo: ${repoName}`);
     const query = `
     SELECT json_build_object(
         'auto_assign', rc.auto_assign,
@@ -31,10 +31,10 @@ export const getRepoConfig = async (provider: string, repoName: string, repoOwne
     ) AS config
     FROM repo_config rc
     WHERE rc.user_id = '${userId}' AND
-        rc.repo_id = (SELECT id FROM repos WHERE repo_name = '${repoName}' AND repo_owner = '${repoOwner}' AND repo_provider = '${provider}')
+        repo_id = (SELECT r.id FROM repos r WHERE r.repo_name = '${repoName}' AND r.repo_owner = '${repoOwner}' AND r.repo_provider = '${provider}')
     `;
     const result = await conn.query(query).catch(err => {
-		console.error(`[getRepoConfig] Could not get repo config for: ${userId}, ${repoName}`,
+		console.error(`[getUserRepoConfig] Could not get repo config for: ${userId}, ${repoName}`,
             { pg_query: query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
