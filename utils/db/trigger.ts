@@ -25,10 +25,13 @@ export const getUserInfoFromDb = async (email: string) => {
 export const getRepoConfig = async (provider: string, repoName: string, repoOwner: string, userId: string) => {
     console.info(`[getRepoConfig] Getting repo config for user: ${userId} and repo: ${repoName}`);
     const query = `
-    SELECT config
-    FROM repo_config
-    WHERE user_id = '${userId}' AND
-        repo_id = (SELECT id FROM repos WHERE repo_name = '${repoName}' AND repo_owner = '${repoOwner}' AND repo_provider = '${provider}')
+    SELECT json_build_object(
+        'auto_assign', rc.auto_assign,
+        'comment', rc.comment_setting
+    ) AS config
+    FROM repo_config rc
+    WHERE rc.user_id = '${userId}' AND
+        rc.repo_id = (SELECT id FROM repos WHERE repo_name = '${repoName}' AND repo_owner = '${repoOwner}' AND repo_provider = '${provider}')
     `;
     const result = await conn.query(query).catch(err => {
 		console.error(`[getRepoConfig] Could not get repo config for: ${userId}, ${repoName}`,
