@@ -105,12 +105,11 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 	};
 
 	const handleSelectAll = () => {
-		if (!selectAll) {
-			setSelectedRepos([...allRepos]);
-		} else {
+		if (selectedRepos.length === allRepos.length) {
 			setSelectedRepos([]);
+		} else {
+			setSelectedRepos([...allRepos]);
 		}
-		setSelectAll(!selectAll);
 	};
 
 	const handleSubmit = () => {
@@ -181,7 +180,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 					))}
 					<div className='flex gap-2 py-2'>
 						<Button variant='outlined' onClick={handleSelectAll}>
-							{selectAll ? "Unselect All" : "Select All"}
+						{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
 						</Button>
 						<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0}>
 							Submit
