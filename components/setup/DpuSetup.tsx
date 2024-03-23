@@ -55,7 +55,6 @@ const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, s
 	const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
-	const [selectAll, setSelectAll] = useState<boolean>(false);
 	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
 	const [installId, setInstallId] = useState<string | null>(null);
 
@@ -142,7 +141,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 
 	return (
 		<div className='relative'>
-			{isRepoSelectionDone ? (
+			{isRepoSelectionDone ||  selectedInstallationType !== 'individual' || selectedProvider !== 'github' ? (
 				<>
 					<pre>{selfHostingCode}</pre>
 					<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
