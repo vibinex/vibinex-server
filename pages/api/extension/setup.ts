@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSetupReposFromDbForOwner } from '../../../utils/db/setup';
 
-const allowedOrigins = ["chrome-extension://jafgelpkkkopeaefadkdjcmnicgpcncc", "https://github.com", "https://bitbucket.org"];
-
 export default async function setupRepos(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
 	if (req.method == "OPTIONS") {
