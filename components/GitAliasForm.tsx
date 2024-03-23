@@ -23,7 +23,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 			}
 		};
 		fetchData();
-	}, []);
+	}, [expanded]);
 
 	const handleInputChange = (alias: string, provider: string, value: string) => {
 		setHandleInputValues(prevState => ({
