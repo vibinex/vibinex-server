@@ -20,7 +20,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	if (!owner || !provider) {
 		return res.status(400).json({ error: 'Bad Request', message: 'Both the arguments owner, and provider are required in the request body' });
 	}
-	getSetupReposFromDbForOwner(owner, provider)
+	await getSetupReposFromDbForOwner(owner, provider)
 		.then((repos: string[]) => {
 			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 				...req.body,

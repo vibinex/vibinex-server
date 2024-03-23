@@ -51,6 +51,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 			...req.body,
 			function: 'relevant_prs',
+			resultLength: Object.entries(formattedData.relevant).length,
 			eventStatusFlag: 1
 		});
 	} else if (type === 'file') {
