@@ -15,7 +15,6 @@ const getUser = async (req: NextApiRequest, res: NextApiResponse) => {
 const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// For cors prefetch options request
 	if (req.method == "OPTIONS") {
-		res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Authorization");
 		res.status(200).send("Ok");
 		return;
 	}
