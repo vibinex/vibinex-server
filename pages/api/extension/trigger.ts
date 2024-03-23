@@ -12,7 +12,7 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
 		return;
 	}
 	// For normal requests
-	console.info("[extension/triggeHandler] Getting setup repos info for ", req.body.owner);
+	console.info("[extension/triggeHandler] Triggering DPU for ", req.body.url);
 
 	if (req.method !== 'POST') {
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
@@ -84,7 +84,7 @@ function parseURL(url: string) {
     
     // Extract the repo provider from the URL
     const repoProvider = "github";
-    
+    console.log(`[trigger/parseURL] Parsed values = ${repoProvider}, ${repoOwner}, ${repoName}, ${prNumber}`);
     // Return the extracted information as an object
     return {
         repoProvider,
