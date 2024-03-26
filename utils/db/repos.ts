@@ -119,9 +119,9 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
 			'comment', rc.comment_setting
 		) AS config
 		from repo_config rc
-        WHERE repo_provider = $1
-            AND repo_owner = $2
-            AND repo_name = $3`;
+		WHERE rc.repo_id = (SELECT id FROM repos WHERE repo_provider = $1
+			AND repo_owner = $2
+			AND repo_name = $3)`;
 
 	const config = await conn.query(get_repo_config_q, [repo.repo_provider, repo.repo_owner, repo.repo_name])
 		.then((dbResponse) => {
