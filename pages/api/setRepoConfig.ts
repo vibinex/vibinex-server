@@ -22,7 +22,7 @@ const setRepoConfigHandler = async (
 ) => {
 	// check auth
 	const session = await getServerSession(req, res, authOptions);
-	if (!session) {
+	if (!session || !session.user.id) {
 		return res.status(401).json({ message: 'Unauthenticated' });
 	}
 
@@ -41,7 +41,7 @@ const setRepoConfigHandler = async (
 		configType,
 		updatedValue: value
 	}
-	await setRepoConfig(repo, configType, value)
+	await setRepoConfig(repo, session.user.id, configType, value)
 		.then((queryResponse) => {
 			if (queryResponse) {
 				rudderStackEvents.track(session.user.id!, "", 'settings-changed', { type: 'setting', eventStatusFlag: 1, name: getAuthUserName(session), eventProperties })

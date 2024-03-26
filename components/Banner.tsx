@@ -26,7 +26,7 @@ const Banner = () => {
 					setBannerHeight(() => {
 						const bannerHeight = 32;
 						setBannerHTML((<>
-							<p className='text-center text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
+							<p className='text-center text-xl w-fit h-fit my-auto'>
 								Browser extension is not installed
 							</p>
 							<Button id="add-to-chrome-btn" variant="outlined" href={chromeExtensionLink} target="_blank" className='h-fit text-center p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] my-auto ml-4'>
@@ -42,7 +42,7 @@ const Banner = () => {
 						const bannerHeight = 24;
 						setBannerHTML((<>
 							<Image src={chromeLogo} alt="chrome extension logo" className={`w-12 inline mr-8 m-6 border border-white rounded-full`}></Image>
-							<p className='text-center font-bold text-xl w-fit sm:max-w-1/2 h-fit my-auto'>
+							<p className='text-center font-bold text-xl w-fit h-fit my-auto'>
 								Vibinex is only supported in Chromium browsers<br />
 								<span className='text-sm font-normal'>Google Chrome, Microsoft Edge, Opera, Chromium, Brave etc.</span>
 							</p>
@@ -54,7 +54,7 @@ const Banner = () => {
 					setBannerHeight(() => {
 						const bannerHeight = 12;
 						setBannerHTML((
-							<p className='text-center text-sm sm:text-xl w-fit sm:max-w-1/2 h-fit my-auto p-1'>
+							<p className='text-center text-sm sm:text-base md:text-xl w-fit h-fit my-auto p-1'>
 								Browser extensions are not supported on this device. Try Vibinex on a laptop or a desktop computer.
 							</p>
 						))
