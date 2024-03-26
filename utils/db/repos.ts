@@ -52,7 +52,7 @@ export const getUserRepositoriesByTopic = async (topicId: string, provider: stri
 		})
 		.catch((err: Error) => {
 			console.error(`[db/getUserRepositoriesByTopic] Could not get repos for topic id ${topicId}`, err);
-			return [];
+			throw new Error("Unable to get user repos by topic");
 		});
 	return repos;
 }

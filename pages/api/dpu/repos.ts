@@ -10,11 +10,16 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).json({ error: 'Invalid get request body' });
 		return;
     }
-    const repoList: RepoIdentifier[] = await getUserRepositoriesByTopic(topicId, provider);
-	if (repoList.length == 0) {
-		return res.status(500).json({error: 'Unable to get repo list'});
-	}
-	return res.status(200).json({repoList: repoList});
+    const repoList: RepoIdentifier[] | null = await getUserRepositoriesByTopic(topicId, provider).catch((err) => {
+        console.error(`[reposHandler] Unable to get user repos for topic ${topicId}`);
+        return null;
+    });
+    if (repoList == null) {
+        res.status(500).json({"error": "Unable to get user repos from db"});
+        return;
+    }
+	res.status(200).json({repoList: repoList});
+    return;
 }
 
 export default reposHandler;
