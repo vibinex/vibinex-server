@@ -79,10 +79,14 @@ export const getRepoList = async (session: Session): Promise<DbRepoSerializable[
 		console.warn(`[RepoList] getRepos from the providers got zero repositories for user: ${session.user.id} (Name: ${session.user.name})`);
 		return [];
 	}
-	const userReposFromDb = await getRepos(userReposFromProvider).catch((err) => {
+	const userReposFromDb = await getRepos(userReposFromProvider, session).catch((err) => {
 		console.error(`[RepoList] getRepos from the database failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
 		return { repos: [], failureRate: 1 };
 	});
+	if (!userReposFromDb) {
+		console.error("[RepoList] getRepos failed for session", session);
+		return [];
+	}
 	if (userReposFromDb.failureRate != 0) {
 		// if necessary, we can add this to the returned object
 		console.warn(`[RepoList] getRepos from database failed to query ~${(100 * userReposFromDb.failureRate).toFixed(2)}% of the repositories for user: ${session.user.id} (Name: ${session.user.name})`)
