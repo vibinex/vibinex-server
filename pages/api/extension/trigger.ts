@@ -66,7 +66,7 @@ function parseURL(url: string) {
     // $: This anchors the match to the end of the string. It ensures that the entire URL matches the pattern, and there are no extra characters at the end.
     
     // Match the URL with the regex
-    const match = url.match(regex);
+    const match = regex.exec(url);
     
     // Check if the URL matches the expected pattern
     if (!match) {
@@ -74,7 +74,7 @@ function parseURL(url: string) {
     }
     
     // Extract the matched groups
-    const [, repoOwner, repoName, prNumber] = match;
+    const [_, repoOwner, repoName, prNumber] = match;
     
     // Extract the repo provider from the URL
     const repoProvider = "github";
