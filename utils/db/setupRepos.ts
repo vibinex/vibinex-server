@@ -75,6 +75,7 @@ const handleRepoSetup = async (repo_name: string, repo_owner: string, repo_provi
         console.error(`[handleRepoSetup] Could not start db transaction: ${repo_provider}/${repo_owner} for install_id ${install_id}`, { pg_query: query }, err);
         throw new Error('Failed to begin transaction');
     });
+
     const query = `SELECT install_id FROM repos WHERE repo_name = $1 AND repo_owner = $2 AND repo_provider = $3`;
     const existingInstallationsResult = await conn.query(query, [repo_name, repo_owner, repo_provider]).catch(err => {
         console.error(`[handleRepoSetup] Could not get the install-id for repository: ${repo_provider}/${repo_owner}/${repo_name} for install_id ${install_id}`, { pg_query: query }, err);
@@ -127,7 +128,6 @@ const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: 
 
     const existingRepos = existingReposResult.rows.map(row => row.repo_name);
     const extraRepos = existingRepos.filter(repo => !incomingRepoNames.includes(repo));
-
 
     for (const repo_name of extraRepos) {
         // Check if the current extra repo is the only one associated with the install_id
