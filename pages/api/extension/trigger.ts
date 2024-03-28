@@ -70,7 +70,7 @@ async function triggerDPU(url: string, userEmail: string) {
 		throw new Error("Topic name not found in db user");
     }
     // publish
-    console.info(`[extension/triggerDPU] Publishing message ${triggerBody} to ${topicName}`);
+    console.info(`[extension/triggerDPU] Publishing message ${JSON.stringify(triggerBody)} to ${topicName}`);
     await publishMessage(topicName, triggerBody, "manual_trigger")
 		.catch((error) => {
 			console.error(`[extension/triggerDPU] Failed to publish message on ${topicName}:`, error);
