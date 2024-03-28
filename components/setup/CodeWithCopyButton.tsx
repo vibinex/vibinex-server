@@ -1,61 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { MouseEvent } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { MdContentCopy } from "react-icons/md";
 
 interface CodeWithCopyButtonProps {
-	userId: string;
-	selectedProvider: string;
-	selectedInstallationType: string;
+	text: string;
+	onCopy: (text: string, result: boolean) => void;
+	onClick: (event: MouseEvent) => void;
+	disabled: boolean;
+	isCopied: boolean;
 }
 
-const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ userId, selectedInstallationType, selectedProvider }) => {
-	const [isCopied, setIsCopied] = useState<boolean>(false);
-	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-	const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
-
-	useEffect(() => {
-		axios.post('/api/dpu/pubsub', { userId }).then((response) => {
-			if (response.data.installId) {
-				if (selectedInstallationType === 'individual' && selectedProvider === 'github'){
-					setSelfHostingCode(`
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-docker run -e INSTALL_ID=${response.data.installId} \\
--e PROVIDER=<your_provider_here> \\
--e GITHUB_PAT=<Your gh cli token> \\
-asia.gcr.io/vibi-prod/dpu/dpu
-					`);
-				} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket'){
-					setSelfHostingCode(`
-Coming Soon!
-					`)
-				} else {
-					setSelfHostingCode(`
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
-					`);
-				}
-			}
-			console.log("[CodeWithCopyButton] topic name ", response.data.installId);
-		}).catch((error) => {
-			setSelfHostingCode(`Unable to get topic name for user\nPlease refresh this page and try again.`);
-			console.error(`[CodeWithCopyButton] Unable to get topic name for user ${userId} - ${error.message}`);
-		});
-	}, [userId, selectedInstallationType, selectedProvider]);
-
-	const handleCopyClick = () => {
-		setIsButtonDisabled(true);
-	};
-
-	const handleCopy = () => {
-		setIsCopied(true);
-		setIsButtonDisabled(false);
-	};
-
+const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text, onCopy, onClick, disabled, isCopied }) => {
 	return (
 		<div style={{ position: 'relative' }}>
-			<pre>{selfHostingCode}</pre>
-			<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
+			<pre>{text}</pre>
+			<CopyToClipboard text={text} onCopy={onCopy}>
 				<button
 					style={{
 						position: 'absolute',
@@ -65,8 +24,8 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 						background: 'none',
 						border: 'none',
 					}}
-					onClick={handleCopyClick}
-					disabled={isButtonDisabled}
+					onClick={onClick}
+					disabled={disabled}
 				>
 					<MdContentCopy />
 				</button>

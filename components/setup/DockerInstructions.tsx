@@ -10,6 +10,7 @@ import { RepoIdentifier } from '../../types/repository';
 import { getUserRepositories } from '../../utils/providerAPI/getUserRepositories';
 import Button from '../Button';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
+import CodeWithCopyButton from './CodeWithCopyButton';
 
 interface DockerInstructionsProps {
 	userId: string;
@@ -181,24 +182,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 					) : (
 						<>
 							<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
-							<pre>{selfHostingCode}</pre>
-							<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
-								<button
-									style={{
-										position: 'absolute',
-										top: '0px',
-										right: '0px',
-										cursor: 'pointer',
-										background: 'none',
-										border: 'none',
-									}}
-									onClick={handleCopyClick}
-									disabled={isButtonDisabled}
-								>
-									<MdContentCopy />
-								</button>
-							</CopyToClipboard>
-							{isCopied && <span style={{ position: 'absolute', top: '0', right: '50%', transform: 'translate(50%, -100%)', color: 'green' }}>Copied!</span>}
+							<CodeWithCopyButton text={selfHostingCode} onCopy={handleCopy} onClick={handleCopyClick} disabled={isButtonDisabled} isCopied={isCopied} />
 							<p className="text-xs mt-2">Minimum config required for running docker image:</p>
 							<ul className="text-xs">
 								<li>RAM: 2 GB</li>
@@ -209,24 +193,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 			): (
 				// selectedInstallationType === 'project'
 				<>
-					<pre>{selfHostingCode}</pre>
-					<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
-						<button
-							style={{
-								position: 'absolute',
-								top: '0px',
-								right: '0px',
-								cursor: 'pointer',
-								background: 'none',
-								border: 'none',
-							}}
-							onClick={handleCopyClick}
-							disabled={isButtonDisabled}
-						>
-							<MdContentCopy />
-						</button>
-					</CopyToClipboard>
-					{isCopied && <span style={{ position: 'absolute', top: '0', right: '50%', transform: 'translate(50%, -100%)', color: 'green' }}>Copied!</span>}
+					<CodeWithCopyButton text={selfHostingCode} onCopy={handleCopy} onClick={handleCopyClick} disabled={isButtonDisabled} isCopied={isCopied} />
 					<p className="text-xs mt-2">Minimum config required for running docker image:</p>
 					<ul className="text-xs">
 						<li>RAM: 2 GB</li>
