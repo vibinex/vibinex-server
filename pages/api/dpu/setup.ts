@@ -9,15 +9,11 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).json({ "error": "Invalid request body" });
 		return;
 	}
-	// delete previous installations
-	let installsRemoved = true;
-	await removePreviousInstallations(jsonBody.installationId).catch(err => {
+	try {
+		await removePreviousInstallations(jsonBody.installationId)	
+	} catch (err) {
 		console.error(`[setupHandler] Unable to remove previous installations for ${jsonBody.installationId}`, err);
 		res.status(500).json({"error": "Internal Server Error"});
-		installsRemoved = false;
-		return;
-	});
-	if (!installsRemoved) {
 		return;
 	}
 	const allSetupReposPromises = [];
