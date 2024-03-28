@@ -9,8 +9,9 @@ import { MdContentCopy } from "react-icons/md";
 import { RepoIdentifier } from '../../types/repository';
 import { getUserRepositories } from '../../utils/providerAPI/getUserRepositories';
 import Button from '../Button';
+import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 
-interface DpuSetupProps {
+interface DockerInstructionsProps {
 	userId: string;
 	selectedProvider: string;
 	selectedInstallationType: string;
@@ -49,7 +50,7 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 
 	return Array.from(setupArgsMap.values());
 }
-const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, selectedProvider, session }) => {
+const DockerInstructions: React.FC<DockerInstructionsProps> = ({ userId, selectedInstallationType, selectedProvider, session }) => {
 	const [isCopied, setIsCopied] = useState<boolean>(false);
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
@@ -64,11 +65,22 @@ const DpuSetup: React.FC<DpuSetupProps> = ({ userId, selectedInstallationType, s
 				setInstallId(response.data.installId);
 				if (selectedInstallationType === 'individual' && selectedProvider === 'github') {
 					if (!session) {
-						console.error(`[DpuSetup] could not get session for userId: ${userId}`);
+						console.error(`[DockerInstructions] could not get session for userId: ${userId}`);
 						return;
 					}
-					let providerReposForUser = await getUserReposForProvider(session, 'github');
-					setAllRepos(providerReposForUser);
+					if (isRepoSelectionDone) {
+						setSelfHostingCode(`
+docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+docker run -e INSTALL_ID=${response.data.installId} \\
+-e PROVIDER=<your_provider_here> \\
+-e GITHUB_PAT=<Your gh cli token> \\
+asia.gcr.io/vibi-prod/dpu/dpu
+					`);
+					}
+					else {
+						let providerReposForUser = await getUserReposForProvider(session, 'github');
+						setAllRepos(providerReposForUser);
+					}
 				} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket') {
 					setSelfHostingCode(`
 Coming Soon!
@@ -82,7 +94,7 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 			}
 		}).catch((error) => {
 			setSelfHostingCode(`Unable to get topic name for user\nPlease refresh this page and try again.`);
-			console.error(`[DpuSetup] Unable to get topic name for user ${userId} - ${error.message}`);
+			console.error(`[DockerInstructions] Unable to get topic name for user ${userId} - ${error.message}`);
 		});
 	}, [userId, selectedInstallationType, selectedProvider]);
 
@@ -119,9 +131,9 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
 		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId }).then((response) => {
 			if (response.status != 200){
-				console.error(`[DpuSetup/handleSubmit] something went wrong while saving repos data in db`);
+				console.error(`[DockerInstructions/handleSubmit] something went wrong while saving repos data in db`);
 			} else {
-				console.info(`[DpuSetup/handleSubmit] repos data saved successfully in db`);
+				console.info(`[DockerInstructions/handleSubmit] repos data saved successfully in db`);
 				setSelfHostingCode(`
 docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
 docker run -e INSTALL_ID=${installId} \\
@@ -135,13 +147,67 @@ asia.gcr.io/vibi-prod/dpu/dpu
 		.catch((error) => {
 			setSelfHostingCode(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
 			setIsRepoSelectionDone(false);
-			console.error(`[DpuSetup] Unable to save selected repos in db for user ${userId} - ${error.message}`);
+			console.error(`[DockerInstructions] Unable to save selected repos in db for user ${userId} - ${error.message}`);
 		});
 	};
 
 	return (
 		<div className='relative'>
-			{isRepoSelectionDone ||  selectedInstallationType !== 'individual' || selectedProvider !== 'github' ? (
+			{selectedInstallationType === 'individual' ? 
+				!isRepoSelectionDone ? ( 
+					<div>
+						<h4 className='my-2 font-semibold'>Select Repositories</h4>
+						{allRepos.map((repo, index) => (
+							<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
+								<input
+									type="checkbox"
+									id={JSON.stringify(repo)}
+									value={`${repo.repo_owner}/${repo.repo_name}`}
+									checked={selectedRepos.includes(repo)}
+									onChange={(event) => handleCheckboxChange(event, repo)}
+								/>
+								<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
+							</div>
+						))}
+						<div className='flex gap-2 py-2'>
+							<Button variant='outlined' onClick={handleSelectAll}>
+							{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
+							</Button>
+							<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0}>
+								Submit
+							</Button>
+						</div>
+					</div> 
+					) : (
+						<>
+							<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
+							<pre>{selfHostingCode}</pre>
+							<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
+								<button
+									style={{
+										position: 'absolute',
+										top: '0px',
+										right: '0px',
+										cursor: 'pointer',
+										background: 'none',
+										border: 'none',
+									}}
+									onClick={handleCopyClick}
+									disabled={isButtonDisabled}
+								>
+									<MdContentCopy />
+								</button>
+							</CopyToClipboard>
+							{isCopied && <span style={{ position: 'absolute', top: '0', right: '50%', transform: 'translate(50%, -100%)', color: 'green' }}>Copied!</span>}
+							<p className="text-xs mt-2">Minimum config required for running docker image:</p>
+							<ul className="text-xs">
+								<li>RAM: 2 GB</li>
+								<li>CPU: 2v or 4v CPU</li>
+								<li>Storage: Depends on codebase size, maximum supported - 20 GB</li>
+							</ul>
+						</>
+			): (
+				// selectedInstallationType === 'project'
 				<>
 					<pre>{selfHostingCode}</pre>
 					<CopyToClipboard text={selfHostingCode} onCopy={handleCopy}>
@@ -161,35 +227,16 @@ asia.gcr.io/vibi-prod/dpu/dpu
 						</button>
 					</CopyToClipboard>
 					{isCopied && <span style={{ position: 'absolute', top: '0', right: '50%', transform: 'translate(50%, -100%)', color: 'green' }}>Copied!</span>}
+					<p className="text-xs mt-2">Minimum config required for running docker image:</p>
+					<ul className="text-xs">
+						<li>RAM: 2 GB</li>
+						<li>CPU: 2v or 4v CPU</li>
+						<li>Storage: Depends on codebase size, maximum supported - 20 GB</li>
+					</ul>
 				</>
-			) : selectedInstallationType === 'individual' && selectedProvider === 'github' && (
-				<div>
-					<h4 className='my-2 font-semibold'>Select Repositories</h4>
-					{allRepos.map((repo, index) => (
-						<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
-							<input
-								type="checkbox"
-								id={JSON.stringify(repo)}
-								value={`${repo.repo_owner}/${repo.repo_name}`}
-								checked={selectedRepos.includes(repo)}
-								onChange={(event) => handleCheckboxChange(event, repo)}
-							/>
-							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
-						</div>
-					))}
-					<div className='flex gap-2 py-2'>
-						<Button variant='outlined' onClick={handleSelectAll}>
-						{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
-						</Button>
-						<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0}>
-							Submit
-						</Button>
-					</div>
-				</div>
-			)
-			}
+			)} 
 		</div>
 	);
-};
+	}
 
-export default DpuSetup;
+export default DockerInstructions;
