@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
-import { getUserInfoFromDb } from '../../../utils/db/trigger';
+import { DbUser, getUserByAlias } from '../../../utils/db/users';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
@@ -44,7 +44,14 @@ async function triggerDPU(url: string, userEmail: string) {
     // parse url for repo name, owner, pr, provider
     const {repoProvider, repoOwner, repoName, prNumber} = parseURL(url);
     // get user id
-    const {userId, topicName} = await getUserInfoFromDb(userEmail);
+    const users: DbUser[] | undefined = await getUserByAlias(userEmail).catch((err) => {
+		console.error(`[triggerDPU] Unable to get user aliases for ${userEmail}, error = ${err}`);
+		throw new Error("Unable to get user from db");
+	});
+	if (users?.length == 0) {
+		console.error(`[triggerDPU] Unable to find user for alias ${userEmail}`);
+		throw new Error("User not found in db");
+	}
     // get repo config
     // prepare body
     // get topic id
