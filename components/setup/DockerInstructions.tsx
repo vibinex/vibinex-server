@@ -133,11 +133,13 @@ docker run -e INSTALL_ID=${installId} \\
 asia.gcr.io/vibi-prod/dpu/dpu
 				`);
 				setIsRepoSelectionDone(true);
+				setIsRepoSubmitButtonDisabled(false);
 			}
 		})
 		.catch((error) => {
 			setSelfHostingCode(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
 			setIsRepoSelectionDone(false);
+			setIsRepoSubmitButtonDisabled(false);
 			console.error(`[DockerInstructions] Unable to save selected repos in db for user ${userId} - ${error.message}`);
 		});
 	};
