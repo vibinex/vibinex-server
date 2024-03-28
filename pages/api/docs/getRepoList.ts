@@ -4,7 +4,7 @@ import { getUserRepositories } from "../../../utils/providerAPI/getUserRepositor
 import { authOptions } from '../auth/[...nextauth]';
 import { RepoIdentifier } from '../../../types/repository';
 
-const getRepoListHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const getUserRepositoriesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const session = await getServerSession(req, res, authOptions);
 	if (!session) {
 		return res.status(401).json({ error: 'Unauthenticated' });
@@ -16,4 +16,4 @@ const getRepoListHandler = async (req: NextApiRequest, res: NextApiResponse) => 
 	return res.status(200).json({repoList: repoList});
 }
 
-export default getRepoListHandler;
+export default getUserRepositoriesHandler;

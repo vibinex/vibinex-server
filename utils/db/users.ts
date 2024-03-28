@@ -28,7 +28,7 @@ export const getUserByProvider = async (provider: string, providerAccountId: str
 		throw new Error('No user found');
 	}
 	if (user_auth_search_result.rowCount > 1) {
-		console.warn("[getUser] Multiple users exist with same auth", { provider, providerAccountId });
+		console.warn("[getUserByProvider] Multiple users exist with same auth", { provider, providerAccountId });
 	}
 	return user_auth_search_result.rows[0];
 }
