@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
-import { getUserRepoConfig, DbUser, getUserByAlias } from '../../../utils/db/users';
+import { getRepoConfigByUserAndRepo } from '../../../utils/db/repos';
+import { DbUser, getUserByAlias } from '../../../utils/db/users';
 import { publishMessage } from '../../../utils/pubsub/pubsubClient';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -49,15 +50,25 @@ async function triggerDPU(url: string, userEmail: string) {
 		console.error(`[triggerDPU] Unable to get user for alias ${userEmail}, error = ${err}`);
 		throw new Error("Unable to get user from db");
 	});
-	if (users?.length == 0) {
+	if (!users || users?.length == 0) {
 		console.error(`[triggerDPU] Unable to find user for alias ${userEmail}`);
 		throw new Error("User not found in db");
 	}
+	const userId = users[0].id;
+	if (!userId) {
+		console.error(`[triggerDPU] Unable to find user id for user ${JSON.stringify(users[0])}`);
+		throw new Error("User ID not found in db user");
+	}
     // get repo config
-    const repoConfig = await getUserRepoConfig(repoProvider, repoName, repoOwner, userId);
+    const repoConfig = await getRepoConfigByUserAndRepo(repoProvider, repoName, repoOwner, userId);
     // prepare body
     const triggerBody = prepareBody(repoProvider, repoOwner, repoName, prNumber, repoConfig);
     // get topic id
+    const topicName = users[0].topic_name;
+    if (!topicName) {
+        console.error(`[triggerDPU] Unable to find topic name for user ${JSON.stringify(users[0])}`);
+		throw new Error("Topic name not found in db user");
+    }
     // publish
     console.info(`[extension/triggerDPU] Publishing message ${triggerBody} to ${topicName}`);
     await publishMessage(topicName, triggerBody, "manual_trigger")
