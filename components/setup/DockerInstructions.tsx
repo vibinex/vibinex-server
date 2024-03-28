@@ -54,6 +54,7 @@ const DockerInstructions: React.FC<DockerInstructionsProps> = ({ userId, selecte
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
+	const [isRepoSubmitButtonDisabled, setIsRepoSubmitButtonDisabled] = useState<boolean>(false);
 	const [installId, setInstallId] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -112,8 +113,10 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 	};
 
 	const handleSubmit = () => {
+		setIsRepoSubmitButtonDisabled(true)
 		if (!installId) {
             console.error("[handleSubmit] InstallId is not available.");
+			// TODO - there is no user feedback here. The user might not know that something has gone wrong
             return;
         }
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
@@ -161,7 +164,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 							<Button variant='outlined' onClick={handleSelectAll}>
 							{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
 							</Button>
-							<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0}>
+							<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
 								Submit
 							</Button>
 						</div>
