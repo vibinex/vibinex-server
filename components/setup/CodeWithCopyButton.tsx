@@ -1,20 +1,28 @@
-import React, { MouseEvent } from 'react';
+import React, { MouseEvent, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { MdContentCopy } from "react-icons/md";
 
 interface CodeWithCopyButtonProps {
 	text: string;
-	onCopy: (text: string, result: boolean) => void;
-	onClick: (event: MouseEvent) => void;
-	disabled: boolean;
-	isCopied: boolean;
 }
 
-const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text, onCopy, onClick, disabled, isCopied }) => {
+const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text }) => {
+	const [isCopied, setIsCopied] = useState<boolean>(false);
+	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+	
+	const handleCopyClick = () => {
+		setIsButtonDisabled(true);
+	};
+
+	const handleCopy = () => {
+		setIsCopied(true);
+		setIsButtonDisabled(false);
+	};
+
 	return (
 		<div style={{ position: 'relative' }}>
 			<pre>{text}</pre>
-			<CopyToClipboard text={text} onCopy={onCopy}>
+			<CopyToClipboard text={text} onCopy={handleCopy}>
 				<button
 					style={{
 						position: 'absolute',
@@ -24,8 +32,8 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text, onCopy, o
 						background: 'none',
 						border: 'none',
 					}}
-					onClick={onClick}
-					disabled={disabled}
+					onClick={handleCopyClick}
+					disabled={isButtonDisabled}
 				>
 					<MdContentCopy />
 				</button>

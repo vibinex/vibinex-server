@@ -44,14 +44,12 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 				installationId: install_id
 			});
 		}
-		setupArgsMap.get(key)!.repos.push(repo.repo_name);
+		setupArgsMap.get(key)?.repos.push(repo.repo_name);
 	});
 
 	return Array.from(setupArgsMap.values());
 }
 const DockerInstructions: React.FC<DockerInstructionsProps> = ({ userId, selectedInstallationType, selectedProvider, session }) => {
-	const [isCopied, setIsCopied] = useState<boolean>(false);
-	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	const [selfHostingCode, setSelfHostingCode] = useState<string>("Generating topic name, please try refreshing if you keep seeing this...");
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
@@ -96,15 +94,6 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 			console.error(`[DockerInstructions] Unable to get topic name for user ${userId} - ${error.message}`);
 		});
 	}, [userId, selectedInstallationType, selectedProvider]);
-
-	const handleCopyClick = () => {
-		setIsButtonDisabled(true);
-	};
-
-	const handleCopy = () => {
-		setIsCopied(true);
-		setIsButtonDisabled(false);
-	};
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
 		if (event.target.checked) {
@@ -180,7 +169,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 					) : (
 						<>
 							<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
-							<CodeWithCopyButton text={selfHostingCode} onCopy={handleCopy} onClick={handleCopyClick} disabled={isButtonDisabled} isCopied={isCopied} />
+							<CodeWithCopyButton text={selfHostingCode} />
 							<p className="text-xs mt-2">Minimum config required for running docker image:</p>
 							<ul className="text-xs">
 								<li>RAM: 2 GB</li>
@@ -191,7 +180,7 @@ asia.gcr.io/vibi-prod/dpu/dpu
 			): (
 				// selectedInstallationType === 'project'
 				<>
-					<CodeWithCopyButton text={selfHostingCode} onCopy={handleCopy} onClick={handleCopyClick} disabled={isButtonDisabled} isCopied={isCopied} />
+					<CodeWithCopyButton text={selfHostingCode} />
 					<p className="text-xs mt-2">Minimum config required for running docker image:</p>
 					<ul className="text-xs">
 						<li>RAM: 2 GB</li>
