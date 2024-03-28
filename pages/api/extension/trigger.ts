@@ -38,7 +38,6 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
 		return;
 	}
     res.status(200).json({message: "DPU triggered!"});
-	return;
 }
 async function triggerDPU(url: any, userEmail: string) {
     // parse url for repo name, owner, pr, provider
