@@ -45,7 +45,7 @@ async function triggerDPU(url: string, userEmail: string) {
     const {repoProvider, repoOwner, repoName, prNumber} = parseURL(url);
     // get user id
     const users: DbUser[] | undefined = await getUserByAlias(userEmail).catch((err) => {
-		console.error(`[triggerDPU] Unable to get user aliases for ${userEmail}, error = ${err}`);
+		console.error(`[triggerDPU] Unable to get user for alias ${userEmail}, error = ${err}`);
 		throw new Error("Unable to get user from db");
 	});
 	if (users?.length == 0) {
