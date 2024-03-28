@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { saveTopicName } from '../../../utils/db/relevance';
-import { SetupReposArgs } from '../../../utils/db/setupRepos';
-import saveSetupReposInDb from '../../../utils/db/setupRepos';
+import { SetupReposArgs, removePreviousInstallations, saveSetupReposInDb } from '../../../utils/db/setupRepos';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[setupHandler]Saving setup info in db...");
@@ -9,6 +7,13 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!Array.isArray(jsonBody.info)) {
 		console.error("[setupHandler] Invalid request body, 'info' is missing or not an array");
 		res.status(400).json({ "error": "Invalid request body" });
+		return;
+	}
+	try {
+		await removePreviousInstallations(jsonBody.installationId)	
+	} catch (err) {
+		console.error(`[setupHandler] Unable to remove previous installations for ${jsonBody.installationId}`, err);
+		res.status(500).json({"error": "Internal Server Error"});
 		return;
 	}
 	const allSetupReposPromises = [];

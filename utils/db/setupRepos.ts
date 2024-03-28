@@ -11,7 +11,7 @@ interface SetupResponse {
     message: string;
 }
 
-const saveSetupReposInDb = async (args: SetupReposArgs): Promise<SetupResponse> => {
+export const saveSetupReposInDb = async (args: SetupReposArgs): Promise<SetupResponse> => {
     const { repo_owner, repo_provider, repo_names, install_id } = args;
     const query = `SELECT EXISTS(SELECT 1 FROM repos WHERE repo_owner = $1 AND repo_provider = $2)`
 
@@ -152,4 +152,14 @@ const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: 
     });
 };
 
-export default saveSetupReposInDb;
+export const removePreviousInstallations = async (install_id: string) => {
+    const query = `UPDATE repos
+    SET install_id = array_remove(install_id, '${install_id}')
+    WHERE '${install_id}' = ANY (install_id);
+    `;
+    await conn.query(query).catch(err => {
+        console.error(`[removePreviousInstallations] Could not remove previous repos for ${install_id}`);
+        throw new Error('Failed to remove previous repos');
+    });
+    console.debug(`[removePreviousInstallations] Previous installations removed for ${install_id}`);
+}
