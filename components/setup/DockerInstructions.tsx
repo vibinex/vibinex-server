@@ -4,13 +4,11 @@ import axios from 'axios';
 import type { Session } from "next-auth";
 import React, { useEffect, useState } from 'react';
 
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { MdContentCopy } from "react-icons/md";
 import { RepoIdentifier } from '../../types/repository';
 import { getUserRepositories } from '../../utils/providerAPI/getUserRepositories';
 import Button from '../Button';
-import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 import CodeWithCopyButton from './CodeWithCopyButton';
+import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 
 interface DockerInstructionsProps {
 	userId: string;
