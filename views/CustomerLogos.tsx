@@ -2,22 +2,24 @@ import AutoScroll from 'embla-carousel-auto-scroll'
 import Image from 'next/image'
 import Carousel from '../components/Carousel'
 import BillNoteLogo from '../public/BillNote-logo.png'
+import BugbaseLogo from '../public/Bugbase-logo-white.svg'
 import CoverForceLogo from '../public/CoverForce-Logo.png'
+import KhiladiProLogo from '../public/KPro_Logo.svg'
 import SupplyNoteLogo from '../public/SupplyNote-logo.png'
 import VyapLogo from '../public/Vyap-Logo.png'
 import AbleJobsLogo from '../public/able_logo.png'
 import BlanceLogo from '../public/blance-full-logo-new.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
-import BugbaseLogo from '../public/Bugbase-logo-white.svg'
 
 const data = [
-	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
 	{ logo: AbleJobsLogo, heading: 'Able' },
-	{ logo: CoverForceLogo, heading: 'CoverForce', customClass: 'py-2' },
+	{ logo: BillNoteLogo, heading: 'BillNote' },
 	{ logo: BlanceLogo, heading: 'Blance' },
 	{ logo: BlitzLogo, heading: 'Blitz' },
-	{ logo: BillNoteLogo, heading: 'BillNote' },
 	{ logo: BugbaseLogo, heading: 'Bugbase' },
+	{ logo: CoverForceLogo, heading: 'CoverForce', customClass: 'py-2' },
+	{ logo: KhiladiProLogo, heading: 'Khiladi Pro' },
+	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
 	{ logo: VyapLogo, heading: 'Vyap' },
 ]
 

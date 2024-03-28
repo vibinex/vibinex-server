@@ -31,7 +31,7 @@ const CarouselControls = ({ controls, autoMovementPlugins }: { controls?: 'none'
 			}
 			callback()
 		},
-		[emblaApi]
+		[emblaApi, autoMovementPlugins]
 	)
 
 	switch (controls) {

@@ -65,6 +65,25 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 	return allDbRepos;
 }
 
+export const getUserRepositoriesByTopic = async (topicId: string, provider: string) => {
+	const getRepoQuery = `SELECT repo_name, repo_owner, repo_provider
+	FROM repos
+	WHERE repo_provider = ${convert(provider)} AND ${convert(topicId)} = ANY(install_id)`;
+	const repos: RepoIdentifier[] = await conn.query(getRepoQuery)
+		.then((dbResponse) => {
+			return dbResponse.rows.map((row) => ({
+				repo_name: row.repo_name,
+				repo_owner: row.repo_owner,
+				repo_provider: row.repo_provider,
+			}));
+		})
+		.catch((err: Error) => {
+			console.error(`[db/getUserRepositoriesByTopic] Could not get repos for topic id ${topicId}, query - ${getRepoQuery}`, err);
+			throw new Error("Unable to get user repos by topic");
+		});
+	return repos;
+}
+
 export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
 	const configTypeColumn = configType === 'comment'? 'comment_setting' : 'auto_assign';
 	const update_repo_config_q = `UPDATE repo_config
@@ -100,9 +119,9 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
 			'comment', rc.comment_setting
 		) AS config
 		from repo_config rc
-        WHERE repo_provider = $1
-            AND repo_owner = $2
-            AND repo_name = $3`;
+		WHERE rc.repo_id = (SELECT id FROM repos WHERE repo_provider = $1
+			AND repo_owner = $2
+			AND repo_name = $3)`;
 
 	const config = await conn.query(get_repo_config_q, [repo.repo_provider, repo.repo_owner, repo.repo_name])
 		.then((dbResponse) => {

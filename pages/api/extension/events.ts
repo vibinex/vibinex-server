@@ -3,8 +3,6 @@ import rudderStackEvents from "../events";
 
 const events = (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method === "OPTIONS") {
-		res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-		res.setHeader("Access-Control-Allow-Origin", "*");
 		res.status(200).send("Ok");
 		return;
 	}
