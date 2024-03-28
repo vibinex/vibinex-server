@@ -35,9 +35,9 @@ const Hero = (props: { ctaLink: string }) => {
 		};
 	}, [rudderEventMethods, session]);
 	return (
-		<div className='flex items-center justify-center h-screen bg-fixed bg-center bg-cover bg-black'>
-			<section className='p-5 text-primary-light my-auto lg:mt-[10%] pt-1 lg:w-1/2 text-center'>
-				<h1 className='text-4xl sm:text-5xl lg:text-8xl font-bold mb-4'>{'Merge PRs with'}
+		<div className='flex items-center justify-center h-fit bg-black'>
+			<section className='p-5 text-primary-light my-auto pt-1 md:w-2/3 xl:w-1/2 text-center'>
+				<h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 mt-8'>{'Merge PRs with'}
 					<span className='text-primary-main font-bold block'>Confidence</span>
 				</h1>
 				<p className="text-xl sm:text-2xl text-gray-300">
@@ -54,7 +54,7 @@ const Hero = (props: { ctaLink: string }) => {
 				<p className="text-lg sm:text-lg mb-10 text-gray-300" title="100% privacy & data protection">
 					Your code <span className="text-primary-main">never leaves your systems</span> by design
 				</p>
-				<div className="mt-20 w-full relative">
+				<div className="my-10 w-full relative">
 					{/*Overlay*/}
 					<div className='absolute bg-black/50 z-10 h-full w-full' />
 					<p>Supported Providers:</p>
