@@ -59,7 +59,11 @@ async function triggerDPU(url: string, userEmail: string) {
 		throw new Error("User ID not found in db user");
 	}
     // get repo config
-    const repoConfig = await getRepoConfigByUserAndRepo(repoProvider, repoName, repoOwner, userId);
+    const repoConfig = await getRepoConfigByUserAndRepo(repoProvider, repoName, repoOwner, userId)
+        .catch((err) => {
+            console.error(`[triggerDPU] Unable to fetch repo config`, err);
+            return {auto_assign: false, comment: false};
+        });
     // prepare body
     const triggerBody = prepareBody(repoProvider, repoOwner, repoName, prNumber, repoConfig);
     // get topic id
