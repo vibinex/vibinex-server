@@ -65,7 +65,7 @@ async function triggerDPU(url: string, userEmail: string) {
             return {auto_assign: false, comment: false};
         });
     // prepare body
-    const triggerBody = prepareBody(repoProvider, repoOwner, repoName, prNumber, repoConfig);
+    const triggerBody = { repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, pr_number: prNumber, repo_config: repoConfig};
     // get topic id
     // publish
     throw new Error('Function not implemented.');
@@ -107,8 +107,4 @@ function parseURL(url: string) {
         repoName,
         prNumber: prNumber.toString()
     };
-}
-
-function prepareBody(repoProvider: string, repoOwner: string, repoName: string, prNumber: string, repoConfig: any) {
-    return { repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, pr_number: prNumber, repo_config: repoConfig};
 }
