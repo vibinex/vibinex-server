@@ -110,11 +110,5 @@ function parseURL(url: string) {
 }
 
 function prepareBody(repoProvider: string, repoOwner: string, repoName: string, prNumber: string, repoConfig: any) {
-    return {
-        repo_provider: repoProvider,
-        repo_owner: repoOwner,
-        repo_name: repoName,
-        pr_number: prNumber,
-        repo_config: repoConfig,
-    }
+    return { repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, pr_number: prNumber, repo_config: repoConfig};
 }
