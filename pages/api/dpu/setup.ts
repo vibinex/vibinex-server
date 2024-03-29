@@ -67,6 +67,4 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 }
 
-
-
 export default setupHandler;
