@@ -80,7 +80,6 @@ async function triggerDPU(url: string, userEmail: string) {
 			console.error(`[extension/triggerDPU] Failed to publish message on ${topicName}:`, error);
             throw new Error('Unable to publish message');
 		});
-    return true;
 }
 
 function parseURL(url: string) {
