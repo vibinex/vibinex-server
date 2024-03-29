@@ -251,3 +251,26 @@ export const getAuthInfoFromDb = async function (user_id: string): Promise<AuthI
 		});
 	return authinfo_promise.authInfo;
 }
+
+export const getUserIdByTopicName = async function(topic_name: string) {
+	const query = `SELECT id FROM users WHERE topic_name = $1`;
+	const params = [topic_name];
+  
+	const userId = await conn.query(query, params)
+	.then((result) => {
+		if (result.rows.length > 0) {
+			console.log(`userId: ${result.rows[0].id} found for topicName ${topic_name}`);
+			return result.rows[0].id;
+		} else {
+			console.info(`[getUserIdByTopicName] No user found for topicName ${topic_name}`);
+			return null;
+		}
+	})
+	.catch((error) => {
+		console.error(`[getUserIdByTopicName] Error in getting userId from the database`,
+		{ pg_query: query }, error);;
+		return null;
+	});
+	return userId;
+  }
+  

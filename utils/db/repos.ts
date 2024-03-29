@@ -170,3 +170,28 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	}
 	return userRows[0].config;
 }
+export const insertRepoConfigOnSetup = async (repoOwner: string, repoNames: string[], userId: string) => {
+	// Construct the VALUES clause dynamically
+	const valuesClause = repoNames.map(repoName => `('${repoName}', '${repoOwner}')`).join(',');
+	const query = `
+		INSERT INTO repo_config (repo_id, user_id, auto_assign, comment_setting)
+		SELECT id, $1, true, true
+		FROM public.repos
+		WHERE (repo_name, repo_owner) IN (${valuesClause})
+		`;
+	const params = [userId];
+
+	const queryIsSuccessful = await conn.query(query, params)
+	.then((dbResponse) => {
+		if (dbResponse.rowCount == 0) {
+			return false;
+		}
+		return true;
+	})
+	.catch((err: Error) => {
+		console.error(`[db/insertRepoConfigOnSetup] Could not insert repo config for the repos: ${repoNames}`, { pg_query: query }, err);
+		return false;
+	})
+	return queryIsSuccessful;
+  }
+  
