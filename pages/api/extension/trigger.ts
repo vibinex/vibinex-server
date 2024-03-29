@@ -71,15 +71,15 @@ async function triggerDPU(url: string, userEmail: string) {
     const topicName = users[0].topic_name;
     if (!topicName) {
         console.error(`[triggerDPU] Unable to find topic name for user ${JSON.stringify(users[0])}`);
-		throw new Error("Topic name not found in db user");
+        throw new Error("Topic name not found in db user");
     }
     // publish
     console.info(`[extension/triggerDPU] Publishing message ${JSON.stringify(triggerBody)} to ${topicName}`);
     await publishMessage(topicName, triggerBody, "manual_trigger")
-		.catch((error) => {
-			console.error(`[extension/triggerDPU] Failed to publish message on ${topicName}:`, error);
+        .catch((error) => {
+            console.error(`[extension/triggerDPU] Failed to publish message on ${topicName}:`, error);
             throw new Error('Unable to publish message');
-		});
+        });
 }
 
 function parseURL(url: string) {
