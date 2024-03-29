@@ -178,6 +178,7 @@ export const insertRepoConfigOnSetup = async (repoOwner: string, repoNames: stri
 		SELECT id, $1, true, true
 		FROM public.repos
 		WHERE (repo_name, repo_owner) IN (${valuesClause})
+		ON CONFLICT DO NOTHING
 		`;
 	const params = [userId];
 
