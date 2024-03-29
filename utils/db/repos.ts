@@ -144,10 +144,13 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
     SELECT json_build_object(
         'auto_assign', rc.auto_assign,
         'comment', rc.comment_setting
-    ) AS config
+    ) AS config,
+	rc.user_id AS userId
     FROM repo_config rc
-    WHERE rc.user_id = '${userId}' AND
-        repo_id = (SELECT r.id FROM repos r WHERE r.repo_name = '${repoName}' AND r.repo_owner = '${repoOwner}' AND r.repo_provider = '${provider}')
+    WHERE repo_id = (SELECT r.id FROM repos r 
+		WHERE r.repo_name = '${repoName}' AND
+		r.repo_owner = '${repoOwner}' AND
+		r.repo_provider = '${provider}')
     `;
     const result = await conn.query(query).catch(err => {
 		console.error(`[getRepoConfig] Could not get repo config for: ${userId}, ${repoName}`,
@@ -157,5 +160,13 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	if (result.rows.length === 0) {
 		throw new Error('No repo config found');
 	}
-	return result.rows[0].config;
+	if (result.rows.length === 1) {
+		return result.rows[0].config;
+	}
+	const userRows = result.rows.filter((rowVal) => rowVal.userId === userId);
+	if (userRows.length === 0) {
+		// return some default
+		return {auto_assign: false, comment: false};
+	}
+	return userRows[0].config;
 }
