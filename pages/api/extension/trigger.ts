@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
-import { getRepoConfigByUserAndRepo } from '../../../utils/db/repos';
+import { getRepoConfig } from '../../../utils/db/repos';
 import { DbUser, getUserByAlias } from '../../../utils/db/users';
+import { RepoProvider, supportedProviders } from '../../../utils/providerAPI';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
 	// For cors prefetch options request
@@ -59,7 +60,17 @@ async function triggerDPU(url: string, userEmail: string) {
 		throw new Error("User ID not found in db user");
 	}
     // get repo config
-    const repoConfig = await getRepoConfigByUserAndRepo(repoProvider, repoName, repoOwner, userId);
+    const provider: RepoProvider = supportedProviders
+        .filter((providerVal) => providerVal === repoProvider)[0];
+    const repoConfig = await getRepoConfig({
+		repo_provider: provider,
+		repo_owner: repoOwner,
+		repo_name: repoName
+	}).catch((err) => {
+        console.error(
+            `[triggerDPU] Unable to find repo config from db for ${repoProvider}/${repoOwner}/${repoName}`, err);
+        return {auto_assign: false, comment: false};
+    });
     // prepare body
     
     // get topic id
