@@ -47,8 +47,6 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.info("[setupHandler] All setup info saved succesfully...")
 		// for repos in ownerInfo, save default repo_config value in repo_config table
 		for (const ownerInfo of jsonBody.info) {
-			console.info("userId: ", typeof(userId));
-			console.info(`owner: ${ownerInfo.owner}, repos: ${ownerInfo.repos}`)
 			await insertRepoConfig(ownerInfo.owner, ownerInfo.repos, userId, ownerInfo.provider)
 			.then((queryResponse: any) => {
 				if (queryResponse) {
