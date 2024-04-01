@@ -256,21 +256,18 @@ export const getUserIdByTopicName = async function(topic_name: string) {
 	const query = `SELECT id FROM users WHERE topic_name = $1`;
 	const params = [topic_name];
   
-	const userId = await conn.query(query, params)
-	.then((result) => {
-		if (result.rows.length > 0) {
-			console.log(`userId: ${result.rows[0].id} found for topicName ${topic_name}`);
-			return result.rows[0].id;
-		} else {
-			console.info(`[getUserIdByTopicName] No user found for topicName ${topic_name}`);
-			return null;
-		}
-	})
-	.catch((error) => {
-		console.error(`[getUserIdByTopicName] Error in getting userId from the database`,
-		{ pg_query: query }, error);;
+	const queryResult = await conn.query(query, params).catch((err) => {
+		console.error(`[getUserIdByTopicName] Query failed: Select from users where topic_name = ${topic_name}`, { pg_query: query }, err);
+    });
+
+	if (queryResult && queryResult.rowCount === 0) {
+		console.error(`[getUserIdByTopicName] No user found for topicName ${topic_name}`);
 		return null;
-	});
-	return userId;
+	} else if (queryResult && queryResult.rowCount > 1) {
+		console.error(`[getUserIdByTopicName] Multiple users found for topicName ${topic_name}`);
+		return null;
+	} else {
+		return queryResult?.rows[0].id;
+	}
   }
   

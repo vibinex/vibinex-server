@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SetupReposArgs, removePreviousInstallations, saveSetupReposInDb } from '../../../utils/db/setupRepos';
 import { getUserIdByTopicName } from '../../../utils/db/users';
-import { insertRepoConfigOnSetup } from '../../../utils/db/repos';
+import { insertRepoConfig } from '../../../utils/db/repos';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[setupHandler]Saving setup info in db...");
@@ -21,8 +21,14 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// get user_id for the given install_id
 	const userId = await getUserIdByTopicName(jsonBody.installationId).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
-		return null;
+		res.status(500).json({ "error": "Internal Server Error" });
+		return;
 	});
+	if (!userId) {
+		console.error(`[setupHandler/getUserIdByTopicName] NO userId found for topic name: ${jsonBody.installationId} from database.`);
+		res.status(404).json({ "error": "No userId found for given installationId" });
+		return;
+	}
 	const allSetupReposPromises = [];
 	for (const ownerInfo of jsonBody.info) {
 		let setupReposArgs: SetupReposArgs = {
@@ -41,22 +47,20 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.info("[setupHandler] All setup info saved succesfully...")
 		// for repos in ownerInfo, save default repo_config value in repo_config table
 		for (const ownerInfo of jsonBody.info) {
-			console.info("userId: ", userId);
+			console.info("userId: ", typeof(userId));
 			console.info(`owner: ${ownerInfo.owner}, repos: ${ownerInfo.repos}`)
-			if (userId) {
-				await insertRepoConfigOnSetup(ownerInfo.owner, ownerInfo.repos, userId)
-					.then((queryResponse: any) => {
-						if (queryResponse) {
-							console.info(`[setupHandler/insertRepoConfigOnSetup] repo config info saved succesfully for repos: ${ownerInfo.repos} for owner: ${ownerInfo.owner}`);
-						}
-						else {
-							console.error(`[setupHandler/insertRepoConfigOnSetup] Failed to save repo config info for repos: ${ownerInfo.repos} for owner: ${ownerInfo.owner}`);
-						}
-					})
-					.catch((error: Error) => {
-						console.error(`[setupHandler/insertRepoConfigOnSetup] Failed to save repo config for repos: ${ownerInfo.repos} for owner: ${ownerInfo.owner}`, error);
-					})
-			}
+			await insertRepoConfig(ownerInfo.owner, ownerInfo.repos, userId, ownerInfo.provider)
+			.then((queryResponse: any) => {
+				if (queryResponse) {
+					console.info(`[setupHandler/insertRepoConfigOnSetup] repo config info saved succesfully for repos: ${ownerInfo.repos} for owner: ${ownerInfo.owner}`);
+				}
+				else {
+					console.error(`[setupHandler/insertRepoConfigOnSetup] Failed to save repo config info for repos: ${ownerInfo.repos} for owner: ${ownerInfo.owner}`);
+				}
+			})
+			.catch((error: Error) => {
+				console.error(`[setupHandler/insertRepoConfigOnSetup] Failed to save repo config for repos: ${ownerInfo.repos} for owner: ${ownerInfo.owner}`, error);
+			})
 		}
 		res.status(200).send("Ok");
 		return;

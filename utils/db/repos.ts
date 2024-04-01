@@ -170,14 +170,14 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	}
 	return userRows[0].config;
 }
-export const insertRepoConfigOnSetup = async (repoOwner: string, repoNames: string[], userId: string) => {
+export const insertRepoConfig = async (repoOwner: string, repoNames: string[], userId: string, provider: string) => {
 	// Construct the VALUES clause dynamically
-	const valuesClause = repoNames.map(repoName => `('${repoName}', '${repoOwner}')`).join(',');
+	const valuesClause = repoNames.map(repoName => `('${repoName}', '${repoOwner}', '${provider}')`).join(',');
 	const query = `
 		INSERT INTO repo_config (repo_id, user_id, auto_assign, comment_setting)
 		SELECT id, $1, true, true
 		FROM public.repos
-		WHERE (repo_name, repo_owner) IN (${valuesClause})
+		WHERE (repo_name, repo_owner, repo_provider) IN (${valuesClause})
 		ON CONFLICT DO NOTHING
 		`;
 	const params = [userId];
