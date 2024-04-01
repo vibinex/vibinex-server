@@ -21,8 +21,6 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// get user_id for the given install_id
 	const userId = await getUserIdByTopicName(jsonBody.installationId).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
-		res.status(500).json({ "error": "Internal Server Error" });
-		return;
 	});
 	if (!userId) {
 		console.error(`[setupHandler/getUserIdByTopicName] NO userId found for topic name: ${jsonBody.installationId} from database.`);
