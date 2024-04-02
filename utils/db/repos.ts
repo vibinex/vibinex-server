@@ -2,6 +2,7 @@ import type { Session } from 'next-auth';
 import conn from '.';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
 import { convert } from './converter';
+import { error } from 'console';
 
 export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => {
 	const userId = session.user.id;
@@ -153,19 +154,21 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 		r.repo_provider = '${provider}')
     `;
     const result = await conn.query(query).catch(err => {
-		console.error(`[getRepoConfig] Could not get repo config for: ${userId}, ${repoName}`,
+		console.error(`[getRepoConfigByUserAndRepo] Could not get repo config for: ${provider}/${repoOwner}/${repoName}/{${userId} using query ${query}`,
             { pg_query: query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
-	if (result.rows.length === 0) {
+	if (result.rowCount === 0) {
 		throw new Error('No repo config found');
 	}
-	if (result.rows.length === 1) {
+	if (result.rowCount === 1) {
 		return result.rows[0].config;
 	}
 	const userRows = result.rows.filter((rowVal) => rowVal.userId === userId);
+	console.log(`[getRepoConfigByUserAndRepo] userRows: ${JSON.stringify(userRows)}, result rows: ${JSON.stringify(result.rows)}`);
 	if (userRows.length === 0) {
 		// return some default
+		console.error(`[getRepoConfigByUserAndRepo] repo config not found for ${provider}/${repoOwner}/${repoName}/{${userId} for query ${query}}. Using defaults..`);
 		return {auto_assign: false, comment: false};
 	}
 	return userRows[0].config;
