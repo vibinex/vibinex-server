@@ -164,11 +164,11 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	if (result.rowCount === 1) {
 		return result.rows[0].config;
 	}
-	const userRows = result.rows.filter((rowVal) => rowVal.userId === userId);
+	const userRows = result.rows.filter((rowVal) => rowVal.userid === userId);
 	console.log(`[getRepoConfigByUserAndRepo] userRows: ${JSON.stringify(userRows)}, result rows: ${JSON.stringify(result.rows)}`);
 	if (userRows.length === 0) {
 		// return some default
-		console.error(`[getRepoConfigByUserAndRepo] repo config not found for ${provider}/${repoOwner}/${repoName}/{${userId} for query ${query}}. Using defaults..`);
+		console.error(`[getRepoConfigByUserAndRepo] repo config not found for ${provider}/${repoOwner}/${repoName}/${userId} for query ${query}}. Using defaults..`);
 		return {auto_assign: false, comment: false};
 	}
 	return userRows[0].config;
