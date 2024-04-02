@@ -163,7 +163,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	if (result.rows.length === 1) {
 		return result.rows[0].config;
 	}
-	const userRows = result.rows.filter((rowVal) => rowVal.userId === userId);
+	const userRows = result.rows.filter((rowVal) => rowVal.userid === userId);
 	if (userRows.length === 0) {
 		// return some default
 		return {auto_assign: false, comment: false};
