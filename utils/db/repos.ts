@@ -153,7 +153,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 		r.repo_provider = '${provider}')
     `;
     const result = await conn.query(query).catch(err => {
-		console.error(`[getRepoConfig] Could not get repo config for: ${userId}, ${repoName}`,
+		console.error(`[getRepoConfigByUserAndRepo] Could not get repo config for: ${userId}, ${repoName}`,
             { pg_query: query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
@@ -166,6 +166,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	const userRows = result.rows.filter((rowVal) => rowVal.userid === userId);
 	if (userRows.length === 0) {
 		// return some default
+		console.error(`[getRepoConfigByUserAndRepo] repo config not found for user: ${userId}. Sending defualts..`);
 		return {auto_assign: false, comment: false};
 	}
 	return userRows[0].config;
