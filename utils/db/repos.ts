@@ -145,7 +145,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
         'auto_assign', rc.auto_assign,
         'comment', rc.comment_setting
     ) AS config,
-	rc.user_id AS userId
+	rc.user_id AS user_id
     FROM repo_config rc
     WHERE repo_id = (SELECT r.id FROM repos r 
 		WHERE r.repo_name = '${repoName}' AND
@@ -153,7 +153,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 		r.repo_provider = '${provider}')
     `;
     const result = await conn.query(query).catch(err => {
-		console.error(`[getRepoConfig] Could not get repo config for: ${userId}, ${repoName}`,
+		console.error(`[getRepoConfigByUserAndRepo] Could not get repo config for: ${userId}, ${repoName}`,
             { pg_query: query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
@@ -163,9 +163,10 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	if (result.rows.length === 1) {
 		return result.rows[0].config;
 	}
-	const userRows = result.rows.filter((rowVal) => rowVal.userId === userId);
+	const userRows = result.rows.filter((rowVal) => rowVal.user_id === userId);
 	if (userRows.length === 0) {
 		// return some default
+		console.error(`[getRepoConfigByUserAndRepo] Repo config not found for user: ${userId}. Sending default configuration: {auto_assign: false, comment: false}.`);
 		return {auto_assign: false, comment: false};
 	}
 	return userRows[0].config;
