@@ -145,7 +145,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
         'auto_assign', rc.auto_assign,
         'comment', rc.comment_setting
     ) AS config,
-	rc.user_id AS userId
+	rc.user_id AS user_id
     FROM repo_config rc
     WHERE repo_id = (SELECT r.id FROM repos r 
 		WHERE r.repo_name = '${repoName}' AND
@@ -163,7 +163,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	if (result.rows.length === 1) {
 		return result.rows[0].config;
 	}
-	const userRows = result.rows.filter((rowVal) => rowVal.userid === userId);
+	const userRows = result.rows.filter((rowVal) => rowVal.user_id === userId);
 	if (userRows.length === 0) {
 		// return some default
 		console.error(`[getRepoConfigByUserAndRepo] repo config not found for user: ${userId}. Sending defualts..`);
