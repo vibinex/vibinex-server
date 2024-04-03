@@ -3,8 +3,9 @@ import conn from '.';
 export const getSetupReposFromDbForOwner = async (owner: string, provider: string): Promise<string[]> => {
 	console.log(`[getSetupReposFromDbForOwner] Getting setup repos from db for owner ${owner} and provider ${provider}`);
 	const query = `SELECT repos.repo_name
-        FROM repos
-        WHERE repos.repo_owner = $1 AND repos.repo_provider = $2;
+		FROM repos
+		WHERE repos.repo_owner = $1 AND repos.repo_provider = $2
+			AND  install_id IS NOT NULL AND install_id != '{}';
     `;
 	const result = await conn.query(query, [owner, provider]).catch(err => {
 		console.error(`[getSetupReposFromDbForOwner] Could not get the github repos for owner ${owner} and provider ${provider}`, { pg_query: query }, err);

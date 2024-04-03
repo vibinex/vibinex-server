@@ -1,4 +1,4 @@
-import { Session } from 'next-auth';
+import type { Session } from 'next-auth';
 import conn from '.';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
 import { convert } from './converter';
@@ -65,6 +65,25 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 	return allDbRepos;
 }
 
+export const getUserRepositoriesByTopic = async (topicId: string, provider: string) => {
+	const getRepoQuery = `SELECT repo_name, repo_owner, repo_provider
+	FROM repos
+	WHERE repo_provider = ${convert(provider)} AND ${convert(topicId)} = ANY(install_id)`;
+	const repos: RepoIdentifier[] = await conn.query(getRepoQuery)
+		.then((dbResponse) => {
+			return dbResponse.rows.map((row) => ({
+				repo_name: row.repo_name,
+				repo_owner: row.repo_owner,
+				repo_provider: row.repo_provider,
+			}));
+		})
+		.catch((err: Error) => {
+			console.error(`[db/getUserRepositoriesByTopic] Could not get repos for topic id ${topicId}, query - ${getRepoQuery}`, err);
+			throw new Error("Unable to get user repos by topic");
+		});
+	return repos;
+}
+
 export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
 	console.log(`configType = ${configType}`);
 	const configTypeColumn = configType === "comment"? "comment_setting" : "auto_assign";
@@ -101,9 +120,9 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
 			'comment', rc.comment_setting
 		) AS config
 		from repo_config rc
-        WHERE repo_provider = $1
-            AND repo_owner = $2
-            AND repo_name = $3`;
+		WHERE rc.repo_id = (SELECT id FROM repos WHERE repo_provider = $1
+			AND repo_owner = $2
+			AND repo_name = $3)`;
 
 	const config = await conn.query(get_repo_config_q, [repo.repo_provider, repo.repo_owner, repo.repo_name])
 		.then((dbResponse) => {
@@ -119,3 +138,37 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
 
 	return config;
 };
+
+export const getRepoConfigByUserAndRepo = async (provider: string, repoName: string, repoOwner: string, userId: string) => {
+    console.info(`[getRepoConfig] Getting repo config for user: ${userId} and repo: ${repoName}`);
+    const query = `
+    SELECT json_build_object(
+        'auto_assign', rc.auto_assign,
+        'comment', rc.comment_setting
+    ) AS config,
+	rc.user_id AS user_id
+    FROM repo_config rc
+    WHERE repo_id = (SELECT r.id FROM repos r 
+		WHERE r.repo_name = '${repoName}' AND
+		r.repo_owner = '${repoOwner}' AND
+		r.repo_provider = '${provider}')
+    `;
+    const result = await conn.query(query).catch(err => {
+		console.error(`[getRepoConfigByUserAndRepo] Could not get repo config for: ${userId}, ${repoName}`,
+            { pg_query: query }, err);
+		throw new Error("Error in running the query on the database", err);
+	});
+	if (result.rows.length === 0) {
+		throw new Error('No repo config found');
+	}
+	if (result.rows.length === 1) {
+		return result.rows[0].config;
+	}
+	const userRows = result.rows.filter((rowVal) => rowVal.user_id === userId);
+	if (userRows.length === 0) {
+		// return some default
+		console.error(`[getRepoConfigByUserAndRepo] Repo config not found for user: ${userId}. Sending default configuration: {auto_assign: false, comment: false}.`);
+		return {auto_assign: false, comment: false};
+	}
+	return userRows[0].config;
+}
