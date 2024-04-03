@@ -166,7 +166,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	const userRows = result.rows.filter((rowVal) => rowVal.user_id === userId);
 	if (userRows.length === 0) {
 		// return some default
-		console.error(`[getRepoConfigByUserAndRepo] repo config not found for user: ${userId}. Sending defualts..`);
+		console.error(`[getRepoConfigByUserAndRepo] Repo config not found for user: ${userId}. Sending default configuration: {auto_assign: false, comment: false}.`);
 		return {auto_assign: false, comment: false};
 	}
 	return userRows[0].config;
