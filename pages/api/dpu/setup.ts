@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { removeRepoconfigForInstallId } from '../../../utils/db/repos';
 import { SetupReposArgs, removePreviousInstallations, saveSetupReposInDb } from '../../../utils/db/setupRepos';
 import { getUserIdByTopicName } from '../../../utils/db/users';
-import { insertRepoConfig, removeRepoconfigForInstallId } from '../../../utils/db/repos';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[setupHandler]Saving setup info in db...");
