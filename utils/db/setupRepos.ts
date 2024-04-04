@@ -152,14 +152,38 @@ const removeExtraRepositories = async (incomingRepoNames: string[], repo_owner: 
     });
 };
 
-export const removePreviousInstallations = async (install_id: string) => {
+export const removePreviousInstallations = async (install_id: string, provider: string) => {
     const query = `UPDATE repos
     SET install_id = array_remove(install_id, '${install_id}')
-    WHERE '${install_id}' = ANY (install_id);
+    WHERE '${install_id}' = ANY (install_id) AND repo_provider = '${provider}';
     `;
     await conn.query(query).catch(err => {
         console.error(`[removePreviousInstallations] Could not remove previous repos for ${install_id}`);
         throw new Error('Failed to remove previous repos');
     });
     console.debug(`[removePreviousInstallations] Previous installations removed for ${install_id}`);
+}
+
+export const removeRepoConfig = async (install_id: string, repo_names: string[], provider: string, user_id: string) => {
+    const deleteRepoConfigQuery = `
+        DELETE FROM repo_config
+        WHERE repo_id IN (
+        SELECT id
+        FROM repos
+        WHERE install_ids && ARRAY[$1]
+            AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
+            AND repo_provider = $3
+        )
+        AND user_id = $4;
+    `;
+
+    const result = await conn.query(deleteRepoConfigQuery, [install_id, repo_names, provider, user_id])
+        .catch((err) => {
+            console.error(`[removeRepoConfig] Could not remove repo config for: ${user_id}, ${repo_names}`, { pg_query: deleteRepoConfigQuery }, err);
+            throw new Error("Error in running the query on the database", err);
+        });
+    if (result.rowCount === 0) {
+        throw new Error('No repo config found to remove');
+    }
+    console.debug(`[removeRepoConfig] Previous repoConfig removed for ${install_id} and ${user_id}`);
 }
