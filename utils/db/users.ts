@@ -265,7 +265,7 @@ export const getUserIdByTopicName = async function(topic_name: string) {
 		return null;
 	} else if (queryResult && queryResult.rowCount > 1) {
 		console.error(`[getUserIdByTopicName] Multiple users found for topicName ${topic_name}`);
-		return null;
+		return queryResult?.rows[0].id; //TODO: Handle the situation better where multiple users are found
 	} else {
 		return queryResult?.rows[0].id;
 	}
