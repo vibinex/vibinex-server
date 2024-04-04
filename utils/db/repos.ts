@@ -170,17 +170,15 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	}
 	return userRows[0].config;
 }
-export const insertRepoConfig = async (repoOwner: string, repoNames: string[], userId: string, provider: string) => {
-	// Construct the VALUES clause dynamically
-	const valuesClause = repoNames.map(repoName => `('${repoName}', '${repoOwner}', '${provider}')`).join(',');
+
+export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 	const query = `
 		INSERT INTO repo_config (repo_id, user_id, auto_assign, comment_setting)
 		SELECT id, $1, true, true
-		FROM public.repos
-		WHERE (repo_name, repo_owner, repo_provider) IN (${valuesClause})
+		FROM unnest($2::INT[]) AS t(id)
 		ON CONFLICT DO NOTHING
 		`;
-	const params = [userId];
+	const params = [userId, repoIds];
 
 	const queryIsSuccessful = await conn.query(query, params)
 	.then((dbResponse) => {
@@ -190,9 +188,32 @@ export const insertRepoConfig = async (repoOwner: string, repoNames: string[], u
 		return true;
 	})
 	.catch((err: Error) => {
-		console.error(`[db/insertRepoConfigOnSetup] Could not insert repo config for the repos: ${repoNames}`, { pg_query: query }, err);
+		console.error(`[db/insertRepoConfigOnSetup] Could not insert repo config for the repos: ${repoIds}`, { pg_query: query }, err);
 		return false;
 	})
 	return queryIsSuccessful;
-  }
+}
   
+export const removeRepoconfigForInstallId = async (install_id: string, repo_names: string[], provider: string, user_id: string) => {
+    const deleteRepoConfigQuery = `
+        DELETE FROM repo_config
+        WHERE repo_id IN (
+        SELECT id
+        FROM repos
+        WHERE install_ids && ARRAY[$1]
+            AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
+            AND repo_provider = $3
+        )
+        AND user_id = $4;
+    `;
+
+    const result = await conn.query(deleteRepoConfigQuery, [install_id, repo_names, provider, user_id])
+        .catch((err) => {
+            console.error(`[removeRepoConfig] Could not remove repo config for: ${user_id}, ${repo_names}`, { pg_query: deleteRepoConfigQuery }, err);
+            throw new Error("Error in running the query on the database", err);
+        });
+    if (result.rowCount === 0) {
+        throw new Error('No repo config found to remove');
+    }
+    console.debug(`[removeRepoConfig] Previous repoConfig removed for ${install_id} and ${user_id}`);
+}
