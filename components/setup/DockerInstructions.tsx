@@ -86,7 +86,8 @@ Coming Soon!
 				} else {
 					setSelfHostingCode(`
 docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
+mkdir ~/.config/vibinex &&\n
+docker run -e INSTALL_ID=${response.data.installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
 					`);
 				}
 			}
