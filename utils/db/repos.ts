@@ -200,7 +200,7 @@ export const removeRepoconfigForInstallId = async (install_id: string, repo_name
         WHERE repo_id IN (
         SELECT id
         FROM repos
-        WHERE install_ids && ARRAY[$1]
+        WHERE install_id && ARRAY[$1]
             AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
             AND repo_provider = $3
         )

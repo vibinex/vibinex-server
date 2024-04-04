@@ -11,14 +11,14 @@ export interface SetupReposArgs {
 export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): Promise<boolean> => {
     const { repo_owner, repo_provider, repo_names, install_id } = args;
     const insertReposQuery = `
-        INSERT INTO repos (repo_name, install_ids, repo_owner, repo_provider)
+        INSERT INTO repos (repo_name, install_id, repo_owner, repo_provider)
         SELECT repo_name, ARRAY[$4]::INT[], $1, $2
         FROM unnest($3::TEXT[]) AS t(repo_name)
         ON CONFLICT (repo_name) DO UPDATE
             SET install_ids = CASE
-            WHEN NOT (repos.install_ids && ARRAY[$4]::INT[]) -- user's install_id not present
-            THEN repos.install_ids || $4 -- append user's install_id
-            ELSE repos.install_ids -- no update needed
+            WHEN NOT (repos.install_id && ARRAY[$4]::INT[]) -- user's install_id not present
+            THEN repos.install_id || $4 -- append user's install_id
+            ELSE repos.install_id -- no update needed
             END,
             repo_owner = $1,
             repo_provider = $2
