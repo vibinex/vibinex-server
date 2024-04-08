@@ -180,7 +180,7 @@ export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 		`;
 	const params = [userId, repoIds];
 
-	const queryIsSuccessful = await conn.query(query, params)
+	const isQuerySuccessful = await conn.query(query, params)
 	.then((dbResponse) => {
 		if (dbResponse.rowCount == 0) {
 			return false;
@@ -191,29 +191,29 @@ export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 		console.error(`[db/insertRepoConfigOnSetup] Could not insert repo config for the repos: ${repoIds}`, { pg_query: query }, err);
 		return false;
 	})
-	return queryIsSuccessful;
+	return isQuerySuccessful;
 }
   
-export const removeRepoconfigForInstallId = async (install_id: string, repo_names: string[], provider: string, user_id: string) => {
+export const removeRepoconfigForInstallId = async (installId: string, repoNamesToBeRetained: string[], provider: string, userId: string) => {
     const deleteRepoConfigQuery = `
         DELETE FROM repo_config
         WHERE repo_id IN (
-        SELECT id
-        FROM repos
-        WHERE install_id && ARRAY[$1]
-            AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
-            AND repo_provider = $3
-        )
+			SELECT id
+			FROM repos
+			WHERE install_id && ARRAY[$1]
+				AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
+				AND repo_provider = $3
+			)
         AND user_id = $4;
     `;
 
-    const result = await conn.query(deleteRepoConfigQuery, [install_id, repo_names, provider, user_id])
+    const result = await conn.query(deleteRepoConfigQuery, [installId, repoNamesToBeRetained, provider, userId])
         .catch((err) => {
-            console.error(`[removeRepoConfig] Could not remove repo config for: ${user_id}, ${repo_names}`, { pg_query: deleteRepoConfigQuery }, err);
+            console.error(`[removeRepoConfig] Could not remove repo config for: ${userId}, ${repoNamesToBeRetained}`, { pg_query: deleteRepoConfigQuery }, err);
             throw new Error("Error in running the query on the database", err);
         });
     if (result.rowCount === 0) {
         throw new Error('No repo config found to remove');
     }
-    console.debug(`[removeRepoConfig] Previous repoConfig removed for ${install_id} and ${user_id}`);
+    console.debug(`[removeRepoConfig] Previous repoConfig removed for ${installId} and ${userId}`);
 }
