@@ -26,7 +26,11 @@ export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): 
     `;
     try {
         await conn.query('BEGIN');
-        const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery, [repo_owner, repo_provider, repo_names, install_id]);
+        const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery, [repo_owner, repo_provider, repo_names, install_id])
+        .catch(err => {
+            console.error(`[saveSetupReposInDb] Could not insert repos for user (${userId}) in the ${args.repo_owner} workspace on ${args.repo_provider}`, { pg_query: insertReposQuery }, err);
+            throw err;
+        });
         if (reposRowCount === 0) {
             await conn.query('ROLLBACK');
             console.error(`[saveSetupRepos] No repositories were inserted or updated for: ${install_id}, ${repo_names}`);

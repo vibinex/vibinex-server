@@ -20,7 +20,7 @@ interface DockerInstructionsProps {
 interface SetupReposApiBodyArgs {
 	owner: string,
 	provider: string,
-	repos: string [],
+	repos: string[],
 	installationId: string
 }
 
@@ -83,10 +83,27 @@ asia.gcr.io/vibi-prod/dpu/dpu
 					setSelfHostingCode(`
 Coming Soon!
 					`)
+				} else if (selectedInstallationType === 'project' && selectedProvider === 'bitbucket') {
+					if (!session) {
+						console.error(`[DockerInstructions] could not get session for userId: ${userId}`);
+						return;
+					}
+					if (isRepoSelectionDone) {
+						setSelfHostingCode(`
+docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+mkdir -p ~/.config/vibinex &&\n
+docker run -e INSTALL_ID=${response.data.installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
+					`);
+					}
+					else {
+						let providerReposForUser = await getUserReposForProvider(session, 'bitbucket');
+						setAllRepos(providerReposForUser);
+					}
 				} else {
 					setSelfHostingCode(`
 docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dpu
+mkdir -p ~/.config/vibinex &&\n
+docker run -e INSTALL_ID=${response.data.installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
 					`);
 				}
 			}
@@ -115,13 +132,13 @@ docker run -e INSTALL_ID=${response.data.installId} asia.gcr.io/vibi-prod/dpu/dp
 	const handleSubmit = () => {
 		setIsRepoSubmitButtonDisabled(true)
 		if (!installId) {
-            console.error("[handleSubmit] InstallId is not available.");
+			console.error("[handleSubmit] InstallId is not available.");
 			// TODO - there is no user feedback here. The user might not know that something has gone wrong
-            return;
-        }
+			return;
+		}
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
 		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId }).then((response) => {
-			if (response.status != 200){
+			if (response.status != 200) {
 				console.error(`[DockerInstructions/handleSubmit] something went wrong while saving repos data in db`);
 			} else {
 				console.info(`[DockerInstructions/handleSubmit] repos data saved successfully in db`);
@@ -136,12 +153,12 @@ asia.gcr.io/vibi-prod/dpu/dpu
 			}
 			setIsRepoSubmitButtonDisabled(false);
 		})
-		.catch((error) => {
-			setSelfHostingCode(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
-			setIsRepoSelectionDone(false);
-			setIsRepoSubmitButtonDisabled(false);
-			console.error(`[DockerInstructions] Unable to save selected repos in db for user ${userId} - ${error.message}`);
-		});
+			.catch((error) => {
+				setSelfHostingCode(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
+				setIsRepoSelectionDone(false);
+				setIsRepoSubmitButtonDisabled(false);
+				console.error(`[DockerInstructions] Unable to save selected repos in db for user ${userId} - ${error.message}`);
+			});
 	};
 
 	return (
@@ -182,8 +199,34 @@ asia.gcr.io/vibi-prod/dpu/dpu
 								<li>Storage: Depends on codebase size, maximum supported - 20 GB</li>
 							</ul>
 						</>
-			): (
-				// selectedInstallationType === 'project'
+			) : 
+			// selectedInstallationType === 'project'
+			(selectedProvider === 'bitbucket' && !isRepoSelectionDone) ? ( 
+				<div>
+					<h4 className='my-2 font-semibold'>Select Repositories</h4>
+					{allRepos.map((repo, index) => (
+						<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
+							<input
+								type="checkbox"
+								id={JSON.stringify(repo)}
+								value={`${repo.repo_owner}/${repo.repo_name}`}
+								checked={selectedRepos.includes(repo)}
+								onChange={(event) => handleCheckboxChange(event, repo)}
+							/>
+							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
+						</div>
+					))}
+					<div className='flex gap-2 py-2'>
+						<Button variant='outlined' onClick={handleSelectAll}>
+						{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
+						</Button>
+						<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
+							Submit
+						</Button>
+					</div>
+				</div> 
+				) :
+			(
 				<>
 					<CodeWithCopyButton text={selfHostingCode} />
 					<p className="text-xs mt-2">Minimum config required for running docker image:</p>

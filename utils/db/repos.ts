@@ -85,8 +85,7 @@ export const getUserRepositoriesByTopic = async (topicId: string, provider: stri
 }
 
 export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
-	console.log(`configType = ${configType}`);
-	const configTypeColumn = configType === "comment"? "comment_setting" : "auto_assign";
+	const configTypeColumn = configType === 'comment' ? 'comment_setting' : 'auto_assign';
 	const update_repo_config_q = `UPDATE repo_config
 	SET 
 		comment_setting = CASE WHEN '${configTypeColumn}' = 'comment_setting' THEN ${convert(value)} ELSE comment_setting END,
@@ -140,22 +139,22 @@ export const getRepoConfig = async (repo: RepoIdentifier) => {
 };
 
 export const getRepoConfigByUserAndRepo = async (provider: string, repoName: string, repoOwner: string, userId: string) => {
-    console.info(`[getRepoConfig] Getting repo config for user: ${userId} and repo: ${repoName}`);
-    const query = `
-    SELECT json_build_object(
-        'auto_assign', rc.auto_assign,
-        'comment', rc.comment_setting
-    ) AS config,
+	console.info(`[getRepoConfig] Getting repo config for user: ${userId} and repo: ${repoName}`);
+	const query = `
+	SELECT json_build_object(
+		'auto_assign', rc.auto_assign,
+		'comment', rc.comment_setting
+	) AS config,
 	rc.user_id AS user_id
-    FROM repo_config rc
-    WHERE repo_id = (SELECT r.id FROM repos r 
+	FROM repo_config rc
+	WHERE repo_id = (SELECT r.id FROM repos r 
 		WHERE r.repo_name = '${repoName}' AND
 		r.repo_owner = '${repoOwner}' AND
 		r.repo_provider = '${provider}')
-    `;
-    const result = await conn.query(query).catch(err => {
+	`;
+	const result = await conn.query(query).catch(err => {
 		console.error(`[getRepoConfigByUserAndRepo] Could not get repo config for: ${userId}, ${repoName}`,
-            { pg_query: query }, err);
+			{ pg_query: query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
 	if (result.rows.length === 0) {
@@ -168,7 +167,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	if (userRows.length === 0) {
 		// return some default
 		console.error(`[getRepoConfigByUserAndRepo] Repo config not found for user: ${userId}. Sending default configuration: {auto_assign: false, comment: false}.`);
-		return {auto_assign: false, comment: false};
+		return { auto_assign: false, comment: false };
 	}
 	return userRows[0].config;
 }
@@ -182,40 +181,41 @@ export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 		`;
 	const params = [userId, repoIds];
 
-	const queryIsSuccessful = await conn.query(query, params)
-	.then((dbResponse) => {
-		if (dbResponse.rowCount == 0) {
+	const isQuerySuccessful = await conn.query(query, params)
+		.then((dbResponse) => {
+			if (dbResponse.rowCount == 0) {
+				return false;
+			}
+			return true;
+		})
+		.catch((err: Error) => {
+			console.error(`[db/insertRepoConfigOnSetup] Could not insert repo config for the repos: ${repoIds}`, { pg_query: query }, err);
 			return false;
-		}
-		return true;
-	})
-	.catch((err: Error) => {
-		console.error(`[db/insertRepoConfigOnSetup] Could not insert repo config for the repos: ${repoIds}`, { pg_query: query }, err);
-		return false;
-	})
-	return queryIsSuccessful;
+		})
+	return isQuerySuccessful;
 }
-  
-export const removeRepoconfigForInstallId = async (install_id: string, repo_names: string[], provider: string, user_id: string) => {
-    const deleteRepoConfigQuery = `
-        DELETE FROM repo_config
-        WHERE repo_id IN (
-        SELECT id
-        FROM repos
-        WHERE install_id && ARRAY[$1]
-            AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
-            AND repo_provider = $3
-        )
-        AND user_id = $4;
-    `;
 
-    const result = await conn.query(deleteRepoConfigQuery, [install_id, repo_names, provider, user_id])
-        .catch((err) => {
-            console.error(`[removeRepoConfig] Could not remove repo config for: ${user_id}, ${repo_names}`, { pg_query: deleteRepoConfigQuery }, err);
-            throw new Error("Error in running the query on the database", err);
-        });
-    if (result.rowCount === 0) {
-        throw new Error('No repo config found to remove');
-    }
-    console.debug(`[removeRepoConfig] Previous repoConfig removed for ${install_id} and ${user_id}`);
+export const removeRepoConfigForInstallIdForOwner = async (installId: string, repoNamesToBeRetained: string[], repoOwner: string, repoProvider: string, userId: string) => {
+	const deleteRepoConfigQuery = `
+		DELETE FROM repo_config
+		WHERE repo_id IN (
+			SELECT id
+			FROM repos
+			WHERE install_id && ARRAY[$1]
+				AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
+				AND repo_owner = $3
+				AND repo_provider = $4
+			)
+		AND user_id = $5;
+	`;
+
+	const result = await conn.query(deleteRepoConfigQuery, [installId, repoNamesToBeRetained, repoOwner, repoProvider, userId])
+		.catch((err) => {
+			console.error(`[removeRepoConfig] Could not remove repo config for: ${userId}, ${repoNamesToBeRetained}`, { pg_query: deleteRepoConfigQuery }, err);
+			throw new Error("Error in running the query on the database", err);
+		});
+	if (result.rowCount === 0) {
+		console.error(`[removeRepoConfig] No repo config found to remove`);
+	}
+	console.debug(`[removeRepoConfig] Previous repoConfig removed for ${installId} and ${userId}`);
 }
