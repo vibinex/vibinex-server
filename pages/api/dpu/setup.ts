@@ -36,7 +36,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			res.status(500).json({ "error": "Internal Server Error" });
 			return;
 		}
-	
+
 		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
