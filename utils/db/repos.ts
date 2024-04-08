@@ -195,7 +195,7 @@ export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 	return isQuerySuccessful;
 }
 
-export const removeRepoconfigForInstallId = async (installId: string, repoNamesToBeRetained: string[], provider: string, userId: string) => {
+export const removeRepoConfigForInstallIdForOwner = async (installId: string, repoNamesToBeRetained: string[], repoOwner: string, repoProvider: string, userId: string) => {
 	const deleteRepoConfigQuery = `
 		DELETE FROM repo_config
 		WHERE repo_id IN (
@@ -203,18 +203,19 @@ export const removeRepoconfigForInstallId = async (installId: string, repoNamesT
 			FROM repos
 			WHERE install_id && ARRAY[$1]
 				AND repo_name NOT IN (SELECT unnest($2::TEXT[]))
-				AND repo_provider = $3
+				AND repo_owner = $3
+				AND repo_provider = $4
 			)
-		AND user_id = $4;
+		AND user_id = $5;
 	`;
 
-	const result = await conn.query(deleteRepoConfigQuery, [installId, repoNamesToBeRetained, provider, userId])
+	const result = await conn.query(deleteRepoConfigQuery, [installId, repoNamesToBeRetained, repoOwner, repoProvider, userId])
 		.catch((err) => {
 			console.error(`[removeRepoConfig] Could not remove repo config for: ${userId}, ${repoNamesToBeRetained}`, { pg_query: deleteRepoConfigQuery }, err);
 			throw new Error("Error in running the query on the database", err);
 		});
 	if (result.rowCount === 0) {
-		throw new Error('No repo config found to remove');
+		console.error(`[removeRepoConfig] No repo config found to remove`);
 	}
 	console.debug(`[removeRepoConfig] Previous repoConfig removed for ${installId} and ${userId}`);
 }

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { removeRepoconfigForInstallId } from '../../../utils/db/repos';
+import { removeRepoConfigForInstallIdForOwner } from '../../../utils/db/repos';
 import { SetupReposArgs, removePreviousInstallations, saveSetupReposInDb } from '../../../utils/db/setupRepos';
 import { getUserIdByTopicName } from '../../../utils/db/users';
 
@@ -11,6 +11,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).json({ "error": "Invalid request body" });
 		return;
 	}
+
 	// get user_id for the given install_id
 	const userId = await getUserIdByTopicName(jsonBody.installationId).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
@@ -18,6 +19,14 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!userId) {
 		console.error(`[setupHandler/getUserIdByTopicName] NO userId found for topic name: ${jsonBody.installationId} from database.`);
 		res.status(404).json({ "error": "No userId found for given installationId" });
+		return;
+	}
+
+	try {
+		await removePreviousInstallations(jsonBody.installationId, jsonBody.info[0].provider);
+	} catch (err) {
+		console.error(`[setupHandler] Unable to remove previous installations for ${jsonBody.installationId}`, err);
+		res.status(500).json({ "error": "Internal Server Error" });
 		return;
 	}
 	const allSetupReposPromises = [];
@@ -29,15 +38,14 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			install_id: jsonBody.installationId
 		}
 		try {
-			await removePreviousInstallations(jsonBody.installationId, ownerInfo.provider);
-			await removeRepoconfigForInstallId(jsonBody.installationId, ownerInfo.provider, ownerInfo.repos, userId);
+			await removeRepoConfigForInstallIdForOwner(jsonBody.installationId, ownerInfo.repos, ownerInfo.owner, ownerInfo.provider, userId);
 		} catch (err) {
-			console.error(`[setupHandler] Unable to remove previous installations for ${jsonBody.installationId}`, err);
+			console.error(`[setupHandler] Unable to remove previous repo configurations for ${jsonBody.installationId}`, err);
 			res.status(500).json({ "error": "Internal Server Error" });
 			return;
 		}
-
-		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
+			
+			const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
 			});
