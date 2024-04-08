@@ -47,7 +47,7 @@ export const getUserById = async (userId: string): Promise<DbUser> => {
 	if (user_search_by_id_result.rowCount > 1) {
 		console.warn("[getUserById] Multiple users exist with same id", { userId });
 	}
-	
+
 	return user_search_by_id_result.rows[0];
 }
 
@@ -250,4 +250,23 @@ export const getAuthInfoFromDb = async function (user_id: string): Promise<AuthI
 			return { authInfo: null };
 		});
 	return authinfo_promise.authInfo;
+}
+
+export const getUserIdByTopicName = async function (topic_name: string) {
+	const query = `SELECT id FROM users WHERE topic_name = $1`;
+	const params = [topic_name];
+
+	const queryResult = await conn.query(query, params).catch((err) => {
+		console.error(`[getUserIdByTopicName] Query failed: Select from users where topic_name = ${topic_name}`, { pg_query: query }, err);
+	});
+
+	if (queryResult && queryResult.rowCount === 0) {
+		console.error(`[getUserIdByTopicName] No user found for topicName ${topic_name}`);
+		return null;
+	}
+	if (queryResult && queryResult.rowCount > 1) {
+		console.error(`[getUserIdByTopicName] Multiple users found for topicName ${topic_name}`);
+		// TODO: Handle the situation better where multiple users are found
+	}
+	return queryResult?.rows[0].id;
 }
