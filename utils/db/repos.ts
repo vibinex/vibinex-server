@@ -184,7 +184,7 @@ export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 	const isQuerySuccessful = await conn.query(query, params)
 		.then((dbResponse) => {
 			if (dbResponse.rowCount == 0) {
-				return false;
+				console.info(`[db/insertRepoConfig] No new repo config added for user: ${userId}. Either the repo is already configured for the user or the insert query failed`);
 			}
 			return true;
 		})
