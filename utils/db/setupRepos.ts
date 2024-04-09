@@ -1,4 +1,5 @@
 import conn from '.';
+import { convert } from './converter';
 import { insertRepoConfig } from './repos';
 
 export interface SetupReposArgs {
@@ -12,21 +13,22 @@ export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): 
     const { repo_owner, repo_provider, repo_names, install_id } = args;
     const insertReposQuery = `
         INSERT INTO repos (repo_name, install_id, repo_owner, repo_provider)
-        SELECT repo_name, ARRAY[$4]::INT[], $1, $2
-        FROM unnest($3::TEXT[]) AS t(repo_name)
-        ON CONFLICT (repo_name) DO UPDATE
-            SET install_ids = CASE
-            WHEN NOT (repos.install_id && ARRAY[$4]::INT[]) -- user's install_id not present
-            THEN repos.install_id || $4 -- append user's install_id
+        SELECT repo_name, ARRAY[${convert(install_id)}], ${convert(repo_owner)}, ${convert(repo_provider)}
+        FROM unnest(${convert(repo_names)}::TEXT[]) AS t(repo_name)
+        ON CONFLICT (repo_name, repo_owner, repo_provider) DO UPDATE
+            SET install_id = CASE
+            WHEN NOT (repos.install_id && ARRAY[${convert(install_id)}]) -- user's install_id not present
+            THEN repos.install_id || ARRAY[${convert(install_id)}] -- append user's install_id
             ELSE repos.install_id -- no update needed
             END,
-            repo_owner = $1,
-            repo_provider = $2
+            repo_owner = ${convert(repo_owner)},
+            repo_provider = ${convert(repo_provider)}
         RETURNING id AS repo_id;
     `;
     try {
         await conn.query('BEGIN');
-        const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery, [repo_owner, repo_provider, repo_names, install_id])
+        console.debug(`[saveSetupReposInDb] insert query: `, insertReposQuery);
+        const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery)
         .catch(err => {
             console.error(`[saveSetupReposInDb] Could not insert repos for user (${userId}) in the ${args.repo_owner} workspace on ${args.repo_provider}`, { pg_query: insertReposQuery }, err);
             throw err;
@@ -42,6 +44,7 @@ export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): 
     
         if (!insertRepoConfigSuccess) {
             await conn.query('ROLLBACK');
+            console.error(`[saveSetupRepos] Could not insert repo configs for: ${install_id}, ${repo_names}`);
             return false;
         }
         await conn.query('COMMIT');
