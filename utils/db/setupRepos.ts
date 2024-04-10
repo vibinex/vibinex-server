@@ -27,7 +27,7 @@ export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): 
     `;
     try {
         await conn.query('BEGIN');
-        console.log(`[saveSetupReposInDb] query paramters: `, repo_owner, repo_provider, JSON.stringify(repo_names), install_id, insertReposQuery);
+        console.debug(`[saveSetupReposInDb] insert query: `, insertReposQuery);
         const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery)
         .catch(err => {
             console.error(`[saveSetupReposInDb] Could not insert repos for user (${userId}) in the ${args.repo_owner} workspace on ${args.repo_provider}`, { pg_query: insertReposQuery }, err);
