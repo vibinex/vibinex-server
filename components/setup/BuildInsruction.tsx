@@ -53,34 +53,26 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		}
 	};
 
-	const buildInstructionContent = () => {
-		if (selectedHosting === 'selfhosting') {
-			return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} />;
-		} else if (selectedHosting === 'cloud') {
-			if (selectedInstallationType === 'project') {
-				return (
-					<div className="flex items-center gap-4">
-						<Button variant="contained" onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
-							Trigger Cloud Build
-						</Button>
-						{renderBuildStatus()}
-					</div>
-				);
-			}
-			else {
-				// TODO - if repo selection is false show repos, if true pat text field and trigger cloud build button
-				return ("Not Implemented!");
-			}
-		} else {
-			return <div>Select a hosting option to view instructions.</div>;
+	if (selectedHosting === 'selfhosting') {
+		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} />;
+	} else if (selectedHosting === 'cloud') {
+		if (selectedInstallationType === 'project') {
+			return (
+				<div className="flex items-center gap-4">
+					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
+						Trigger Cloud Build
+					</Button>
+					{renderBuildStatus()}
+				</div>
+			);
 		}
-	};
-
-	return (
-		<div>
-			{buildInstructionContent()}
-		</div>
-	);
+		else {
+			// TODO - if repo selection is false show repos, if true pat text field and trigger cloud build button
+			return ("Not Implemented!");
+		}
+	} else {
+		return <div>Select a hosting option to view instructions.</div>;
+	}
 };
 
 export default BuildInstruction;
