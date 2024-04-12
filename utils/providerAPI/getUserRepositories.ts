@@ -101,6 +101,7 @@ const getUserRepositoriesForGitHub = async (access_token: string, authId?: strin
 					},
 				}
 			);
+
 			const data = response.data.data;
 			const repos: GithubRepoObj[] = data.viewer.repositories.nodes;
 
