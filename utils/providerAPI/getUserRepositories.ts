@@ -101,7 +101,6 @@ const getUserRepositoriesForGitHub = async (access_token: string, authId?: strin
 					},
 				}
 			);
-			console.log(`[getUserRepositoriesForGitHub] response = ${JSON.stringify(response.data)}`)
 
 			const data = response.data.data;
 			const repos: GithubRepoObj[] = data.viewer.repositories.nodes;
