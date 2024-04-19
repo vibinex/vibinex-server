@@ -1,5 +1,4 @@
 import axios from "axios";
-import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { RepoIdentifier } from "../../types/repository";
 import { RepoProvider } from "../../utils/providerAPI";
@@ -13,14 +12,15 @@ interface SetupReposApiBodyArgs {
 	installationId: string
 }
 
-async function getUserReposForProvider(session: Session, targetProvider: string) {
-	const allRepos = await axios.get<{repoList: RepoIdentifier[]}>('/api/docs/getRepoList').then((response) => {
-		return response.data.repoList;
-	})
-	.catch((err) => {
-		console.error('[getUserReposForProvider] Error occurred while getting repo list from API', err);
-		return [];
-	});
+async function getUserReposForProvider(targetProvider: string) {
+	const allRepos = await axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getRepoList')
+		.then((response) => {
+			return response.data.repoList;
+		})
+		.catch((err) => {
+			console.error('[getUserReposForProvider] Error occurred while getting repo list from API', err);
+			return [];
+		});
 	// Filter repos based on the targetProvider
 	const filteredRepos = allRepos.filter(repo => repo.repo_provider === targetProvider);
 	return filteredRepos;
@@ -45,7 +45,7 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 	return Array.from(setupArgsMap.values());
 }
 
-const RepoSelection = ({ repoProvider, session, installId, setIsRepoSelectionDone }: { repoProvider: RepoProvider, session: Session | null, installId: string, setIsRepoSelectionDone: Function }) => {
+const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function }) => {
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [isGetReposLoading, setIsGetReposLoading] = useState<boolean>(false);
@@ -54,12 +54,7 @@ const RepoSelection = ({ repoProvider, session, installId, setIsRepoSelectionDon
 
 	useEffect(() => {
 		setIsGetReposLoading(true);
-		if (!session) {
-			console.error(`[RepoSelection] could not get session for user.`);
-			setError("No user session")
-			return;
-		}
-		getUserReposForProvider(session, repoProvider)
+		getUserReposForProvider(repoProvider)
 			.then((providerReposForUser) => setAllRepos(providerReposForUser))
 			.catch(err => {
 				console.log(`[RepoSelection] getUserReposForProvider failed:`, err);
@@ -68,7 +63,7 @@ const RepoSelection = ({ repoProvider, session, installId, setIsRepoSelectionDon
 			.finally(() => {
 				setIsGetReposLoading(false);
 			});
-	}, [repoProvider, session])
+	}, [repoProvider])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
 		if (event.target.checked) {
@@ -119,13 +114,13 @@ const RepoSelection = ({ repoProvider, session, installId, setIsRepoSelectionDon
 				(<div className='border-4 border-t-primary-main rounded-full w-12 h-12 animate-spin mx-auto'> </div>) :
 				allRepos.map((repo, index) => (
 					<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
-						<input
+					<input
 							type="checkbox"
 							id={JSON.stringify(repo)}
 							value={`${repo.repo_owner}/${repo.repo_name}`}
 							checked={selectedRepos.includes(repo)}
 							onChange={(event) => handleCheckboxChange(event, repo)}
-						/>
+/>
 						<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
 					</div>
 				))
@@ -135,7 +130,7 @@ const RepoSelection = ({ repoProvider, session, installId, setIsRepoSelectionDon
 					{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
 				</Button>
 				<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
-					Submit
+			Submit
 				</Button>
 			</div>
 		</div>

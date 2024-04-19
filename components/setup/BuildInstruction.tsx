@@ -82,7 +82,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			</div>);
 		}
 		if (!isRepoSelectionDone && (selectedProvider === 'bitbucket' || selectedInstallationType === 'individual')) {
-			return (<RepoSelection repoProvider={selectedProvider} session={session} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
 		}
 		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
 	} else if (selectedHosting === 'cloud') {
