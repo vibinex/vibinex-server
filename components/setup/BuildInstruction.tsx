@@ -81,7 +81,10 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				<p>Something went wrong while fetching install id.</p>
 			</div>);
 		}
-		if (!isRepoSelectionDone && (selectedProvider === 'bitbucket' || selectedInstallationType === 'individual')) {
+		if (!isRepoSelectionDone && (
+			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') || 
+			(selectedProvider === 'github' && selectedInstallationType === 'individual')
+		)) {
 			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
 		}
 		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
