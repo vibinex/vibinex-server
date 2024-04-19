@@ -1,60 +1,90 @@
 import axios from 'axios';
 import type { Session } from 'next-auth';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { RepoProvider } from '../../utils/providerAPI';
 import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
 import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
+import RepoSelection from './RepoSelection';
 
 interface BuildInstructionProps {
 	selectedHosting: string;
-	selectedProvider: string;
+	selectedProvider: RepoProvider;
 	selectedInstallationType: string;
 	userId: string;
 	session: Session | null;
 }
 
-interface RenderDockerInstructionsProps {
-	selectedInstallationType: string;
-	selectedProvider: string;
+const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isButtonDisabled: boolean }> = ({ buildStatus, isButtonDisabled }) => {
+	if (buildStatus === null) {
+		if (isButtonDisabled) {
+			return (<div className='border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin'> </div>)
+		}
+		return (<></>)
+	} else if (buildStatus.success) {
+		return <span className='text-success'> Build succeeded! </span>
+	} else {
+		return (<span className='text-error'> Build failed! Error: {buildStatus.message} </span>)
+	}
 }
 
 const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType, session }) => {
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
+	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
+	const [installId, setInstallId] = useState<string | null>(null);
+	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
 
 	const handleBuildButtonClick = () => {
 		setIsButtonDisabled(true);
 		setBuildStatus(null);
 
 		axios.post('/api/dpu/trigger', { userId })
-		.then((response) => {
-			console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
-			setBuildStatus(response.data);
-			if (response.data.success) {
-				return;
+			.then((response) => {
+				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
+				setBuildStatus(response.data);
+				if (response.data.success) {
+					return;
+				}
+			})
+			.catch((error) => {
+				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
+				setIsButtonDisabled(false);
+				setBuildStatus({ success: false, message: 'API request failed' });
+			})
+	};
+
+	useEffect(() => {
+		setIsGetInstallIdLoading(true);
+		axios.post('/api/dpu/pubsub', { userId }).then(async (response) => {
+			if (response.data.installId) {
+				setInstallId(response.data.installId);
 			}
 		})
-		.catch((error) => {
-			console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
-			setIsButtonDisabled(false);
-			setBuildStatus({ success: false, message: 'API request failed' });
-		})
-	};
-
-	const renderBuildStatus = () => {
-		if (buildStatus === null) {
-			return isButtonDisabled ? <div className='border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin'></div> : null;
-		} else {
-			return buildStatus.success ? (
-				<span className='text-success'>Build succeeded!</span>
-			) : (
-				<span className='text-error'>Build failed! Error: {buildStatus.message}</span>
-			);
-		}
-	};
+			.catch((error) => {
+				console.error(`[BuildInstruction] Unable to get topic name for user ${userId} - ${error.message}`);
+			})
+			.finally(() => {
+				setIsGetInstallIdLoading(false);
+			});
+	}, [userId])
 
 	if (selectedHosting === 'selfhosting') {
-		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} />;
+		if (isGetInstallIdLoading) {
+			return (<>
+				<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
+				Generating topic name...
+			</>);
+		}
+		if (!installId) {
+			return (<div className="flex items-center gap-4">
+				<p>Something went wrong while fetching install id.</p>
+			</div>);
+		}
+		if (!isRepoSelectionDone && (selectedProvider === 'bitbucket' || selectedInstallationType === 'individual')) {
+			return (<RepoSelection repoProvider={selectedProvider} session={session} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+		}
+		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
 	} else if (selectedHosting === 'cloud') {
 		if (selectedInstallationType === 'project') {
 			return (
@@ -62,13 +92,12 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
 						Trigger Cloud Build
 					</Button>
-					{renderBuildStatus()}
+					<BuildStatus buildStatus={buildStatus} isButtonDisabled={isButtonDisabled} />
 				</div>
 			);
-		}
-		else {
+		} else {
 			// TODO - if repo selection is false show repos, if true pat text field and trigger cloud build button
-			return ("Not Implemented!");
+			return (<>Not Implemented!</>);
 		}
 	} else {
 		return <div>Select a hosting option to view instructions.</div>;

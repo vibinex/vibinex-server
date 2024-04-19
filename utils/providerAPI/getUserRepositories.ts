@@ -160,3 +160,10 @@ export const getUserRepositories = async (session: Session) => {
 	})
 	return Array.from(allRepos);
 }
+
+export async function getUserReposForProvider(session: Session, targetProvider: string) {
+	const allRepos = await getUserRepositories(session);
+	// Filter repos based on the targetProvider
+	const filteredRepos = allRepos.filter(repo => repo.repo_provider === targetProvider);
+	return filteredRepos;
+}
