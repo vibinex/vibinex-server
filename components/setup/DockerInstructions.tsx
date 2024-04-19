@@ -1,15 +1,10 @@
 "use client";
 
-import axios from 'axios';
 import type { Session } from "next-auth";
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import { RepoIdentifier } from '../../types/repository';
-import { getUserRepositories } from '../../utils/providerAPI/getUserRepositories';
-import Button from '../Button';
 import CodeWithCopyButton from './CodeWithCopyButton';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
-import RepoSelection from './RepoSelection';
 
 interface DockerInstructionsProps {
 	userId: string;

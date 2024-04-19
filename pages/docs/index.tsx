@@ -6,7 +6,7 @@ import Chip from '../../components/Chip';
 import Footer from '../../components/Footer';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import RudderContext from '../../components/RudderContext';
-import BuildInstruction from '../../components/setup/BuildInsruction';
+import BuildInstruction from '../../components/setup/BuildInstruction';
 import HostingSelector from '../../components/setup/HostingSelector';
 import InstallationSelector from '../../components/setup/InstallationSelector';
 import ProviderSelector from '../../components/setup/ProviderSelector';
