@@ -1,9 +1,8 @@
 import axios from "axios";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
-import { RepoIdentifier } from "../../types/repository"
+import { RepoIdentifier } from "../../types/repository";
 import { RepoProvider } from "../../utils/providerAPI";
-import { getUserReposForProvider } from "../../utils/providerAPI/getUserRepositories";
 import Button from "../Button";
 
 
@@ -12,6 +11,19 @@ interface SetupReposApiBodyArgs {
 	provider: string,
 	repos: string[],
 	installationId: string
+}
+
+async function getUserReposForProvider(session: Session, targetProvider: string) {
+	const allRepos = await axios.get<{repoList: RepoIdentifier[]}>('/api/docs/getRepoList').then((response) => {
+		return response.data.repoList;
+	})
+	.catch((err) => {
+		console.error('[getUserReposForProvider] Error occurred while getting repo list from API', err);
+		return [];
+	});
+	// Filter repos based on the targetProvider
+	const filteredRepos = allRepos.filter(repo => repo.repo_provider === targetProvider);
+	return filteredRepos;
 }
 
 function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: string) {
