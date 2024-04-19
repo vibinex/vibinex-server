@@ -12,6 +12,7 @@ import InstallationSelector from '../../components/setup/InstallationSelector';
 import ProviderSelector from '../../components/setup/ProviderSelector';
 import TriggerContent from '../../components/setup/TriggerContent';
 import { getAuthUserId, getAuthUserName, hasValidAuthInfo, isAuthInfoExpired } from '../../utils/auth';
+import { RepoProvider } from '../../utils/providerAPI';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
 import MainAppBar from '../../views/MainAppBar';
 
@@ -31,7 +32,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 			const sessionVal = await res.json();
 			setSession(sessionVal);
 		}).catch((err) => {
-			console.error(`[LoginLogout] Error in getting session`, err);
+			console.error(`[docs] Error in getting session`, err);
 		}).finally(() => {
 			setLoading(false);
 		});
@@ -61,10 +62,10 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 	}, [rudderEventMethods, session]);
 
 	const providerOptions = [
-		{ value: 'github', label: 'Github', disabled: !hasValidAuthInfo(session, 'github') },
-		{ value: 'bitbucket', label: 'Bitbucket', disabled: !hasValidAuthInfo(session, 'bitbucket') },
+		{ value: 'github' as RepoProvider, label: 'Github', disabled: !hasValidAuthInfo(session, 'github') },
+		{ value: 'bitbucket' as RepoProvider, label: 'Bitbucket', disabled: !hasValidAuthInfo(session, 'bitbucket') },
 	];
-	const [selectedProvider, setSelectedProvider] = useState<string>('');
+	const [selectedProvider, setSelectedProvider] = useState<RepoProvider | undefined>(undefined);
 	const [selectedInstallation, setSelectedInstallation] = useState<string>('');
 	const [selectedHosting, setSelectedHosting] = useState<string>('');
 
@@ -102,13 +103,13 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 						</label>
 					</AccordionContent>
 				</AccordionItem>
-				<AccordionItem value="instruction-3" disabled={selectedHosting === ''}>
+				<AccordionItem value="instruction-3" disabled={selectedHosting === '' || !selectedProvider || selectedInstallation === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider} session={session} />
+						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider!!} session={session} />
 					</AccordionContent>
 				</AccordionItem>
-				<AccordionItem value="instruction-4" disabled={selectedProvider === ''}>
+				<AccordionItem value="instruction-4" disabled={!selectedProvider}>
 					<AccordionTrigger>Set up triggers</AccordionTrigger>
 					<AccordionContent>
 						<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation}/>
