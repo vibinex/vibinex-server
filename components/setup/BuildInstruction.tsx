@@ -15,9 +15,9 @@ interface BuildInstructionProps {
 	session: Session | null;
 }
 
-const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isButtonDisabled: boolean }> = ({ buildStatus, isButtonDisabled }) => {
+const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBuildButtonDisabled: boolean }> = ({ buildStatus, isTriggerBuildButtonDisabled }) => {
 	if (buildStatus === null) {
-		if (isButtonDisabled) {
+		if (isTriggerBuildButtonDisabled) {
 			return (<div className='border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin'> </div>)
 		}
 		return (<></>)
@@ -29,14 +29,14 @@ const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isButtonDisa
 }
 
 const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType, session }) => {
-	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+	const [isTriggerBuildButtonDisabled, setIsTriggerBuildButtonDisabled] = useState<boolean>(false);
 	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
 	const [installId, setInstallId] = useState<string | null>(null);
 	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
 
 	const handleBuildButtonClick = () => {
-		setIsButtonDisabled(true);
+		setIsTriggerBuildButtonDisabled(true);
 		setBuildStatus(null);
 
 		axios.post('/api/dpu/trigger', { userId })
@@ -49,7 +49,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			})
 			.catch((error) => {
 				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
-				setIsButtonDisabled(false);
+				setIsTriggerBuildButtonDisabled(false);
 				setBuildStatus({ success: false, message: 'API request failed' });
 			})
 	};
@@ -82,7 +82,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			</div>);
 		}
 		if (!isRepoSelectionDone && (
-			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') || 
+			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
 			(selectedProvider === 'github' && selectedInstallationType === 'individual')
 		)) {
 			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
@@ -92,10 +92,10 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		if (selectedInstallationType === 'project') {
 			return (
 				<div className="flex items-center gap-4">
-					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isButtonDisabled}>
+					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled}>
 						Trigger Cloud Build
 					</Button>
-					<BuildStatus buildStatus={buildStatus} isButtonDisabled={isButtonDisabled} />
+					<BuildStatus buildStatus={buildStatus} isTriggerBuildButtonDisabled={isTriggerBuildButtonDisabled} />
 				</div>
 			);
 		} else {
