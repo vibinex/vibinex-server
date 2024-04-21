@@ -9,9 +9,15 @@ const getUserRepositoriesHandler = async (req: NextApiRequest, res: NextApiRespo
 	if (!session) {
 		return res.status(401).json({ error: 'Unauthenticated' });
 	}
-	const repoList: RepoIdentifier[] = await getUserRepositories(session);
+	const repoList: RepoIdentifier[] | null = await getUserRepositories(session).catch(err => {
+		console.error('Error getting repositories', err);
+		return null;
+	})
+	if (!repoList) {
+		return res.status(500).json({ error: 'Error getting repositories' });
+	}
 	if (repoList.length == 0) {
-		return res.status(500).json({ error: 'Unable to get repo list' });
+		return res.status(204).json({ error: 'No repositories found' });
 	}
 	return res.status(200).json({ repoList: repoList });
 }
