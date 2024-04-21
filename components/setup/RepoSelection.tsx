@@ -112,25 +112,27 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 			<h4 className='my-2 font-semibold'>Select Repositories</h4>
 			{isGetReposLoading ?
 				(<div className='border-4 border-t-primary-main rounded-full w-12 h-12 animate-spin mx-auto'> </div>) :
-				allRepos.map((repo, index) => (
-					<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
-					<input
-							type="checkbox"
-							id={JSON.stringify(repo)}
-							value={`${repo.repo_owner}/${repo.repo_name}`}
-							checked={selectedRepos.includes(repo)}
-							onChange={(event) => handleCheckboxChange(event, repo)}
-/>
-						<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
-					</div>
-				))
+				allRepos.length === 0 ?
+					(<p>No repositories found</p>) :
+					allRepos.map((repo) => (
+						<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
+							<input
+								type="checkbox"
+								id={JSON.stringify(repo)}
+								value={`${repo.repo_owner}/${repo.repo_name}`}
+								checked={selectedRepos.includes(repo)}
+								onChange={(event) => handleCheckboxChange(event, repo)}
+							/>
+							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
+						</div>
+					))
 			}
 			<div className='flex gap-2 py-2'>
 				<Button variant='outlined' onClick={handleSelectAll}>
 					{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
 				</Button>
 				<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
-			Submit
+					Submit
 				</Button>
 			</div>
 		</div>
