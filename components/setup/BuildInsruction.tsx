@@ -26,7 +26,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		setIsButtonDisabled(true);
 		setBuildStatus(null);
 
-		axios.post('/api/dpu/trigger', { userId })
+		axios.post('/api/dpu/trigger', { userId,  selectedProvider, selectedInstallationType, selectedHosting })
 		.then((response) => {
 			console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 			setBuildStatus(response.data);
