@@ -1,12 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
-import { CloudBuildStatus, createTopicNameInGcloud, triggerBuildUsingGcloudApi, pollBuildStatus } from '../../../utils/pubsub/pubsubClient';
+import { CloudBuildStatus, createTopicNameInGcloud, triggerBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from '../../../utils/pubsub/pubsubClient';
 import { DbUser, getUserById } from '../../../utils/db/users';
 
 const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[triggerHandler] pub sub setup info in db...");
 	const jsonBody = req.body;
 	let topicName: string;
+	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
+		if(!jsonBody.github_pat){
+			console.error("[triggerHandler] Missing GitHub Personal Access Token");
+			return res.status(400).json({ "error": "Missing GitHub Personal Access Token" });
+		}
+	}
+
 	if (!jsonBody.userId) {
 		console.error("[triggerHandler] Invalid request body");
 		res.status(400).json({ "error": "Invalid request body" });
@@ -50,12 +57,21 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[triggerHandler] topic name created successfully and saved in db: ", topicName);
 
 	//check if already a build exists in users table for the user, if yes? check status else continue
-
-	const buildStatus: CloudBuildStatus = await triggerBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
-		console.error(`[triggerHandler] error in triggering build`, err);
-		return { success: false, message: 'Unable to trigger build using GCloud API' };
-	});
-	console.info("[triggerHandler] build status: ", buildStatus);
+	let buildStatus: CloudBuildStatus;
+	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud'){
+		buildStatus = await triggerCloudPatBuildUsingGcloudApi(jsonBody.userId, topicName, jsonBody.github_pat, jsonBody.selectedProvider).catch(err => {
+			console.error(`[triggerHandler] error in triggering build`, err);
+			return { success: false, message: 'Unable to trigger build using GCloud API' };
+		});
+		console.info("[triggerHandler] build status: ", buildStatus);
+	
+	} else {
+		buildStatus = await triggerBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
+			console.error(`[triggerHandler] error in triggering build`, err);
+			return { success: false, message: 'Unable to trigger build using GCloud API' };
+		});
+		console.info("[triggerHandler] build status: ", buildStatus);
+	}
 	if (!buildStatus.success) {
 		console.error('[triggerHandler] Error triggering build:', buildStatus.message);
 		return res.status(500).json({ "error": buildStatus.message, success: false });
