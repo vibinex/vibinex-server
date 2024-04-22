@@ -1,8 +1,9 @@
 import React from 'react';
+import { RepoProvider } from '../../utils/providerAPI';
 import Button from '../Button';
 
 interface TriggerContentProps {
-    selectedProvider: string;
+    selectedProvider?: RepoProvider;
     bitbucket_auth_url: string;
     selectedInstallationType: string;
     selectedHosting: string;
