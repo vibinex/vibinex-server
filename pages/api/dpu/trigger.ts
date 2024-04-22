@@ -2,11 +2,17 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
 import { CloudBuildStatus, createTopicNameInGcloud, triggerBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from '../../../utils/pubsub/pubsubClient';
 import { DbUser, getUserById } from '../../../utils/db/users';
+import { json } from "stream/consumers";
 
 const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[triggerHandler] pub sub setup info in db...");
 	const jsonBody = req.body;
 	let topicName: string;
+	if (!jsonBody.selectedProvider || !jsonBody.selectedInstallationType || !jsonBody.selectedHosting || !jsonBody.userId) {
+		console.error("[triggerHandler] Invalid request body");
+		return res.status(400).json({ "error": "Invalid request body" });
+	}
+	
 	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
 		if(!jsonBody.github_pat){
 			console.error("[triggerHandler] Missing GitHub Personal Access Token");
@@ -14,11 +20,6 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		}
 	}
 
-	if (!jsonBody.userId) {
-		console.error("[triggerHandler] Invalid request body");
-		res.status(400).json({ "error": "Invalid request body" });
-		return;
-	}
 	const userData: DbUser | null = await getUserById(jsonBody.userId).catch(err => {
 		console.error(`[triggerHandler] error in getting user data`, err);
 		return null;
