@@ -26,7 +26,6 @@ const getInstalledReposForUser = async (req: NextApiRequest, res: NextApiRespons
 		console.error(`[getInstalledReposForUser] Failed to get repos for topicId: ${topicId}`, err);
 		return res.status(500).json({ error: 'Failed to get repos for topicId' });
 	});	
-	console.log(userReposFromDb)
 	return res.status(200).json({ repoList: userReposFromDb });
 }
 
