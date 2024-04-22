@@ -12,20 +12,6 @@ interface SetupReposApiBodyArgs {
 	installationId: string
 }
 
-async function getUserReposForProvider(targetProvider: string) {
-	const allRepos = await axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getRepoList')
-		.then((response) => {
-			return response.data.repoList;
-		})
-		.catch((err) => {
-			console.error('[getUserReposForProvider] Error occurred while getting repo list from API', err);
-			return [];
-		});
-	// Filter repos based on the targetProvider
-	const filteredRepos = allRepos.filter(repo => repo.repo_provider === targetProvider);
-	return filteredRepos;
-}
-
 function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: string) {
 	// Group by repo_owner and generate setup args
 	const setupArgsMap: Map<string, SetupReposApiBodyArgs> = new Map();
@@ -54,10 +40,33 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 
 	useEffect(() => {
 		setIsGetReposLoading(true);
-		getUserReposForProvider(repoProvider)
-			.then((providerReposForUser) => setAllRepos(providerReposForUser))
+		axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getAllRepos')
+			.then((response) => {
+				return response.data.repoList;
+			})
+			.then((allRepos) => {
+				const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
+				setAllRepos(providerReposForUser)
+				
+				// automatically check the repositories that are already installed by the user
+				axios.get<{repoList: RepoIdentifier[]}>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
+				.then((response) => {
+					return response.data.repoList;
+				})
+				.then((repos) => {
+					const filteredRepos = providerReposForUser.filter(repo => repos.some(selectedRepo => 
+						selectedRepo.repo_provider === repo.repo_provider &&
+						selectedRepo.repo_owner === repo.repo_owner &&
+						selectedRepo.repo_name === repo.repo_name
+					)); // this is important because we are matching object references when we compare values in the checkbox
+					setSelectedRepos(filteredRepos);
+				})
+				.catch((err) => {
+					console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
+				})
+			})
 			.catch(err => {
-				console.log(`[RepoSelection] getUserReposForProvider failed:`, err);
+				console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
 				setError("Failed to get repositories")
 			})
 			.finally(() => {
