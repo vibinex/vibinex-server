@@ -189,7 +189,7 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
 		return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey for decryption in environment variables.' };
 	}
 
-    if (!encrypted_github_pat || provider) {
+    if (!encrypted_github_pat || !provider) {
         console.error('[triggerCloudPatBuildUsingGcloudApi] Missing required parameters: github_pat or provider');
         return { success: false, message: 'Missing required parameters: github_pat or provider' };
     }
