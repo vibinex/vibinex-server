@@ -1,9 +1,10 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import PageHeader from "../../components/blog/PageHeader";
-import PostList, { Article } from "../../components/blog/PostList";
-import { fetchAPI } from "../../utils/blog/fetch-api";
+import PageHeader from "../../../components/blog/PageHeader";
+import PostList, { Article } from "../../../components/blog/PostList";
+import { fetchAPI } from "../../../utils/blog/fetch-api";
+
 
 async function fetchPostsByCategory(filter: string) {
 	try {
