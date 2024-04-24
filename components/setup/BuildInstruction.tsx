@@ -69,17 +69,17 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			});
 	}, [userId])
 
+	if (!installId) {
+		return (<div className="flex items-center gap-4">
+			<p>Something went wrong while fetching install id.</p>
+		</div>);
+	}
 	if (selectedHosting === 'selfhosting') {
 		if (isGetInstallIdLoading) {
 			return (<>
 				<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
 				Generating topic name...
 			</>);
-		}
-		if (!installId) {
-			return (<div className="flex items-center gap-4">
-				<p>Something went wrong while fetching install id.</p>
-			</div>);
 		}
 		if (!isRepoSelectionDone && (
 			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
@@ -100,7 +100,24 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			);
 		} else {
 			// TODO - if repo selection is false show repos, if true pat text field and trigger cloud build button
-			return (<>Not Implemented!</>);
+			if (!isRepoSelectionDone &&
+				(selectedProvider === 'github' && selectedInstallationType === 'individual')
+			) {
+				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+			} 
+	
+			return (<>
+				<div className="flex items-center gap-4">
+					<input
+						type="text"
+						placeholder='Enter your Personal Access Token'
+						className="mb-2 w-full"
+					/>
+					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled}>
+						Submit github personal access token
+					</Button>
+				</div>
+			</>);
 		}
 	} else {
 		return <div>Select a hosting option to view instructions.</div>;
