@@ -6,15 +6,15 @@ import {
 	SelectValue,
 } from "./SelectBase";
 
-interface SelectProps {
-	optionsType: string,
-	options: { value: string, label: string, disabled?: boolean }[],
-	onValueChange: (value: string) => void;
-	defaultValue?: string,
-	className?: string,
-}
+interface SelectProps<T extends string> {
+	optionsType: string;
+	options: {value: T; label: string; disabled?: boolean}[];
+	onValueChange: (value: T) => void;
+	defaultValue?: T;
+	className?: string;
+  }
 
-const Select: React.FC<SelectProps> = ({ optionsType, options, onValueChange, defaultValue, className }) => {
+const Select = <T extends string>({ optionsType, options, onValueChange, defaultValue, className }: SelectProps<T>) => {
 	return (
 		<div className={className}>
 			<SelectBase onValueChange={onValueChange} defaultValue={defaultValue}>

@@ -66,10 +66,11 @@ export const getGitAliasesWithHandlesFromDB = async (userId: string): Promise<Al
             repo_alias AS git_alias,
             a.github,
             a.bitbucket
-        FROM 
-            (SELECT unnest(r.aliases) AS repo_alias FROM repos r
-            LEFT JOIN users u ON u.topic_name = ANY(r.install_id)
-            WHERE u.id = $1 OR u.id IS NULL) AS repo_aliases
+        FROM (
+            SELECT unnest(r.aliases) AS repo_alias FROM repos r
+            JOIN users u ON u.topic_name = ANY(r.install_id)
+            WHERE u.id = $1 OR u.id IS NULL
+        ) AS repo_aliases
         LEFT JOIN 
             aliases a ON repo_aliases.repo_alias = a.git_alias
         GROUP BY 

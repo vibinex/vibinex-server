@@ -2,20 +2,14 @@ import axios from "axios";
 import type { Session } from "next-auth";
 import { baseURL, supportedProviders } from ".";
 import type { RepoIdentifier } from "../../types/repository";
-import { Bitbucket } from "./Bitbucket";
-import AuthInfo from "../../types/AuthInfo";
 import { bitbucketAccessToken } from "./auth";
+import { Bitbucket } from "./Bitbucket";
 
 type GithubRepoObj = {
-	name: string,
-	full_name: string,
-	created_at: string,
-	updated_at: string,
-	license: any,
-	private: boolean,
-	owner: object,
-	html_url: string,
-	[property: string]: any
+	name: string;
+	owner: {
+		login: string;
+	};
 }
 
 type BitbucketWorkspaceObj = {
@@ -64,37 +58,80 @@ type BitbucketRepoObj = {
 
 // type GitlabRepoObj = {
 // }
-
-const getUserRepositoriesForGitHub = async (access_key: string, authId?: string) => {
+const getUserRepositoriesForGitHub = async (access_token: string, authId?: string) => {
 	const perPage = 100;
-	let pageNo = 1;
-	const allGitHubRepositories: RepoIdentifier[] = []
-	let isResponseFull = true;
+	let endCursor = null;
+	let hasNextPage = true;
+	const allGitHubRepositories: RepoIdentifier[] = [];
 
 	do {
-		const endPoint = `/user/repos?sort=updated&per_page=${perPage}&page=${pageNo}`;
-		const { data: repos }: { data: GithubRepoObj[] } = await axios.get(baseURL['github'] + endPoint, {
-			headers: {
-				'Accept': 'application/vnd.github+json',
-				'Authorization': `Bearer ${access_key}`
+		const query: string = `
+			query GetUserRepositories {
+				viewer {
+					repositories(
+						first: ${perPage}
+						after: ${endCursor ? `"${endCursor}"` : null}
+						affiliations: [OWNER, ORGANIZATION_MEMBER, COLLABORATOR]
+						ownerAffiliations: [OWNER, ORGANIZATION_MEMBER, COLLABORATOR]
+					) {
+						totalCount
+						pageInfo {
+							endCursor
+							hasNextPage
+						}
+						nodes {
+							name
+							owner {
+								login
+							}
+						}
+					}
+				}
 			}
-		})
-			.catch(err => {
-				console.error(`[getUserRepositories] Error occurred while getting user repositories from GitHub API (provider-assigned id: ${authId}). Endpoint: ${endPoint}`, err.message);
-				throw err;
-			})
-		if (repos.length === 0) {
-			console.warn(`[getUserRepositories] No repositories received from GitHub API (provider-assigned id: ${authId}). Endpoint: ${endPoint}`);
+		`;
+
+		try {
+			const response = await axios.post(
+				'https://api.github.com/graphql',
+				{ query },
+				{
+					headers: {
+						Authorization: `Bearer ${access_token}`,
+					},
+				}
+			);
+
+			const data = response.data.data;
+			const repos: GithubRepoObj[] = data.viewer.repositories.nodes;
+
+			if (repos.length === 0) {
+				console.warn(`[getUserRepositories] No repositories received from GitHub API (provider-assigned id: ${authId}).`);
+				break;
+			}
+
+			const allGitHubRepoIdentifiers = repos.map(repo => ({
+				repo_provider: supportedProviders[0],
+				repo_owner: repo.owner.login,
+				repo_name: repo.name,
+			}));
+
+			allGitHubRepositories.push(...allGitHubRepoIdentifiers);
+
+			hasNextPage = data.viewer.repositories.pageInfo.hasNextPage;
+			endCursor = data.viewer.repositories.pageInfo.endCursor;
+		} catch (err) {
+			console.error(`[getUserRepositories] Error occurred while getting user repositories from GitHub GraphQL API (provider-assigned id: ${authId}).`, err);
+			throw err;
 		}
-		const allGitHubRepoIdentifiers = repos.map(repo => ({
-			repo_provider: supportedProviders[0],
-			repo_owner: repo.full_name.split('/')[0],
-			repo_name: repo.name
-		}))
-		allGitHubRepositories.push(...allGitHubRepoIdentifiers);
-		isResponseFull = repos.length == perPage;
-		pageNo++;
-	} while (isResponseFull);
+	} while (hasNextPage);
+
+	// Sort repositories by repo_owner and then by repo_name
+	allGitHubRepositories.sort((a , b) => {
+		if (a.repo_owner === b.repo_owner) {
+			return a.repo_name.localeCompare(b.repo_name);
+		}
+		return a.repo_owner.localeCompare(b.repo_owner);
+	});
 
 	return allGitHubRepositories;
 }
