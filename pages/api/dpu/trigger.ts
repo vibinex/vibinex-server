@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
-import { CloudBuildStatus, createTopicNameInGcloud, triggerBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from '../../../utils/pubsub/pubsubClient';
+import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
+import { CloudBuildStatus, triggerBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from './../../../utils/trigger';
 import { DbUser, getUserById } from '../../../utils/db/users';
 
 const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
