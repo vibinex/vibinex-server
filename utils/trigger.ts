@@ -13,6 +13,27 @@ interface AccessTokenApiResponse {
 	access_token: string;
 }
 
+interface CloudBuildApiResponse {
+    metadata: {
+        "@type": string;
+        build: {
+            id: string;
+            status: string;
+            source: {
+                gitSource: {
+                    url: string;
+                    revision: string;
+                };
+            };
+            createTime: string;
+            timeout: string;
+            projectId: string;
+            buildTriggerId: string;
+            queueTtl: string;
+            name: string;
+        };
+    };
+}
 
 interface BuildStatusResponse {
 	status: string;
@@ -31,6 +52,86 @@ async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string>{
 	const data = response.data as AccessTokenApiResponse;
     console.info(`[getAccessTokenFromMetaServerForGcloudApi] retreived access token from meta server for gcloud trigger api, data: ${JSON.stringify(data)}`);
 	return data.access_token;
+}
+
+export async function pollBuildStatus(projectId: string, location: string, buildId: string): Promise<string> { //Instead of constant status polling from client[-side, I decided to do the polling in the api itself to avoid setting up websocket or another functionality for polling from client side. We can discuss on it whether we want user to see each and every build status or simply a success or failure response?!
+    const url = `https://cloudbuild.googleapis.com/v1/projects/${projectId}/locations/${location}/builds/${buildId}`;
+    let attempts = 0;
+    const maxAttempts = 30; // we can adjust this as per our maximum build time
+    const delay = 10000; // Delay between attempts
+
+    const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
+    while (attempts < maxAttempts) {
+        const response = await axios.get(url, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+
+        if (!response.data) {
+            console.error('[pollBuildStatus] Failed to fetch build status:', response.statusText);
+            return 'ERROR';
+        }
+
+        const data: BuildStatusResponse = await response.data;
+        if (['SUCCESS', 'FAILURE', 'INTERNAL_ERROR', 'TIMEOUT', 'CANCELLED', 'EXPIRED', 'STATUS_UNKNOWN'].includes(data.status)) {
+            return data.status; // These above states are considered as Final state
+        }
+
+        // In-progress states
+        if (['PENDING', 'QUEUED', 'WORKING'].includes(data.status)) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+            attempts++;
+            continue;
+        }
+
+        console.error(`[pollBuildStatus] Unexpected build status: ${data.status}`);
+        return 'ERROR';
+    }
+    console.error('[pollBuildStatus] Build status check exceeded maximum attempts');
+    return 'TIMEOUT'; // Indicate a timeout in build status check
+}
+
+/**
+ * Triggers a Cloud Build based on provided parameters.
+ * @param projectId - GCP project ID.
+ * @param triggerId - Cloud Build trigger ID.
+ * @param location - GCP location for the build.
+ * @param triggerBranchName - Branch name to trigger the build for.
+ * @param substitutions - Environment-specific substitutions for the build.
+ * @param topic_name - Topic name associated with the build.
+ * @param user_id - User ID associated with the build.
+ * @returns Promise<CloudBuildStatus> - The status and details of the triggered build.
+ */
+export async function runGcloudTrigger(projectId: string, triggerId: string, location: string, triggerBranchName: string, substitutions: { [key: string]: string }, topic_name: string, user_id: string): Promise<CloudBuildStatus> {
+    const url = `https://cloudbuild.googleapis.com/v1/projects/${projectId}/locations/${location}/triggers/${triggerId}:run`;
+
+    const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
+
+    return axios.post(url, {
+        projectId,
+        triggerId,
+        source: {
+            projectId,
+            substitutions,
+            branchName: triggerBranchName
+        }
+    }, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (!response.data) {
+            console.error('[triggerCommonCloudBuild] Error triggering build:', response.statusText);
+            return { success: false, message: 'Error triggering build', buildDetails: response.statusText };
+        }
+
+        const buildDetails = response.data.metadata.build;
+        console.info(`[triggerCommonCloudBuild] Build triggered successfully for topic_name: ${topic_name} and user_id: ${user_id} with build details: ${buildDetails.id}`);
+        return { success: true, message: 'Build triggered successfully', buildDetails };
+    }).catch(error => {
+        console.error('[triggerCommonCloudBuild] Error in triggering Cloud Build:', error.message);
+        return { success: false, message: `Error in triggering Cloud Build: ${error.message}`, buildDetails: null };
+    });
 }
 
 export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: string): Promise<CloudBuildStatus> {
@@ -61,69 +162,11 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 		_USER_ID: user_id
 	};
 
-	const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
-    const url = `https://cloudbuild.googleapis.com/v1/projects/${projectId}/locations/${location}/triggers/${triggerId}:run`;
-
-	const response = await axios.post(url, {
-        projectId,
-        triggerId,
-        source: {
-            projectId,
-            substitutions,
-            branchName: triggerBranchName
-        }
-    }, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
-    });
-
-    if (!response.data) {
-        console.error('[triggerBuildUsingGcloudApi] Error triggering build: ', response.statusText);
-        return { success: false, message: 'Error triggering build', buildDetails: response.statusText };
-    }
-
-    const buildDetails = response.data.metadata.build;
-    console.debug(`[triggerBuildUsinggcloudAPi] ${buildDetails.buildTriggerId} ${buildDetails.status} ${buildDetails.id}`);
-    console.info(`[triggerBuildUsingGcloudApi] build triggered for topic_name: ${topic_name} and user_id: ${user_id}`);
-    return { success: true, message: response.statusText, buildDetails: buildDetails };
-}
-
-export async function pollBuildStatus(projectId: string, location: string, buildId: string): Promise<string> { //Instead of constant status polling from client[-side, I decided to do the polling in the api itself to avoid setting up websocket or another functionality for polling from client side. We can discuss on it whether we want user to see each and every build status or simply a success or failure response?!
-    const url = `https://cloudbuild.googleapis.com/v1/projects/${projectId}/locations/${location}/builds/${buildId}`;
-    let attempts = 0;
-    const maxAttempts = 30; // we can adjust this as per our maximum build time
-    const delay = 10000; // Delay between attempts
-
-	const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
-    while (attempts < maxAttempts) {
-        const response = await axios.get(url, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
+    return runGcloudTrigger(projectId, triggerId, location, triggerBranchName, substitutions, topic_name, user_id)
+        .catch((error) => {
+            console.error('[triggerBuildUsingGcloudApi] Error triggering build:', error.message);
+            return { success: false, message: 'Error triggering build', buildDetails: error.message };
         });
-
-        if (!response.data) {
-            console.error('[pollBuildStatus] Failed to fetch build status:', response.statusText);
-            return 'ERROR';
-        }
-
-        const data: BuildStatusResponse = await response.data;
-        if (['SUCCESS', 'FAILURE', 'INTERNAL_ERROR', 'TIMEOUT', 'CANCELLED', 'EXPIRED', 'STATUS_UNKNOWN'].includes(data.status)) {
-            return data.status; // These above states are considered as Final state
-        }
-
-        // In-progress states
-        if (['PENDING', 'QUEUED', 'WORKING'].includes(data.status)) {
-            await new Promise(resolve => setTimeout(resolve, delay));
-            attempts++;
-            continue;
-        }
-
-        console.error(`[pollBuildStatus] Unexpected build status: ${data.status}`);
-        return 'ERROR';
-    }
-	console.error('[pollBuildStatus] Build status check exceeded maximum attempts');
-    return 'TIMEOUT'; // Indicate a timeout in build status check
 }
 
 export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_name: string, encrypted_github_pat: string, provider: string): Promise<CloudBuildStatus> {
@@ -160,31 +203,9 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
         _PROVIDER: provider
 	};
 
-	const accessToken = await getAccessTokenFromMetaServerForGcloudApi();
-    const url = `https://cloudbuild.googleapis.com/v1/projects/${projectId}/locations/${location}/triggers/${triggerId}:run`;
-
-	const response = await axios.post(url, {
-        projectId,
-        triggerId,
-        source: {
-            projectId,
-            substitutions,
-            branchName: triggerBranchName
-        }
-    }, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
+    return runGcloudTrigger(projectId, triggerId, location, triggerBranchName, substitutions, topic_name, user_id)
+    .catch((error) => {
+        console.error('[triggerCloudPatBuildUsingGcloudApi] Error triggering build:', error.message);
+        return { success: false, message: 'Error triggering build', buildDetails: error.message };
     });
-
-    if (!response.data) {
-        console.error('[triggerBuildUsingGcloudApi] Error triggering build: ', response.statusText);
-        return { success: false, message: 'Error triggering build', buildDetails: response.statusText };
-    }
-
-    const buildDetails = response.data.metadata.build;
-    console.debug(`[triggerBuildUsinggcloudAPi] ${buildDetails.buildTriggerId} ${buildDetails.status} ${buildDetails.id}`);
-    console.info(`[triggerBuildUsingGcloudApi] build triggered for topic_name: ${topic_name} and user_id: ${user_id}`);
-    return { success: true, message: response.statusText, buildDetails: buildDetails };
 }
