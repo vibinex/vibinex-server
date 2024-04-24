@@ -177,11 +177,12 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
 	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
 	const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
     const secretKey: string | undefined = process.env.SECRET_KEY;
-
+    
 	if (!projectId || !triggerId || !location || !triggerBranchName || !secretKey) {
 		console.error('[triggerCloudPatBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
-		return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey for decryption in environment variables.' };
+		return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey in environment variables.' };
 	}
+    console.info("[triggerCloudPatBuildUsingGcloudApi] projectId, triggerId, location, triggerBranchName, secretKey are available in environment variables", projectId, triggerId, location, triggerBranchName, secretKey);
 
     if (!encrypted_github_pat || !provider) {
         console.error('[triggerCloudPatBuildUsingGcloudApi] Missing required parameters: github_pat or provider');
