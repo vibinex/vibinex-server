@@ -170,7 +170,7 @@ export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: st
 }
 
 export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_name: string, encrypted_github_pat: string, provider: string): Promise<CloudBuildStatus> {
-	console.info(`[triggerBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
+	console.info(`[triggerCloudPatBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
 
 	const projectId: string | undefined = process.env.PROJECT_ID;
 	const triggerId: string | undefined = process.env.CLOUD_BUILD_PAT_TRIGGER_ID;
@@ -179,7 +179,7 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
     const secretKey: string | undefined = process.env.SECRET_KEY;
 
 	if (!projectId || !triggerId || !location || !triggerBranchName || !secretKey) {
-		console.error('[triggerBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
+		console.error('[triggerCloudPatBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
 		return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey for decryption in environment variables.' };
 	}
 
