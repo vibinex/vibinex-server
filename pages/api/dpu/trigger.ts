@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
 import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
-import { CloudBuildStatus, triggerBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from './../../../utils/trigger';
+import { CloudBuildStatus, triggerCloudProjectBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from './../../../utils/trigger';
 import { DbUser, getUserById } from '../../../utils/db/users';
 
 const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -67,7 +67,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.info("[triggerHandler] build status: ", buildStatus);
 	
 	} else if (jsonBody.selectedInstallationType === 'project' && jsonBody.selectedHosting === 'cloud') {
-		buildStatus = await triggerBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
+		buildStatus = await triggerCloudProjectBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
 			return { success: false, message: 'Unable to trigger build using GCloud API' };
 		});
