@@ -1,6 +1,8 @@
 import conn from '.';
 import { getUserByAlias } from './users';
 import { v4 as uuidv4 } from 'uuid';
+import { convert } from './converter';
+import type { DPUHunkInfo } from '../../pages/api/hunks';
 
 export interface HunkInfo {
 	author: string,
@@ -21,17 +23,16 @@ export interface DbHunks {
 	}
 }
 
-export const saveHunk = async (hunkInfo: string) => {
-	const hunkinfo_json = JSON.parse(hunkInfo);
-	console.info("[saveHunk] Saving hunk for ", hunkinfo_json.repo_name);
-	for (const prHunk of hunkinfo_json.prhunkvec) {
+export const saveHunk = async (hunkInfo: DPUHunkInfo) => {
+	console.info(`[saveHunk] Saving hunk for ${hunkInfo.repo_provider}/${hunkInfo.repo_owner}/${hunkInfo.repo_name}`);
+	for (const prHunk of hunkInfo.prhunkvec) {
 		const hunk_val = JSON.stringify({ "blamevec": prHunk.blamevec });
 		const hunk_query = `
 	  INSERT INTO hunks (repo_provider, repo_owner, 
 		repo_name, review_id, author, hunks
-		) VALUES ('${hunkinfo_json.repo_provider}',
-			'${hunkinfo_json.repo_owner}', 
-			'${hunkinfo_json.repo_name}',
+		) VALUES ('${hunkInfo.repo_provider}',
+			'${hunkInfo.repo_owner}', 
+			'${hunkInfo.repo_name}',
 			'${prHunk.pr_number}',
 			'${prHunk.author}',
 			'${hunk_val}')
@@ -42,6 +43,35 @@ export const saveHunk = async (hunkInfo: string) => {
 			console.error(`[saveHunk] Failed to insert hunks in the db`, { pg_query: hunk_query }, err);
 		});
 	}
+}
+
+export const saveNewAuthorAliasesFromHunkData = async (hunkInfo: DPUHunkInfo) => {
+	console.debug(`[saveNewAuthorAliases] Saving new author aliases for ${hunkInfo.repo_provider}/${hunkInfo.repo_owner}/${hunkInfo.repo_name}`);
+	const authorAliases = hunkInfo.prhunkvec.map(prHunk => prHunk.blamevec.map(blameItem => blameItem.author)).flat();
+
+	// update the aliases table
+	const insertAliasesQuery = `
+		INSERT INTO aliases (git_alias)
+		VALUES ${authorAliases.map(alias => `(${convert(alias)})`).join(",")}
+		ON CONFLICT (git_alias) DO NOTHING;
+	`
+	await conn.query(insertAliasesQuery).catch(err => {
+		console.error(`[saveNewAuthorAliases] Failed to insert aliases in the db`, { pg_query: insertAliasesQuery }, err);
+	});
+
+	// update the aliases in the repos table
+	const updateAliasesInReposQuery = `
+		UPDATE repos
+		SET aliases = array(
+			SELECT DISTINCT unnest(aliases || ${convert(authorAliases)})
+		)
+		WHERE repo_provider = ${convert(hunkInfo.repo_provider)}
+			AND repo_owner = ${convert(hunkInfo.repo_owner)}
+			AND repo_name = ${convert(hunkInfo.repo_name)};
+	`
+	await conn.query(updateAliasesInReposQuery).catch(err => {
+		console.error(`[saveNewAuthorAliases] Failed to update aliases in repos in the db`, { pg_query: updateAliasesInReposQuery }, err);
+	});
 }
 
 export const getAuthorAliases = async (alias_email: string) => {
