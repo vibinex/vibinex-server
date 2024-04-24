@@ -66,12 +66,15 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 		console.info("[triggerHandler] build status: ", buildStatus);
 	
-	} else {
+	} else if (jsonBody.selectedInstallationType === 'project' && jsonBody.selectedHosting === 'cloud') {
 		buildStatus = await triggerBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
 			return { success: false, message: 'Unable to trigger build using GCloud API' };
 		});
 		console.info("[triggerHandler] build status: ", buildStatus);
+	} else {
+		console.error('[triggerHandler] Invalid provider, installation type, or hosting combination');
+		return res.status(400).json({ "error": "Invalid provider, installation type, or hosting combination", success: false });
 	}
 	if (!buildStatus.success) {
 		console.error('[triggerHandler] Error triggering build:', buildStatus.message);
