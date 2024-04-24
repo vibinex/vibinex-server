@@ -2,9 +2,8 @@ import axios from "axios";
 import type { Session } from "next-auth";
 import { baseURL, supportedProviders } from ".";
 import type { RepoIdentifier } from "../../types/repository";
-import { Bitbucket } from "./Bitbucket";
-import AuthInfo from "../../types/AuthInfo";
 import { bitbucketAccessToken } from "./auth";
+import { Bitbucket } from "./Bitbucket";
 
 type GithubRepoObj = {
 	name: string;
