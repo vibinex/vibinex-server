@@ -41,7 +41,7 @@ interface BuildStatusResponse {
 
 async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string>{
 	console.info(`[getAccessTokenFromMetaServerForGcloudApi] getting access token from meta server for gcloud trigger api`)
-	const response = await axios.get('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
+	const response = await axios.get('https://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
     headers: { 'Metadata-Flavor': 'Google' }
 	});
 	if (!response.data) {
