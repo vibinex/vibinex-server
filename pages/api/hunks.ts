@@ -3,12 +3,12 @@ import { saveHunk, saveNewAuthorAliasesFromHunkData } from '../../utils/db/relev
 
 interface BlameItem {
 	author: string,
-	timestamp: string,
+	timestamp?: string,
 	line_start: string,
 	line_end: string,
 	filepath: string,
-	commit: string,
-	filepath_raw: string,
+	commit?: string,
+	filepath_raw?: string,
 }
 
 export interface DPUHunkInfo {
