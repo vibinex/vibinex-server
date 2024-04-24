@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { decrypt } from './encrypt_decrypt';
+import { decrypt, encrypt } from './encrypt_decrypt';
 
 export interface CloudBuildStatus {
 	success: boolean;
@@ -188,8 +188,10 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
         console.error('[triggerCloudPatBuildUsingGcloudApi] Missing required parameters: github_pat or provider');
         return { success: false, message: 'Missing required parameters: github_pat or provider' };
     }
-
-    const github_pat = decrypt(secretKey, encrypted_github_pat);
+    const encrypt_data = encrypt(secretKey, encrypted_github_pat);
+    console.log("[triggerCloudPatBuildUsingGcloudApi] Encrypted GitHub PAT:", encrypt_data);
+    const github_pat = decrypt(secretKey, encrypt_data);
+    console.log("[triggerCloudPatBuildUsingGcloudApi] Decrypted GitHub PAT:", github_pat);
 	// Build the substitutions object using environment variables
 	const substitutions: { [key: string]: string } = {
         _BITBUCKET_BASE_URL: process.env.BITBUCKET_BASE_URL ?? '',
