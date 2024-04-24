@@ -18,6 +18,44 @@ describe('saveNewAuthorAliasesFromHunkData', () => {
 			]
 		}]
 	}
+	const expectedAliases = ['dummyalias1@example.com', 'dummyalias2@example.com'];
+
+	/**
+	 * Check that the database has the aliases after the function is called
+	 */
+	async function checkFinalStateInDatabase() {
+		// check that the aliases were added to the aliases table
+		const aliases = await conn.query(
+			`SELECT git_alias FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
+		);
+		expect(aliases.rows.map(row => row.git_alias)).toEqual(expectedAliases);
+
+		// check that the aliases were added to the repos table
+		const aliasesInRepos = await conn.query(
+			`SELECT aliases FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
+		);
+		const resultAliases = aliasesInRepos.rows[0].aliases;
+		expect(resultAliases).toEqual(expectedAliases);
+	}
+
+	/**
+	 * Clean up database after each test
+	 * @returns {Promise<void>}
+	 */
+	async function cleanUpDatabase() {
+		// clean up the dummy rows created in the database
+		await conn.query(
+			`DELETE FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
+		);
+		await conn.query(
+			`DELETE FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
+		);
+	}
+
+	afterEach(async () => {
+		// clean up the dummy rows created in the database
+		await cleanUpDatabase();
+	});
 
 	afterAll(async () => {
 		// Close database connection
@@ -31,29 +69,9 @@ describe('saveNewAuthorAliasesFromHunkData', () => {
 			VALUES ('bitbucket', 'dummyOwner', 'dummyRepo')`
 		);
 
-		const expectedAliases = ['dummyalias1@example.com', 'dummyalias2@example.com'];
-
 		await saveNewAuthorAliasesFromHunkData(hunkInfo);
-		// check that the aliases were added to the aliases table
-		const aliases = await conn.query(
-			`SELECT git_alias FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
-		expect(aliases.rows.map(row => row.git_alias)).toEqual(expectedAliases);
 
-		// check that the aliases were added to the repos table
-		const aliasesInRepos = await conn.query(
-			`SELECT aliases FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		const resultAliases = aliasesInRepos.rows[0].aliases;
-		expect(resultAliases).toEqual(expectedAliases);
-
-		// clean up the dummy rows created in the database
-		await conn.query(
-			`DELETE FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		await conn.query(
-			`DELETE FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
+		await checkFinalStateInDatabase();
 	});
 
 	it('should not add duplicate aliases to the aliases table, but add aliases in repos table', async () => {
@@ -66,29 +84,10 @@ describe('saveNewAuthorAliasesFromHunkData', () => {
 			`INSERT INTO aliases (git_alias)
 			VALUES ('dummyalias1@example.com'), ('dummyalias2@example.com')`
 		);
-		const expectedAliases = ['dummyalias1@example.com', 'dummyalias2@example.com'];
+
 		await saveNewAuthorAliasesFromHunkData(hunkInfo);
 
-		// check that the aliases were added to the aliases table
-		const aliases = await conn.query(
-			`SELECT git_alias FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
-		expect(aliases.rows.map(row => row.git_alias)).toEqual(expectedAliases);
-
-		// check that the aliases were added to the repos table
-		const aliasesInRepos = await conn.query(
-			`SELECT aliases FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		const resultAliases = aliasesInRepos.rows[0].aliases;
-		expect(resultAliases).toEqual(expectedAliases);
-
-		// clean up the dummy rows created in the database
-		await conn.query(
-			`DELETE FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		await conn.query(
-			`DELETE FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
+		await checkFinalStateInDatabase();
 	});
 
 	it('should not add duplicate aliases in repos table, but add aliases in aliases table', async () => {
@@ -101,30 +100,10 @@ describe('saveNewAuthorAliasesFromHunkData', () => {
 			`INSERT INTO aliases (git_alias)
 			VALUES ('dummyalias1@example.com')`
 		);
-		const expectedAliases = ['dummyalias1@example.com', 'dummyalias2@example.com'];
 
 		await saveNewAuthorAliasesFromHunkData(hunkInfo);
 
-		// check that the aliases were added to the aliases table
-		const aliases = await conn.query(
-			`SELECT git_alias FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
-		expect(aliases.rows.map(row => row.git_alias)).toEqual(expectedAliases);
-
-		// check that the aliases were added to the repos table
-		const aliasesInRepos = await conn.query(
-			`SELECT aliases FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		const resultAliases = aliasesInRepos.rows[0].aliases;
-		expect(resultAliases).toEqual(expectedAliases);
-
-		// clean up the dummy rows created in the database
-		await conn.query(
-			`DELETE FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		await conn.query(
-			`DELETE FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
+		await checkFinalStateInDatabase();
 	});
 
 	it('should not add duplicate aliases in repos table or in aliases table', async () => {
@@ -137,29 +116,9 @@ describe('saveNewAuthorAliasesFromHunkData', () => {
 			`INSERT INTO aliases (git_alias)
 			VALUES ('dummyalias1@example.com'), ('dummyalias2@example.com')`
 		);
-		const expectedAliases = ['dummyalias1@example.com', 'dummyalias2@example.com'];
 
 		await saveNewAuthorAliasesFromHunkData(hunkInfo);
 
-		// check that the aliases were added to the aliases table
-		const aliases = await conn.query(
-			`SELECT git_alias FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
-		expect(aliases.rows.map(row => row.git_alias)).toEqual(expectedAliases);
-
-		// check that the aliases were added to the repos table
-		const aliasesInRepos = await conn.query(
-			`SELECT aliases FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		const resultAliases = aliasesInRepos.rows[0].aliases;
-		expect(resultAliases).toEqual(expectedAliases);
-
-		// clean up the dummy rows created in the database
-		await conn.query(
-			`DELETE FROM repos WHERE repo_provider = 'bitbucket' AND repo_owner = 'dummyOwner' AND repo_name = 'dummyRepo'`
-		);
-		await conn.query(
-			`DELETE FROM aliases WHERE git_alias = ANY(${convert(expectedAliases)})`
-		);
+		await checkFinalStateInDatabase();
 	});
 });
