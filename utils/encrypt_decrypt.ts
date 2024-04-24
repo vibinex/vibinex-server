@@ -6,6 +6,10 @@ export const generateSecretKey = (): string => {
 
 export const encrypt = (secretKey: string, data: string): string => {
     try {
+        if (secretKey.length !== 64) {
+            throw new Error('[encrypt] Invalid secret key length. It should be 64 characters (32 bytes).');
+        }
+
         // Generate an initialization vector (IV) from the secret key
         const iv = crypto.randomBytes(12);
         const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(secretKey, 'hex'), iv);
@@ -28,14 +32,16 @@ export const encrypt = (secretKey: string, data: string): string => {
 
 export const decrypt = (secretKey: string, data: string): string => {
    try {
+        if (secretKey.length !== 64) {
+            throw new Error('[decrypt] Invalid secret key length. It should be 64 characters (32 bytes).');
+        }
         // Split the encrypted payload into IV, encrypted data, and authentication tag
         const [ivHex, encryptedDataHex, tagHex] = data.split(':');
         const iv = Buffer.from(ivHex, 'hex');
-        const encryptedData = Buffer.from(encryptedDataHex, 'hex');
+        const encryptedData = Buffer.from(encryptedDataHex,  'hex');
         const tag = Buffer.from(tagHex, 'hex');
-
         // Create a decipher using AES-GCM
-        const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(secretKey, 'hex').toString('hex'), iv);
+        const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(secretKey, 'hex'), iv);
         decipher.setAuthTag(tag);
 
         // Decrypt the data
@@ -45,5 +51,5 @@ export const decrypt = (secretKey: string, data: string): string => {
     } catch (error) {
        console.error('[decrypt] Error decrypting data:', error);
        throw error;
-   }
+    }
 };
