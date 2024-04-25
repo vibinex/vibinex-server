@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Post from '../../../../components/blog/Post';
 import { Article } from '../../../../components/blog/Post';
+import Footer from '../../../../components/Footer';
 import { fetchAPI } from '../../../../utils/blog/fetch-api';
+import Navbar from '../../../../views/Navbar';
 
 async function getPostBySlug(slug: string) {
     const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
@@ -56,7 +58,13 @@ const PostRoute: NextPage = () => {
     },[router]);
     
     if (!articleInfo) return <h2>no post found</h2>;
-    return <Post article={articleInfo.attributes} />;
+    return (
+    <div>
+        <Navbar transparent={true} />
+        <Post article={articleInfo.attributes} />
+        <Footer />
+    </div>
+    );
 }
 
 export async function generateStaticParams() {

@@ -3,7 +3,9 @@ import { useState, useEffect, useCallback } from "react";
 import Loader from "../../components/blog/Loader";
 import PageHeader from "../../components/blog/PageHeader";
 import PostList from "../../components/blog/PostList";
+import Footer from "../../components/Footer";
 import { fetchAPI } from "../../utils/blog/fetch-api";
+import Navbar from "../../views/Navbar";
 
 
 interface Meta {
@@ -68,6 +70,7 @@ export default function Profile() {
 
   return (
     <div>
+      <Navbar transparent={true} />
       <PageHeader heading="Our Blog" text="Checkout Something Cool" />
       <PostList data={data}>
         {meta!.pagination.start + meta!.pagination.limit <
@@ -83,6 +86,7 @@ export default function Profile() {
           </div>
         )}
       </PostList>
+      <Footer />
     </div>
   );
 }
