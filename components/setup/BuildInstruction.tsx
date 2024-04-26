@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { Session } from 'next-auth';
 import React, { useEffect, useState } from 'react';
 import { RepoProvider } from '../../utils/providerAPI';
-import { CloudBuildStatus } from '../../utils/pubsub/pubsubClient';
+import { CloudBuildStatus } from '../../utils/trigger';
 import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
 import RepoSelection from './RepoSelection';
