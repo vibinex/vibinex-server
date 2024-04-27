@@ -59,7 +59,7 @@ const PostRoute: NextPage = () => {
 	
 	if (!articleInfo) return <h2>no post found</h2>;
 	return (
-	<div>
+	<div className='overflow-hidden'>
 		<Navbar transparent={true} />
 		<div className='flex justify-center'>
 			<div className='mx-auto max-w-3xl px-6 lg:px-0'>
