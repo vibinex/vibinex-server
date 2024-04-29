@@ -35,7 +35,7 @@ const nextConfig = {
 			},
 			{
 				protocol: 'http',
-				hostname: '34.93.53.85', // Blog server
+				hostname: process.env.NEXT_PUBLIC_STRAPI_API_URL, // Blog server
 				port: '1337',
 				pathname: '/**',
 			},
