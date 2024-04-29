@@ -1,20 +1,33 @@
 import axios from "axios";
-import type { Session } from "next-auth";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ProviderLogo from "../components/ProviderLogo";
 import SwitchSubmit from "../components/SwitchSubmit";
 import { TableCell, TableHeaderCell } from "../components/Table";
 import type { DbRepoSerializable, RepoIdentifier } from "../types/repository";
-import { getRepos } from "../utils/db/repos";
-import { getUserRepositories } from "../utils/providerAPI/getUserRepositories";
-import ProviderLogo from "../components/ProviderLogo";
 
-const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
-	const [loading, setLoading] = useState(false); // while loading user can't send another api request to change setting
-	const [repoList, setRepoList] = useState(props.repoList);
+const RepoList = () => {
+	const [loading, setLoading] = useState(false);
+	const [configLoading, setConfigLoading] = useState(false); // while loading user can't send another api request to change setting
+	const [repoList, setRepoList] = useState<DbRepoSerializable[]>([]);
+
+	useEffect(() => {
+		setLoading(true);
+		// get the list of repositories of the user
+		axios.get<{repoList: DbRepoSerializable[]}>("/api/repoList")
+			.then((res) => {
+				setRepoList(res.data.repoList);
+			})
+			.catch(err => {
+				console.error("[RepoList] fetching repo list failed", err);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	}, [])
 
 	const setConfig = (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
-		setLoading(true);
+		setConfigLoading(true);
 		axios.post("/api/setRepoConfig", { repo, configType, value })
 			.then(() => {
 				const updatedRepoList = repoList.map(repository => {
@@ -24,14 +37,24 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 					return repository;
 				});
 				setRepoList(updatedRepoList);
-				setLoading(false);
+				setConfigLoading(false);
 			})
 			.catch(err => {
 				console.error(`[RepoList] updating config failed for this repository: ${repo.repo_provider}/${repo.repo_owner}/${repo.repo_name}`, err);
-				setLoading(false);
+				setConfigLoading(false);
 			})
 	}
 
+	if (loading) {
+		return (
+			<div className='border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin'> </div>
+		);
+	}
+	if (repoList.length === 0) {
+		return (
+			<span>No repositories added yet.</span>
+		)
+	}
 	return (<>
 		<h2 className="text-xl font-semibold my-2">Added Repositories</h2>
 		<table className="min-w-full divide-y divide-gray-200">
@@ -58,8 +81,8 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 							<TableCell>{repoName}</TableCell>
 							<TableCell>{repoOwner}</TableCell>
 							<TableCell className="text-center"><ProviderLogo provider={repoProvider} theme="dark" className="mx-auto" /></TableCell>
-							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => setConfig(repo_id, 'auto_assign', !config.auto_assign)} disabled={loading} /></TableCell>
-							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => setConfig(repo_id, 'comment', !config.comment)} disabled={loading} /></TableCell>
+							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => setConfig(repo_id, 'auto_assign', !config.auto_assign)} disabled={configLoading} /></TableCell>
+							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => setConfig(repo_id, 'comment', !config.comment)} disabled={configLoading} /></TableCell>
 							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repoAddr}`}>Link</Link></TableCell>
 						</tr>
 					)
@@ -68,33 +91,6 @@ const RepoList = (props: { repoList: DbRepoSerializable[] }) => {
 			</tbody>
 		</table>
 	</>)
-}
-
-export const getRepoList = async (session: Session): Promise<DbRepoSerializable[]> => {
-	const userReposFromProvider = await getUserRepositories(session).catch((err): RepoIdentifier[] => {
-		console.error(`[RepoList] getRepos from the providers failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
-		return [];
-	});
-	if (userReposFromProvider.length === 0) {
-		console.warn(`[RepoList] getRepos from the providers got zero repositories for user: ${session.user.id} (Name: ${session.user.name})`);
-		return [];
-	}
-	const userReposFromDb = await getRepos(userReposFromProvider, session).catch((err) => {
-		console.error(`[RepoList] getRepos from the database failed for user: ${session.user.id} (Name: ${session.user.name})`, err);
-		return { repos: [], failureRate: 1 };
-	});
-	if (!userReposFromDb) {
-		console.error("[RepoList] getRepos failed for session", session);
-		return [];
-	}
-	if (userReposFromDb.failureRate != 0) {
-		// if necessary, we can add this to the returned object
-		console.warn(`[RepoList] getRepos from database failed to query ~${(100 * userReposFromDb.failureRate).toFixed(2)}% of the repositories for user: ${session.user.id} (Name: ${session.user.name})`)
-	}
-	return userReposFromDb.repos.map(repo => {
-		const { created_at, ...other } = repo;
-		return { created_at: created_at.toDateString(), ...other }
-	});
 }
 
 export default RepoList;
