@@ -21,7 +21,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 	console.info("[webookHandler] Received bitbucket webhook event for ", repo_name);
-	const topicName: string[] | null = await getTopicNameFromDB(owner, repo_name, provider).catch((error) => {
+	const topicName: string[] | null = await getTopicNameFromDB(provider, owner, repo_name).catch((error) => {
 		console.error('[webhookHandler] Failed to get topic name from db:', error);
 		return null;
 	});

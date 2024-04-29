@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
 import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
-import { CloudBuildStatus, triggerBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from './../../../utils/trigger';
+import { CloudBuildStatus, triggerCloudProjectBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from './../../../utils/trigger';
 import { DbUser, getUserById } from '../../../utils/db/users';
 
 const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -10,13 +10,15 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	let topicName: string;
 	if (!jsonBody.selectedProvider || !jsonBody.selectedInstallationType || !jsonBody.selectedHosting || !jsonBody.userId) {
 		console.error("[triggerHandler] Invalid request body");
-		return res.status(400).json({ "error": "Invalid request body" });
+		res.status(400).json({ "error": "Invalid request body" });
+		return;
 	}
 	
 	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
 		if(!jsonBody.github_pat){
 			console.error("[triggerHandler] Missing GitHub Personal Access Token");
-			return res.status(400).json({ "error": "Missing GitHub Personal Access Token" });
+			res.status(400).json({ "error": "Missing GitHub Personal Access Token" });
+			return;
 		}
 	}
 
@@ -52,7 +54,8 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			await saveTopicNameInUsersTable(jsonBody.userId, topicName);
 		} catch (error) {
 			console.error("[triggerHandler] Unable to save topic name in db, ", error);
-			return res.status(500).json({ "error": "Internal server error" });
+			res.status(500).json({ "error": "Internal server error" });
+			return;
 		}
 	}
 	console.info("[triggerHandler] topic name created successfully and saved in db: ", topicName);
@@ -67,18 +70,20 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.info("[triggerHandler] build status: ", buildStatus);
 	
 	} else if (jsonBody.selectedInstallationType === 'project' && jsonBody.selectedHosting === 'cloud') {
-		buildStatus = await triggerBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
+		buildStatus = await triggerCloudProjectBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
 			return { success: false, message: 'Unable to trigger build using GCloud API' };
 		});
 		console.info("[triggerHandler] build status: ", buildStatus);
 	} else {
 		console.error('[triggerHandler] Invalid provider, installation type, or hosting combination');
-		return res.status(400).json({ "error": "Invalid provider, installation type, or hosting combination", success: false });
+		res.status(400).json({ "error": "Invalid provider, installation type, or hosting combination", success: false });
+		return;
 	}
 	if (!buildStatus.success) {
 		console.error('[triggerHandler] Error triggering build:', buildStatus.message);
-		return res.status(500).json({ "error": buildStatus.message, success: false });
+		res.status(500).json({ "error": buildStatus.message, success: false });
+		return 
 	}
 	const projectId: string | undefined = process.env.PROJECT_ID;
 	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
@@ -90,17 +95,20 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const buildId = buildStatus.buildDetails?.id;
 	if (!buildId) {
 		console.error('[triggerHandler] No build ID found in buildDetails');
-		return res.status(500).json({ error: 'No build ID found', success: false });
+		res.status(500).json({ error: 'No build ID found', success: false });
+		return;
 	}
 	const finalBuildStatus = await pollBuildStatus(projectId, location, buildId).catch(err => {
 		console.error(`[triggerHandler] error in polling build status`, err);
 		return 'ERROR';
 	});
 	if (finalBuildStatus === 'SUCCESS') {
-		return res.status(200).json({ message: 'Build completed successfully', success: true });
+		res.status(200).json({ message: 'Build completed successfully', success: true });
+		return; 
 	} else {
 		console.error(`[triggerHandler] Build failed with status: ${finalBuildStatus}`);
-		return res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
+		res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
+		return; 
 	}
 }
 

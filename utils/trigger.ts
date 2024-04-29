@@ -134,7 +134,7 @@ export async function runGcloudTrigger(projectId: string, triggerId: string, loc
     });
 }
 
-export async function triggerBuildUsingGcloudApi(user_id: string, topic_name: string): Promise<CloudBuildStatus> {
+export async function triggerCloudProjectBuildUsingGcloudApi(user_id: string, topic_name: string): Promise<CloudBuildStatus> {
 	console.info(`[triggerBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
 
 	const projectId: string | undefined = process.env.PROJECT_ID;

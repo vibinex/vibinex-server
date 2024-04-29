@@ -5,7 +5,6 @@ import React from "react";
 import Footer from "../components/Footer";
 import RudderContext from "../components/RudderContext";
 import { ContributorVector } from "../types/contributor";
-import type { DbRepoSerializable } from "../types/repository";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { renderObjAsTable } from "../utils/data";
 import conn from '../utils/db';
@@ -13,17 +12,16 @@ import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initi
 import CommitsPerFile from "../views/Dashboard/commitsPerFile";
 import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
 import MainAppBar from "../views/MainAppBar";
-import RepoList, { getRepoList } from "../views/RepoList";
+import RepoList from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
 
 type RepoProfileData = {
 	sessionObj: Session,
-	repoList?: DbRepoSerializable[],
 	repoName?: string,
 	contributor_2d_data?: Array<ContributorVector>
 }
 
-const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repoList, repoName: repoAddr, contributor_2d_data }) => {
+const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repoName: repoAddr, contributor_2d_data }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -46,14 +44,11 @@ const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repoList,
 						<Contributors2DView repo_data={contributor_2d_data} />
 					</div>
 					<div dangerouslySetInnerHTML={{ __html: renderObjAsTable(contributor_2d_data) }}></div>
-				</>) : (repoList) ? (
+				</>) : (
 					<div className="max-w-[80%] mx-auto">
-						<RepoList repoList={repoList} />
+						<RepoList />
 					</div>
-				) : (
-					<p>Something went wrong</p>
-				)
-				}
+				)}
 			</div >
 			<Footer />
 		</>
@@ -90,13 +85,8 @@ export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ 
 		console.debug("No repo name received");
 	}
 
-	// by default, show the list of repositories of the user
-	const repoList = await getRepoList(session);
 	return {
-		props: {
-			sessionObj: session,
-			repoList: repoList
-		}
+		props: { sessionObj: session }
 	}
 }
 

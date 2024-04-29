@@ -32,7 +32,13 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'gitlab.com', // GitLab profile images
 				pathname: '/uploads/-/system/user/avatar/**',
-			}
+			},
+			{
+				protocol: 'http',
+				hostname: process.env.NEXT_PUBLIC_STRAPI_API_URL, // Blog server
+				port: '1337',
+				pathname: '/**',
+			},
 		],
 	},
 	webpack: (config, { isServer }) => {
