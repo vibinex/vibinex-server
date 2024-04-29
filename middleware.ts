@@ -1,4 +1,3 @@
-import Negotiator from 'negotiator';
 import { NextRequest, NextResponse } from 'next/server'
 
 const allowedOrigins = [

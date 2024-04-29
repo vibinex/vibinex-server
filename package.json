@@ -1,97 +1,98 @@
 {
-  "name": "vibinex-website",
-  "version": "0.1.24",
-  "private": false,
-  "homepage": "https://vibinex.com",
-  "description": "A plugin that works with GitHub, Bitbucket and GitLab to personalize and data-enrich their code review interfaces",
-  "license": "LGPL-3.0-or-later",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "jest",
-    "create-env": "printenv > .env"
-  },
-  "dependencies": {
-    "@google-cloud/cloudbuild": "4.1.0",
-    "@google-cloud/pubsub": "^3.7.1",
-    "@google-cloud/storage": "^6.9.0",
-    "@mdx-js/loader": "^2.3.0",
-    "@mdx-js/react": "^2.3.0",
-    "@next/mdx": "^13.4.4",
-    "@nivo/bar": "^0.80.0",
-    "@nivo/bump": "^0.80.0",
-    "@nivo/core": "^0.80.0",
-    "@nivo/radar": "^0.80.0",
-    "@nivo/voronoi": "^0.80.0",
-    "@radix-ui/react-accordion": "^1.1.2",
-    "@radix-ui/react-select": "^2.0.0",
-    "@radix-ui/react-switch": "^1.0.3",
-    "@radix-ui/themes": "^2.0.2",
-    "@rudderstack/rudder-sdk-node": "^2.0.2",
-    "@types/mdx": "^2.0.5",
-    "@types/node": "18.11.14",
-    "@types/react": "18.0.26",
-    "@types/react-dom": "18.0.9",
-    "axios": "^1.2.2",
-    "embla-carousel-auto-scroll": "^8.0.0",
-    "embla-carousel-autoplay": "^8.0.0",
-    "embla-carousel-react": "^8.0.0",
-    "eslint": "8.29.0",
-    "eslint-config-next": "13.0.6",
-    "next": "13.3.1",
-    "next-auth": "4.22.1",
-    "pg": "^8.11.3",
-    "react": "18.2.0",
-    "react-calendly": "^4.1.1",
-    "react-copy-to-clipboard": "^5.1.0",
-    "react-dom": "18.2.0",
-    "react-famewall": "^1.0.10",
-    "react-icons": "^4.7.1",
-    "react-lite-youtube-embed": "^2.4.0",
-    "rudder-sdk-js": "^2.25.0",
-    "sharp": "^0.32.6",
-    "typescript": "4.9.4",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/forms": "^0.5.3",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@types/pg": "^8.6.6",
-    "@types/react-copy-to-clipboard": "^5.0.7",
-    "@types/uuid": "^9.0.1",
-    "autoprefixer": "^10.4.13",
-    "jest": "^29.3.1",
-    "jest-environment-jsdom": "^29.3.1",
-    "postcss": "^8.4.20",
-    "tailwindcss": "^3.2.4"
-  },
-  "browser": {
-    "fs": false,
-    "dns": false,
-    "net": false,
-    "tls": false,
-    "pg-native": false
-  },
-  "contributors": [
-    {
-      "name": "Avikalp Kumar Gupta",
-      "email": "avikalp@vibinex.com",
-      "url": "https://avikalpg.github.io"
-    },
-    {
-      "name": "Tapish Rathore",
-      "email": "tapish@vibinex.com"
-    },
-    {
-      "name": "Muskan Paliwal",
-      "email": "muskan@vibinex.com"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Alokit-Innovations/team-monitor-website.git"
-  }
+	"name": "vibinex-website",
+	"version": "0.1.24",
+	"private": false,
+	"homepage": "https://vibinex.com",
+	"description": "A plugin that works with GitHub, Bitbucket and GitLab to personalize and data-enrich their code review interfaces",
+	"license": "LGPL-3.0-or-later",
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"test": "jest",
+		"create-env": "printenv > .env"
+	},
+	"dependencies": {
+		"@google-cloud/cloudbuild": "4.1.0",
+		"@google-cloud/pubsub": "^3.7.1",
+		"@google-cloud/storage": "^6.9.0",
+		"@mdx-js/loader": "^2.3.0",
+		"@mdx-js/react": "^2.3.0",
+		"@next/mdx": "^13.4.4",
+		"@nivo/bar": "^0.80.0",
+		"@nivo/bump": "^0.80.0",
+		"@nivo/core": "^0.80.0",
+		"@nivo/radar": "^0.80.0",
+		"@nivo/voronoi": "^0.80.0",
+		"@radix-ui/react-accordion": "^1.1.2",
+		"@radix-ui/react-select": "^2.0.0",
+		"@radix-ui/react-switch": "^1.0.3",
+		"@radix-ui/themes": "^2.0.2",
+		"@rudderstack/rudder-sdk-node": "^2.0.2",
+		"@types/mdx": "^2.0.5",
+		"@types/node": "18.11.14",
+		"@types/qs": "^6.9.15",
+		"@types/react": "18.0.26",
+		"@types/react-dom": "18.0.9",
+		"axios": "^1.2.2",
+		"embla-carousel-auto-scroll": "^8.0.0",
+		"embla-carousel-autoplay": "^8.0.0",
+		"embla-carousel-react": "^8.0.0",
+		"eslint": "8.29.0",
+		"eslint-config-next": "13.0.6",
+		"next": "13.3.1",
+		"next-auth": "4.22.1",
+		"pg": "^8.11.3",
+		"qs": "^6.12.1",
+		"react": "18.2.0",
+		"react-calendly": "^4.1.1",
+		"react-copy-to-clipboard": "^5.1.0",
+		"react-dom": "18.2.0",
+		"react-famewall": "^1.0.10",
+		"react-icons": "^4.12.0",
+		"react-lite-youtube-embed": "^2.4.0",
+		"react-markdown": "^9.0.1",
+		"react-slideshow-image": "^4.3.1",
+		"remark-gfm": "^4.0.0",
+		"rudder-sdk-js": "^2.25.0",
+		"sharp": "^0.32.6",
+		"typescript": "4.9.4",
+		"uuid": "^9.0.0"
+	},
+	"devDependencies": {
+		"@tailwindcss/forms": "^0.5.3",
+		"@testing-library/jest-dom": "^5.16.5",
+		"@testing-library/react": "^13.4.0",
+		"@types/pg": "^8.6.6",
+		"@types/react-copy-to-clipboard": "^5.0.7",
+		"@types/uuid": "^9.0.1",
+		"jest": "^29.3.1"
+	},
+	"browser": {
+		"fs": false,
+		"dns": false,
+		"net": false,
+		"tls": false,
+		"pg-native": false
+	},
+	"contributors": [
+		{
+			"name": "Avikalp Kumar Gupta",
+			"email": "avikalp@vibinex.com",
+			"url": "https://avikalpg.github.io"
+		},
+		{
+			"name": "Tapish Rathore",
+			"email": "tapish@vibinex.com"
+		},
+		{
+			"name": "Muskan Paliwal",
+			"email": "muskan@vibinex.com"
+		}
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Alokit-Innovations/team-monitor-website.git"
+	}
 }
