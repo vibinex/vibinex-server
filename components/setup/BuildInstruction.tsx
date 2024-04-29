@@ -43,9 +43,9 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     };
 
 	const encrypt_github_pat = (handleGithubPatInputValue: string) => {
-		let secret_key = process.env.NEXT_PUBLIC_SECRET_KEY;
-		if (secret_key) {
-			return encrypt(secret_key, handleGithubPatInputValue);
+		let github_pat_encryption_secret_key = process.env.NEXT_PUBLIC_GITHUB_PAT_ENCRYPTION_SECRET_KEY;
+		if (github_pat_encryption_secret_key) {
+			return encrypt(github_pat_encryption_secret_key, handleGithubPatInputValue);
 		}
 	}
 
