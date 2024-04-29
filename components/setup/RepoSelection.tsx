@@ -72,7 +72,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 			.finally(() => {
 				setIsGetReposLoading(false);
 			});
-	}, [repoProvider])
+	}, [repoProvider, installId])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
 		if (event.target.checked) {
