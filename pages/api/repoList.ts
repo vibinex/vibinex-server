@@ -7,11 +7,13 @@ import { authOptions } from "./auth/[...nextauth]";
 
 const getReposForUser = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method !== 'GET') {
-		return res.status(405).json({ error: 'Method not allowed' });
+		res.status(405).json({ error: 'Method not allowed' });
+		return;
 	}
 	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
-		return res.status(401).json({ error: 'Unauthenticated' });
+		res.status(401).json({ error: 'Unauthenticated' });
+		return;
 	}
 
 	const userReposFromProvider = await getUserRepositories(session).catch((err): RepoIdentifier[] => {
@@ -20,7 +22,8 @@ const getReposForUser = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 	if (userReposFromProvider.length === 0) {
 		console.warn(`[RepoList] getRepos from the providers got zero repositories for user: ${session.user.id} (Name: ${session.user.name})`);
-		return res.status(204).json({ repoList: [] });
+		res.status(204).json({ repoList: [] });
+		return;
 	}
 
 	const userReposFromDb = await getRepos(userReposFromProvider, session).catch((err) => {
@@ -29,7 +32,8 @@ const getReposForUser = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 	if (!userReposFromDb) {
 		console.error("[RepoList] getRepos failed for session", session);
-		return res.status(500).json({ repoList: [], error: "Failed to get user repositories from the database" });
+		res.status(500).json({ repoList: [], error: "Failed to get user repositories from the database" });
+		return;
 	}
 	if (userReposFromDb.failureRate != 0) {
 		// if necessary, we can add this to the returned object
@@ -39,7 +43,7 @@ const getReposForUser = async (req: NextApiRequest, res: NextApiResponse) => {
 		const { created_at, ...other } = repo;
 		return { created_at: created_at.toDateString(), ...other }
 	});
-	return res.status(200).json({ repoList, failureRate: userReposFromDb.failureRate });
+	res.status(200).json({ repoList, failureRate: userReposFromDb.failureRate });
 }
 
 export default getReposForUser;
