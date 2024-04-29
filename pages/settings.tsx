@@ -2,6 +2,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import Footer from "../components/Footer";
 import GitAliasForm from "../components/GitAliasForm";
 import MainAppBar from "../views/MainAppBar";
+import RepoList from '../views/RepoList';
 
 const ExpandedGitAliasFormPage: React.FC = () => {
 	return <>
@@ -27,8 +28,7 @@ const ExpandedGitAliasFormPage: React.FC = () => {
 			<GitAliasForm expanded={true} />
 		</Tabs.Content>
 		<Tabs.Content value="feature-flags" className="grow px-5 bg-white rounded-r-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black">
-			{/* <RepoList /> */}
-			RepoList
+			<RepoList />
 		</Tabs.Content>
 		</Tabs.Root>
 		<Footer />
