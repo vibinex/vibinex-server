@@ -6,6 +6,7 @@ import { CloudBuildStatus } from '../../utils/trigger';
 import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
 import RepoSelection from './RepoSelection';
+import { encrypt } from '../../utils/encrypt_decrypt';
 
 interface BuildInstructionProps {
 	selectedHosting: string;
@@ -34,22 +35,43 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
 	const [installId, setInstallId] = useState<string | null>(null);
 	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
+	const [handleGithubPatInputValue, setHandleGithubPatInputValue] = useState<string>("");
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+	const handleGithubPatInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setHandleGithubPatInputValue(event.target.value);
+    };
+
+	const encrypt_github_pat = (handleGithubPatInputValue: string) => {
+		let secret_key = process.env.NEXT_PUBLIC_SECRET_KEY;
+		if (secret_key) {
+			return encrypt(secret_key, handleGithubPatInputValue);
+		}
+	}
 
 	const handleBuildButtonClick = () => {
 		setIsTriggerBuildButtonDisabled(true);
 		setBuildStatus(null);
+		setErrorMessage(null);
+		let encrypted_github_pat = encrypt_github_pat(handleGithubPatInputValue);
 
-		axios.post('/api/dpu/trigger', { userId })
+		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encrypted_github_pat })
 			.then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 				setBuildStatus(response.data);
+				setHandleGithubPatInputValue("");  // Clear the input field after successful submission
+				if (!response.data.success) {
+					setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
+				}
 				if (response.data.success) {
 					return;
 				}
 			})
 			.catch((error) => {
 				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
+				setErrorMessage('API request failed: ' + error.message);
 				setIsTriggerBuildButtonDisabled(false);
+				// setHandleGithubPatInputValue(""); TODO: Not sure if this needs to be done.
 				setBuildStatus({ success: false, message: 'API request failed' });
 			})
 	};
@@ -104,19 +126,26 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				(selectedProvider === 'github' && selectedInstallationType === 'individual')
 			) {
 				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
-			} 
-	
+			}
 			return (<>
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2 py-2">
 					<input
 						type="text"
 						placeholder='Enter your Personal Access Token'
-						className="mb-2 w-full"
+						value={handleGithubPatInputValue}
+						onChange={handleGithubPatInput}
+						disabled={isTriggerBuildButtonDisabled}
+						className="w-full h-8"
 					/>
-					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled}>
-						Submit github personal access token
+					<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
+						Submit
 					</Button>
 				</div>
+				{errorMessage && (
+					<div className="text-error mt-2">
+						{errorMessage}
+					</div>
+				)}
 			</>);
 		}
 	} else {
