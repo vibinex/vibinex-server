@@ -71,7 +71,6 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
 				setErrorMessage('API request failed: ' + error.message);
 				setIsTriggerBuildButtonDisabled(false);
-				// setHandleGithubPatInputValue(""); TODO: Not sure if this needs to be done.
 				setBuildStatus({ success: false, message: 'API request failed' });
 			})
 	};
@@ -96,18 +95,18 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			<p>Something went wrong while fetching install id.</p>
 		</div>);
 	}
+	if (!isRepoSelectionDone && (
+		(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
+		(selectedProvider === 'github' && selectedInstallationType === 'individual')
+	)) {
+		return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+	}
 	if (selectedHosting === 'selfhosting') {
 		if (isGetInstallIdLoading) {
 			return (<>
 				<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
 				Generating topic name...
 			</>);
-		}
-		if (!isRepoSelectionDone && (
-			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
-			(selectedProvider === 'github' && selectedInstallationType === 'individual')
-		)) {
-			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
 		}
 		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
 	} else if (selectedHosting === 'cloud') {
@@ -121,12 +120,6 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				</div>
 			);
 		} else {
-			// TODO - if repo selection is false show repos, if true pat text field and trigger cloud build button
-			if (!isRepoSelectionDone &&
-				(selectedProvider === 'github' && selectedInstallationType === 'individual')
-			) {
-				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
-			}
 			return (<>
 				<div className="flex items-center gap-2 py-2">
 					<input
@@ -135,7 +128,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 						value={handleGithubPatInputValue}
 						onChange={handleGithubPatInput}
 						disabled={isTriggerBuildButtonDisabled}
-						className="w-full h-8"
+						className="grow h-8"
 					/>
 					<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
 						Submit
