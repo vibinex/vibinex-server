@@ -6,6 +6,8 @@ import { CloudBuildStatus } from '../../utils/trigger';
 import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
 import RepoSelection from './RepoSelection';
+import { encrypt } from '../../utils/encrypt_decrypt';
+import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 
 interface BuildInstructionProps {
 	selectedHosting: string;
@@ -34,22 +36,51 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
 	const [installId, setInstallId] = useState<string | null>(null);
 	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
+	const [handleGithubPatInputValue, setHandleGithubPatInputValue] = useState<string>("");
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [maskedGithubPat, setMaskedGithubPat] = useState('');
+	const [isInputDisabled, setIsInputDisabled] = useState(false);
+
+	const handleGithubPatInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setHandleGithubPatInputValue(event.target.value);
+    };
+
+	const encrypt_github_pat = (handleGithubPatInputValue: string) => {
+		const github_pat_encryption_secret_key = process.env.NEXT_PUBLIC_GITHUB_PAT_ENCRYPTION_SECRET_KEY;
+		if (github_pat_encryption_secret_key) {
+			return encrypt(github_pat_encryption_secret_key, handleGithubPatInputValue);
+		}
+	}
+
+	const maskGithubPat = (handleGithubPatInputValue: string) => {
+		return handleGithubPatInputValue.replace(/.(?=.{4})/g, '*');  // Mask all but the last four characters
+	};
 
 	const handleBuildButtonClick = () => {
 		setIsTriggerBuildButtonDisabled(true);
 		setBuildStatus(null);
+		setErrorMessage(null);
+		setIsInputDisabled(true);
+		let encrypted_github_pat = encrypt_github_pat(handleGithubPatInputValue);
 
-		axios.post('/api/dpu/trigger', { userId })
+		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encrypted_github_pat })
 			.then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 				setBuildStatus(response.data);
+				setIsTriggerBuildButtonDisabled(false);
+				if (!response.data.success) {
+					setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
+				}
 				if (response.data.success) {
+					setMaskedGithubPat(maskGithubPat(handleGithubPatInputValue)); // Mask the GitHub PAT
 					return;
 				}
 			})
 			.catch((error) => {
 				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
+				setErrorMessage('API request failed: ' + error.message);
 				setIsTriggerBuildButtonDisabled(false);
+				setIsInputDisabled(false);
 				setBuildStatus({ success: false, message: 'API request failed' });
 			})
 	};
@@ -69,18 +100,18 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			});
 	}, [userId])
 
+	if (isGetInstallIdLoading) {
+		return (<>
+			<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
+			Generating topic name...
+		</>);
+	}
+	if (!installId) {
+		return (<div className="flex items-center gap-4">
+			<p>Something went wrong while fetching install id.</p>
+		</div>);
+	}
 	if (selectedHosting === 'selfhosting') {
-		if (isGetInstallIdLoading) {
-			return (<>
-				<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
-				Generating topic name...
-			</>);
-		}
-		if (!installId) {
-			return (<div className="flex items-center gap-4">
-				<p>Something went wrong while fetching install id.</p>
-			</div>);
-		}
 		if (!isRepoSelectionDone && (
 			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
 			(selectedProvider === 'github' && selectedInstallationType === 'individual')
@@ -99,8 +130,30 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				</div>
 			);
 		} else {
-			// TODO - if repo selection is false show repos, if true pat text field and trigger cloud build button
-			return (<>Not Implemented!</>);
+			if (!isRepoSelectionDone){
+				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+			}
+			return (<>
+				<div className="flex items-center gap-2 py-2">
+					<input
+						type="text"
+						placeholder='Enter your Personal Access Token'
+						value={isInputDisabled ? maskedGithubPat : handleGithubPatInputValue}
+						onChange={handleGithubPatInput}
+						disabled={isInputDisabled}
+						className="grow h-8"
+					/>
+					<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
+						Deploy
+					</Button>
+				</div>
+				{errorMessage && (
+					<div className="text-error mt-2">
+						{errorMessage}
+					</div>
+				)}
+				<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
+			</>);
 		}
 	} else {
 		return <div>Select a hosting option to view instructions.</div>;
