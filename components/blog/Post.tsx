@@ -65,7 +65,7 @@ const Post: React.FC<{ article: Article["attributes"] }> = ({ article }) => {
 							/>
 						)}
 						<p className="text-md dark:text-violet-400">
-							{author && author.name} • {formatDate(publishedAt)}
+							{author?.name} • {formatDate(publishedAt)}
 						</p>
 					</div>
 				</div>
