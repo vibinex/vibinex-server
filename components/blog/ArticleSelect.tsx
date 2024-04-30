@@ -20,24 +20,26 @@ interface Article {
   };
 }
 
+interface ArticleSelectProps {
+	categories: Category[];
+	articles: Article[];
+	params: {
+		slug: string;
+		category: string;
+	};
+}
+
 function selectedFilter(current: string, selected: string) {
   return current === selected
 	? "px-3 py-1 rounded-lg hover:underline dark:bg-violet-700 dark:text-gray-100"
 	: "px-3 py-1 rounded-lg hover:underline dark:bg-violet-400 dark:text-gray-900";
 }
 
-export default function ArticleSelect({
+const ArticleSelect = ({
   categories,
   articles,
   params,
-}: {
-  categories: Category[];
-  articles: Article[];
-  params: {
-	slug: string;
-	category: string;
-  };
-}) {
+}: ArticleSelectProps) => {
 
   return (
 	<div className="p-4 rounded-lg dark:bg-gray-900 min-h-[365px] relative">
@@ -91,3 +93,5 @@ export default function ArticleSelect({
 	</div>
   );
 }
+
+export default ArticleSelect;
