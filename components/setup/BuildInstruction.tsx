@@ -7,6 +7,7 @@ import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
 import RepoSelection from './RepoSelection';
 import { encrypt } from '../../utils/encrypt_decrypt';
+import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 
 interface BuildInstructionProps {
 	selectedHosting: string;
@@ -37,6 +38,8 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
 	const [handleGithubPatInputValue, setHandleGithubPatInputValue] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [maskedGithubPat, setMaskedGithubPat] = useState('');
+	const [isInputDisabled, setIsInputDisabled] = useState(false);
 
 	const handleGithubPatInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setHandleGithubPatInputValue(event.target.value);
@@ -49,6 +52,10 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		}
 	}
 
+	const maskGithubPat = (handleGithubPatInputValue: string) => {
+		return handleGithubPatInputValue.replace(/.(?=.{4})/g, '*');  // Mask all but the last four characters
+	};
+
 	const handleBuildButtonClick = () => {
 		setIsTriggerBuildButtonDisabled(true);
 		setBuildStatus(null);
@@ -59,11 +66,13 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			.then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 				setBuildStatus(response.data);
-				setHandleGithubPatInputValue("");  // Clear the input field after successful submission
+				setIsTriggerBuildButtonDisabled(false);
 				if (!response.data.success) {
 					setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
 				}
 				if (response.data.success) {
+					setMaskedGithubPat(maskGithubPat(handleGithubPatInputValue)); // Mask the GitHub PAT
+					setIsInputDisabled(true);
 					return;
 				}
 			})
@@ -71,6 +80,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
 				setErrorMessage('API request failed: ' + error.message);
 				setIsTriggerBuildButtonDisabled(false);
+				setIsInputDisabled(false);
 				setBuildStatus({ success: false, message: 'API request failed' });
 			})
 	};
@@ -90,18 +100,18 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			});
 	}, [userId])
 
+	if (isGetInstallIdLoading) {
+		return (<>
+			<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
+			Generating topic name...
+		</>);
+	}
+	if (!installId) {
+		return (<div className="flex items-center gap-4">
+			<p>Something went wrong while fetching install id.</p>
+		</div>);
+	}
 	if (selectedHosting === 'selfhosting') {
-		if (isGetInstallIdLoading) {
-			return (<>
-				<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
-				Generating topic name...
-			</>);
-		}
-		if (!installId) {
-			return (<div className="flex items-center gap-4">
-				<p>Something went wrong while fetching install id.</p>
-			</div>);
-		}
 		if (!isRepoSelectionDone && (
 			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
 			(selectedProvider === 'github' && selectedInstallationType === 'individual')
@@ -110,11 +120,6 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		}
 		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
 	} else if (selectedHosting === 'cloud') {
-		if (!installId) {
-			return (<div className="flex items-center gap-4">
-				<p>Something went wrong while fetching install id.</p>
-			</div>);
-		}
 		if (selectedInstallationType === 'project') {
 			return (
 				<div className="flex items-center gap-4">
@@ -133,9 +138,9 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 					<input
 						type="text"
 						placeholder='Enter your Personal Access Token'
-						value={handleGithubPatInputValue}
+						value={isInputDisabled ? maskedGithubPat : handleGithubPatInputValue}
 						onChange={handleGithubPatInput}
-						disabled={isTriggerBuildButtonDisabled}
+						disabled={isInputDisabled}
 						className="grow h-8"
 					/>
 					<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
@@ -147,6 +152,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 						{errorMessage}
 					</div>
 				)}
+				<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
 			</>);
 		}
 	} else {
