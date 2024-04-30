@@ -1,8 +1,7 @@
 import type { Metadata, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Post from '../../../../components/blog/Post';
-import { Article } from '../../../../components/blog/Post';
+import Post, { Article } from '../../../../components/blog/Post';
 import Footer from '../../../../components/Footer';
 import { fetchAPI } from '../../../../utils/blog/fetch-api';
 import Navbar from '../../../../views/Navbar';
