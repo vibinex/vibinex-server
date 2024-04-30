@@ -90,17 +90,6 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			});
 	}, [userId])
 
-	if (!installId) {
-		return (<div className="flex items-center gap-4">
-			<p>Something went wrong while fetching install id.</p>
-		</div>);
-	}
-	if (!isRepoSelectionDone && (
-		(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
-		(selectedProvider === 'github' && selectedInstallationType === 'individual')
-	)) {
-		return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
-	}
 	if (selectedHosting === 'selfhosting') {
 		if (isGetInstallIdLoading) {
 			return (<>
@@ -108,8 +97,24 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				Generating topic name...
 			</>);
 		}
+		if (!installId) {
+			return (<div className="flex items-center gap-4">
+				<p>Something went wrong while fetching install id.</p>
+			</div>);
+		}
+		if (!isRepoSelectionDone && (
+			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
+			(selectedProvider === 'github' && selectedInstallationType === 'individual')
+		)) {
+			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+		}
 		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
 	} else if (selectedHosting === 'cloud') {
+		if (!installId) {
+			return (<div className="flex items-center gap-4">
+				<p>Something went wrong while fetching install id.</p>
+			</div>);
+		}
 		if (selectedInstallationType === 'project') {
 			return (
 				<div className="flex items-center gap-4">
@@ -120,6 +125,9 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				</div>
 			);
 		} else {
+			if (!isRepoSelectionDone){
+				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+			}
 			return (<>
 				<div className="flex items-center gap-2 py-2">
 					<input
