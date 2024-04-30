@@ -5,7 +5,7 @@ interface PageHeaderProps {
 	text?: string,
 }
 
-export default function PageHeader({ heading, text }: PageHeaderProps) {
+const PageHeader = ({ heading, text }: PageHeaderProps) => {
 	return (
 		<div className="my-16 w-full text-center">
 			{text && <span className="text-violet-400 font-bold">{text}</span>}
@@ -13,3 +13,5 @@ export default function PageHeader({ heading, text }: PageHeaderProps) {
 		</div>
 	);
 }
+
+export default PageHeader;
