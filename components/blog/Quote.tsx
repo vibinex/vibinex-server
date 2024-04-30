@@ -4,9 +4,9 @@ interface QuoteProps {
 	  body: string;
 	  author: string;
 	};
-  }
+}
 
-  export default function Quote({ data }: QuoteProps) {
+const Quote = ({ data }: QuoteProps) => {
 	const { title, body, author } = data;
 
 	return (
@@ -37,4 +37,6 @@ interface QuoteProps {
 		{author ? <p>{author}</p> : "unknown"}
 	  </div>
 	);
-  }
+}
+
+export default Quote;

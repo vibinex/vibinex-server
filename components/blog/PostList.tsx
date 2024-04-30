@@ -112,7 +112,7 @@ const PostList = ({
 			);
 		})}
 		</div>
-		{children && children}
+		{children}
 	</section>
 	);
 }
