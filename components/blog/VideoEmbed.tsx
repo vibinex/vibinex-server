@@ -30,9 +30,9 @@ const VideoEmbed = ({ data }: { data: VideoEmbedProps }) => {
 	<div className="video-embed relative pb-56.25 h-72 lg:h-[450px] overflow-hidden my-8">
 	  <iframe
 		title="video"
-		src={embedUrl || ""}
-		width={data.width || "100%"}
-		height={data.height || "100%"}
+		src={embedUrl ?? ""}
+		width={data.width ?? "100%"}
+		height={data.height ?? "100%"}
 		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 		allowFullScreen
 		className="absolute top-0 left-0 w-full h-full"
