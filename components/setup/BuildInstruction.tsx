@@ -46,7 +46,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
     };
 
 	const encrypt_github_pat = (handleGithubPatInputValue: string) => {
-		let github_pat_encryption_secret_key = process.env.NEXT_PUBLIC_GITHUB_PAT_ENCRYPTION_SECRET_KEY;
+		const github_pat_encryption_secret_key = process.env.NEXT_PUBLIC_GITHUB_PAT_ENCRYPTION_SECRET_KEY;
 		if (github_pat_encryption_secret_key) {
 			return encrypt(github_pat_encryption_secret_key, handleGithubPatInputValue);
 		}
@@ -60,6 +60,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		setIsTriggerBuildButtonDisabled(true);
 		setBuildStatus(null);
 		setErrorMessage(null);
+		setIsInputDisabled(true);
 		let encrypted_github_pat = encrypt_github_pat(handleGithubPatInputValue);
 
 		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encrypted_github_pat })
@@ -72,7 +73,6 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				}
 				if (response.data.success) {
 					setMaskedGithubPat(maskGithubPat(handleGithubPatInputValue)); // Mask the GitHub PAT
-					setIsInputDisabled(true);
 					return;
 				}
 			})
@@ -144,7 +144,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 						className="grow h-8"
 					/>
 					<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
-						Submit
+						Deploy
 					</Button>
 				</div>
 				{errorMessage && (
