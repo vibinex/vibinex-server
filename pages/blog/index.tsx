@@ -19,10 +19,10 @@ interface Meta {
 const Profile: NextPage = () => {
 	const [meta, setMeta] = useState<Meta | undefined>();
 	const [data, setData] = useState<any>([]);
-	const [isLoading, setLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const fetchData = useCallback(async (start: number, limit: number) => {
-		setLoading(true);
+		setIsLoading(true);
 		try {
 			const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 			const path = `/articles`;
@@ -53,7 +53,7 @@ const Profile: NextPage = () => {
 		} catch (error) {
 			console.error(error);
 		} finally {
-			setLoading(false);
+			setIsLoading(false);
 		}
 	}, []);
 
