@@ -30,9 +30,7 @@ interface ArticleSelectProps {
 }
 
 function selectedFilter(current: string, selected: string) {
-  return current === selected
-	? "px-3 py-1 rounded-lg hover:underline dark:bg-violet-700 dark:text-gray-100"
-	: "px-3 py-1 rounded-lg hover:underline dark:bg-violet-400 dark:text-gray-900";
+  return `px-3 py-1 rounded-lg hover:underline ${current === selected ? "dark:bg-violet-700 dark:text-gray-100" : "dark:bg-violet-400 dark:text-gray-900"}`;
 }
 
 const ArticleSelect = ({
@@ -72,7 +70,7 @@ const ArticleSelect = ({
 		  <ul className="ml-4 space-y-1 list-disc">
 			{articles.map((article: Article) => {
 			  return (
-				<li key ={article.id}>
+				<li key={`article-${article.id}`}>
 				  <Link
 				  	key={article.id}
 					rel="noopener noreferrer"
