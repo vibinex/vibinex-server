@@ -44,10 +44,11 @@ const CategoryRoute: NextPage = () => {
 	useEffect(() => {
 		async function renderCategory(category: string) {
 			const { data: postsByCategory } = await fetchPostsByCategory(category);
-			const categoryName = postsByCategory[0]?.attributes.category.data.attributes.name;
+			const catName = postsByCategory[0]?.attributes.category.data.attributes.name;
+			const catDesc = postsByCategory[0]?.attributes.category.data.attributes.description;
 			setCategoryData(postsByCategory);
-			setCategoryName(categoryName);
-			setCategoryDescription(categoryDescription);
+			setCategoryName(catName);
+			setCategoryDescription(catDesc);
 		}
 		renderCategory(router.query.category as string);
 	}, [router]);

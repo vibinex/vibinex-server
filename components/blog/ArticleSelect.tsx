@@ -20,24 +20,24 @@ interface Article {
   };
 }
 
-function selectedFilter(current: string, selected: string) {
-  return current === selected
-	? "px-3 py-1 rounded-lg hover:underline dark:bg-violet-700 dark:text-gray-100"
-	: "px-3 py-1 rounded-lg hover:underline dark:bg-violet-400 dark:text-gray-900";
+interface ArticleSelectProps {
+	categories: Category[];
+	articles: Article[];
+	params: {
+		slug: string;
+		category: string;
+	};
 }
 
-export default function ArticleSelect({
+function selectedFilter(current: string, selected: string) {
+  return `px-3 py-1 rounded-lg hover:underline ${current === selected ? "dark:bg-violet-700 dark:text-gray-100" : "dark:bg-violet-400 dark:text-gray-900"}`;
+}
+
+const ArticleSelect = ({
   categories,
   articles,
   params,
-}: {
-  categories: Category[];
-  articles: Article[];
-  params: {
-	slug: string;
-	category: string;
-  };
-}) {
+}: ArticleSelectProps) => {
 
   return (
 	<div className="p-4 rounded-lg dark:bg-gray-900 min-h-[365px] relative">
@@ -70,7 +70,7 @@ export default function ArticleSelect({
 		  <ul className="ml-4 space-y-1 list-disc">
 			{articles.map((article: Article) => {
 			  return (
-				<li key ={article.id}>
+				<li key={`article-${article.id}`}>
 				  <Link
 				  	key={article.id}
 					rel="noopener noreferrer"
@@ -91,3 +91,5 @@ export default function ArticleSelect({
 	</div>
   );
 }
+
+export default ArticleSelect;

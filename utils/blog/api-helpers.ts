@@ -1,5 +1,10 @@
 export function getStrapiURL(path = '') {
-	return `${process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337'}${path}`;
+	if (!process.env.NEXT_PUBLIC_STRAPI_API_URL) {
+		console.error(
+			`[getStrapiURL] NEXT_PUBLIC_STRAPI_API_URL env variable is not set, unable to get strapi URL`);
+		throw new Error(`NEXT_PUBLIC_STRAPI_API_URL env variable is not set, unable to get strapi URL`);
+	}
+	return `http://${process.env.NEXT_PUBLIC_STRAPI_API_URL}:1337${path}`;
 }
 
 export function getStrapiMedia(url: string | null) {

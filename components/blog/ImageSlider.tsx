@@ -18,14 +18,14 @@ interface SlidShowProps {
   };
 }
 
-export default function Slideshow({ data }: { data: SlidShowProps }) {
+const Slideshow = ({ data }: { data: SlidShowProps }) => {
   return (
 	<div className="slide-container">
 	  <Fade>
-		{data.files.data.map((fadeImage: Image, index) => {
+		{data.files.data.map((fadeImage: Image) => {
 		  const imageUrl = getStrapiMedia(fadeImage.attributes.url);
 		  return (
-			<div key={index}>
+			<div key={fadeImage.attributes.url}>
 			  {imageUrl && <Image className="w-full h-96 object-cover rounded-lg" height={400} width={600} alt="alt text" src={imageUrl} />}
 			</div>
 		  );
@@ -34,3 +34,5 @@ export default function Slideshow({ data }: { data: SlidShowProps }) {
 	</div>
   );
 }
+
+export default Slideshow;

@@ -176,9 +176,8 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
 	const triggerId: string | undefined = process.env.CLOUD_BUILD_PAT_TRIGGER_ID;
 	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
 	const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
-    const secretKey: string | undefined = process.env.SECRET_KEY;
-    
-    console.log("[triggerCloudPatBuildUsingGcloudApi] projectId, triggerId, location, triggerBranchName, secretKey are available in environment variables", projectId, triggerId, location, triggerBranchName, secretKey);
+    const secretKey: string | undefined = process.env.NEXT_PUBLIC_GITHUB_PAT_ENCRYPTION_SECRET_KEY;
+
 	if (!projectId || !triggerId || !location || !triggerBranchName || !secretKey) {
 		console.error('[triggerCloudPatBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
 		return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey in environment variables.' };
