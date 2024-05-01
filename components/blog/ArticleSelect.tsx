@@ -70,7 +70,7 @@ const ArticleSelect = ({
 		  <ul className="ml-4 space-y-1 list-disc">
 			{articles.map((article: Article) => {
 			  return (
-				<li key ={article.id}>
+				<li key={`article-${article.id}`}>
 				  <Link
 				  	key={article.id}
 					rel="noopener noreferrer"
