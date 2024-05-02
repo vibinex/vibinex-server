@@ -1,15 +1,22 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { MdEdit } from "react-icons/md";
-import { AliasMap, AliasProviderMap, HandleMap } from "../types/AliasMap";
 import Button from "../components/Button";
-import Chip from "../components/Chip";
-import { getProviderLogoSrc } from "../components/ProviderLogo";
+import GitAliasListItem from "../components/GitAliasListItem";
+import { AliasMap, AliasProviderMap } from "../types/AliasMap";
 
 const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [handleInputValues, setHandleInputValues] = useState<{ [key: string]: { github: string; bitbucket: string } }>({});
+
+	const setProviderMap = (providerMap: AliasMap) => {
+		setGitAliasMap(prevMap => prevMap ? (
+			{
+				...prevMap,
+				providerMaps: prevMap.providerMaps.map(map => map.alias === providerMap.alias ? providerMap : map)
+			}) : (
+			{ providerMaps: [providerMap] }
+		));
+	};
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -37,47 +44,6 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 		fetchData();
 	}, [expanded]);
 
-	const handleInputChange = (alias: string, provider: string, value: string) => {
-		setHandleInputValues(prevState => ({
-			...prevState,
-			[alias]: {
-				...prevState[alias],
-				[provider]: value
-			}
-		}));
-	};
-
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		try {
-			if (!gitAliasMap) {
-				throw new Error('No new value to submit');
-			}
-			const updatedProviderMaps = gitAliasMap.providerMaps.map(providerMap => {
-				const updatedHandleMaps = providerMap.handleMaps.map(handleMap => {
-					const inputValue = handleInputValues[providerMap.alias]?.[handleMap.provider as keyof typeof handleInputValues['']];
-					const updatedHandles = inputValue ? [inputValue.toString()] : [];
-					return { ...handleMap, handles: updatedHandles };
-				});
-				return { ...providerMap, handleMaps: updatedHandleMaps };
-			});
-
-			const updatedGitAliasMap = { providerMaps: updatedProviderMaps };
-			const response = await axios.post('/api/alias', { aliasProviderMap: updatedGitAliasMap }, {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-			if (!response) {
-				throw new Error('Failed to save Git alias map');
-			}
-			alert("Git aliases updated successfully!");
-		} catch (error) {
-			console.error("Error saving Git aliases:", error);
-			alert("An error occurred while saving Git aliases. Please try again.");
-		}
-	};
-
 	if (loading) {
 		return (<div>Loading...</div>)
 	}
@@ -86,17 +52,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 		return (
 			<div>
 				{gitAliasMap.providerMaps.map((providerMap: AliasMap) => (
-					<div key={providerMap.alias} className="flex border-b border-gray-300 last-of-type:border-0 w-full p-4 flex-wrap items-center">
-						<p className="w-full md:w-fit md:grow break-words">{providerMap.alias}</p>
-						{providerMap.handleMaps?.map((handleMap: HandleMap) => 
-							handleMap.handles.map((handle: string) => (
-								<Chip key={handle} name={handle} avatar={getProviderLogoSrc(handleMap.provider, "dark")} disabled={false} className="h-fit" />
-							)
-						))}
-						<Button variant="text">
-							<MdEdit className="w-6 h-6 hover:text-primary-text" />
-						</Button>
-					</div>
+					<GitAliasListItem key={providerMap.alias} providerMap={providerMap} setProviderMap={setProviderMap} />
 				))}
 				{!expanded && (
 					<Button variant="outlined" className="w-full my-2" href="/settings">View all aliases</Button>
