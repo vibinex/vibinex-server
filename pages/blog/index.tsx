@@ -56,7 +56,7 @@ const Profile: NextPage = () => {
 	}, []);
 
 	function loadMorePosts(): void {
-		const nextPosts = meta!.pagination.start + meta!.pagination.limit;
+		const nextPosts = meta?.pagination.start ?? 0 + (meta?.pagination.limit ?? 0);
 		fetchData(nextPosts, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
 	}
 
@@ -71,8 +71,8 @@ const Profile: NextPage = () => {
 			<Navbar transparent={true} />
 			<PageHeader heading="Our Blog" text="Checkout Something Cool" />
 			<PostList data={data}>
-				{meta!.pagination.start + meta!.pagination.limit <
-					meta!.pagination.total && (
+				{(meta?.pagination.start ?? 0) + (meta?.pagination.limit ?? 0) <
+					(meta?.pagination.total ?? 0) && (
 					<div className="flex justify-center">
 						<button
 							type="button"
