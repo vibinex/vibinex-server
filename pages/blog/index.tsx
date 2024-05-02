@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { useState, useEffect, useCallback } from "react";
 import Loader from "../../components/blog/Loader";
 import PageHeader from "../../components/blog/PageHeader";
-import PostList from "../../components/blog/PostList";
+import PostList, { Article } from "../../components/blog/PostList";
 import Footer from "../../components/Footer";
 import { fetchAPI } from "../../utils/blog/fetch-api";
 import Navbar from "../../views/Navbar";
@@ -18,7 +18,7 @@ interface Meta {
 }
 const Profile: NextPage = () => {
 	const [meta, setMeta] = useState<Meta | undefined>();
-	const [data, setData] = useState<any>([]);
+	const [data, setData] = useState<Article[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
 	const fetchData = useCallback(async (start: number, limit: number) => {
@@ -46,7 +46,7 @@ const Profile: NextPage = () => {
 			if (start === 0) {
 				setData(responseData.data);
 			} else {
-				setData((prevData: any[] ) => [...prevData, ...responseData.data]);
+				setData((prevData: Article[] ) => [...prevData, ...responseData.data]);
 			}
 
 			setMeta(responseData.meta);
