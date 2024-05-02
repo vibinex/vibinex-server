@@ -4,7 +4,7 @@ export function getStrapiURL(path = '') {
 			`[getStrapiURL] NEXT_PUBLIC_STRAPI_API_URL env variable is not set, unable to get strapi URL`);
 		throw new Error(`NEXT_PUBLIC_STRAPI_API_URL env variable is not set, unable to get strapi URL`);
 	}
-	return `http://${process.env.NEXT_PUBLIC_STRAPI_API_URL}:1337${path}`;
+	return `https://${process.env.NEXT_PUBLIC_STRAPI_API_URL}${path}`;
 }
 
 export function getStrapiMedia(url: string | null) {
