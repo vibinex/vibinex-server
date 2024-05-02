@@ -24,7 +24,6 @@ const Profile: NextPage = () => {
 	const fetchData = useCallback(async (start: number, limit: number) => {
 		setIsLoading(true);
 		try {
-			const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 			const path = `/articles`;
 			const urlParamsObject = {
 				sort: { createdAt: "desc" },
@@ -40,8 +39,7 @@ const Profile: NextPage = () => {
 					limit: limit,
 				},
 			};
-			const options = { headers: { Authorization: `Bearer ${token}` } };
-			const responseData = await fetchAPI(path, urlParamsObject, options);
+			const responseData = await fetchAPI(path, urlParamsObject);
 
 			if (start === 0) {
 				setData(responseData.data);
