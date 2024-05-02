@@ -29,7 +29,7 @@ export async function fetchAPI(
 		const response = await axios(requestUrl, mergedOptions);
 		return response.data;
 	} catch (error) {
-		console.error(`[fetchApi] Unable to call api ${path}`, err);
+		console.error(`[fetchApi] Unable to call api ${path}`, error);
 		throw new Error(
 			`Please check if your server is running and you set all the required tokens.`
 		);
