@@ -14,9 +14,9 @@ const ExpandedGitAliasFormPage: React.FC = () => {
 		<Tabs.Root 
 			defaultValue="alias-form" 
 			orientation="vertical" 
-			className="flex w-full md:w-4/5 mx-auto my-4"
+			className="flex flex-col md:flex-row w-full md:w-4/5 mx-auto my-4"
 		>
-		<Tabs.List className="shrink flex flex-col w-64" aria-label="Account settings">
+		<Tabs.List className="shrink flex flex-col w-full md:w-64 pb-4 mb-4 border-b-2 border-secondary-main md:border-0 gap-2" aria-label="Account settings">
 			<Tabs.Trigger value="alias-form" className="bg-white py-2 h-11 flex-1 flex grow-0 ps-4 items-center justify-start text-sm leading-none select-none rounded-s-md hover:bg-secondary-main/50 data-[state=active]:text-primary-main data-[state=active]:font-medium data-[state=active]:bg-secondary-main outline-none cursor-default">
 				Missing Aliases
 			</Tabs.Trigger>
