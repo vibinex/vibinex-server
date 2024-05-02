@@ -34,9 +34,8 @@ const nextConfig = {
 				pathname: '/uploads/-/system/user/avatar/**',
 			},
 			{
-				protocol: 'http',
+				protocol: 'https',
 				hostname: process.env.NEXT_PUBLIC_STRAPI_API_URL, // Blog server
-				port: '1337',
 				pathname: '/**',
 			},
 		],
