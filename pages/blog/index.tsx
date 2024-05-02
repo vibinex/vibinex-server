@@ -44,7 +44,7 @@ const Profile: NextPage = () => {
 			if (start === 0) {
 				setData(responseData.data);
 			} else {
-				setData((prevData: Article[] ) => [...prevData, ...responseData.data]);
+				setData((prevData: Article[]) => [...prevData, ...responseData.data]);
 			}
 
 			setMeta(responseData.meta);
@@ -73,16 +73,16 @@ const Profile: NextPage = () => {
 			<PostList data={data}>
 				{(meta?.pagination.start ?? 0) + (meta?.pagination.limit ?? 0) <
 					(meta?.pagination.total ?? 0) && (
-					<div className="flex justify-center">
-						<button
-							type="button"
-							className="px-6 py-3 text-sm rounded-lg hover:underline dark:bg-gray-900 dark:text-gray-400"
-							onClick={loadMorePosts}
-						>
-							Load more posts...
-						</button>
-					</div>
-				)}
+						<div className="flex justify-center">
+							<button
+								type="button"
+								className="px-6 py-3 text-sm rounded-lg hover:underline dark:bg-gray-900 dark:text-gray-400"
+								onClick={loadMorePosts}
+							>
+								Load more posts...
+							</button>
+						</div>
+					)}
 			</PostList>
 			<Footer />
 		</div>

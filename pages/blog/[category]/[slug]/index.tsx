@@ -50,25 +50,25 @@ const PostRoute: NextPage = () => {
 			setArticleInfo(data.data[0]);
 		}
 		renderPostRouteData(router.query.slug as string);
-	},[router]);
-	
+	}, [router]);
+
 	if (!articleInfo) return <h2>no post found</h2>;
 	return (
-	<div className='overflow-hidden'>
-		<Navbar transparent={true} />
-		<div className='flex justify-center'>
-			<div className='mx-auto max-w-3xl px-6 lg:px-0'>
-				<Post article={articleInfo.attributes} />
+		<div className='overflow-hidden'>
+			<Navbar transparent={true} />
+			<div className='flex justify-center'>
+				<div className='mx-auto max-w-3xl px-6 lg:px-0'>
+					<Post article={articleInfo.attributes} />
+				</div>
 			</div>
+			<Footer />
 		</div>
-		<Footer />
-	</div>
 	);
 }
 
 export async function generateStaticParams() {
 	const path = `/articles`;
-	const articleResponse = await fetchAPI(path, {populate: ['category'],});
+	const articleResponse = await fetchAPI(path, { populate: ['category'], });
 
 	return articleResponse.data.map(
 		(article: {
