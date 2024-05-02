@@ -1,6 +1,6 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import Footer from "../components/Footer";
-import GitAliasForm from "../components/GitAliasForm";
+import GitAliasForm from "../views/GitAliasForm";
 import MainAppBar from "../views/MainAppBar";
 import RepoList from '../views/RepoList';
 

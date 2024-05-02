@@ -2,9 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { AliasMap, AliasProviderMap, HandleMap } from "../types/AliasMap";
-import Button from "./Button";
-import Chip from "./Chip";
-import { getProviderLogoSrc } from "./ProviderLogo";
+import Button from "../components/Button";
+import Chip from "../components/Chip";
+import { getProviderLogoSrc } from "../components/ProviderLogo";
 
 const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	const [gitAliasMap, setGitAliasMap] = useState<AliasProviderMap | null>(null);
