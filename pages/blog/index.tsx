@@ -68,7 +68,7 @@ const Profile: NextPage = () => {
 	if (isLoading) return <Loader />;
 
 	return (
-		<div>
+		<>
 			<Navbar transparent={true} />
 			<PageHeader heading="Our Blog" text="Checkout Something Cool" />
 			<PostList data={data}>
@@ -85,7 +85,7 @@ const Profile: NextPage = () => {
 					)}
 			</PostList>
 			<Footer />
-		</div>
+		</>
 	);
 }
 
