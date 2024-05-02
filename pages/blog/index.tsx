@@ -3,7 +3,8 @@ import { NextPage } from "next";
 import { useState, useEffect, useCallback } from "react";
 import Loader from "../../components/blog/Loader";
 import PageHeader from "../../components/blog/PageHeader";
-import PostList from "../../components/blog/PostList";
+import PostList, { Article } from "../../components/blog/PostList";
+import Button from "../../components/Button";
 import Footer from "../../components/Footer";
 import { fetchAPI } from "../../utils/blog/fetch-api";
 import Navbar from "../../views/Navbar";
@@ -18,13 +19,12 @@ interface Meta {
 }
 const Profile: NextPage = () => {
 	const [meta, setMeta] = useState<Meta | undefined>();
-	const [data, setData] = useState<any>([]);
+	const [data, setData] = useState<Article[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
 	const fetchData = useCallback(async (start: number, limit: number) => {
 		setIsLoading(true);
 		try {
-			const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 			const path = `/articles`;
 			const urlParamsObject = {
 				sort: { createdAt: "desc" },
@@ -40,25 +40,24 @@ const Profile: NextPage = () => {
 					limit: limit,
 				},
 			};
-			const options = { headers: { Authorization: `Bearer ${token}` } };
-			const responseData = await fetchAPI(path, urlParamsObject, options);
+			const responseData = await fetchAPI(path, urlParamsObject);
 
 			if (start === 0) {
 				setData(responseData.data);
 			} else {
-				setData((prevData: any[] ) => [...prevData, ...responseData.data]);
+				setData((prevData: Article[]) => [...prevData, ...responseData.data]);
 			}
 
 			setMeta(responseData.meta);
 		} catch (error) {
-			console.error(error);
+			console.error(`[blog/index.tsx] Unable to fetch articles - ${JSON.stringify(error)}`);
 		} finally {
 			setIsLoading(false);
 		}
 	}, []);
 
 	function loadMorePosts(): void {
-		const nextPosts = meta!.pagination.start + meta!.pagination.limit;
+		const nextPosts = meta?.pagination.start ?? 0 + (meta?.pagination.limit ?? 0);
 		fetchData(nextPosts, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
 	}
 
@@ -69,25 +68,24 @@ const Profile: NextPage = () => {
 	if (isLoading) return <Loader />;
 
 	return (
-		<div>
+		<>
 			<Navbar transparent={true} />
 			<PageHeader heading="Our Blog" text="Checkout Something Cool" />
 			<PostList data={data}>
-				{meta!.pagination.start + meta!.pagination.limit <
-					meta!.pagination.total && (
-					<div className="flex justify-center">
-						<button
-							type="button"
-							className="px-6 py-3 text-sm rounded-lg hover:underline dark:bg-gray-900 dark:text-gray-400"
-							onClick={loadMorePosts}
-						>
-							Load more posts...
-						</button>
-					</div>
-				)}
+				{(meta?.pagination.start ?? 0) + (meta?.pagination.limit ?? 0) <
+					(meta?.pagination.total ?? 0) && (
+						<div className="flex justify-center">
+							<Button
+								type="button"
+								className="px-6 py-3 text-sm rounded-lg hover:underline dark:bg-gray-900 dark:text-gray-400"
+								onClick={loadMorePosts} variant={"text"}							>
+								Load more posts...
+							</Button>
+						</div>
+					)}
 			</PostList>
 			<Footer />
-		</div>
+		</>
 	);
 }
 

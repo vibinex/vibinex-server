@@ -100,7 +100,7 @@ const Navbar = (props: { transparent: boolean }) => {
 				<li id="docs-link" className='p-3 lg:p-4'>
 					<Link href='/docs'>Docs</Link>
 				</li>
-				<li id="docs-link" className='p-3 lg:p-4'>
+				<li id="blog-link" className='p-3 lg:p-4'>
 					<Link href='/blog'>Blog</Link>
 				</li>
 				<li id="contribute-link" className='p-3 lg:p-4'>

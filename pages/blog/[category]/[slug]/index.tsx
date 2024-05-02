@@ -7,7 +7,6 @@ import { fetchAPI } from '../../../../utils/blog/fetch-api';
 import Navbar from '../../../../views/Navbar';
 
 async function getPostBySlug(slug: string) {
-	const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 	const path = `/articles`;
 	const urlParamsObject = {
 		filters: { slug },
@@ -18,20 +17,17 @@ async function getPostBySlug(slug: string) {
 			blocks: { populate: '*' },
 		},
 	};
-	const options = { headers: { Authorization: `Bearer ${token}` } };
-	const response = await fetchAPI(path, urlParamsObject, options);
+	const response = await fetchAPI(path, urlParamsObject);
 	return response;
 }
 
 async function getMetaData(slug: string) {
-	const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 	const path = `/articles`;
 	const urlParamsObject = {
 		filters: { slug },
 		populate: { seo: { populate: '*' } },
 	};
-	const options = { headers: { Authorization: `Bearer ${token}` } };
-	const response = await fetchAPI(path, urlParamsObject, options);
+	const response = await fetchAPI(path, urlParamsObject);
 	return response.data;
 }
 
@@ -54,33 +50,25 @@ const PostRoute: NextPage = () => {
 			setArticleInfo(data.data[0]);
 		}
 		renderPostRouteData(router.query.slug as string);
-	},[router]);
-	
+	}, [router]);
+
 	if (!articleInfo) return <h2>no post found</h2>;
 	return (
-	<div className='overflow-hidden'>
-		<Navbar transparent={true} />
-		<div className='flex justify-center'>
-			<div className='mx-auto max-w-3xl px-6 lg:px-0'>
-				<Post article={articleInfo.attributes} />
+		<div className='overflow-hidden'>
+			<Navbar transparent={true} />
+			<div className='flex justify-center'>
+				<div className='mx-auto max-w-3xl px-6 lg:px-0'>
+					<Post article={articleInfo.attributes} />
+				</div>
 			</div>
+			<Footer />
 		</div>
-		<Footer />
-	</div>
 	);
 }
 
 export async function generateStaticParams() {
-	const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 	const path = `/articles`;
-	const options = { headers: { Authorization: `Bearer ${token}` } };
-	const articleResponse = await fetchAPI(
-		path,
-		{
-			populate: ['category'],
-		},
-		options
-	);
+	const articleResponse = await fetchAPI(path, { populate: ['category'], });
 
 	return articleResponse.data.map(
 		(article: {
