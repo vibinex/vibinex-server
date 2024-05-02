@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Loader from "../../components/blog/Loader";
 import PageHeader from "../../components/blog/PageHeader";
 import PostList, { Article } from "../../components/blog/PostList";
+import Button from "../../components/Button";
 import Footer from "../../components/Footer";
 import { fetchAPI } from "../../utils/blog/fetch-api";
 import Navbar from "../../views/Navbar";
@@ -74,13 +75,12 @@ const Profile: NextPage = () => {
 				{(meta?.pagination.start ?? 0) + (meta?.pagination.limit ?? 0) <
 					(meta?.pagination.total ?? 0) && (
 						<div className="flex justify-center">
-							<button
+							<Button
 								type="button"
 								className="px-6 py-3 text-sm rounded-lg hover:underline dark:bg-gray-900 dark:text-gray-400"
-								onClick={loadMorePosts}
-							>
+								onClick={loadMorePosts} variant={"text"}							>
 								Load more posts...
-							</button>
+							</Button>
 						</div>
 					)}
 			</PostList>
