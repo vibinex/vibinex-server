@@ -23,7 +23,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 			}
 		};
 		fetchData();
-	}, []);
+	}, [expanded]);
 
 	const handleInputChange = (alias: string, provider: string, value: string) => {
 		setHandleInputValues(prevState => ({
@@ -69,83 +69,84 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	if (loading) {
 		return (<div>Loading...</div>)
 	}
-	return (
-		<form onSubmit={handleSubmit}>
-			{(gitAliasMap?.providerMaps && gitAliasMap.providerMaps.length > 0) ? (
-				<>
-					<h3 className="font-semibold my-4 ml-4">Please enter Github/Bitbucket usernames and click Submit:</h3>
-
-					{/* Header */}
-					<div className="grid grid-cols-3 border-b text-blue-800">
-						<div className="p-4">
-							<h3 className="text-center font-bold">Alias</h3>
-						</div>
-						<div className="p-4">
-							<h3 className="text-center font-bold">Github</h3>
-						</div>
-						<div className="p-4">
-							<h3 className="text-center font-bold">Bitbucket</h3>
-						</div>
+	
+	if (gitAliasMap?.providerMaps && gitAliasMap.providerMaps.length > 0) {
+		return (
+			<form onSubmit={handleSubmit}>
+				<h3 className="font-bold mb-4">Please enter Github/Bitbucket usernames and click Submit:</h3>
+				{/* Header */}
+				<div className="grid grid-cols-3 border-b text-blue-800">
+					<div className="p-4">
+						<h3 className="text-center font-bold">Alias</h3>
 					</div>
-
-					{/* Rows */}
-					{gitAliasMap.providerMaps.map((providerMap: AliasMap) => (
-						<div key={providerMap.alias} className="grid grid-cols-3 border-b border-gray-300">
-							{/* Alias column */}
-							<div className="p-4">
-								<div>{providerMap.alias}</div>
-							</div>
-
-							{/* github column */}
-							<div className="p-4">
-								<div>
-									<input
-										type="text"
-										value={handleInputValues[providerMap.alias]?.github || ''}
-										onChange={(e) => handleInputChange(providerMap.alias, 'github', e.target.value)}
-										className="mb-2 w-full"
-									/>
-								</div>
-								{/* Display additional handles beneath the input field if available */}
-								{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string) => (
-									<Chip key={handle} name={handle} avatar={"/github-dark.svg"} disabled={false} />
-								))}
-							</div>
-
-							{/* bitbucket column */}
-							<div className="p-4">
-								<div>
-									<input
-										type="text"
-										value={handleInputValues[providerMap.alias]?.bitbucket || ''}
-										onChange={(e) => handleInputChange(providerMap.alias, 'bitbucket', e.target.value)}
-										className="mb-2 w-full"
-									/>
-								</div>
-								{/* Display additional handles beneath the input field if available */}
-								{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string) => (
-									<Chip key={handle} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
-								))}
-							</div>
-						</div>
-					))}
-					{/* Buttons */}
-					<div className="mt-4 flex gap-2">
-						<Button variant="contained" type="submit" className={`${expanded ? 'w-full block mb-4' : ''}`}>Submit</Button>
-						{!expanded && (
-							<Button variant="outlined" className="flex-grow" href="/settings">View all aliases</Button>
-						)}
+					<div className="p-4">
+						<h3 className="text-center font-bold">Github</h3>
 					</div>
-				</>
-			) : expanded ? (
-				<div className="h-screen-1/2 text-primary-text flex flex-col items-center justify-center" >
-					<p className="font-bold text-lg">No aliases found</p>
-					<p>Please setup a repository from this account to view aliases</p>
+					<div className="p-4">
+						<h3 className="text-center font-bold">Bitbucket</h3>
+					</div>
 				</div>
-			) : null
-			}
-		</form>
-	);
+
+				{/* Rows */}
+				{gitAliasMap.providerMaps.map((providerMap: AliasMap) => (
+					<div key={providerMap.alias} className="grid grid-cols-3 border-b border-gray-300">
+						{/* Alias column */}
+						<div className="p-4">
+							<div>{providerMap.alias}</div>
+						</div>
+
+						{/* github column */}
+						<div className="p-4">
+							<div>
+								<input
+									type="text"
+									value={handleInputValues[providerMap.alias]?.github || ''}
+									onChange={(e) => handleInputChange(providerMap.alias, 'github', e.target.value)}
+									className="mb-2 w-full"
+								/>
+							</div>
+							{/* Display additional handles beneath the input field if available */}
+							{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'github')?.handles.map((handle: string) => (
+								<Chip key={handle} name={handle} avatar={"/github-dark.svg"} disabled={false} />
+							))}
+						</div>
+
+						{/* bitbucket column */}
+						<div className="p-4">
+							<div>
+								<input
+									type="text"
+									value={handleInputValues[providerMap.alias]?.bitbucket || ''}
+									onChange={(e) => handleInputChange(providerMap.alias, 'bitbucket', e.target.value)}
+									className="mb-2 w-full"
+								/>
+							</div>
+							{/* Display additional handles beneath the input field if available */}
+							{providerMap.handleMaps?.find(handleMap => handleMap.provider === 'bitbucket')?.handles.map((handle: string) => (
+								<Chip key={handle} name={handle} avatar={"/bitbucket-dark.svg"} disabled={false} />
+							))}
+						</div>
+					</div>
+				))}
+				{/* Buttons */}
+				<div className="mt-4 flex gap-2">
+					<Button variant="contained" type="submit" className={`${expanded ? 'w-full block mb-4' : ''}`}>Submit</Button>
+					{!expanded && (
+						<Button variant="outlined" className="flex-grow" href="/settings">View all aliases</Button>
+					)}
+				</div>
+			</form>
+		)
+	}
+	if (expanded) {
+		return (
+			<div className="h-screen-1/2 text-primary-text flex flex-col items-center justify-center" >
+				<p className="font-bold text-lg">No aliases found</p>
+				<p>Please setup a repository from this account to view aliases</p>
+			</div>
+		)
+	}
+	return (<></>)
 };
 
 export default GitAliasForm;

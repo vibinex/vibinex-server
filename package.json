@@ -1,6 +1,6 @@
 {
   "name": "vibinex-website",
-  "version": "0.1.19",
+  "version": "0.1.26",
   "private": false,
   "homepage": "https://vibinex.com",
   "description": "A plugin that works with GitHub, Bitbucket and GitLab to personalize and data-enrich their code review interfaces",
@@ -28,6 +28,7 @@
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/themes": "^2.0.2",
     "@rudderstack/rudder-sdk-node": "^2.0.2",
     "@types/mdx": "^2.0.5",
@@ -51,7 +52,7 @@
     "react-icons": "^4.7.1",
     "react-lite-youtube-embed": "^2.4.0",
     "rudder-sdk-js": "^2.25.0",
-    "sharp": "^0.32.0",
+    "sharp": "^0.32.6",
     "typescript": "4.9.4",
     "uuid": "^9.0.0"
   },

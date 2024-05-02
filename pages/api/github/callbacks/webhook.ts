@@ -22,7 +22,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 		
 	console.info("[webookHandler] Received github webhook event for ", name);
-	const topicName: string[] | null = await getTopicNameFromDB(owner, name, provider).catch((error) => {
+	const topicName: string[] | null = await getTopicNameFromDB(provider, owner, name).catch((error) => {
 		console.error('[webhookHandler] Failed to get topic name from db:', error);
 		return null;
 	});

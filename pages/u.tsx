@@ -6,23 +6,21 @@ import Button from "../components/Button";
 import Footer from "../components/Footer";
 import GitAliasForm from "../components/GitAliasForm";
 import RudderContext from "../components/RudderContext";
-import type { DbRepoSerializable } from "../types/repository";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
+import { updateAliasesForUser } from "../utils/db/aliases";
 import { updateUser } from "../utils/db/users";
 import { getEmailAliases } from "../utils/providerAPI/getEmailAliases";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getURLWithParams } from "../utils/url_utils";
 import MainAppBar from "../views/MainAppBar";
-import RepoList, { getRepoList } from "../views/RepoList";
+import RepoList from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { updateAliasesForUser } from "../utils/db/aliases";
 
 type ProfileProps = {
 	sessionObj: Session,
-	repoList: DbRepoSerializable[],
 }
 
-const Profile: NextPage<ProfileProps> = ({ sessionObj: session, repoList }) => {
+const Profile: NextPage<ProfileProps> = ({ sessionObj: session }) => {
 	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -45,7 +43,7 @@ const Profile: NextPage<ProfileProps> = ({ sessionObj: session, repoList }) => {
 			<MainAppBar />
 			<div className="max-w-[80%] mx-auto flex-grow">
 				<GitAliasForm expanded={false} />
-				<RepoList repoList={repoList} />
+				<RepoList />
 				<Button id='add-repository' variant="contained" href="/docs" className="w-full my-2 py-2">+ Add Repository</Button>
 			</div>
 			<Footer />
@@ -80,13 +78,9 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 		})
 	})
 
-	// get the list of repositories of the user
-	const repoList = await getRepoList(session);
-
 	return {
 		props: {
-			sessionObj: session,
-			repoList
+			sessionObj: session
 		}
 	}
 }

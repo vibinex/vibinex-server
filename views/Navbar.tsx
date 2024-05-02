@@ -80,32 +80,32 @@ const Navbar = (props: { transparent: boolean }) => {
 	}, [rudderEventMethods, session]);
 
 	return (
-		<AppBar position='fixed' offset={!props.transparent} className='mx-auto p-4 justify-between items-center max-w-7xl'
-			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-transparent text-primary-light')}
+		<AppBar position='fixed' className='mx-auto p-4 justify-between items-center max-w-7xl'
+			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-black text-primary-light')}
 		>
 			<Link href='/' className='flex items-center'>
 				<Image src={VibinexDarkLogo} alt="Vibinex logo" className="inline w-10 mr-2" priority></Image>
-				<h1 className='font-bold text-3xl sm:text-4xl font-sans tracking-widest'>
+				<h1 className='font-bold text-3xl sm:text-4xl'>
 					Vibinex
 				</h1>
 			</Link>
-			<ul className='hidden sm:flex'>
-				<li id="docs-link" className='p-4'>
+			<ul className='hidden sm:flex sm:items-center sm:justify-evenly'>
+				<li id="docs-link" className='p-3 lg:p-4'>
 					<Link href='/docs'>Docs</Link>
 				</li>
-				<li id="contribute-link" className='p-4'>
+				<li id="contribute-link" className='p-3 lg:p-4'>
 					<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
 				</li>
-				<li className='p-4' id='pricing-link'>
+				<li className='p-3 lg:p-4' id='pricing-link'>
 					<Link href='/pricing'>Pricing</Link>
 				</li>
-				<li className='p-4' id='download-link'>
+				<li className='hidden md:inline p-3 lg:p-4' id='download-link'>
 					<Link href={chromeExtensionLink} target="_blank">
 						Download
 						<Image src={chromeLogo} alt="chrome extension logo" className="inline ml-1 w-6"></Image>
 					</Link>
 				</li>
-				<li id='login-logout-link' className='p-4'>
+				<li id='login-logout-link' className='p-3 lg:p-4'>
 					<LoginLogout />
 				</li>
 			</ul>

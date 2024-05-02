@@ -1,6 +1,8 @@
 import conn from '.';
 import { getUserByAlias } from './users';
 import { v4 as uuidv4 } from 'uuid';
+import { convert } from './converter';
+import type { DPUHunkInfo } from '../../pages/api/hunks';
 
 export interface HunkInfo {
 	author: string,
@@ -21,17 +23,16 @@ export interface DbHunks {
 	}
 }
 
-export const saveHunk = async (hunkInfo: string) => {
-	const hunkinfo_json = JSON.parse(hunkInfo);
-	console.info("[saveHunk] Saving hunk for ", hunkinfo_json.repo_name);
-	for (const prHunk of hunkinfo_json.prhunkvec) {
+export const saveHunk = async (hunkInfo: DPUHunkInfo) => {
+	console.info(`[saveHunk] Saving hunk for ${hunkInfo.repo_provider}/${hunkInfo.repo_owner}/${hunkInfo.repo_name}`);
+	for (const prHunk of hunkInfo.prhunkvec) {
 		const hunk_val = JSON.stringify({ "blamevec": prHunk.blamevec });
 		const hunk_query = `
 	  INSERT INTO hunks (repo_provider, repo_owner, 
 		repo_name, review_id, author, hunks
-		) VALUES ('${hunkinfo_json.repo_provider}',
-			'${hunkinfo_json.repo_owner}', 
-			'${hunkinfo_json.repo_name}',
+		) VALUES ('${hunkInfo.repo_provider}',
+			'${hunkInfo.repo_owner}', 
+			'${hunkInfo.repo_name}',
 			'${prHunk.pr_number}',
 			'${prHunk.author}',
 			'${hunk_val}')
@@ -42,6 +43,35 @@ export const saveHunk = async (hunkInfo: string) => {
 			console.error(`[saveHunk] Failed to insert hunks in the db`, { pg_query: hunk_query }, err);
 		});
 	}
+}
+
+export const saveNewAuthorAliasesFromHunkData = async (hunkInfo: DPUHunkInfo) => {
+	console.debug(`[saveNewAuthorAliases] Saving new author aliases for ${hunkInfo.repo_provider}/${hunkInfo.repo_owner}/${hunkInfo.repo_name}`);
+	const authorAliases = hunkInfo.prhunkvec.map(prHunk => prHunk.blamevec.map(blameItem => blameItem.author)).flat();
+
+	// update the aliases table
+	const insertAliasesQuery = `
+		INSERT INTO aliases (git_alias)
+		VALUES ${authorAliases.map(alias => `(${convert(alias)})`).join(",")}
+		ON CONFLICT (git_alias) DO NOTHING;
+	`
+	await conn.query(insertAliasesQuery).catch(err => {
+		console.error(`[saveNewAuthorAliases] Failed to insert aliases in the db`, { pg_query: insertAliasesQuery }, err);
+	});
+
+	// update the aliases in the repos table
+	const updateAliasesInReposQuery = `
+		UPDATE repos
+		SET aliases = array(
+			SELECT DISTINCT unnest(aliases || ${convert(authorAliases)})
+		)
+		WHERE repo_provider = ${convert(hunkInfo.repo_provider)}
+			AND repo_owner = ${convert(hunkInfo.repo_owner)}
+			AND repo_name = ${convert(hunkInfo.repo_name)};
+	`
+	await conn.query(updateAliasesInReposQuery).catch(err => {
+		console.error(`[saveNewAuthorAliases] Failed to update aliases in repos in the db`, { pg_query: updateAliasesInReposQuery }, err);
+	});
 }
 
 export const getAuthorAliases = async (alias_email: string) => {
@@ -88,17 +118,23 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 		console.error(`[getReviewData] Could not get hunks for repository: ${provider}/${owner}/${repoName}`, { pg_query: review_query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
-	const filteredRows = result.rows.map(async (row) => {
-		const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
-			const hunk_author = obj["author"].toString();
-			return user_emails.has(hunk_author);
+	const filteredRows = result.rows
+		.filter((row) => row?.hunks?.blamevec && row?.pr_number)
+		.map((row) => {
+			const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
+				if (!obj || !("author" in obj)) {
+					console.error("[getReviewData/filteredBlamevec] blamevec obj missing keys, obj = ", obj);
+					return false;
+				}
+				const hunk_author = obj["author"].toString();
+				return user_emails.has(hunk_author);
+			});
+			const reviewData = {
+				review_id: row["pr_number"].toString(),
+				blamevec: filteredBlamevec
+			}
+			return reviewData;
 		});
-		const reviewData = {
-			review_id: row["pr_number"].toString(),
-			blamevec: filteredBlamevec
-		}
-		return reviewData;
-	});
 	return filteredRows;
 }
 
@@ -116,7 +152,7 @@ export const getFileData = async (provider: string, owner: string, reponame: str
 	return files;
 }
 
-export const getTopicNameFromDB = async (owner: string, repoName: string, provider: string): Promise<string[]> => {
+export const getTopicNameFromDB = async (provider: string, owner: string, repoName: string): Promise<string[]> => {
 	console.log(`[getTopicNameFromDB] Getting topic name from db ${provider}/${owner}/${repoName}`); //TODO: To be removed
 	const query = `
     SELECT install_id 
@@ -147,7 +183,7 @@ export const saveTopicName = async (owner: string, provider: string, topicName: 
 }
 
 export const createTopicName = async (user_id: string) => {
-	console.info(`[createTopicName] creating topic name for user with id: ${user_id}`); 
+	console.info(`[createTopicName] creating topic name for user with id: ${user_id}`);
 	let topicName = "topic-" + uuidv4();
 	if (!topicName) {
 		console.error(`[createTopicName] could not create topic name`);
