@@ -49,7 +49,7 @@ const Profile: NextPage = () => {
 
 			setMeta(responseData.meta);
 		} catch (error) {
-			console.error(error);
+			console.error(`[blog/index.tsx] Unable to fetch articles - ${JSON.stringify(error)}`);
 		} finally {
 			setIsLoading(false);
 		}
