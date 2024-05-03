@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import { useState } from 'react';
-import { MdEdit } from 'react-icons/md';
+import { MdDone, MdEdit } from 'react-icons/md';
 import type { AliasMap, AliasProviderMap, HandleMap } from '../types/AliasMap';
 import type { RepoProvider } from '../utils/providerAPI';
 import Button from './Button';
@@ -57,7 +57,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 	return (
 		<div key={providerMap.alias} className="flex border-b border-gray-300 last-of-type:border-0 w-full p-4 flex-wrap items-center">
 			<p className="w-full md:w-fit md:grow break-words">{providerMap.alias}</p>
-			{(editMode) ? (<form onSubmit={handleSubmit} className="grow flex flex-wrap items-center gap-2 justify-end">
+			{(editMode) ? (<form onSubmit={handleSubmit} className="grow flex flex-wrap items-end gap-2 justify-end">
 				{providerMap.handleMaps.map(handleMap => (
 					<div key={handleMap.provider} className='grow relative mt-2'>
 						<input
@@ -74,8 +74,9 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 						</label>
 					</div>
 				))}
-				<Button variant="contained" type="submit" className='grow-0' disabled={loading}>Submit</Button>
-				{errorMsg && <p className="text-red-500 w-full text-end text-sm">{errorMsg}</p>}
+				<Button variant="contained" type="submit" className='grow-0 !p-2' disabled={loading}>
+					<MdDone className="w-7 h-7 hover:text-primary-text" />
+				</Button>
 			</form>) : (<>
 				{providerMap.handleMaps?.map((handleMap: HandleMap) =>
 					handleMap.handles.map((handle: string) => (
@@ -86,6 +87,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 					<MdEdit className="w-6 h-6 hover:text-primary-text" />
 				</Button>
 			</>)}
+			{errorMsg && <p className="text-red-500 w-full text-end text-sm">{errorMsg}</p>}
 		</div>
 	);
 };
