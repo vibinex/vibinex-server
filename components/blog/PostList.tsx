@@ -65,10 +65,6 @@ const PostList = ({
 					const avatarUrl = getStrapiMedia(
 						authorsBio?.avatar.data.attributes.url
 					);
-					if (imageUrl === null || avatarUrl === null) {
-						console.error(`[PostList] imageUrl = ${imageUrl}, avatarURL = ${avatarUrl}`);
-						return <></>;
-					}
 
 					return (
 						<Link
