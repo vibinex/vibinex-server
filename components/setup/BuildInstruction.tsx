@@ -47,17 +47,21 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 
 	const encryptGithubPat = (handleGithubPatInputValue: string) => {
 		const encryptionPublicKey = process.env.NEXT_PUBLIC_ENCRYPTION_PUBLIC_KEY;
-		if (encryptionPublicKey) {
-			return encrypt(encryptionPublicKey, handleGithubPatInputValue)
-			.then((encryptedData) => {
-				return encryptedData;
-			})
-			.catch((error) => {
-				console.error('[handleBuildButtonClick] /api/dpu/trigger error:', error);
-				setErrorMessage('Failed to trigger build. Please try again later.');
-				setIsInputDisabled(false);
-			});
+		if (!encryptionPublicKey) {
+			console.error('[encryptGithubPat] Encryption public key is missing');
+			setErrorMessage('Failed to encrypt data. Please contact support.');
+			setIsInputDisabled(false);
+			return;
 		}
+		return encrypt(encryptionPublicKey, handleGithubPatInputValue)
+		.then((encryptedData) => {
+			return encryptedData;
+		})
+		.catch((error) => {
+			console.error('[handleBuildButtonClick] /api/dpu/trigger error:', error);
+			setErrorMessage('Failed to trigger build. Please try again later.');
+			setIsInputDisabled(false);
+		});
 	}
 
 	const maskGithubPat = (handleGithubPatInputValue: string) => {
