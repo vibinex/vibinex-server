@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { Session } from 'next-auth';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { encrypt } from '../../utils/encryptDecrypt';
 import { RepoProvider } from '../../utils/providerAPI';
 import { CloudBuildStatus } from '../../utils/trigger';
