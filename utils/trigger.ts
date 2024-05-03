@@ -176,9 +176,9 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
 	const triggerId: string | undefined = process.env.CLOUD_BUILD_PAT_TRIGGER_ID;
 	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
 	const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
-    const encryptionPrivateKey: string | undefined = process.env.ENCRYPTION_PRIVATE_KEY;
+    const decryptionPrivateKey: string | undefined = process.env.DECRYPTION_PRIVATE_KEY;
 
-	if (!projectId || !triggerId || !location || !triggerBranchName || !encryptionPrivateKey) {
+	if (!projectId || !triggerId || !location || !triggerBranchName || !decryptionPrivateKey) {
 		console.error('[triggerCloudPatBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
 		return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey for decryption in environment variables.' };
 	}
@@ -188,7 +188,7 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
         return { success: false, message: 'Missing required parameters: github_pat or provider' };
     }
 
-    const github_pat = await decrypt(encryptionPrivateKey, encrypted_github_pat);
+    const github_pat = await decrypt(decryptionPrivateKey, encrypted_github_pat);
 	// Build the substitutions object using environment variables
 	const substitutions: { [key: string]: string } = {
         _BITBUCKET_BASE_URL: process.env.BITBUCKET_BASE_URL ?? '',
