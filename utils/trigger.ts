@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { decrypt } from './encrypt_decrypt';
+import { decrypt } from './encryptDecrypt';
 
 export interface CloudBuildStatus {
 	success: boolean;

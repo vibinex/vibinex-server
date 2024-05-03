@@ -6,7 +6,7 @@ import { CloudBuildStatus } from '../../utils/trigger';
 import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
 import RepoSelection from './RepoSelection';
-import { encrypt } from '../../utils/encrypt_decrypt';
+import { encrypt } from '../../utils/encryptDecrypt';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 
 interface BuildInstructionProps {
