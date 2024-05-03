@@ -68,18 +68,22 @@ const PostRoute: NextPage = () => {
 
 export async function generateStaticParams() {
 	const path = `/articles`;
-	const articleResponse = await fetchAPI(path, { populate: ['category'], });
-
-	return articleResponse.data.map(
-		(article: {
-			attributes: {
-				slug: string;
-				category: {
+	try {
+		const articleResponse = await fetchAPI(path, { populate: ['category'], });
+		return articleResponse.data.map(
+			(article: {
+				attributes: {
 					slug: string;
+					category: {
+						slug: string;
+					};
 				};
-			};
-		}) => ({ slug: article.attributes.slug, category: article.attributes.slug })
-	);
+			}) => ({ slug: article.attributes.slug, category: article.attributes.slug })
+		);
+	} catch (error) {
+		console.error(`[generateStaticParams] Failed to get articles`, error);
+		return null;
+	}
 }
 
 export default PostRoute;
