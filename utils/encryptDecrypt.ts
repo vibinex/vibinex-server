@@ -11,8 +11,6 @@ const generateJWKKeyPair = async (): Promise<KeyPair> => {
       use: 'enc'
     });
   
-    console.debug('Private Key:', JSON.stringify(keyPair.toJSON(true)));
-    console.debug('Public Key:', JSON.stringify(keyPair.toJSON()));
     return {
         publicKey: JSON.stringify(keyPair.toJSON()),
         privateKey: JSON.stringify(keyPair.toJSON(true))
