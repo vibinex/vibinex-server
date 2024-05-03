@@ -10,6 +10,7 @@ import VyapLogo from '../public/Vyap-Logo.png'
 import AbleJobsLogo from '../public/able_logo.png'
 import BlanceLogo from '../public/blance-full-logo-new.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
+import LifioLogo from '../public/lifio-logo.png'
 
 const data = [
 	{ logo: AbleJobsLogo, heading: 'Able' },
@@ -19,6 +20,7 @@ const data = [
 	{ logo: BugbaseLogo, heading: 'Bugbase' },
 	{ logo: CoverForceLogo, heading: 'CoverForce', customClass: 'py-2' },
 	{ logo: KhiladiProLogo, heading: 'Khiladi Pro' },
+	{ logo: LifioLogo, heading: 'Lifio' },
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
 	{ logo: VyapLogo, heading: 'Vyap' },
 ]

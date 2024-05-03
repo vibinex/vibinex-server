@@ -1,13 +1,13 @@
 import axios from 'axios';
 import type { Session } from 'next-auth';
 import React, { useEffect, useState } from 'react';
+import { encrypt } from '../../utils/encryptDecrypt';
 import { RepoProvider } from '../../utils/providerAPI';
 import { CloudBuildStatus } from '../../utils/trigger';
 import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
-import RepoSelection from './RepoSelection';
-import { encrypt } from '../../utils/encrypt_decrypt';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
+import RepoSelection from './RepoSelection';
 
 interface BuildInstructionProps {
 	selectedHosting: string;
@@ -42,28 +42,47 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 	const [isInputDisabled, setIsInputDisabled] = useState(false);
 
 	const handleGithubPatInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setHandleGithubPatInputValue(event.target.value);
-    };
+		setHandleGithubPatInputValue(event.target.value);
+	};
 
-	const encrypt_github_pat = (handleGithubPatInputValue: string) => {
-		const github_pat_encryption_secret_key = process.env.NEXT_PUBLIC_GITHUB_PAT_ENCRYPTION_SECRET_KEY;
-		if (github_pat_encryption_secret_key) {
-			return encrypt(github_pat_encryption_secret_key, handleGithubPatInputValue);
+	const encryptGithubPat = (handleGithubPatInputValue: string) => {
+		const encryptionPublicKey = process.env.NEXT_PUBLIC_ENCRYPTION_PUBLIC_KEY;
+		if (!encryptionPublicKey) {
+			console.error('[encryptGithubPat] Encryption public key is missing');
+			setErrorMessage('Failed to encrypt data. Please contact support.');
+			setIsInputDisabled(false);
+			return;
 		}
+		return encrypt(encryptionPublicKey, handleGithubPatInputValue)
+			.then((encryptedData) => {
+				return encryptedData;
+			})
+			.catch((error) => {
+				console.error('[handleBuildButtonClick] /api/dpu/trigger error:', error);
+				setErrorMessage('Failed to trigger build. Please try again later.');
+				setIsInputDisabled(false);
+			});
 	}
 
 	const maskGithubPat = (handleGithubPatInputValue: string) => {
 		return handleGithubPatInputValue.replace(/.(?=.{4})/g, '*');  // Mask all but the last four characters
 	};
 
-	const handleBuildButtonClick = () => {
+	const handleBuildButtonClick = async () => {
 		setIsTriggerBuildButtonDisabled(true);
 		setBuildStatus(null);
 		setErrorMessage(null);
 		setIsInputDisabled(true);
-		let encrypted_github_pat = encrypt_github_pat(handleGithubPatInputValue);
+		let encryptedGithubPat = await encryptGithubPat(handleGithubPatInputValue);
 
-		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encrypted_github_pat })
+		if (!encryptedGithubPat) {
+			setErrorMessage('Failed to encrypt GitHub PAT. Please try again.');
+			setIsInputDisabled(false);
+			setIsTriggerBuildButtonDisabled(false);
+			return;
+		}
+
+		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encryptedGithubPat })
 			.then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 				setBuildStatus(response.data);
@@ -130,7 +149,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				</div>
 			);
 		} else {
-			if (!isRepoSelectionDone){
+			if (!isRepoSelectionDone) {
 				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
 			}
 			return (<>
