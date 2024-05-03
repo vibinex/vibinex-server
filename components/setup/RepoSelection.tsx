@@ -31,7 +31,7 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 	return Array.from(setupArgsMap.values());
 }
 
-const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function }) => {
+const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null }) => {
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [isGetReposLoading, setIsGetReposLoading] = useState<boolean>(false);
@@ -100,12 +100,12 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 					setError('Something went wrong');
 				} else {
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
-					setIsRepoSelectionDone(true);
+					if(setIsRepoSelectionDone) {setIsRepoSelectionDone(true) };
 				}
 			})
 			.catch((error) => {
 				setError(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
-				setIsRepoSelectionDone(false);
+				if(setIsRepoSelectionDone) {setIsRepoSelectionDone(false) };
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
