@@ -1,55 +1,44 @@
-import * as crypto from 'crypto';
+import * as jose from 'node-jose';
 
-export const generateSecretKey = (): string => {
-    return crypto.randomBytes(32).toString('hex'); // 256-bit key
+interface KeyPair { 
+    publicKey: string;
+    privateKey: string;
+}
+const generateJWKKeyPair = async (): Promise<KeyPair> => {
+    const keyStore = jose.JWK.createKeyStore();
+    const keyPair = await keyStore.generate('RSA', 2048, {
+      alg: 'RSA-OAEP',
+      use: 'enc'
+    });
+  
+    console.debug('Private Key:', JSON.stringify(keyPair.toJSON(true)));
+    console.debug('Public Key:', JSON.stringify(keyPair.toJSON()));
+    return {
+        publicKey: JSON.stringify(keyPair.toJSON()),
+        privateKey: JSON.stringify(keyPair.toJSON(true))
+    };
 }
 
-export const encrypt = (secretKey: string, data: string): string => {
+export const encrypt = async (publicKey: string, data: string): Promise<string> => {
     try {
-        if (secretKey.length !== 64) {
-            throw new Error('[encrypt] Invalid secret key length. It should be 64 characters (32 bytes).');
-        }
-
-        // Generate an initialization vector (IV) from the secret key
-        const iv = crypto.randomBytes(12);
-        const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(secretKey, 'hex'), iv);
-        // Encrypt the data
-        let encryptedData = cipher.update(data, 'utf8', 'hex');
-        encryptedData += cipher.final('hex');
-
-        // Get the authentication tag
-        const tag = cipher.getAuthTag();
-
-        // Combine IV, encrypted data, and authentication tag
-        const encryptedPayload = `${iv.toString('hex')}:${encryptedData}:${tag.toString('hex')}`;
-
-        return encryptedPayload;
+        const key = await jose.JWK.asKey(publicKey, 'json');
+        const result = await jose.JWE.createEncrypt({ format: 'compact' }, key)
+        .update(data)
+        .final();
+        return result;
     } catch (error) {
         console.error('[encrypt] Error encrypting data:', error);
         throw error;
     }
 };
-
-export const decrypt = (secretKey: string, data: string): string => {
-   try {
-        if (secretKey.length !== 64) {
-            throw new Error('[decrypt] Invalid secret key length. It should be 64 characters (32 bytes).');
-        }
-        // Split the encrypted payload into IV, encrypted data, and authentication tag
-        const [ivHex, encryptedDataHex, tagHex] = data.split(':');
-        const iv = Buffer.from(ivHex, 'hex');
-        const encryptedData = Buffer.from(encryptedDataHex,  'hex');
-        const tag = Buffer.from(tagHex, 'hex');
-        // Create a decipher using AES-GCM
-        const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(secretKey, 'hex'), iv);
-        decipher.setAuthTag(tag);
-
-        // Decrypt the data
-        let decryptedData = decipher.update(encryptedData).toString(('utf8'));
-        decryptedData += decipher.final('utf8');
-        return decryptedData;
+  
+export const decrypt = async (privateKey: string, encryptedData: string): Promise<string> => {
+    try {
+        const key = await jose.JWK.asKey(privateKey, 'json');
+        const result = await jose.JWE.createDecrypt(key).decrypt(encryptedData);
+        return result.plaintext.toString('utf8');
     } catch (error) {
-       console.error('[decrypt] Error decrypting data:', error);
-       throw error;
+        console.error('[decrypt] Error decrypting data:', error);
+        throw error;
     }
 };
