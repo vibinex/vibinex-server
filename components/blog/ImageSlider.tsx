@@ -24,7 +24,7 @@ const Slideshow = ({ data }: { data: SlideShowProps }) => {
 	  <Fade>
 		{data.files.data.map((fadeImage: Image) => {
 		  const imageUrl = getStrapiMedia(fadeImage.attributes.url);
-		  if (imageUrl === null) {
+		  if (!imageUrl) {
 			console.error(`[ImageSlider/Slideshow] imageUrl is null`);
 			return <></>;
 		  }
