@@ -69,7 +69,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 							disabled={loading}
 							className="w-full"
 						/>
-						<label htmlFor={`${handleMap.provider}-handles`} className="absolute -top-2 left-2 text-xs bg-inherit">
+						<label htmlFor={`${handleMap.provider}-handles`} className="absolute -top-2 left-2 text-xs px-1 bg-popover">
 							{handleMap.provider.charAt(0).toUpperCase() + handleMap.provider.slice(1) + " handles"}
 						</label>
 					</div>
