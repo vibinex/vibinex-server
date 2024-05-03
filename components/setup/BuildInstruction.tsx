@@ -45,12 +45,12 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
         setHandleGithubPatInputValue(event.target.value);
     };
 
-	const encrypt_github_pat = async (handleGithubPatInputValue: string) => {
-		const encryption_public_key = process.env.NEXT_PUBLIC_ENCRYPTION_PUBLIC_KEY;
-		if (encryption_public_key) {
-			return encrypt(encryption_public_key, handleGithubPatInputValue)
-			.then((encrypted_data) => {
-				return encrypted_data;
+	const encryptGithubPat = async (handleGithubPatInputValue: string) => {
+		const encryptionPublicKey = process.env.NEXT_PUBLIC_ENCRYPTION_PUBLIC_KEY;
+		if (encryptionPublicKey) {
+			return encrypt(encryptionPublicKey, handleGithubPatInputValue)
+			.then((encryptedData) => {
+				return encryptedData;
 			})
 			.catch((error) => {
 				console.error('[handleBuildButtonClick] /api/dpu/trigger error:', error);
@@ -69,15 +69,15 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		setBuildStatus(null);
 		setErrorMessage(null);
 		setIsInputDisabled(true);
-		let encrypted_github_pat = await encrypt_github_pat(handleGithubPatInputValue);
+		let encryptedGithubPat = await encryptGithubPat(handleGithubPatInputValue);
 
-		if (!encrypted_github_pat) {
+		if (!encryptedGithubPat) {
 			setErrorMessage('Failed to encrypt GitHub PAT. Please try again.');
 			setIsInputDisabled(false);
 			return;
 		}
 
-		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encrypted_github_pat })
+		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encryptedGithubPat })
 			.then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 				setBuildStatus(response.data);
