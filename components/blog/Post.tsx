@@ -43,7 +43,7 @@ const Post: React.FC<{ article: Article["attributes"] }> = ({ article }) => {
 	if(imageUrl === null || authorImgUrl === null) {
 		console.error(`[blog/Post] imageUrl = ${imageUrl}, authorImgUrl = ${authorImgUrl}`);
 	}
-
+	// TODO - add placeholder image and/or author image
 	return (
 		<div className="space-y-8 dark:bg-black dark:text-gray-50">
 			{imageUrl && (
