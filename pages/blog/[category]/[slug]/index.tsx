@@ -48,7 +48,8 @@ const PostRoute: NextPage = () => {
 		// TODO: check that router.query.slug is a string
 		getPostBySlug(router.query.slug as string).then((data) => {
 			setArticleInfo(data.data[0]);
-		});
+		}).catch((error) => { console.error(
+			`[PostRoute] Unable to get post by slug ${router.query.slug}`, error);});
 	}, [router]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
