@@ -57,27 +57,39 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 	return (
 		<div key={providerMap.alias} className="flex border-b border-gray-300 last-of-type:border-0 w-full p-4 flex-wrap items-center">
 			<p className="w-full md:w-fit md:grow break-words">{providerMap.alias}</p>
-			{(editMode) ? (<form onSubmit={handleSubmit} className="grow flex flex-wrap items-end gap-2 justify-end">
-				{providerMap.handleMaps.map(handleMap => (
-					<div key={handleMap.provider} className='grow relative mt-2'>
-						<input
-							id={`${handleMap.provider}-handles`}
-							type="text"
-							value={inputHandleMap.find(inputValue => inputValue.provider === handleMap.provider)?.handles.join(',') ?? ''}
-							placeholder={`${handleMap.provider} handles`}
-							onChange={(e) => handleInputChange(handleMap.provider, e.target.value)}
-							disabled={loading}
-							className="w-full"
-						/>
-						<label htmlFor={`${handleMap.provider}-handles`} className="absolute -top-2 left-2 text-xs px-1 bg-popover">
-							{handleMap.provider.charAt(0).toUpperCase() + handleMap.provider.slice(1) + " handles"}
-						</label>
-					</div>
-				))}
-				<Button variant="contained" type="submit" className='grow-0 !p-2' disabled={loading}>
-					<MdDone className="w-7 h-7 hover:text-primary-text" />
-				</Button>
-			</form>) : (<>
+			{(editMode) ? (
+				<form
+					onSubmit={handleSubmit}
+					onKeyDown={(e) => {
+						if (e.key === 'Escape') {
+							e.preventDefault();
+							setEditMode(false);
+							setErrorMsg("");
+						}
+					}}
+					className="grow flex flex-wrap items-end gap-2 justify-end"
+				>
+					{providerMap.handleMaps.map(handleMap => (
+						<div key={handleMap.provider} className='grow relative mt-2'>
+							<input
+								id={`${handleMap.provider}-handles`}
+								type="text"
+								value={inputHandleMap.find(inputValue => inputValue.provider === handleMap.provider)?.handles.join(',') ?? ''}
+								placeholder={`${handleMap.provider} handles`}
+								onChange={(e) => handleInputChange(handleMap.provider, e.target.value)}
+								disabled={loading}
+								className="w-full"
+							/>
+							<label htmlFor={`${handleMap.provider}-handles`} className="absolute -top-2 left-2 text-xs px-1 bg-popover">
+								{handleMap.provider.charAt(0).toUpperCase() + handleMap.provider.slice(1) + " handles"}
+							</label>
+						</div>
+					))}
+					<Button variant="contained" type="submit" className='grow-0 !p-2' disabled={loading}>
+						<MdDone className="w-7 h-7 hover:text-primary-text" />
+					</Button>
+				</form>
+			) : (<>
 				{providerMap.handleMaps?.map((handleMap: HandleMap) =>
 					handleMap.handles.map((handle: string) => (
 						<Chip key={handle} name={handle} avatar={getProviderLogoSrc(handleMap.provider, "dark")} disabled={false} className="h-fit" />
