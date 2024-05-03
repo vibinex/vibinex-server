@@ -16,12 +16,8 @@ export function getStrapiMedia(url: string | null) {
 	if (url.startsWith('http') || url.startsWith('//')) {
 		return url;
 	}
-	const prefixUrl = getStrapiURL();
-	if (prefixUrl === null) {
-		return null;
-	} 
-	// Otherwise prepend the URL path with the Strapi URL
-	return `${prefixUrl}${url}`;
+	
+	return `${getStrapiURL(url)}`;
 }
 
 export function formatDate(dateString: string) {
