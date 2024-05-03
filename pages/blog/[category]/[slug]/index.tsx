@@ -45,11 +45,10 @@ const PostRoute: NextPage = () => {
 	const [articleInfo, setArticleInfo] = useState<Article>();
 	const router = useRouter();
 	useEffect(() => {
-		async function renderPostRouteData(slug: string) {
-			const data = await getPostBySlug(slug);
+		// TODO: check that router.query.slug is a string
+		getPostBySlug(router.query.slug as string).then((data) => {
 			setArticleInfo(data.data[0]);
-		}
-		renderPostRouteData(router.query.slug as string);
+		});
 	}, [router]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
