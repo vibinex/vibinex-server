@@ -52,7 +52,7 @@ const PostRoute: NextPage = () => {
 		renderPostRouteData(router.query.slug as string);
 	}, [router]);
 
-	if (!articleInfo) return <h2>no post found</h2>;
+	if (!articleInfo) return <h2>Post not found</h2>;
 	return (
 		<div className='overflow-hidden'>
 			<Navbar transparent={true} />
