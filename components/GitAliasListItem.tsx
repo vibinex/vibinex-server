@@ -13,6 +13,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 	const [editMode, setEditMode] = useState(false);
 	const [inputHandleMap, setInputHandleMap] = useState<HandleMap[]>(providerMap.handleMaps);
 	const [loading, setLoading] = useState<boolean>(false);
+	const [errorMsg, setErrorMsg] = useState<string>("");
 
 	const handleInputChange = (provider: RepoProvider, value: string) => {
 		const handlesList = value.split(",").map(handle => handle.trim());
@@ -26,6 +27,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setLoading(true);
+		setErrorMsg("");
 		try {
 			const updatedAliasMap: AliasMap = {
 				alias: providerMap.alias,
@@ -33,7 +35,6 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 			}
 
 			const updatedGitAliasMap: AliasProviderMap = { providerMaps: [updatedAliasMap] };
-			console.dir(updatedGitAliasMap);
 			const response = await axios.post('/api/alias', { aliasProviderMap: updatedGitAliasMap }, {
 				headers: {
 					'Content-Type': 'application/json',
@@ -44,12 +45,12 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 			}
 			// success
 			setProviderMap(updatedAliasMap);
+			setEditMode(false);
 		} catch (error) {
 			console.error("Error saving Git aliases:", error);
-			alert("An error occurred while saving Git aliases. Please try again.");
+			setErrorMsg("An error occurred while saving Git aliases. Please try again.");
 		} finally {
 			setLoading(false);
-			setEditMode(false);
 		}
 	};
 
@@ -74,6 +75,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 					</div>
 				))}
 				<Button variant="contained" type="submit" className='grow-0' disabled={loading}>Submit</Button>
+				{errorMsg && <p className="text-red-500 w-full text-end text-sm">{errorMsg}</p>}
 			</form>) : (<>
 				{providerMap.handleMaps?.map((handleMap: HandleMap) =>
 					handleMap.handles.map((handle: string) => (

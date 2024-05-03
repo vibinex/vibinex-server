@@ -11,7 +11,7 @@ interface ChipProps {
 
 const Chip: React.FC<ChipProps> = ({ name, avatar, disabled = false, className }) => (
 	<div
-		className={`flex min-w-fit items-center space-x-1 outline outline-1 outline-slate-500 rounded-full py-1 px-3 m-1 ${disabled ? 'opacity-50 bg-action-inactive' : ''} ${className}`}
+		className={`flex min-w-fit items-center space-x-1 outline outline-1 outline-slate-500 rounded-full py-1 px-3 m-1 ${className} ${disabled ? 'opacity-50 bg-action-inactive' : ''}`}
 		title={disabled ? 'This auth has expired' : ''}
 	>
 		<Image
