@@ -1,13 +1,13 @@
 import axios from 'axios';
 import type { Session } from 'next-auth';
 import React, { useEffect, useState } from 'react';
+import { encrypt } from '../../utils/encryptDecrypt';
 import { RepoProvider } from '../../utils/providerAPI';
 import { CloudBuildStatus } from '../../utils/trigger';
 import Button from '../Button';
 import DockerInstructions from './DockerInstructions';
-import RepoSelection from './RepoSelection';
-import { encrypt } from '../../utils/encryptDecrypt';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
+import RepoSelection from './RepoSelection';
 
 interface BuildInstructionProps {
 	selectedHosting: string;
@@ -42,8 +42,8 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 	const [isInputDisabled, setIsInputDisabled] = useState(false);
 
 	const handleGithubPatInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setHandleGithubPatInputValue(event.target.value);
-    };
+		setHandleGithubPatInputValue(event.target.value);
+	};
 
 	const encryptGithubPat = (handleGithubPatInputValue: string) => {
 		const encryptionPublicKey = process.env.NEXT_PUBLIC_ENCRYPTION_PUBLIC_KEY;
@@ -54,14 +54,14 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			return;
 		}
 		return encrypt(encryptionPublicKey, handleGithubPatInputValue)
-		.then((encryptedData) => {
-			return encryptedData;
-		})
-		.catch((error) => {
-			console.error('[handleBuildButtonClick] /api/dpu/trigger error:', error);
-			setErrorMessage('Failed to trigger build. Please try again later.');
-			setIsInputDisabled(false);
-		});
+			.then((encryptedData) => {
+				return encryptedData;
+			})
+			.catch((error) => {
+				console.error('[handleBuildButtonClick] /api/dpu/trigger error:', error);
+				setErrorMessage('Failed to trigger build. Please try again later.');
+				setIsInputDisabled(false);
+			});
 	}
 
 	const maskGithubPat = (handleGithubPatInputValue: string) => {
@@ -149,7 +149,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 				</div>
 			);
 		} else {
-			if (!isRepoSelectionDone){
+			if (!isRepoSelectionDone) {
 				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
 			}
 			return (<>
