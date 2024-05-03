@@ -42,7 +42,6 @@ const Post: React.FC<{ article: Article["attributes"] }> = ({ article }) => {
 
 	if(imageUrl === null || authorImgUrl === null) {
 		console.error(`[blog/Post] imageUrl = ${imageUrl}, authorImgUrl = ${authorImgUrl}`);
-		return <></>;
 	}
 
 	return (
