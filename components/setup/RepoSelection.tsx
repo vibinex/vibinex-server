@@ -31,7 +31,8 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 	return Array.from(setupArgsMap.values());
 }
 
-const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null }) => {
+const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT }:
+	{ repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null, isPAT: boolean }) => {
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [isGetReposLoading, setIsGetReposLoading] = useState<boolean>(false);
@@ -47,23 +48,23 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 			.then((allRepos) => {
 				const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
 				setAllRepos(providerReposForUser)
-				
+
 				// automatically check the repositories that are already installed by the user
-				axios.get<{repoList: RepoIdentifier[]}>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
-				.then((response) => {
-					return response.data.repoList;
-				})
-				.then((repos) => {
-					const filteredRepos = providerReposForUser.filter(repo => repos.some(selectedRepo => 
-						selectedRepo.repo_provider === repo.repo_provider &&
-						selectedRepo.repo_owner === repo.repo_owner &&
-						selectedRepo.repo_name === repo.repo_name
-					)); // this is important because we are matching object references when we compare values in the checkbox
-					setSelectedRepos(filteredRepos);
-				})
-				.catch((err) => {
-					console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
-				})
+				axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
+					.then((response) => {
+						return response.data.repoList;
+					})
+					.then((repos) => {
+						const filteredRepos = providerReposForUser.filter(repo => repos.some(selectedRepo =>
+							selectedRepo.repo_provider === repo.repo_provider &&
+							selectedRepo.repo_owner === repo.repo_owner &&
+							selectedRepo.repo_name === repo.repo_name
+						)); // this is important because we are matching object references when we compare values in the checkbox
+						setSelectedRepos(filteredRepos);
+					})
+					.catch((err) => {
+						console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
+					})
 			})
 			.catch(err => {
 				console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
@@ -93,19 +94,19 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 	const handleSubmit = () => {
 		setIsRepoSubmitButtonDisabled(true)
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
-		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId })
+		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isPAT })
 			.then((response) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);
 					setError('Something went wrong');
 				} else {
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
-					if(setIsRepoSelectionDone) {setIsRepoSelectionDone(true) };
+					if (setIsRepoSelectionDone) { setIsRepoSelectionDone(true) };
 				}
 			})
 			.catch((error) => {
 				setError(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
-				if(setIsRepoSelectionDone) {setIsRepoSelectionDone(false) };
+				if (setIsRepoSelectionDone) { setIsRepoSelectionDone(false) };
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
