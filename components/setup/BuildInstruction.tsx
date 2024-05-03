@@ -74,6 +74,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 		if (!encryptedGithubPat) {
 			setErrorMessage('Failed to encrypt GitHub PAT. Please try again.');
 			setIsInputDisabled(false);
+			setIsTriggerBuildButtonDisabled(false);
 			return;
 		}
 
