@@ -2,7 +2,7 @@ export function getStrapiURL(path = '') {
 	if (!process.env.NEXT_PUBLIC_STRAPI_API_URL) {
 		console.error(
 			`[getStrapiURL] NEXT_PUBLIC_STRAPI_API_URL env variable is not set, unable to get strapi URL`);
-		throw new Error(`NEXT_PUBLIC_STRAPI_API_URL env variable is not set, unable to get strapi URL`);
+		return null;
 	}
 	return `https://${process.env.NEXT_PUBLIC_STRAPI_API_URL}${path}`;
 }
@@ -16,9 +16,12 @@ export function getStrapiMedia(url: string | null) {
 	if (url.startsWith('http') || url.startsWith('//')) {
 		return url;
 	}
-
+	const prefixUrl = getStrapiURL();
+	if (prefixUrl === null) {
+		return null;
+	} 
 	// Otherwise prepend the URL path with the Strapi URL
-	return `${getStrapiURL()}${url}`;
+	return `${prefixUrl}${url}`;
 }
 
 export function formatDate(dateString: string) {
