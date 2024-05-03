@@ -12,13 +12,13 @@ interface Image {
   };
 }
 
-interface SlidShowProps {
+interface SlideShowProps {
   files: {
 	data: Image[];
   };
 }
 
-const Slideshow = ({ data }: { data: SlidShowProps }) => {
+const Slideshow = ({ data }: { data: SlideShowProps }) => {
   return (
 	<div className="slide-container">
 	  <Fade>
