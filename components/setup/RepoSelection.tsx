@@ -38,6 +38,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 	const [isGetReposLoading, setIsGetReposLoading] = useState<boolean>(false);
 	const [isRepoSubmitButtonDisabled, setIsRepoSubmitButtonDisabled] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
+	const [submitButtonText, setSubmitButtonText] = useState<string>("Submit");
 
 	useEffect(() => {
 		setIsGetReposLoading(true);
@@ -102,6 +103,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 				} else {
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
 					if (setIsRepoSelectionDone) { setIsRepoSelectionDone(true) };
+					if (isPAT) { setSubmitButtonText("Submitted") }
 				}
 			})
 			.catch((error) => {
@@ -110,7 +112,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
-				setIsRepoSubmitButtonDisabled(false);
+				if (!isPAT) { setIsRepoSubmitButtonDisabled(false);}
 			})
 	};
 
@@ -142,7 +144,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 					{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
 				</Button>
 				<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
-					Submit
+					{submitButtonText}
 				</Button>
 			</div>
 		</div>
