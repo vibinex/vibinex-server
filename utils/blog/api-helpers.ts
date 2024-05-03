@@ -17,7 +17,7 @@ export function getStrapiMedia(url: string | null) {
 		return url;
 	}
 	
-	return `${getStrapiURL(url)}`;
+	return getStrapiURL(url);
 }
 
 export function formatDate(dateString: string) {
