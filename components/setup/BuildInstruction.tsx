@@ -45,7 +45,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
         setHandleGithubPatInputValue(event.target.value);
     };
 
-	const encryptGithubPat = async (handleGithubPatInputValue: string) => {
+	const encryptGithubPat = (handleGithubPatInputValue: string) => {
 		const encryptionPublicKey = process.env.NEXT_PUBLIC_ENCRYPTION_PUBLIC_KEY;
 		if (encryptionPublicKey) {
 			return encrypt(encryptionPublicKey, handleGithubPatInputValue)
