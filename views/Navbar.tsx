@@ -42,6 +42,10 @@ const Navbar = (props: { transparent: boolean }) => {
 			rudderEventMethods?.track(getAuthUserId(session), "Add to chrome button", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
 
+		const handleBlogClick = () => {
+			rudderEventMethods?.track(getAuthUserId(session), "Blog link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
+		};
+
 		const handlePricingClick = () => {
 			rudderEventMethods?.track(getAuthUserId(session), "Pricing link clicked", { type: "link", eventStatusFlag: 1, source: "navbar", name: getAuthUserName(session) }, anonymousId)
 		};
@@ -59,12 +63,14 @@ const Navbar = (props: { transparent: boolean }) => {
 		}
 
 		const downloadLink = document.getElementById('download-link');
+		const blogLink = document.getElementById('blog-link');
 		const pricingLink = document.getElementById('pricing-link');
 		const contributeLink = document.getElementById('contribute-link');
 		const loginLogoutLink = document.getElementById('login-logout-link');
 		const docsLink = document.getElementById('docs-link');
 
 		downloadLink?.addEventListener('click', handleDownloadClick);
+		blogLink?.addEventListener('click', handleBlogClick);
 		pricingLink?.addEventListener('click', handlePricingClick);
 		contributeLink?.addEventListener('click', handleContributeClick);
 		loginLogoutLink?.addEventListener('click', handleLoginLogoutClick);
@@ -72,6 +78,7 @@ const Navbar = (props: { transparent: boolean }) => {
 
 		return () => {
 			downloadLink?.removeEventListener('click', handleDownloadClick);
+			blogLink?.removeEventListener('click', handleDownloadClick);
 			pricingLink?.removeEventListener('click', handlePricingClick);
 			contributeLink?.removeEventListener('click', handleContributeClick);
 			loginLogoutLink?.removeEventListener('click', handleLoginLogoutClick);
@@ -92,6 +99,9 @@ const Navbar = (props: { transparent: boolean }) => {
 			<ul className='hidden sm:flex sm:items-center sm:justify-evenly'>
 				<li id="docs-link" className='p-3 lg:p-4'>
 					<Link href='/docs'>Docs</Link>
+				</li>
+				<li id="blog-link" className='p-3 lg:p-4'>
+					<Link href='/blog'>Blog</Link>
 				</li>
 				<li id="contribute-link" className='p-3 lg:p-4'>
 					<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
