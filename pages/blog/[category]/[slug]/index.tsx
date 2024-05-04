@@ -45,14 +45,14 @@ const PostRoute: NextPage = () => {
 	const [articleInfo, setArticleInfo] = useState<Article>();
 	const router = useRouter();
 	useEffect(() => {
-		async function renderPostRouteData(slug: string) {
-			const data = await getPostBySlug(slug);
+		// TODO: check that router.query.slug is a string
+		getPostBySlug(router.query.slug as string).then((data) => {
 			setArticleInfo(data.data[0]);
-		}
-		renderPostRouteData(router.query.slug as string);
+		}).catch((error) => { console.error(
+			`[PostRoute] Unable to get post by slug ${router.query.slug}`, error);});
 	}, [router]);
 
-	if (!articleInfo) return <h2>no post found</h2>;
+	if (!articleInfo) return <h2>Post not found</h2>;
 	return (
 		<div className='overflow-hidden'>
 			<Navbar transparent={true} />
@@ -68,18 +68,22 @@ const PostRoute: NextPage = () => {
 
 export async function generateStaticParams() {
 	const path = `/articles`;
-	const articleResponse = await fetchAPI(path, { populate: ['category'], });
-
-	return articleResponse.data.map(
-		(article: {
-			attributes: {
-				slug: string;
-				category: {
+	try {
+		const articleResponse = await fetchAPI(path, { populate: ['category'], });
+		return articleResponse.data.map(
+			(article: {
+				attributes: {
 					slug: string;
+					category: {
+						slug: string;
+					};
 				};
-			};
-		}) => ({ slug: article.attributes.slug, category: article.attributes.slug })
-	);
+			}) => ({ slug: article.attributes.slug, category: article.attributes.slug })
+		);
+	} catch (error) {
+		console.error(`[generateStaticParams] Failed to get articles`, error);
+		return null;
+	}
 }
 
 export default PostRoute;

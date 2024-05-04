@@ -40,6 +40,10 @@ const Post: React.FC<{ article: Article["attributes"] }> = ({ article }) => {
 	const imageUrl = getStrapiMedia(cover.data?.attributes.url);
 	const authorImgUrl = getStrapiMedia(authorsBio.data?.attributes.avatar.data.attributes.url);
 
+	if(imageUrl === null || authorImgUrl === null) {
+		console.error(`[blog/Post] imageUrl = ${imageUrl}, authorImgUrl = ${authorImgUrl}`);
+	}
+	// TODO - add placeholder image and/or author image
 	return (
 		<div className="space-y-8 dark:bg-black dark:text-gray-50">
 			{imageUrl && (

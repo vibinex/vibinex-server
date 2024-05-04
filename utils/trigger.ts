@@ -1,16 +1,16 @@
 import axios from 'axios';
-import { decrypt, encrypt } from './encrypt_decrypt';
+import { decrypt } from './encryptDecrypt';
 
 export interface CloudBuildStatus {
-	success: boolean;
-	message: string;
-	buildDetails?: any;
+    success: boolean;
+    message: string;
+    buildDetails?: any;
 }
 
 interface AccessTokenApiResponse {
-	expires_in: string;
-	token_type: string;
-	access_token: string;
+    expires_in: string;
+    token_type: string;
+    access_token: string;
 }
 
 interface CloudBuildApiResponse {
@@ -36,22 +36,22 @@ interface CloudBuildApiResponse {
 }
 
 interface BuildStatusResponse {
-	status: string;
+    status: string;
 }
 
-async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string>{
-	console.info(`[getAccessTokenFromMetaServerForGcloudApi] getting access token from meta server for gcloud trigger api`)
-	const response = await axios.get('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
-    headers: { 'Metadata-Flavor': 'Google' }
-	});
-	if (!response.data) {
-		console.error('[getAccessTokenFromMetaServerForGcloudApi] Failed to retrieve access token');
-		return response.statusText;
-	}
+async function getAccessTokenFromMetaServerForGcloudApi(): Promise<string> {
+    console.info(`[getAccessTokenFromMetaServerForGcloudApi] getting access token from meta server for gcloud trigger api`)
+    const response = await axios.get('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
+        headers: { 'Metadata-Flavor': 'Google' }
+    });
+    if (!response.data) {
+        console.error('[getAccessTokenFromMetaServerForGcloudApi] Failed to retrieve access token');
+        return response.statusText;
+    }
 
-	const data = response.data as AccessTokenApiResponse;
+    const data = response.data as AccessTokenApiResponse;
     console.info(`[getAccessTokenFromMetaServerForGcloudApi] retreived access token from meta server for gcloud trigger api, data: ${JSON.stringify(data)}`);
-	return data.access_token;
+    return data.access_token;
 }
 
 export async function pollBuildStatus(projectId: string, location: string, buildId: string): Promise<string> { //Instead of constant status polling from client[-side, I decided to do the polling in the api itself to avoid setting up websocket or another functionality for polling from client side. We can discuss on it whether we want user to see each and every build status or simply a success or failure response?!
@@ -135,20 +135,20 @@ export async function runGcloudTrigger(projectId: string, triggerId: string, loc
 }
 
 export async function triggerCloudProjectBuildUsingGcloudApi(user_id: string, topic_name: string): Promise<CloudBuildStatus> {
-	console.info(`[triggerBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
+    console.info(`[triggerBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
 
-	const projectId: string | undefined = process.env.PROJECT_ID;
-	const triggerId: string | undefined = process.env.CLOUD_BUILD_TRIGGER_ID;
-	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
-	const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
+    const projectId: string | undefined = process.env.PROJECT_ID;
+    const triggerId: string | undefined = process.env.CLOUD_BUILD_TRIGGER_ID;
+    const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
+    const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
 
-	if (!projectId || !triggerId || !location || !triggerBranchName) {
-		console.error('[triggerBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
-		return { success: false, message: 'Missing projectId, triggerId, trigger location or trigger branch name in environment variables.' };
-	}
+    if (!projectId || !triggerId || !location || !triggerBranchName) {
+        console.error('[triggerBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
+        return { success: false, message: 'Missing projectId, triggerId, trigger location or trigger branch name in environment variables.' };
+    }
 
-	// Build the substitutions object using environment variables
-	const substitutions: { [key: string]: string } = {
+    // Build the substitutions object using environment variables
+    const substitutions: { [key: string]: string } = {
         _BITBUCKET_BASE_URL: process.env.BITBUCKET_BASE_URL ?? '',
         _BITBUCKET_CLIENT_ID: process.env.BITBUCKET_CLIENT_ID ?? '',
         _BITBUCKET_CLIENT_SECRET: process.env.BITBUCKET_CLIENT_SECRET ?? '',
@@ -159,8 +159,8 @@ export async function triggerCloudProjectBuildUsingGcloudApi(user_id: string, to
         _GITHUB_BASE_URL: process.env.GITHUB_BASE_URL ?? '',
         _INSTALL_ID: topic_name ?? '',
         _SERVER_URL: process.env.SERVER_URL ?? '',
-		_USER_ID: user_id
-	};
+        _USER_ID: user_id
+    };
 
     return runGcloudTrigger(projectId, triggerId, location, triggerBranchName, substitutions, topic_name, user_id)
         .catch((error) => {
@@ -170,29 +170,27 @@ export async function triggerCloudProjectBuildUsingGcloudApi(user_id: string, to
 }
 
 export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_name: string, encrypted_github_pat: string, provider: string): Promise<CloudBuildStatus> {
-	console.info(`[triggerCloudPatBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
+    console.info(`[triggerCloudPatBuildUsingGcloudApi] triggering cloudbuild for topic_name ${topic_name} and user_id ${user_id}`);
 
-	const projectId: string | undefined = process.env.PROJECT_ID;
-	const triggerId: string | undefined = process.env.CLOUD_BUILD_PAT_TRIGGER_ID;
-	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
-	const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
-    const secretKey: string | undefined = process.env.NEXT_PUBLIC_GITHUB_PAT_ENCRYPTION_SECRET_KEY;
+    const projectId: string | undefined = process.env.PROJECT_ID;
+    const triggerId: string | undefined = process.env.CLOUD_BUILD_PAT_TRIGGER_ID;
+    const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
+    const triggerBranchName: string | undefined = process.env.CLOUD_BUILD_BRANCH_NAME;
+    const decryptionPrivateKey: string | undefined = process.env.DECRYPTION_PRIVATE_KEY;
 
-	if (!projectId || !triggerId || !location || !triggerBranchName || !secretKey) {
-		console.error('[triggerCloudPatBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
-		return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey in environment variables.' };
-	}
+    if (!projectId || !triggerId || !location || !triggerBranchName || !decryptionPrivateKey) {
+        console.error('[triggerCloudPatBuildUsingGcloudApi] Environment variables for projectId and triggerId must be set');
+        return { success: false, message: 'Missing projectId, triggerId, trigger location, trigger branch name or secretKey for decryption in environment variables.' };
+    }
 
     if (!encrypted_github_pat || !provider) {
         console.error('[triggerCloudPatBuildUsingGcloudApi] Missing required parameters: github_pat or provider');
         return { success: false, message: 'Missing required parameters: github_pat or provider' };
     }
-    const encrypt_data = encrypt(secretKey, encrypted_github_pat);
-    console.log("[triggerCloudPatBuildUsingGcloudApi] Encrypted GitHub PAT:", encrypt_data);
-    const github_pat = decrypt(secretKey, encrypt_data);
-    console.log("[triggerCloudPatBuildUsingGcloudApi] Decrypted GitHub PAT:", github_pat);
-	// Build the substitutions object using environment variables
-	const substitutions: { [key: string]: string } = {
+
+    const github_pat = await decrypt(decryptionPrivateKey, encrypted_github_pat);
+    // Build the substitutions object using environment variables
+    const substitutions: { [key: string]: string } = {
         _BITBUCKET_BASE_URL: process.env.BITBUCKET_BASE_URL ?? '',
         _BITBUCKET_CLIENT_ID: process.env.BITBUCKET_CLIENT_ID ?? '',
         _BITBUCKET_CLIENT_SECRET: process.env.BITBUCKET_CLIENT_SECRET ?? '',
@@ -200,14 +198,14 @@ export async function triggerCloudPatBuildUsingGcloudApi(user_id: string, topic_
         _GITHUB_BASE_URL: process.env.GITHUB_BASE_URL ?? '',
         _INSTALL_ID: topic_name ?? '',
         _SERVER_URL: process.env.SERVER_URL ?? '',
-		_USER_ID: user_id,
+        _USER_ID: user_id,
         _GITHUB_PAT: github_pat,
         _PROVIDER: provider
-	};
+    };
 
     return runGcloudTrigger(projectId, triggerId, location, triggerBranchName, substitutions, topic_name, user_id)
-    .catch((error) => {
-        console.error('[triggerCloudPatBuildUsingGcloudApi] Error triggering build:', error.message);
-        return { success: false, message: 'Error triggering build', buildDetails: error.message };
-    });
+        .catch((error) => {
+            console.error('[triggerCloudPatBuildUsingGcloudApi] Error triggering build:', error.message);
+            return { success: false, message: 'Error triggering build', buildDetails: error.message };
+        });
 }

@@ -12,18 +12,22 @@ interface Image {
   };
 }
 
-interface SlidShowProps {
+interface SlideShowProps {
   files: {
 	data: Image[];
   };
 }
 
-const Slideshow = ({ data }: { data: SlidShowProps }) => {
+const Slideshow = ({ data }: { data: SlideShowProps }) => {
   return (
 	<div className="slide-container">
 	  <Fade>
 		{data.files.data.map((fadeImage: Image) => {
 		  const imageUrl = getStrapiMedia(fadeImage.attributes.url);
+		  if (!imageUrl) {
+			console.error(`[ImageSlider/Slideshow] imageUrl is null`);
+			return <></>;
+		  }
 		  return (
 			<div key={fadeImage.attributes.url}>
 			  {imageUrl && <Image className="w-full h-96 object-cover rounded-lg" height={400} width={600} alt="alt text" src={imageUrl} />}
