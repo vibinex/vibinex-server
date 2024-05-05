@@ -16,8 +16,10 @@ export function getStrapiMedia(url: string | null) {
 	if (url.startsWith('http') || url.startsWith('//')) {
 		return url;
 	}
-	
-	return getStrapiURL(url);
+	const finalUrl = getStrapiURL(url);
+	// TODO - to be removed
+	console.log(`[getStrapiMedia] url = ${finalUrl}`)
+	return finalUrl;
 }
 
 export function formatDate(dateString: string) {
