@@ -1,5 +1,6 @@
 import conn from '.';
 import { AliasMap, AliasProviderMap } from '../../types/AliasMap';
+import { convert } from './converter';
 import { DbUser, getUserById } from './users';
 
 export const saveUserAliasesToRepo = async (repoName: string, repoOwner: string, repoProvider: string, aliases: string[]) => {
@@ -81,7 +82,7 @@ export const getGitAliasesWithHandlesFromDB = async (userId: string): Promise<Al
         console.error(`[getGitEmailAliasesFromDB] Error getting aliases for user ${userId}:`, err);
         throw new Error("Error getting aliases from the database");
     })
-    console.info(`[getGitEmailAliasesFromDB] Got aliases for user: ${userId}, rows = ${rows}`);
+    console.info(`[getGitEmailAliasesFromDB] Got aliases for user: ${userId}, rows = ${JSON.stringify(rows)}`);
     const providerMaps: AliasMap[] = [];
     // Loop through each row and populate the map
     rows.forEach(row => {
@@ -107,17 +108,13 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
 
         for (const handleMap of handleMaps) {
             if (handleMap.provider === 'github' && handleMap.handles.length > 0) {
-                githubHandle = handleMap.handles.join("','");
+                githubHandle = convert(handleMap.handles)
             } else if (handleMap.provider === 'bitbucket' && handleMap.handles.length > 0) {
-                bitbucketHandle = handleMap.handles.join("','");
+                bitbucketHandle = convert(handleMap.handles)
             }
         }
 
-        if (githubHandle !== null || bitbucketHandle !== null) {
-            const ghValue = githubHandle !== null ? `ARRAY['${githubHandle}']` : 'NULL';
-            const bbValue = bitbucketHandle !== null ? `ARRAY['${bitbucketHandle}']` : 'NULL';
-            values.push(`('${alias}', ${ghValue}, ${bbValue})`);
-        }
+        values.push(`('${alias}', ${githubHandle}, ${bitbucketHandle})`);
     }
 
     if (values.length <= 0) {
@@ -129,12 +126,12 @@ export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) =>
         VALUES ${valuesClause}
         ON CONFLICT (git_alias) DO UPDATE SET 
             github = (
-                SELECT ARRAY(SELECT DISTINCT UNNEST(aliases.github || excluded.github))
+                SELECT ARRAY(SELECT DISTINCT UNNEST(excluded.github))
                 FROM aliases
                 WHERE aliases.git_alias = excluded.git_alias
             ),
             bitbucket = (
-                SELECT ARRAY(SELECT DISTINCT UNNEST(aliases.bitbucket || excluded.bitbucket))
+                SELECT ARRAY(SELECT DISTINCT UNNEST(excluded.bitbucket))
                 FROM aliases
                 WHERE aliases.git_alias = excluded.git_alias
             );
