@@ -54,19 +54,20 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 		}
 	};
 
+	const handleAbort = (e: React.KeyboardEvent<HTMLInputElement|HTMLButtonElement>) => {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			setEditMode(false);
+			setErrorMsg("");
+		}
+	}
+
 	return (
 		<div key={providerMap.alias} className="flex border-b border-gray-300 last-of-type:border-0 w-full p-4 flex-wrap items-center">
 			<p className="w-full md:w-fit md:grow break-words">{providerMap.alias}</p>
 			{(editMode) ? (
 				<form
 					onSubmit={handleSubmit}
-					onKeyDown={(e) => {
-						if (e.key === 'Escape') {
-							e.preventDefault();
-							setEditMode(false);
-							setErrorMsg("");
-						}
-					}}
 					className="grow flex flex-wrap items-end gap-2 justify-end"
 				>
 					{providerMap.handleMaps.map(handleMap => (
@@ -77,6 +78,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 								value={inputHandleMap.find(inputValue => inputValue.provider === handleMap.provider)?.handles.join(',') ?? ''}
 								placeholder={`${handleMap.provider} handles`}
 								onChange={(e) => handleInputChange(handleMap.provider, e.target.value)}
+								onKeyDown={handleAbort}
 								disabled={loading}
 								className="w-full"
 							/>
@@ -85,7 +87,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 							</label>
 						</div>
 					))}
-					<Button variant="contained" type="submit" className='grow-0 !p-2' disabled={loading}>
+					<Button variant="contained" type="submit" className='grow-0 !p-2' disabled={loading} onKeyDown={handleAbort}>
 						<MdDone className="w-7 h-7 hover:text-primary-text" />
 					</Button>
 				</form>
