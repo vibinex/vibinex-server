@@ -105,13 +105,13 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 					setError('Something went wrong');
 				} else {
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
-					setIsRepoSelectionDone(true)
+					if(setIsRepoSelectionDone) {setIsRepoSelectionDone(true) }
 					if (isPAT) { setSubmitButtonText("Submitted") }
 				}
 			})
 			.catch((error) => {
 				setError(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
-				setIsRepoSelectionDone(false);
+				if(setIsRepoSelectionDone) {setIsRepoSelectionDone(false) }
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
