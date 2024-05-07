@@ -31,8 +31,8 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 	return Array.from(setupArgsMap.values());
 }
 
-const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT }:
-	{ repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null, isPAT: boolean }) => {
+const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewAccordion }:
+	{ repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null, isNewAccordion: boolean }) => {
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [isGetReposLoading, setIsGetReposLoading] = useState<boolean>(false);
@@ -95,7 +95,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 	const handleSubmit = () => {
 		setIsRepoSubmitButtonDisabled(true)
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
-		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isPAT })
+		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
 			.then((response) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);
@@ -103,7 +103,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 				} else {
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
 					if(setIsRepoSelectionDone) {setIsRepoSelectionDone(true) }
-					if (isPAT) { setSubmitButtonText("Submitted") }
+					if (isNewAccordion) { setSubmitButtonText("Submitted") }
 				}
 			})
 			.catch((error) => {
@@ -112,7 +112,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
-				if (!isPAT) { setIsRepoSubmitButtonDisabled(false);}
+				if (!isNewAccordion) { setIsRepoSubmitButtonDisabled(false);}
 			})
 	};
 
