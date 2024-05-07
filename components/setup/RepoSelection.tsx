@@ -93,9 +93,6 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 	};
 
 	const handleSubmit = () => {
-		if(!setIsRepoSelectionDone) {
-			return (<p className="text-error">Unable to load and set repo selections</p>);
-		}
 		setIsRepoSubmitButtonDisabled(true)
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
 		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isPAT })
@@ -111,7 +108,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isPAT 
 			})
 			.catch((error) => {
 				setError(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
-				if(setIsRepoSelectionDone) {setIsRepoSelectionDone(false) }
+				if (setIsRepoSelectionDone) { setIsRepoSelectionDone(false); }
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
