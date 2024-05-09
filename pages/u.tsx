@@ -4,7 +4,7 @@ import type { Session } from "next-auth/core/types";
 import { useContext, useEffect } from "react";
 import Button from "../components/Button";
 import Footer from "../components/Footer";
-import GitAliasForm from "../components/GitAliasForm";
+import GitAliasForm from "../views/GitAliasForm";
 import RudderContext from "../components/RudderContext";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import { updateAliasesForUser } from "../utils/db/aliases";

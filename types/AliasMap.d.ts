@@ -1,5 +1,7 @@
+import { RepoProvider } from "../utils/providerAPI"
+
 type HandleMap = {
-	provider: string,
+	provider: RepoProvider,
     handles: string[],
 }
 
