@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { Session } from 'next-auth';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { encrypt } from '../../utils/encryptDecrypt';
 import { RepoProvider } from '../../utils/providerAPI';
 import { CloudBuildStatus } from '../../utils/trigger';
@@ -15,6 +15,7 @@ interface BuildInstructionProps {
 	selectedInstallationType: string;
 	userId: string;
 	session: Session | null;
+	installId: string | null;
 }
 
 const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBuildButtonDisabled: boolean }> = ({ buildStatus, isTriggerBuildButtonDisabled }) => {
@@ -30,12 +31,10 @@ const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBui
 	}
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType, session }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType, session, installId }) => {
 	const [isTriggerBuildButtonDisabled, setIsTriggerBuildButtonDisabled] = useState<boolean>(false);
 	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
-	const [installId, setInstallId] = useState<string | null>(null);
-	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
 	const [handleGithubPatInputValue, setHandleGithubPatInputValue] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [maskedGithubPat, setMaskedGithubPat] = useState('');
@@ -104,27 +103,6 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			})
 	};
 
-	useEffect(() => {
-		setIsGetInstallIdLoading(true);
-		axios.post('/api/dpu/pubsub', { userId }).then(async (response) => {
-			if (response.data.installId) {
-				setInstallId(response.data.installId);
-			}
-		})
-			.catch((error) => {
-				console.error(`[BuildInstruction] Unable to get topic name for user ${userId} - ${error.message}`);
-			})
-			.finally(() => {
-				setIsGetInstallIdLoading(false);
-			});
-	}, [userId])
-
-	if (isGetInstallIdLoading) {
-		return (<>
-			<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
-			Generating topic name...
-		</>);
-	}
 	if (!installId) {
 		return (<div className="flex items-center gap-4">
 			<p>Something went wrong while fetching install id.</p>
@@ -132,10 +110,8 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 	}
 	if (selectedHosting === 'selfhosting') {
 		if (!isRepoSelectionDone && (
-			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project') ||
-			(selectedProvider === 'github' && selectedInstallationType === 'individual')
-		)) {
-			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project'))) {
+			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} isNewAccordion={false} />)
 		}
 		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
 	} else if (selectedHosting === 'cloud') {
@@ -150,7 +126,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			);
 		} else {
 			if (!isRepoSelectionDone) {
-				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} isNewAccordion={false} />)
 			}
 			return (<>
 				<div className="flex items-center gap-2 py-2">

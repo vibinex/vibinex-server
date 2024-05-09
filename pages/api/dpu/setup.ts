@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { removeRepoConfigForInstallIdForOwner } from '../../../utils/db/repos';
 import { SetupReposArgs, removePreviousInstallations, saveSetupReposInDb } from '../../../utils/db/setupRepos';
 import { getUserIdByTopicName } from '../../../utils/db/users';
+import { publishMessage } from '../../../utils/pubsub/pubsubClient';
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[setupHandler]Saving setup info in db...");
@@ -51,8 +52,12 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			});
 		allSetupReposPromises.push(saveSetupReposPromises);
 	}
-	await Promise.all(allSetupReposPromises).then(() => {
+	await Promise.all(allSetupReposPromises).then(async () => {
 		console.info("[setupHandler] All setup info saved succesfully...")
+		if (jsonBody.isPublish) {
+			const res = await publishMessage(jsonBody.installationId, jsonBody.info, "PATSetup");
+			console.info(`[setupHandler] Published msg to ${jsonBody.installationId}`, res);
+		}
 		res.status(200).send("Ok");
 		return;
 	}).catch((error) => {
