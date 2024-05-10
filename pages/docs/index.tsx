@@ -1,3 +1,4 @@
+import axios from 'axios';
 import type { Session } from 'next-auth';
 import React, { useEffect, useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
@@ -10,6 +11,7 @@ import BuildInstruction from '../../components/setup/BuildInstruction';
 import HostingSelector from '../../components/setup/HostingSelector';
 import InstallationSelector from '../../components/setup/InstallationSelector';
 import ProviderSelector from '../../components/setup/ProviderSelector';
+import RepoSelection from '../../components/setup/RepoSelection';
 import TriggerContent from '../../components/setup/TriggerContent';
 import { getAuthUserId, getAuthUserName, hasValidAuthInfo, isAuthInfoExpired } from '../../utils/auth';
 import { RepoProvider } from '../../utils/providerAPI';
@@ -25,12 +27,21 @@ const verifySetup = [
 const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
 	const [loading, setLoading] = useState(true);
 	const [session, setSession] = useState<Session | null>(null);
+	const [installId, setInstallId] = useState<string | null>(null);
 	const { rudderEventMethods } = React.useContext(RudderContext);
 
 	useEffect(() => {
 		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
-			const sessionVal = await res.json();
+			const sessionVal: Session | null = await res.json();
 			setSession(sessionVal);
+			const userId = await getAuthUserId(sessionVal);
+			axios.post('/api/dpu/pubsub', { userId }).then(async (response) => {
+				if (response.data.installId) {
+					setInstallId(response.data.installId);
+				}
+			}).catch((error) => {
+				console.error(`[docs] Unable to get topic name for user ${userId} - ${error.message}`);
+			});
 		}).catch((err) => {
 			console.error(`[docs] Error in getting session`, err);
 		}).finally(() => {
@@ -96,24 +107,39 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 							<ProviderSelector providerOptions={providerOptions} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} />
 						</label>
 						<label className='flex justify-between font-semibold text-sm'>Installation Type:
-							<InstallationSelector selectedInstallation={selectedInstallation} setSelectedInstallation={setSelectedInstallation}/>
+							<InstallationSelector selectedInstallation={selectedInstallation} setSelectedInstallation={setSelectedInstallation} />
 						</label>
 						<label className='font-semibold text-sm w-full flex justify-between'>Hosting:
-							<HostingSelector selectedHosting={selectedHosting} setSelectedHosting={setSelectedHosting}/>
+							<HostingSelector selectedHosting={selectedHosting} setSelectedHosting={setSelectedHosting} />
 						</label>
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-3" disabled={selectedHosting === '' || !selectedProvider || selectedInstallation === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider!!} session={session} />
+						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider!!} session={session} installId={installId} />
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={!selectedProvider}>
-					<AccordionTrigger>Set up triggers</AccordionTrigger>
-					<AccordionContent>
-						<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation}/>
-					</AccordionContent>
+					{selectedProvider === 'github' && selectedHosting === 'selfhosting' && selectedInstallation === 'individual' ? (
+						<>
+							<AccordionTrigger>Repository Selection</AccordionTrigger>
+							<AccordionContent>
+								{installId ? (
+									<RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} />
+								) : (
+									<>User Info not found, please refresh and try again.</>
+								)}
+							</AccordionContent>
+						</>
+					) : (
+						<>
+							<AccordionTrigger>Set up triggers</AccordionTrigger>
+							<AccordionContent>
+								<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation} />
+							</AccordionContent>
+						</>
+					)}
 				</AccordionItem>
 				<AccordionItem value="instruction-5">
 					<AccordionTrigger>Install browser extension</AccordionTrigger>
@@ -128,7 +154,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 					<AccordionContent>
 						Once you have set up your repositories, installed the browser extension and signed in, you can verify if everything is correctly set up.
 						<ol>
-							{verifySetup.map((checkItem, index) => (<li key={checkItem} className='mt-2 ml-1' dangerouslySetInnerHTML={{ __html: `${index + 1}. ${checkItem}` }}/>))}
+							{verifySetup.map((checkItem, index) => (<li key={checkItem} className='mt-2 ml-1' dangerouslySetInnerHTML={{ __html: `${index + 1}. ${checkItem}` }} />))}
 						</ol>
 					</AccordionContent>
 				</AccordionItem>
@@ -144,7 +170,7 @@ Docs.getInitialProps = async () => {
 	const redirectUri = 'https://vibinex.com/api/bitbucket/callbacks/install';
 	const scopes = 'repository';
 	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
-	const image_name= process.env.DPU_IMAGE_NAME;
+	const image_name = process.env.DPU_IMAGE_NAME;
 
 	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
 	console.debug(`[getInitialProps] url: `, url)
