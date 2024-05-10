@@ -34,6 +34,7 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewAccordion }:
 	{ repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null, isNewAccordion: boolean }) => {
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
+	const [disbaleAllRepos, setDisableAllRepos] = useState<boolean>(false);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [isGetReposLoading, setIsGetReposLoading] = useState<boolean>(false);
 	const [isRepoSubmitButtonDisabled, setIsRepoSubmitButtonDisabled] = useState<boolean>(false);
@@ -112,6 +113,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 
 	const handleSubmit = () => {
 		setIsRepoSubmitButtonDisabled(true)
+		setDisableAllRepos(true);
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
 		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
 			.then((response) => {
@@ -152,6 +154,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 								value={`${repo.repo_owner}/${repo.repo_name}`}
 								checked={selectedRepos.includes(repo)}
 								onChange={(event) => handleCheckboxChange(event, repo)}
+								disabled={disbaleAllRepos}
 							/>
 							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
 						</div>
