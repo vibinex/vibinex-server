@@ -54,6 +54,9 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 				.catch((err) => {
 					console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
 				})
+				.finally(() => {
+					setIsGetReposLoading(false);
+				});
 		}
 		else {
 			axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getAllRepos')
