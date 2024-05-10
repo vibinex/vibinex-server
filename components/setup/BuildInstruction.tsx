@@ -111,7 +111,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 	if (selectedHosting === 'selfhosting') {
 		if (!isRepoSelectionDone && (
 			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project'))) {
-			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} isNewAccordion={false} />)
 		}
 		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
 	} else if (selectedHosting === 'cloud') {
@@ -126,7 +126,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			);
 		} else {
 			if (!isRepoSelectionDone) {
-				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} />)
+				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} isNewAccordion={false} />)
 			}
 			return (<>
 				<div className="flex items-center gap-2 py-2">

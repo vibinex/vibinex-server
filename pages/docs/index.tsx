@@ -126,7 +126,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 							<AccordionTrigger>Repository Selection</AccordionTrigger>
 							<AccordionContent>
 								{installId ? (
-									<RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} />
+									<RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} isNewAccordion={true}/>
 								) : (
 									<>User Info not found, please refresh and try again.</>
 								)}

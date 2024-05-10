@@ -31,47 +31,69 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 	return Array.from(setupArgsMap.values());
 }
 
-const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null }) => {
+
+const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewAccordion }:
+	{ repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null, isNewAccordion: boolean }) => {
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
+	const [disableAllRepos, setDisableAllRepos] = useState<boolean>(false);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
 	const [isGetReposLoading, setIsGetReposLoading] = useState<boolean>(false);
 	const [isRepoSubmitButtonDisabled, setIsRepoSubmitButtonDisabled] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
+	const [submitButtonText, setSubmitButtonText] = useState<string>("Submit");
 
 	useEffect(() => {
 		setIsGetReposLoading(true);
-		axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getAllRepos')
-			.then((response) => {
-				return response.data.repoList;
-			})
-			.then((allRepos) => {
-				const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
-				setAllRepos(providerReposForUser)
-				
-				// automatically check the repositories that are already installed by the user
-				axios.get<{repoList: RepoIdentifier[]}>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
+		if (isNewAccordion) {
+			axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
 				.then((response) => {
 					return response.data.repoList;
 				})
-				.then((repos) => {
-					const filteredRepos = providerReposForUser.filter(repo => repos.some(selectedRepo => 
-						selectedRepo.repo_provider === repo.repo_provider &&
-						selectedRepo.repo_owner === repo.repo_owner &&
-						selectedRepo.repo_name === repo.repo_name
-					)); // this is important because we are matching object references when we compare values in the checkbox
-					setSelectedRepos(filteredRepos);
+				.then((allRepos) => {
+					const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
+					setAllRepos(providerReposForUser)
 				})
 				.catch((err) => {
 					console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
 				})
-			})
-			.catch(err => {
-				console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
-				setError("Failed to get repositories")
-			})
-			.finally(() => {
-				setIsGetReposLoading(false);
-			});
+				.finally(() => {
+					setIsGetReposLoading(false);
+				});
+		}
+		else {
+			axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getAllRepos')
+				.then((response) => {
+					return response.data.repoList;
+				})
+				.then((allRepos) => {
+					const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
+					setAllRepos(providerReposForUser)
+
+					// automatically check the repositories that are already installed by the user
+					axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
+						.then((response) => {
+							return response.data.repoList;
+						})
+						.then((repos) => {
+							const filteredRepos = providerReposForUser.filter(repo => repos.some(selectedRepo =>
+								selectedRepo.repo_provider === repo.repo_provider &&
+								selectedRepo.repo_owner === repo.repo_owner &&
+								selectedRepo.repo_name === repo.repo_name
+							)); // this is important because we are matching object references when we compare values in the checkbox
+							setSelectedRepos(filteredRepos);
+						})
+						.catch((err) => {
+							console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
+						})
+				})
+				.catch(err => {
+					console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
+					setError("Failed to get repositories")
+				})
+				.finally(() => {
+					setIsGetReposLoading(false);
+				});
+			}
 	}, [repoProvider, installId])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
@@ -92,15 +114,17 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 
 	const handleSubmit = () => {
 		setIsRepoSubmitButtonDisabled(true)
+		setDisableAllRepos(true);
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
-		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId })
+		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
 			.then((response) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);
 					setError('Something went wrong');
 				} else {
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
-					if (setIsRepoSelectionDone) { setIsRepoSelectionDone(true); }
+					if(setIsRepoSelectionDone) {setIsRepoSelectionDone(true) }
+					if (isNewAccordion) { setSubmitButtonText("Submitted") }
 				}
 			})
 			.catch((error) => {
@@ -109,7 +133,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
-				setIsRepoSubmitButtonDisabled(false);
+				if (!isNewAccordion) { setIsRepoSubmitButtonDisabled(false);}
 			})
 	};
 
@@ -131,6 +155,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 								value={`${repo.repo_owner}/${repo.repo_name}`}
 								checked={selectedRepos.includes(repo)}
 								onChange={(event) => handleCheckboxChange(event, repo)}
+								disabled={disableAllRepos}
 							/>
 							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
 						</div>
@@ -141,7 +166,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone }: { re
 					{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
 				</Button>
 				<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
-					Submit
+					{submitButtonText}
 				</Button>
 			</div>
 		</div>
