@@ -21,7 +21,10 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const response = await axios.get<{ aliasProviderMap: AliasProviderMap }>(`/api/alias`, { params: { expanded } });
+				const response = await axios.get<{ aliasProviderMap: AliasProviderMap }>(`/api/alias`, {
+					params: { expanded },
+					headers: { 'Cache-Control': 'no-cache' }
+				});
 				if (!response.data?.aliasProviderMap) {
 					throw new Error('Failed to fetch Git email aliases');
 				}
