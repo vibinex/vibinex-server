@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getGitAliasesWithHandlesFromDB, saveGitAliasMapToDB } from "../../utils/db/aliases";
-import { AliasProviderMap } from "../../types/AliasMap";
+import type { AliasMap, AliasProviderMap } from "../../types/AliasMap";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "./auth/[...nextauth]";
 
@@ -29,11 +29,12 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(500).json({error: error});
         });
     } else if (method === 'POST') {
-        const aliasProviderMap: AliasProviderMap = body.aliasProviderMap;
-        await saveGitAliasMap(aliasProviderMap)
+        const aliasHandleMap: AliasMap = body.aliasHandleMap;
+        await saveGitAliasMap(aliasHandleMap)
         .then(() => {
             res.status(200).send('Git alias map saved successfully.');
         }).catch((error) => {
+            console.error(`[aliasHandler] Error saving Git alias map: ${error}`);
             res.status(500).json({error: error});
         });
     } else {
@@ -59,12 +60,12 @@ const getGitEmailAliases = async (userId: string, expanded?: boolean): Promise<A
     }
 }
 
-const saveGitAliasMap = async (aliasProviderMap: AliasProviderMap): Promise<void> => {
+const saveGitAliasMap = async (aliasHandleMap: AliasMap): Promise<void> => {
     // Validate that aliasMap is provided
-    if (!aliasProviderMap) {
+    if (!aliasHandleMap) {
         throw new Error("Alias Provider map is required to save Git email aliases.");
     }
-    await saveGitAliasMapToDB(aliasProviderMap);
+    await saveGitAliasMapToDB(aliasHandleMap);
 }
 
 

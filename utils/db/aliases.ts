@@ -99,31 +99,22 @@ export const getGitAliasesWithHandlesFromDB = async (userId: string): Promise<Al
     return aliasProvider;
 }
 
-export const saveGitAliasMapToDB = async (aliasProviderMap: AliasProviderMap) => {
-    const values: string[] = [];
-    for (const aliasMap of aliasProviderMap.providerMaps) {
-        const { alias, handleMaps } = aliasMap;
-        let githubHandle = null;
-        let bitbucketHandle = null;
+export const saveGitAliasMapToDB = async (aliasMap: AliasMap) => {
+    const { alias, handleMaps } = aliasMap;
+    let githubHandle = null;
+    let bitbucketHandle = null;
 
-        for (const handleMap of handleMaps) {
-            if (handleMap.provider === 'github' && handleMap.handles.length > 0) {
-                githubHandle = convert(handleMap.handles)
-            } else if (handleMap.provider === 'bitbucket' && handleMap.handles.length > 0) {
-                bitbucketHandle = convert(handleMap.handles)
-            }
+    for (const handleMap of handleMaps) {
+        if (handleMap.provider === 'github' && handleMap.handles.length > 0) {
+            githubHandle = convert(handleMap.handles)
+        } else if (handleMap.provider === 'bitbucket' && handleMap.handles.length > 0) {
+            bitbucketHandle = convert(handleMap.handles)
         }
-
-        values.push(`('${alias}', ${githubHandle}, ${bitbucketHandle})`);
     }
-
-    if (values.length <= 0) {
-        console.info(`[saveGitAliasMapToDB] No new values to insert.`);
-    }
-    const valuesClause = values.join(', ');
+    const aliasesRowValue = `('${alias}', ${githubHandle}, ${bitbucketHandle})`;
     const query = `
         INSERT INTO aliases (git_alias, github, bitbucket)
-        VALUES ${valuesClause}
+        VALUES ${aliasesRowValue}
         ON CONFLICT (git_alias) DO UPDATE SET 
             github = (
                 SELECT ARRAY(SELECT DISTINCT UNNEST(excluded.github))
