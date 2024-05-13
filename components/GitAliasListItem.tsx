@@ -3,7 +3,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { MdDone, MdEdit } from 'react-icons/md';
-import type { AliasMap, AliasProviderMap, HandleMap } from '../types/AliasMap';
+import type { AliasMap, HandleMap } from '../types/AliasMap';
 import type { RepoProvider } from '../utils/providerAPI';
 import Button from './Button';
 import Chip from './Chip';
@@ -31,11 +31,13 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 		try {
 			const updatedAliasMap: AliasMap = {
 				alias: providerMap.alias,
-				handleMaps: inputHandleMap
+				handleMaps: inputHandleMap.map(handleMap => ({
+					provider: handleMap.provider,
+					handles: handleMap.handles.filter(handle => handle !== '') // Remove empty handles,
+				}))
 			}
 
-			const updatedGitAliasMap: AliasProviderMap = { providerMaps: [updatedAliasMap] };
-			const response = await axios.post('/api/alias', { aliasProviderMap: updatedGitAliasMap }, {
+			const response = await axios.post('/api/alias', { aliasHandleMap: updatedAliasMap }, {
 				headers: {
 					'Content-Type': 'application/json',
 				},
