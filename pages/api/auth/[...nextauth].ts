@@ -8,6 +8,7 @@ import rudderStackEvents from "../events";
 import axios from "axios"
 import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
 import { v4 as uuidv4 } from "uuid";
+import sGrid from "@sendgrid/mail";
 
 interface SignInParam {
 	user: User,
@@ -76,6 +77,13 @@ export const authOptions = {
 				}).catch(err => {
 					console.error("[signup] Rudderstack event failed: Could not get user id", dbUser, err);
 				});
+				// email send
+				if (!process.env.SENDGRID_API_KEY) {
+					console.error("[signIn] SENDGRID_API_KEY env var not set, unable to send signup email");
+					return true;
+				}
+				user.name && user.email && sendSignupEmail(user.email, user.name);
+
 			} else {
 				const existingAuth = (account) ? Object.keys(dbUser.auth_info!).includes(account.provider) && Object.keys(dbUser.auth_info![account.provider]).includes(account.providerAccountId) : false;
 				// if user is found, update the db entry
@@ -172,6 +180,95 @@ const createUserUpdateObj = (user: User, account: Account | null, profile: Profi
 			updateObj.aliases = [user.email]
 	}
 	return updateObj;
+}
+
+const sendSignupEmail = (userEmail: string, userName: string) => {
+	const htmlBody = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Welcome to Vibinex</title>
+	<style>
+		/* Add your custom CSS styles here */
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f5f5f5;
+			color: #333;
+			margin: 0;
+			padding: 0;
+		}
+		.container {
+			max-width: 600px;
+			margin: 20px auto;
+			padding: 20px;
+			background-color: #fff;
+			border-radius: 8px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		}
+		.logo {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		.logo img {
+			max-width: 150px;
+			height: auto;
+		}
+		h1 {
+			color: #2196F3;
+			text-align: center;
+		}
+		p {
+			margin-bottom: 20px;
+			line-height: 1.5;
+		}
+		.cta-button {
+			display: block;
+			width: 200px;
+			margin: 20px auto;
+			padding: 10px 20px;
+			text-align: center;
+			background-color: #2196F3;
+			color: #fff;
+			text-decoration: none;
+			border-radius: 4px;
+			transition: background-color 0.3s ease;
+		}
+		.cta-button:hover {
+			background-color: #0c7cd5;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="logo">
+			<img src="https://vibinex.com/favicon.ico" alt="Vibinex Logo">
+		</div>
+		<h1>Welcome to Vibinex, ${userName}!</h1>
+		<p>With Vibinex, you can streamline your pull request reviews, collaborate with your team more efficiently, and accelerate your software development process.</p>
+		<p>Start exploring now by logging into your account:</p>
+		<a href="https://vibinex.com/login" class="cta-button">Log In to Vibinex</a>
+		<p>If you have any questions or need assistance, feel free to reach out to our support team at <a href="mailto:contact@vibinex.com">contact@vibinex.com</a>.</p>
+		<p>Happy coding!</p>
+		<p>The Vibinex Team</p>
+	</div>
+</body>
+</html>
+
+	`;
+	const msg = {
+		to: userEmail, // recipient's email address
+		from: "contact@vibinex.com", // sender's email address
+		subject: "Welcome to Vibinex", // email subject
+		text: "Generate your welcome message here.", // plain text body
+		html: "<p>Generate your welcome message here.</p>", // HTML body
+	};
+	// Send email
+	sGrid.send(msg).catch((err) => {
+		console.error("Error sending email:", err);
+	});
+	console.debug("[signIn] Email sent successfully!");
 }
 
 // Solution found here: https://github.com/nextauthjs/next-auth/pull/3076#issuecomment-1180218158
