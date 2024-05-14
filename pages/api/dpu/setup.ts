@@ -16,8 +16,8 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!userId) {
 		console.error(`[setupHandler/getUserIdByTopicName] NO userId found for topic name: ${jsonBody.installationId} from database.`);
 		const eventProperties = { ...jsonBody.info, response_status: 404 };
-		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
 		res.status(404).json({ "error": "No userId found for given installationId" });
+		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	if (!Array.isArray(jsonBody.info)) {
@@ -33,8 +33,8 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	} catch (err) {
 		console.error(`[setupHandler] Unable to remove previous installations for ${jsonBody.installationId}`, err);
 		const eventProperties = { ...jsonBody.info, response_status: 500 };
-		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
 		res.status(500).json({ "error": "Internal Server Error" });
+		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const allSetupReposPromises = [];
@@ -50,8 +50,8 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		} catch (err) {
 			console.error(`[setupHandler] Unable to remove previous repo configurations for ${jsonBody.installationId}`, err);
 			const eventProperties = { ...jsonBody.info, response_status: 500 };
-			rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
 			res.status(500).json({ "error": "Internal Server Error" });
+			rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
@@ -67,14 +67,14 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			console.info(`[setupHandler] Published msg to ${jsonBody.installationId}`, res);
 		}
 		const eventProperties = { ...jsonBody.info, response_status: 200 };
-		rudderStackEvents.track(userId, "", 'setup', { type: 'setup-repos', eventStatusFlag: 1, eventProperties })
 		res.status(200).send("Ok");
+		rudderStackEvents.track(userId, "", 'setup', { type: 'setup-repos', eventStatusFlag: 1, eventProperties })
 		return;
 	}).catch((error) => {
 		console.error("[setupHandler] Unable to save all setup info in db, error: ", error);
 		const eventProperties = { ...jsonBody.info, response_status: 500 };
-		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
 		res.status(500).json({ "error": "Unable to save setup info" });
+		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
 		return;
 	});
 }
