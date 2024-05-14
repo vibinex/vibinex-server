@@ -2,7 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { saveTopicNameInUsersTable, createTopicName } from '../../../utils/db/relevance';
 import { createTopicNameInGcloud } from '../../../utils/pubsub/pubsubClient';
 import { CloudBuildStatus, triggerCloudProjectBuildUsingGcloudApi, pollBuildStatus, triggerCloudPatBuildUsingGcloudApi } from './../../../utils/trigger';
-import { DbUser, getUserById } from '../../../utils/db/users';
+import { DbUser, getUserById, getUserIdByTopicName } from '../../../utils/db/users';
+import rudderStackEvents from '../events';
 
 const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[triggerHandler] pub sub setup info in db...");
@@ -11,13 +12,17 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!jsonBody.selectedProvider || !jsonBody.selectedInstallationType || !jsonBody.selectedHosting || !jsonBody.userId) {
 		console.error("[triggerHandler] Invalid request body");
 		res.status(400).json({ "error": "Invalid request body" });
+		const eventProperties = { ...jsonBody, response_status: 400 };
+		rudderStackEvents.track("", "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 		return;
 	}
-	
+
 	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
-		if(!jsonBody.github_pat){
+		if (!jsonBody.github_pat) {
 			console.error("[triggerHandler] Missing GitHub Personal Access Token");
 			res.status(400).json({ "error": "Missing GitHub Personal Access Token" });
+			const eventProperties = { ...jsonBody, response_status: 400 };
+			rudderStackEvents.track("", "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 	}
@@ -28,8 +33,11 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 	if (!userData) {
 		res.status(500).json({ "error": "Internal server error" });
+		const eventProperties = { ...jsonBody, response_status: 500 };
+		rudderStackEvents.track("", "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 		return;
 	}
+	let userId = "";
 	if (userData.topic_name !== null && userData.topic_name !== undefined) {
 		topicName = userData.topic_name;
 	} else {
@@ -39,14 +47,22 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 		if (!generatedTopic) {
 			res.status(500).json({ "error": "Internal server error" });
+			const eventProperties = { ...jsonBody, response_status: 500 };
+			rudderStackEvents.track("", "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 			return;
 		}
+		userId = await getUserIdByTopicName(generatedTopic as string).catch((error: any) => {
+			console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
+			return "";
+		});
 		const gcloudTopic = await createTopicNameInGcloud(generatedTopic).catch(err => {
 			console.error(`[triggerHandler] error in creating topic in google cloud`, err);
 			return;
 		})
 		if (!gcloudTopic) {
 			res.status(500).json({ "error": "Internal server error" });
+			const eventProperties = { ...jsonBody, response_status: 500 };
+			rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		topicName = generatedTopic;
@@ -55,6 +71,8 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		} catch (error) {
 			console.error("[triggerHandler] Unable to save topic name in db, ", error);
 			res.status(500).json({ "error": "Internal server error" });
+			const eventProperties = { ...jsonBody, response_status: 500 };
+			rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 	}
@@ -62,13 +80,13 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	//check if already a build exists in users table for the user, if yes? check status else continue
 	let buildStatus: CloudBuildStatus;
-	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud'){
+	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
 		buildStatus = await triggerCloudPatBuildUsingGcloudApi(jsonBody.userId, topicName, jsonBody.github_pat, jsonBody.selectedProvider).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
 			return { success: false, message: 'Unable to trigger build using GCloud API' };
 		});
 		console.info("[triggerHandler] build status: ", buildStatus);
-	
+
 	} else if (jsonBody.selectedInstallationType === 'project' && jsonBody.selectedHosting === 'cloud') {
 		buildStatus = await triggerCloudProjectBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
@@ -78,24 +96,32 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	} else {
 		console.error('[triggerHandler] Invalid provider, installation type, or hosting combination');
 		res.status(400).json({ "error": "Invalid provider, installation type, or hosting combination", success: false });
+		const eventProperties = { ...jsonBody, response_status: 400 };
+		rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	if (!buildStatus.success) {
 		console.error('[triggerHandler] Error triggering build:', buildStatus.message);
 		res.status(500).json({ "error": buildStatus.message, success: false });
-		return 
+		const eventProperties = { ...jsonBody, response_status: 500 };
+		rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
+		return
 	}
 	const projectId: string | undefined = process.env.PROJECT_ID;
 	const location: string | undefined = process.env.CLOUD_BUILD_LOCATION;
 	if (!projectId || !location) {
 		console.error('[triggerHandler] Environment variables for projectId and location must be set');
 		res.status(400).json({ "error": "env variables must be set", success: false });
+		const eventProperties = { ...jsonBody, response_status: 400 };
+		rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const buildId = buildStatus.buildDetails?.id;
 	if (!buildId) {
 		console.error('[triggerHandler] No build ID found in buildDetails');
 		res.status(500).json({ error: 'No build ID found', success: false });
+		const eventProperties = { ...jsonBody, response_status: 500 };
+		rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const finalBuildStatus = await pollBuildStatus(projectId, location, buildId).catch(err => {
@@ -104,11 +130,15 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 	if (finalBuildStatus === 'SUCCESS') {
 		res.status(200).json({ message: 'Build completed successfully', success: true });
-		return; 
+		const eventProperties = { ...jsonBody, response_status: 200 };
+		rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 1, eventProperties });
+		return;
 	} else {
 		console.error(`[triggerHandler] Build failed with status: ${finalBuildStatus}`);
 		res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
-		return; 
+		const eventProperties = { ...jsonBody, response_status: 500 };
+		rudderStackEvents.track(userId, "", 'trigger', { type: 'run-trigger', eventStatusFlag: 0, eventProperties });
+		return;
 	}
 }
 
