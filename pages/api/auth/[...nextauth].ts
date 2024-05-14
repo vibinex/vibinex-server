@@ -255,20 +255,18 @@ const sendSignupEmail = (userEmail: string, userName: string) => {
 	</div>
 </body>
 </html>
-
 	`;
 	const msg = {
 		to: userEmail, // recipient's email address
 		from: "contact@vibinex.com", // sender's email address
 		subject: "Welcome to Vibinex", // email subject
-		text: "Generate your welcome message here.", // plain text body
-		html: "<p>Generate your welcome message here.</p>", // HTML body
+		html: htmlBody,
 	};
 	// Send email
 	sGrid.send(msg).catch((err) => {
-		console.error("Error sending email:", err);
+		console.error("[sendSignupEmail] Error sending email:", err);
 	});
-	console.debug("[signIn] Email sent successfully!");
+	console.debug("[sendSignupEmail] Email sent successfully!");
 }
 
 // Solution found here: https://github.com/nextauthjs/next-auth/pull/3076#issuecomment-1180218158
