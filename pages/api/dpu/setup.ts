@@ -24,7 +24,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error("[setupHandler] Invalid request body, 'info' is missing or not an array");
 		res.status(400).json({ "error": "Invalid request body" });
 		const eventProperties = { ...jsonBody.info, response_status: 400 };
-		rudderStackEvents.track(userId, "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
+		rudderStackEvents.track(userId, "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 
@@ -34,7 +34,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error(`[setupHandler] Unable to remove previous installations for ${jsonBody.installationId}`, err);
 		const eventProperties = { ...jsonBody.info, response_status: 500 };
 		res.status(500).json({ "error": "Internal Server Error" });
-		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(userId, "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const allSetupReposPromises = [];
@@ -51,7 +51,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			console.error(`[setupHandler] Unable to remove previous repo configurations for ${jsonBody.installationId}`, err);
 			const eventProperties = { ...jsonBody.info, response_status: 500 };
 			res.status(500).json({ "error": "Internal Server Error" });
-			rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(userId, "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
@@ -74,7 +74,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error("[setupHandler] Unable to save all setup info in db, error: ", error);
 		const eventProperties = { ...jsonBody.info, response_status: 500 };
 		res.status(500).json({ "error": "Unable to save setup info" });
-		rudderStackEvents.track("", "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
+		rudderStackEvents.track(userId, "", 'setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
 		return;
 	});
 }
