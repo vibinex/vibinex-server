@@ -82,7 +82,7 @@ export const authOptions = {
 					console.error("[signIn] SENDGRID_API_KEY env var not set, unable to send signup email");
 					return true;
 				}
-				user.name && user.email && sendSignupEmail(user.email, user.name);
+				if (user?.name && user?.email) { sendSignupEmail(user.email, user.name); }
 
 			} else {
 				const existingAuth = (account) ? Object.keys(dbUser.auth_info!).includes(account.provider) && Object.keys(dbUser.auth_info![account.provider]).includes(account.providerAccountId) : false;
@@ -256,6 +256,8 @@ const sendSignupEmail = (userEmail: string, userName: string) => {
 </body>
 </html>
 	`;
+	console.debug(`[sendSignupEmail] SENDGRID_API_KEY = ${process.env.SENDGRID_API_KEY}`);
+	console.debug(`[sendSignupEmail] user email = ${userEmail}`);
 	const msg = {
 		to: userEmail, // recipient's email address
 		from: "contact@vibinex.com", // sender's email address
@@ -263,10 +265,11 @@ const sendSignupEmail = (userEmail: string, userName: string) => {
 		html: htmlBody,
 	};
 	// Send email
-	sGrid.send(msg).catch((err) => {
+	sGrid.send(msg).then((res) => { 
+		console.debug(`[sendSignupEmail] Email sent successfully! res = ${JSON.stringify(res)}`);
+	}).catch((err) => {
 		console.error("[sendSignupEmail] Error sending email:", err);
 	});
-	console.debug("[sendSignupEmail] Email sent successfully!");
 }
 
 // Solution found here: https://github.com/nextauthjs/next-auth/pull/3076#issuecomment-1180218158
