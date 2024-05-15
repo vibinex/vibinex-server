@@ -36,7 +36,7 @@ const nextConfig = {
 			{
 				protocol: 'https',
 				hostname: process.env.NEXT_PUBLIC_STRAPI_API_URL, // Blog server
-				pathname: '/**',
+				pathname: '/uploads/**',
 			},
 		],
 	},
