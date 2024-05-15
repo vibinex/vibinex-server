@@ -78,10 +78,6 @@ export const authOptions = {
 					console.error("[signup] Rudderstack event failed: Could not get user id", dbUser, err);
 				});
 				// email send
-				if (!process.env.SENDGRID_API_KEY) {
-					console.error("[signIn] SENDGRID_API_KEY env var not set, unable to send signup email");
-					return true;
-				}
 				if (user?.name && user?.email) { sendSignupEmail(user.email, user.name); }
 
 			} else {
@@ -265,6 +261,11 @@ const sendSignupEmail = (userEmail: string, userName: string) => {
 		html: htmlBody,
 	};
 	// Send email
+	if (!process.env.SENDGRID_API_KEY) {
+		console.error("[sendSignupEmail] SENDGRID_API_KEY env var not set, unable to send signup email");
+		return;
+	}
+	sGrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 	sGrid.send(msg).then((res) => { 
 		console.debug(`[sendSignupEmail] Email sent successfully! res = ${JSON.stringify(res)}`);
 	}).catch((err) => {
