@@ -8,8 +8,8 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const { topicId, provider } = req.query;
 	const userId = await getUserIdByTopicName(topicId as string).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
-		const eventProperties = { ...req.query, response_status: 400 };
-		rudderStackEvents.track(userId, "", 'dpu/repos', { type: 'no-user-data-for-topic', eventStatusFlag: 0, eventProperties });
+		const eventProperties = { ...req.query, response_status: 500 };
+		rudderStackEvents.track(userId, "", 'dpu/repos', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
 		return "";
 	});
 	if (!topicId || !provider 
@@ -23,7 +23,7 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const repoList: RepoIdentifier[] | null = await getUserRepositoriesByTopic(topicId, provider).catch((err) => {
 		console.error(`[reposHandler] Unable to get user repos for topic ${topicId}`);
 		const eventProperties = { ...req.query, response_status: 400 };
-		rudderStackEvents.track(userId, "", 'dpu/repos', { type: 'no-user-repos-for-topic', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(userId, "", 'dpu/repos', { type: 'user-repos-for-topic', eventStatusFlag: 0, eventProperties });
 		return null;
 	});
 	if (repoList == null) {

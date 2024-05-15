@@ -11,7 +11,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
 		console.error("[pubsubHandler] Invalid request body");
 		res.status(400).json({ "error": "Invalid request body" });
 		const eventProperties = { ...jsonBody, response_status: 400 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu/pubsub', { type: 'no-user-id-in-body', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu/pubsub', { type: 'user-id-in-body', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const userData: DbUser = await getUserById(jsonBody.userId);
@@ -19,7 +19,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
 		console.error(`[pubsubHandler] cannot get userData`);
 		res.status(500).json({ "error": "Internal server error" });
 		const eventProperties = { ...jsonBody, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu/pubsub', { type: 'no-user-data-for-id', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu/pubsub', { type: 'user-data-for-id', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	if (!userData.topic_name) {
