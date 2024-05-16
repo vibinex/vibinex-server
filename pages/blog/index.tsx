@@ -1,12 +1,16 @@
 "use client";
 import { NextPage } from "next";
-import { useState, useEffect, useCallback } from "react";
+import { Session } from "next-auth/core/types";
+import { useState, useEffect, useCallback, useContext } from "react";
 import Loader from "../../components/blog/Loader";
 import PageHeader from "../../components/blog/PageHeader";
 import PostList, { Article } from "../../components/blog/PostList";
 import Button from "../../components/Button";
 import Footer from "../../components/Footer";
+import RudderContext from "../../components/RudderContext";
+import { getAuthUserId, getAuthUserName } from "../../utils/auth";
 import { fetchAPI } from "../../utils/blog/fetch-api";
+import { getAndSetAnonymousIdFromLocalStorage } from "../../utils/rudderstack_initialize";
 import Navbar from "../../views/Navbar";
 
 
@@ -17,10 +21,16 @@ interface Meta {
 		total: number;
 	};
 }
-const Profile: NextPage = () => {
+
+type BlogProfileProps = {
+	sessionObj: Session,
+}
+
+const Profile: NextPage<BlogProfileProps> = ({sessionObj: session}) => {
 	const [meta, setMeta] = useState<Meta | undefined>();
 	const [data, setData] = useState<Article[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const { rudderEventMethods } = useContext(RudderContext);
 
 	const fetchData = useCallback(async (start: number, limit: number) => {
 		setIsLoading(true);
@@ -63,7 +73,9 @@ const Profile: NextPage = () => {
 
 	useEffect(() => {
 		fetchData(0, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
-	}, [fetchData]);
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
+		rudderEventMethods?.track(getAuthUserId(session), "blog-list-page", { type: "page-visit", name: getAuthUserName(session) }, anonymousId);
+	}, [rudderEventMethods, fetchData]);
 
 	if (isLoading) return <Loader />;
 
