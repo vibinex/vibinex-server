@@ -4,7 +4,7 @@ interface KeyPair {
     publicKey: string;
     privateKey: string;
 }
-const generateJWKKeyPair = async (): Promise<KeyPair> => { // Created this function so that in future we can use this to generate keyPair whenever needed. Currently this is not used anywhere.
+export const generateJWKKeyPair = async (): Promise<KeyPair> => { // This function generates a key pair for future use. Currently, it is not utilized elsewhere in the codebase.
     const keyStore = jose.JWK.createKeyStore();
     const keyPair = await keyStore.generate('RSA', 2048, {
       alg: 'RSA-OAEP',
