@@ -35,7 +35,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[webookHandler] Received bitbucket webhook event for ", repo_name);
 	const topicName: string[] | null = await getTopicNameFromDB(provider, owner, repo_name).catch((error) => {
 		console.error('[webhookHandler] Failed to get topic name from db:', error);
-		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'get-topic-from-db', eventStatusFlag: 0, event_properties });
 		return null;
 	});
 	if (!topicName) {
@@ -50,7 +49,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		repo_name: repo_name
 	}).catch((error) => {
 		console.error('[webookHandler] Failed to get repoConfig from db :', error);
-		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'get-repo-config', eventStatusFlag: 0, event_properties });
 		return null;
 	});
 	if (!repoConfig) {

@@ -18,7 +18,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
 		console.error("[pubsubHandler] Invalid request body");
 		res.status(400).json({ "error": "Invalid request body" });
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'dpu-pubsub', { type: 'user-id-in-body', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-pubsub', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const userData: DbUser = await getUserById(jsonBody.userId);

@@ -34,7 +34,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	const topicName: string[] | null = await getTopicNameFromDB(provider, owner, name).catch((error) => {
 		console.error('[webhookHandler] Failed to get topic name from db:', error);
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'get-topic-from-db', eventStatusFlag: 0, event_properties });
 		return null;
 	});
 	if (!topicName) {
@@ -52,7 +51,6 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		repo_name: name
 	}).catch((error) => {
 		console.error('[webookHandler] Failed to get repoConfig from db :', error);
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'get-repo-config', eventStatusFlag: 0, event_properties });
 		return null;
 	});
 	if (!repoConfig) {

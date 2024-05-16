@@ -21,7 +21,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error("[setupHandler] Invalid request body", jsonBody);
 		res.status(400).json({ "error": "Invalid request body" });
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'dpu-setup', { type: 'invalid-body', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-setup', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	

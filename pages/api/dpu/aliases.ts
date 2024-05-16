@@ -31,7 +31,7 @@ const aliasesPostHandler = async (req: NextApiRequest, res: NextApiResponse) => 
         || !Array.isArray(jsonBody.aliases)) {
         console.error("[aliasesPostHandler] Invalid request body", jsonBody);
         const eventProperties = { ...event_properties, response_status: 400 };
-        rudderStackEvents.track("absent", "", 'dpu-post-aliases', { type: 'invalid-body', eventStatusFlag: 0, eventProperties }); //TODO: aliases endpoint - need to send topic name for getting user for auth
+        rudderStackEvents.track("absent", "", 'dpu-post-aliases', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties }); //TODO: aliases endpoint - need to send topic name for getting user for auth
         res.status(400).json({ "error": "Invalid request body" });
         return;
     }

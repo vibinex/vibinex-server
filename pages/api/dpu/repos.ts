@@ -17,7 +17,7 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		|| topicId.length === 0 || provider.length === 0) {
 		res.status(400).json({ error: 'Invalid get request body' });
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'dpu-repos', { type: 'invalid-body', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-repos', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 
