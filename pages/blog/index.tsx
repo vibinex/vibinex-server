@@ -75,7 +75,7 @@ const Profile: NextPage<BlogProfileProps> = ({sessionObj: session}) => {
 		fetchData(0, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "blog-list-page", { type: "page-visit", name: getAuthUserName(session) }, anonymousId);
-	}, [rudderEventMethods, fetchData]);
+	}, [rudderEventMethods, session, fetchData]);
 
 	if (isLoading) return <Loader />;
 
