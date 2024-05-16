@@ -7,7 +7,7 @@ import rudderStackEvents from '../../events';
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method !== 'POST') {
 		const eventProperties = { response_status: 405 };
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
 		res.status(405).json({ error: 'Method Not Allowed' });
 		return;
 	}
@@ -19,27 +19,28 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const repo_name = jsonBody.repository.name;
 
 	const event_properties = {
-		repository_name: repo_name,
-		repository_owner: owner,
-		event_type: eventHeader
+		repo_name: repo_name,
+		repo_owner: owner,
+		event_type: eventHeader,
+		repo_provider: provider
 	};
 
 	// Verify the event type
 	if (eventHeader !== 'pullrequest:approved' && eventHeader !== 'pullrequest:created' && eventHeader !== 'pullrequest:updated') {
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'event-type', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'event-type', eventStatusFlag: 0, eventProperties });
 		res.status(400).json({ error: 'Invalid event header' });
 		return;
 	}
 	console.info("[webookHandler] Received bitbucket webhook event for ", repo_name);
 	const topicName: string[] | null = await getTopicNameFromDB(provider, owner, repo_name).catch((error) => {
 		console.error('[webhookHandler] Failed to get topic name from db:', error);
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'get-topic-from-db', eventStatusFlag: 0, event_properties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'get-topic-from-db', eventStatusFlag: 0, event_properties });
 		return null;
 	});
 	if (!topicName) {
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'get-topic-from-db', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'get-topic-from-db', eventStatusFlag: 0, eventProperties });
 		res.status(500).json({ error: 'Unable to get topic name from db' });
 		return;
 	}
@@ -49,12 +50,12 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		repo_name: repo_name
 	}).catch((error) => {
 		console.error('[webookHandler] Failed to get repoConfig from db :', error);
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'get-repo-config', eventStatusFlag: 0, event_properties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'get-repo-config', eventStatusFlag: 0, event_properties });
 		return null;
 	});
 	if (!repoConfig) {
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'get-repo-config', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'get-repo-config', eventStatusFlag: 0, eventProperties });
 		res.status(500).json({ error: 'Unable to get repoConfig from db' });
 		return;
 	}
@@ -77,8 +78,8 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 		const result: string | null = await publishMessage(installId, data, msgType)
 		.catch((error) => {
-			const eventProperties = { ...event_properties, topicName: installId };
-			rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'publish-webhook-message', eventStatusFlag: 0, eventProperties });	
+			const eventProperties = { ...event_properties, topic_name: installId };
+			rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'publish-webhook-message', eventStatusFlag: 0, eventProperties });	
 			console.error('[webookHandler] Failed to publish message:', error);
 			failedCount++;
 			return null;
@@ -86,19 +87,19 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 		if (result === null) continue;
 
-		const eventProperties = { ...event_properties, topicName: installId };
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'publish-webhook-message', eventStatusFlag: 1, eventProperties });
+		const eventProperties = { ...event_properties, topic_name: installId };
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'publish-webhook-message', eventStatusFlag: 1, eventProperties });
 		console.info("[webookHandler] Sent message to pubsub for ", installId, result);
 	}
 
 	// Determine the response status code based on the number of failures
 	if (failedCount > 0) {
-		const eventProperties = { ...event_properties, response_status: 500, failedCount: failedCount};
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'publish-webhook-message-for-all-topic', eventStatusFlag: 0, eventProperties });
+		const eventProperties = { ...event_properties, response_status: 500, failed_count: failedCount};
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'publish-webhook-message-for-all-topic', eventStatusFlag: 0, eventProperties });
 		res.status(500).json({ error: `Failed to publish ${failedCount} messages to Pub/Sub` });
 	} else {
-		const eventProperties = { ...event_properties, response_status: 200, failedCount: failedCount };
-		rudderStackEvents.track("absent", "", 'bitbucket/webhook', { type: 'publish-webhook-message-for-all-topic', eventStatusFlag: 1, eventProperties });
+		const eventProperties = { ...event_properties, response_status: 200, failed_count: failedCount };
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'publish-webhook-message-for-all-topic', eventStatusFlag: 1, eventProperties });
 		res.status(200).send("Success");
 	}
 }
