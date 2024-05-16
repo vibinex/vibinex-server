@@ -1,4 +1,5 @@
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
+import { getServerSession } from "next-auth";
 import { Session } from "next-auth/core/types";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import RudderContext from "../../../components/RudderContext";
 import { getAuthUserId, getAuthUserName } from "../../../utils/auth";
 import { fetchAPI } from "../../../utils/blog/fetch-api";
 import { getAndSetAnonymousIdFromLocalStorage } from "../../../utils/rudderstack_initialize";
+import { authOptions } from "../../api/auth/[...nextauth]";
 
 
 async function fetchPostsByCategory(filter: string) {
@@ -38,7 +40,7 @@ async function fetchPostsByCategory(filter: string) {
 }
 
 type BlogCategoryProps = {
-	sessionObj: Session,
+	sessionObj: Session | null,
 }
 
 const CategoryRoute: NextPage<BlogCategoryProps> = ({ sessionObj: session }) => {
@@ -68,6 +70,20 @@ const CategoryRoute: NextPage<BlogCategoryProps> = ({ sessionObj: session }) => 
 			<PostList data={categoryData} />
 		</div>
 	);
+}
+
+export const getServerSideProps: GetServerSideProps<BlogCategoryProps> = async ({ req, res }) => {
+	res.setHeader(
+		'Cache-Control',
+		'public, s-maxage=1, stale-while-revalidate=10'
+	)
+	// check if user is logged in
+	const session = await getServerSession(req, res, authOptions);
+	return {
+		props: {
+			sessionObj: session
+		}
+	}
 }
 
 export default CategoryRoute;

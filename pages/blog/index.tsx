@@ -1,5 +1,6 @@
 "use client";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
+import { getServerSession } from "next-auth";
 import { Session } from "next-auth/core/types";
 import { useState, useEffect, useCallback, useContext } from "react";
 import Loader from "../../components/blog/Loader";
@@ -10,8 +11,13 @@ import Footer from "../../components/Footer";
 import RudderContext from "../../components/RudderContext";
 import { getAuthUserId, getAuthUserName } from "../../utils/auth";
 import { fetchAPI } from "../../utils/blog/fetch-api";
+import { updateAliasesForUser } from "../../utils/db/aliases";
+import { updateUser } from "../../utils/db/users";
+import { getEmailAliases } from "../../utils/providerAPI/getEmailAliases";
 import { getAndSetAnonymousIdFromLocalStorage } from "../../utils/rudderstack_initialize";
+import { getURLWithParams } from "../../utils/url_utils";
 import Navbar from "../../views/Navbar";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 
 interface Meta {
@@ -23,7 +29,7 @@ interface Meta {
 }
 
 type BlogProfileProps = {
-	sessionObj: Session,
+	sessionObj: Session | null,
 }
 
 const Profile: NextPage<BlogProfileProps> = ({sessionObj: session}) => {
@@ -99,6 +105,20 @@ const Profile: NextPage<BlogProfileProps> = ({sessionObj: session}) => {
 			<Footer />
 		</>
 	);
+}
+
+export const getServerSideProps: GetServerSideProps<BlogProfileProps> = async ({ req, res }) => {
+	res.setHeader(
+		'Cache-Control',
+		'public, s-maxage=1, stale-while-revalidate=10'
+	)
+	// check if user is logged in
+	const session = await getServerSession(req, res, authOptions);
+	return {
+		props: {
+			sessionObj: session
+		}
+	}
 }
 
 export default Profile;
