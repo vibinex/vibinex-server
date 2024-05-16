@@ -61,7 +61,7 @@ const PostRoute: NextPage<BlogPostProps> = ({ sessionObj: session }) => {
 			`[PostRoute] Unable to get post by slug ${router.query.slug}`, error);});
 			const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 			rudderEventMethods?.track(getAuthUserId(session), "blog-list-page", { type: "page-visit", name: getAuthUserName(session) }, anonymousId);
-	}, [rudderEventMethods, router]);
+	}, [rudderEventMethods, session, router]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
 	return (

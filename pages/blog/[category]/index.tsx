@@ -60,7 +60,7 @@ const CategoryRoute: NextPage<BlogCategoryProps> = ({ sessionObj: session }) => 
 		renderCategory(router.query.category as string);
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "blog-category-page", { type: "page-visit", name: getAuthUserName(session) }, anonymousId);
-	}, [rudderEventMethods, router]);
+	}, [rudderEventMethods, session, router]);
 
 	return (
 		<div>
