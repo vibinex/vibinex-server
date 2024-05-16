@@ -13,14 +13,14 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const userId = await getUserIdByTopicName(jsonBody.installationId).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
 		const eventProperties = { ...jsonBody.info, ...jsonBody.installationId, response_status: 500 };
-		rudderStackEvents.track("", "", 'dpu/setup', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu/setup', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
 
 	});
 	if (!userId) {
 		console.error(`[setupHandler/getUserIdByTopicName] NO userId found for topic name: ${jsonBody.installationId} from database.`);
 		res.status(404).json({ "error": "No userId found for given installationId" });
 		const eventProperties = { ...jsonBody.info, ...jsonBody.installationId, response_status: 404 };
-		rudderStackEvents.track("", "", 'dpu/setup', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu/setup', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	if (!Array.isArray(jsonBody.info)) {
