@@ -60,7 +60,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			return;
 		}
 		formattedData = formatReviewResponse(reviewDb);
-		const eventProperties = { ...event_properties, resultLength: Object.entries(formattedData.relevant).length };
+		const eventProperties = { ...event_properties, result_length: Object.entries(formattedData.relevant).length };
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_ extension_relevant-handler', {
 			type: 'relevant-prs',
 			eventStatusFlag: 1,
@@ -83,7 +83,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			req.body.pr_number,
 			user_emails);
 		formattedData = formatFileResponse(fileSet);
-		const eventProperties = { ...event_properties, resultLength: formattedData.files.length };
+		const eventProperties = { ...event_properties, result_length: formattedData.files.length };
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant_handler', {
 			type: 'relevant-file',
 			eventStatusFlag: 1,
@@ -119,7 +119,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			return;
 		}
 		formattedData = formatHunkResponse(hunkRes);
-		const eventProperties = { ...event_properties, resultLength: formattedData.hunkinfo.length };
+		const eventProperties = { ...event_properties, result_length: formattedData.hunkinfo.length };
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant_handler', {
 			type: 'relevant-hunks',
 			eventStatusFlag: 1,

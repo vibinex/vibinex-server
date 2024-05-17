@@ -29,19 +29,17 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 	const repoList: RepoIdentifier[] | null = await getUserRepositoriesByTopic(topicId, provider).catch((err) => {
 		console.error(`[reposHandler] Unable to get user repos for topic ${topicId}`);
-		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'user-repos-for-topic', eventStatusFlag: 0, eventProperties });
 		return null;
 	});
 	if (repoList == null) {
 		res.status(500).json({"error": "Unable to get user repos from db"});
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'empty-repos-list-from-db', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'get-user-repos-by-topic-from-db', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	res.status(200).json({repoList: repoList});
 	const eventProperties = { ...event_properties, response_status: 200 };
-	rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'get-user-repos', eventStatusFlag: 1, eventProperties });
+	rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'get-user-repos-by-topic-from-db', eventStatusFlag: 1, eventProperties });
 	return;
 }
 

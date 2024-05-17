@@ -23,14 +23,20 @@ const setRepoConfigHandler = async (
 	// check auth
 	const session = await getServerSession(req, res, authOptions);
 	if (!session || !session.user.id) {
+		const eventProperties = { response_status: 401 };
+        rudderStackEvents.track("absent", "", 'set-repo-config', { type: 'user-auth', eventStatusFlag: 0, eventProperties });
 		return res.status(401).json({ message: 'Unauthenticated' });
 	}
 
 	// validate request
 	if (req.method !== 'POST') {
+		const eventProperties = { response_status: 405 };
+        rudderStackEvents.track("absent", "", 'set-repo-config', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
 		return res.status(405).json({ message: 'setRepoConfig API must be called using POST method' });
 	}
 	if (!isSetRepoConfigReqBody(req.body)) {
+		const eventProperties = { response_status: 400 };
+        rudderStackEvents.track("absent", "", 'get-repo-config', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return res.status(400).json({ message: 'setRepoConfig API received invalid values for one or more of its fields' })
 	}
 
@@ -38,20 +44,20 @@ const setRepoConfigHandler = async (
 	const { repo, configType, value }: SetRepoConfigReqBody = req.body;
 	const eventProperties = {
 		...repo,
-		configType,
-		updatedValue: value
+		config_type: configType,
+		updated_value: value
 	}
 	await setRepoConfig(repo, session.user.id, configType, value)
 		.then((queryResponse) => {
 			if (queryResponse) {
-				rudderStackEvents.track(session.user.id!, "", 'settings-changed', { type: 'setting', eventStatusFlag: 1, name: getAuthUserName(session), eventProperties })
+				rudderStackEvents.track(session.user.id!, "", 'set-repo-config', { type: 'setting-changed', eventStatusFlag: 1, name: getAuthUserName(session), eventProperties })
 				res.status(200).json({ message: 'success' });
 			}
 			else
 				throw new Error('Failed to modify repository configuration');
 		})
 		.catch((err) => {
-			rudderStackEvents.track(session.user.id!, "", 'settings-changed', { type: 'setting', eventStatusFlag: 0, name: getAuthUserName(session), eventProperties })
+			rudderStackEvents.track(session.user.id!, "", 'set-repo-config', { type: 'setting-changed', eventStatusFlag: 0, name: getAuthUserName(session), eventProperties })
 			console.error(`[setRepoConfig] Failed to update config for ${repo.repo_provider}/${repo.repo_owner}/${repo.repo_name}`, err);
 			res.status(500).json({ message: 'Internal error: Could not update repository configuration.' })
 		})

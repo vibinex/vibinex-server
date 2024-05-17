@@ -28,7 +28,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	}
 	await getSetupReposFromDbForOwner(owner, provider)
 		.then((repos: string[]) => {
-			const eventProperties = { ...event_properties, response_status: 200, resultLength: repos.length };
+			const eventProperties = { ...event_properties, response_status: 200, result_length: repos.length };
 			rudderStackEvents.track(user_id, "", 'chrome-extension-setup', {
 				type: 'repos-in-org-from-db',
 				eventStatusFlag: 1,

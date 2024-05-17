@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { saveHunk, saveNewAuthorAliasesFromHunkData } from '../../utils/db/relevance';
+import rudderStackEvents from './events';
 
 interface BlameItem {
 	author: string,
@@ -32,6 +33,8 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	catch (error) {
 		console.error('[hunkHandler] Error parsing hunk json:', error);
+		const eventProperties = { hunk: hunkJson, response_status: 400 };
+		rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'parse-hunks', eventStatusFlag: 0, eventProperties });    
 		res.status(400).json({ error: 'Invalid hunk json' });
 		return;
 	}
@@ -41,14 +44,20 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			return null;
 		});
 	if (result == null) {
+		const eventProperties = { hunk: hunkJson, response_status: 500 };
+		rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'save-hunks', eventStatusFlag: 0, eventProperties });    	
 		res.status(500).json({ error: 'Failed to save hunk to db' });
 		return;
 	}
+	const eventProperties = { hunk: hunkJson, response_status: 200 };
+	rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'save-hunks', eventStatusFlag: 1, eventProperties });    	
 	res.status(200).send("Success");
 
 	// extract authors from hunkmap and save in aliases table and repos table
 	saveNewAuthorAliasesFromHunkData(hunkInfo).catch((error) => {
 		console.error('[hunkHandler] Error saving new author aliases from hunk data:', error);
+		const eventProperties = { hunk: hunkJson };
+		rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'save-author-aliases-from-hunk', eventStatusFlag: 0, eventProperties });    	
 	});
 }
 
