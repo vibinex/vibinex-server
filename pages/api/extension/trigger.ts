@@ -3,6 +3,7 @@ import { getToken } from 'next-auth/jwt';
 import { getRepoConfigByUserAndRepo } from '../../../utils/db/repos';
 import { DbUser, getUserByAlias } from '../../../utils/db/users';
 import { publishMessage } from '../../../utils/pubsub/pubsubClient';
+import rudderStackEvents from '../events';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
     // For cors prefetch options request
@@ -12,10 +13,28 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
     }
     // For normal requests
     console.info("[extension/triggeHandler] Triggering DPU for ", req.body.url);
-
     if (req.method !== 'POST') {
+        const eventProperties = { response_status: 405 };
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
         res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
         return;
+    }
+
+    const { url } = req.body;
+    if (!url) {
+        console.error("[extension/triggeHandler] Error parsing url");
+        const eventProperties = { ...req.body, response_status: 400 };
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
+        res.status(400).json({ error: 'Bad Request', message: 'url is required in the request body' });
+
+        return;
+    }
+    const { repoProvider, repoOwner, repoName, prNumber } = parseURL(req.body.url);
+    const event_properties = {
+        repo_provider: repoProvider || "",
+        repo_owner: repoOwner || "",
+        repo_name: repoName || "",
+        url: url
     }
     const user = await getToken({ req: req }).catch((err) => {
         console.error("[extension/triggeHandler] Error getting user token", err);
@@ -23,13 +42,9 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
     });
     if (!user?.email) {
         console.error("[extension/triggeHandler] Error getting user");
+        const eventProperties = { ...event_properties, response_status: 401 };
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'user-auth', eventStatusFlag: 0, eventProperties });
         res.status(401).json({ error: 'Unauthenticated', message: 'Incorrect auth token in request' });
-        return;
-    }
-    const { url } = req.body;
-    if (!url) {
-        console.error("[extension/triggeHandler] Error parsing url");
-        res.status(400).json({ error: 'Bad Request', message: 'url is required in the request body' });
         return;
     }
 
@@ -37,6 +52,8 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
         await triggerDPU(url, user.email);
     } catch (error) {
         console.error('[extension/triggeHandler] Error triggering dpu for: ' + user.id + ' and pr: ' + url, error);
+        const eventProperties = { ...event_properties, response_status: 500 };
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'trigger-dpu', eventStatusFlag: 0, eventProperties });
         res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred while triggering dpu' });
         return;
     }

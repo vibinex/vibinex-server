@@ -12,28 +12,37 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	console.info("[extension/setup] Getting setup repos info for ", req.body.owner);
 
 	if (req.method !== 'POST') {
+		const eventProperties = { response_status: 405 };
+		rudderStackEvents.track("absent", "", 'chrome-extension-setup', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
-	const { owner, provider } = req.body;
-	if (!owner || !provider) {
-		return res.status(400).json({ error: 'Bad Request', message: 'Both the arguments owner, and provider are required in the request body' });
+	const { owner, provider, user_id } = req.body;
+	const event_properties = {
+		repo_provider: provider || "",
+		repo_owner: owner || ""
+	};
+	if (!owner || !provider || !user_id) {
+		const eventProperties = { ...event_properties, response_status: 400 };
+        rudderStackEvents.track("absent", "", 'chrome-extension-setup', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
+		return res.status(400).json({ error: 'Bad Request', message: 'Invalid request body' });
 	}
 	await getSetupReposFromDbForOwner(owner, provider)
 		.then((repos: string[]) => {
-			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
-				...req.body,
-				function: 'repos_in_org',
-				resultLength: repos.length,
-				eventStatusFlag: 1
+			const eventProperties = { ...event_properties, response_status: 200, resultLength: repos.length };
+			rudderStackEvents.track(user_id, "", 'chrome-extension-setup', {
+				type: 'repos-in-org-from-db',
+				eventStatusFlag: 1,
+				eventProperties
 			});
 			res.status(200).json({ repos: repos });
 		})
 		.catch((error: Error) => {
 			console.error('[extension/setup] Error fetching repositories from database for org: ' + owner + ' and provider: ' + provider, error);
-			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
-				...req.body,
-				function: 'repos_in_org',
-				eventStatusFlag: 0
+			const eventProperties = { ...event_properties, response_status: 500 };
+			rudderStackEvents.track(user_id, "", 'chrome_extension_setup', {
+				type: 'repos-in-org-from-db',
+				eventStatusFlag: 0,
+				eventProperties
 			});
 			res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred while fetching repositories from the database' });
 		});
