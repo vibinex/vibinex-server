@@ -43,14 +43,6 @@ const ChipInput: React.FC<ChipInputProps> = ({
 	const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (DELIMITER_KEYS.includes(event.key) && inputValue.trim() !== '') {
 			event.preventDefault();
-			// check if the new value is a duplicate
-			const isDuplicate = values.some((chipData) => chipData.text === inputValue.trim());
-			if (isDuplicate) {
-				console.warn('Duplicate values are not allowed');
-				setInputValue('');
-				return;
-			}
-
 			const newChipData: ChipData = {
 				text: inputValue.trim(),
 				avatar: getAvatarFromValue(inputValue.trim()),
