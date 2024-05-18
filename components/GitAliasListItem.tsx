@@ -7,6 +7,7 @@ import type { AliasMap, HandleMap } from '../types/AliasMap';
 import type { RepoProvider } from '../utils/providerAPI';
 import Button from './Button';
 import Chip from './Chip';
+import ChipInput, { ChipData } from './ChipInput';
 import { getProviderLogoSrc } from './ProviderLogo';
 
 const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasMap, setProviderMap: (providerMap: AliasMap) => void }) => {
@@ -14,15 +15,6 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 	const [inputHandleMap, setInputHandleMap] = useState<HandleMap[]>(providerMap.handleMaps);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = useState<string>("");
-
-	const handleInputChange = (provider: RepoProvider, value: string) => {
-		const handlesList = value.split(",").map(handle => handle.trim());
-		const updatedHandleInputValues = inputHandleMap.map(handleInputValue => {
-			if (handleInputValue.provider !== provider) return handleInputValue;
-			return { ...handleInputValue, handles: handlesList };
-		});
-		setInputHandleMap(updatedHandleInputValues);
-	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -56,13 +48,28 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 		}
 	};
 
-	const handleAbort = (e: React.KeyboardEvent<HTMLInputElement|HTMLButtonElement>) => {
-		if (e.key === 'Escape') {
-			e.preventDefault();
-			setEditMode(false);
-			setErrorMsg("");
-		}
-	}
+	const abort = () => {
+		setEditMode(false);
+		setErrorMsg("");
+	};
+
+	const handleAdd = (provider: RepoProvider) => (chipData: ChipData) => {
+		// Get current value and split into array 
+		const updatedHandleInputValues = inputHandleMap.map(handleInputValue => {
+			if (handleInputValue.provider !== provider) return handleInputValue;
+			return { ...handleInputValue, handles: [...handleInputValue.handles, chipData.text] };
+		});
+		setInputHandleMap(updatedHandleInputValues);
+	};
+
+	const handleRemove = (provider: RepoProvider) => (chipData: ChipData) => {
+		// remove the last value from the handles list
+		const updatedHandleInputValues = inputHandleMap.map(handleInputValue => {
+			if (handleInputValue.provider !== provider) return handleInputValue;
+			return { ...handleInputValue, handles: handleInputValue.handles.filter((handle) => handle !== chipData.text) };
+		});
+		setInputHandleMap(updatedHandleInputValues);
+	};
 
 	return (
 		<div key={providerMap.alias} className="flex border-b border-gray-300 last-of-type:border-0 w-full p-4 flex-wrap items-center">
@@ -71,25 +78,26 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 				<form
 					onSubmit={handleSubmit}
 					className="grow flex flex-wrap items-end gap-2 justify-end"
+					onKeyDown={(e) => e.key === 'Escape' && abort()}
 				>
 					{providerMap.handleMaps.map(handleMap => (
 						<div key={handleMap.provider} className='grow relative mt-2'>
-							<input
-								id={`${handleMap.provider}-handles`}
-								type="text"
-								value={inputHandleMap.find(inputValue => inputValue.provider === handleMap.provider)?.handles.join(',') ?? ''}
+							<ChipInput
+								onAdd={handleAdd(handleMap.provider)}
+								onRemove={handleRemove(handleMap.provider)}
+								defaultValues={inputHandleMap.find(inputValue => inputValue.provider === handleMap.provider)?.handles.map(handle => (
+									{ text: handle, avatar: getProviderLogoSrc(handleMap.provider, "dark") }
+								))}
 								placeholder={`${handleMap.provider} handles`}
-								onChange={(e) => handleInputChange(handleMap.provider, e.target.value)}
-								onKeyDown={handleAbort}
+								getAvatarFromValue={(_) => getProviderLogoSrc(handleMap.provider, "dark")}
 								disabled={loading}
-								className="w-full"
 							/>
 							<label htmlFor={`${handleMap.provider}-handles`} className="absolute -top-2 left-2 text-xs px-1 bg-popover">
 								{handleMap.provider.charAt(0).toUpperCase() + handleMap.provider.slice(1) + " handles"}
 							</label>
 						</div>
 					))}
-					<Button variant="contained" type="submit" className='grow-0 !p-2' disabled={loading} onKeyDown={handleAbort}>
+					<Button title='Save' variant="contained" type="submit" className='grow-0 !p-2 my-auto' disabled={loading}>
 						<MdDone className="w-7 h-7 hover:text-primary-text" />
 					</Button>
 				</form>
@@ -99,7 +107,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 						<Chip key={handle} name={handle} avatar={getProviderLogoSrc(handleMap.provider, "dark")} disabled={false} className="h-fit" />
 					)))
 				}
-				<Button variant="text" onClick={() => setEditMode(true)}>
+				<Button title='Edit' variant="text" onClick={() => setEditMode(true)}>
 					<MdEdit className="w-6 h-6 hover:text-primary-text" />
 				</Button>
 			</>)}
