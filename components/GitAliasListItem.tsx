@@ -73,6 +73,13 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 		// remove the last value from the handles list
 		const updatedHandleInputValues = inputHandleMap.map(handleInputValue => {
 			if (handleInputValue.provider !== provider) return handleInputValue;
+			
+			// check if the value doesn't exist
+			const isValueInHandles = handleInputValue.handles.some(handle => handle === chipData.text);
+			if (!isValueInHandles) {
+				console.warn('Value does not exist in handles list');
+				return handleInputValue;
+			}
 			return { ...handleInputValue, handles: handleInputValue.handles.filter((handle) => handle !== chipData.text) };
 		});
 		setInputHandleMap(updatedHandleInputValues);
