@@ -1,8 +1,8 @@
 "use client";
 
 import Image from 'next/image';
-import Button from './Button';
 import { RxCross1 } from "react-icons/rx";
+import Button from './Button';
 
 interface ChipProps {
 	avatar: string;
@@ -24,7 +24,7 @@ const Chip: React.FC<ChipProps> = ({ name, avatar, disabled = false, disabledTex
 			width={24} height={24} className="h-6 rounded-full"
 		/>
 		<span className="text-md">{name}</span>
-		{ onDelete && (<Button variant='text' onClick={onDelete} className='!p-0'>
+		{!disabled && onDelete && (<Button variant='text' onClick={onDelete} aria-label={`Delete ${name}`} className='!p-0'>
 			<RxCross1 className='hover:text-red-600 cursor-pointer' />
 		</Button>)}
 	</div>
