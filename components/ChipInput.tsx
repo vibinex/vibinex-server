@@ -72,12 +72,13 @@ const ChipInput: React.FC<ChipInputProps> = ({
 		setValues(values.filter((value) => value.text !== chipData.text));
 	};
 
-	const handleInputFocus = () => {
+	const handleInputFocus = (e: React.MouseEvent) => {
+		e.preventDefault();
 		inputRef.current?.focus();
 	};
 
 	return (
-		<div
+		<button
 			className={`flex items-center gap-0 border border-gray-300 rounded-md p-2 focus-within:outline focus-within:outline-2 focus-within:outline-blue-500 ${className}`}
 			onClick={handleInputFocus}
 		>
@@ -99,7 +100,7 @@ const ChipInput: React.FC<ChipInputProps> = ({
 				disabled={disabled}
 				className="outline-none flex-grow border-none focus:ring-0 px-1"
 			/>
-		</div>
+		</button>
 	);
 };
 
