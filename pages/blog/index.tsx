@@ -1,23 +1,14 @@
 "use client";
-import { GetServerSideProps, NextPage } from "next";
-import { getServerSession } from "next-auth";
-import { Session } from "next-auth/core/types";
-import { useState, useEffect, useCallback, useContext } from "react";
+import { NextPage } from "next";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Loader from "../../components/blog/Loader";
 import PageHeader from "../../components/blog/PageHeader";
 import PostList, { Article } from "../../components/blog/PostList";
 import Button from "../../components/Button";
 import Footer from "../../components/Footer";
 import RudderContext from "../../components/RudderContext";
-import { getAuthUserId, getAuthUserName } from "../../utils/auth";
 import { fetchAPI } from "../../utils/blog/fetch-api";
-import { updateAliasesForUser } from "../../utils/db/aliases";
-import { updateUser } from "../../utils/db/users";
-import { getEmailAliases } from "../../utils/providerAPI/getEmailAliases";
-import { getAndSetAnonymousIdFromLocalStorage } from "../../utils/rudderstack_initialize";
-import { getURLWithParams } from "../../utils/url_utils";
 import Navbar from "../../views/Navbar";
-import { authOptions } from "../api/auth/[...nextauth]";
 
 
 interface Meta {
@@ -28,11 +19,7 @@ interface Meta {
 	};
 }
 
-type BlogProfileProps = {
-	sessionObj: Session | null,
-}
-
-const Profile: NextPage<BlogProfileProps> = ({sessionObj: session}) => {
+const Profile: NextPage = () => {
 	const [meta, setMeta] = useState<Meta | undefined>();
 	const [data, setData] = useState<Article[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -79,9 +66,8 @@ const Profile: NextPage<BlogProfileProps> = ({sessionObj: session}) => {
 
 	useEffect(() => {
 		fetchData(0, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
-		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(getAuthUserId(session), "blog-list-page", { type: "page-visit", name: getAuthUserName(session) }, anonymousId);
-	}, [rudderEventMethods, session, fetchData]);
+		rudderEventMethods?.page("page-visit", "blog-list-page", { });
+	}, [rudderEventMethods, fetchData]);
 
 	if (isLoading) return <Loader />;
 
@@ -105,20 +91,6 @@ const Profile: NextPage<BlogProfileProps> = ({sessionObj: session}) => {
 			<Footer />
 		</>
 	);
-}
-
-export const getServerSideProps: GetServerSideProps<BlogProfileProps> = async ({ req, res }) => {
-	res.setHeader(
-		'Cache-Control',
-		'public, s-maxage=1, stale-while-revalidate=10'
-	)
-	// check if user is logged in
-	const session = await getServerSession(req, res, authOptions);
-	return {
-		props: {
-			sessionObj: session
-		}
-	}
 }
 
 export default Profile;

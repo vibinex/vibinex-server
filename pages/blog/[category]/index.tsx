@@ -1,15 +1,11 @@
-import { GetServerSideProps, NextPage } from "next";
-import { getServerSession } from "next-auth";
-import { Session } from "next-auth/core/types";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import PageHeader from "../../../components/blog/PageHeader";
 import PostList, { Article } from "../../../components/blog/PostList";
 import RudderContext from "../../../components/RudderContext";
-import { getAuthUserId, getAuthUserName } from "../../../utils/auth";
 import { fetchAPI } from "../../../utils/blog/fetch-api";
 import { getAndSetAnonymousIdFromLocalStorage } from "../../../utils/rudderstack_initialize";
-import { authOptions } from "../../api/auth/[...nextauth]";
 
 
 async function fetchPostsByCategory(filter: string) {
@@ -39,11 +35,7 @@ async function fetchPostsByCategory(filter: string) {
 	}
 }
 
-type BlogCategoryProps = {
-	sessionObj: Session | null,
-}
-
-const CategoryRoute: NextPage<BlogCategoryProps> = ({ sessionObj: session }) => {
+const CategoryRoute: NextPage = () => {
 	const [categoryName, setCategoryName] = useState<string>("");
 	const [categoryDescription, setCategoryDescription] = useState<string>("");
 	const [categoryData, setCategoryData] = useState<Article[]>([]);
@@ -59,10 +51,10 @@ const CategoryRoute: NextPage<BlogCategoryProps> = ({ sessionObj: session }) => 
 			setCategoryName(catName);
 			setCategoryDescription(catDesc);
 		}
-		renderCategory(router.query.category as string);
-		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(getAuthUserId(session), "blog-category-page", { type: "page-visit", name: getAuthUserName(session) }, anonymousId);
-	}, [rudderEventMethods, session, router]);
+		const category = router.query.category as string 
+		renderCategory(category);
+		rudderEventMethods?.page("page-visit", "blog-category-page", { category: category });
+	}, [rudderEventMethods, router]);
 
 	return (
 		<div>
@@ -70,20 +62,6 @@ const CategoryRoute: NextPage<BlogCategoryProps> = ({ sessionObj: session }) => 
 			<PostList data={categoryData} />
 		</div>
 	);
-}
-
-export const getServerSideProps: GetServerSideProps<BlogCategoryProps> = async ({ req, res }) => {
-	res.setHeader(
-		'Cache-Control',
-		'public, s-maxage=1, stale-while-revalidate=10'
-	)
-	// check if user is logged in
-	const session = await getServerSession(req, res, authOptions);
-	return {
-		props: {
-			sessionObj: session
-		}
-	}
 }
 
 export default CategoryRoute;

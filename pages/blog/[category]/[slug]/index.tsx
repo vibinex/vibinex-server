@@ -1,16 +1,11 @@
-import type { GetServerSideProps, Metadata, NextPage } from 'next';
-import { getServerSession } from 'next-auth';
-import { Session } from 'next-auth/core/types';
+import type { Metadata, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import Post, { Article } from '../../../../components/blog/Post';
 import Footer from '../../../../components/Footer';
 import RudderContext from '../../../../components/RudderContext';
-import { getAuthUserId, getAuthUserName } from '../../../../utils/auth';
 import { fetchAPI } from '../../../../utils/blog/fetch-api';
-import { getAndSetAnonymousIdFromLocalStorage } from '../../../../utils/rudderstack_initialize';
 import Navbar from '../../../../views/Navbar';
-import { authOptions } from '../../../api/auth/[...nextauth]';
 
 async function getPostBySlug(slug: string) {
 	const path = `/articles`;
@@ -47,23 +42,19 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 	};
 }
 
-type BlogPostProps = {
-	sessionObj: Session | null,
-}
-
-const PostRoute: NextPage<BlogPostProps> = ({ sessionObj: session }) => {
+const PostRoute: NextPage = () => {
 	const [articleInfo, setArticleInfo] = useState<Article>();
 	const router = useRouter();
 	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
 		// TODO: check that router.query.slug is a string
-		getPostBySlug(router.query.slug as string).then((data) => {
+		const slug = router.query.slug as string;
+		getPostBySlug(slug).then((data) => {
 			setArticleInfo(data.data[0]);
 		}).catch((error) => { console.error(
-			`[PostRoute] Unable to get post by slug ${router.query.slug}`, error);});
-		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
-		rudderEventMethods?.track(getAuthUserId(session), "blog-list-page", { type: "page-visit", name: getAuthUserName(session) }, anonymousId);
-	}, [rudderEventMethods, session, router]);
+			`[PostRoute] Unable to get post by slug ${slug}`, error);});
+		rudderEventMethods?.page("page-visit", "blog-main-page", {slug: slug});
+	}, [rudderEventMethods, router]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
 	return (
@@ -96,20 +87,6 @@ export async function generateStaticParams() {
 	} catch (error) {
 		console.error(`[generateStaticParams] Failed to get articles`, error);
 		return null;
-	}
-}
-
-export const getServerSideProps: GetServerSideProps<BlogPostProps> = async ({ req, res }) => {
-	res.setHeader(
-		'Cache-Control',
-		'public, s-maxage=1, stale-while-revalidate=10'
-	)
-	// check if user is logged in
-	const session = await getServerSession(req, res, authOptions);
-	return {
-		props: {
-			sessionObj: session
-		}
 	}
 }
 
