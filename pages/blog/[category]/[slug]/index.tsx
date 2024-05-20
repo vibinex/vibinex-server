@@ -5,6 +5,7 @@ import Post, { Article } from '../../../../components/blog/Post';
 import Footer from '../../../../components/Footer';
 import RudderContext from '../../../../components/RudderContext';
 import { fetchAPI } from '../../../../utils/blog/fetch-api';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../../../utils/rudderstack_initialize';
 import Navbar from '../../../../views/Navbar';
 
 async function getPostBySlug(slug: string) {
@@ -53,7 +54,9 @@ const PostRoute: NextPage = () => {
 			setArticleInfo(data.data[0]);
 		}).catch((error) => { console.error(
 			`[PostRoute] Unable to get post by slug ${slug}`, error);});
-		rudderEventMethods?.page("page-visit", "blog-main-page", {slug: slug});
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+		rudderEventMethods?.track("absent", "page-visit",
+			{ type: "blog-main-page", slug: slug}, anonymousId);
 	}, [rudderEventMethods, router]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;

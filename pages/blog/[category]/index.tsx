@@ -53,7 +53,9 @@ const CategoryRoute: NextPage = () => {
 		}
 		const category = router.query.category as string 
 		renderCategory(category);
-		rudderEventMethods?.page("page-visit", "blog-category-page", { category: category });
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+		rudderEventMethods?.track("absent", "page-visit",
+			{ type: "blog-category-page", category: category }, anonymousId);
 	}, [rudderEventMethods, router]);
 
 	return (

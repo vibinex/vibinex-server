@@ -8,6 +8,7 @@ import Button from "../../components/Button";
 import Footer from "../../components/Footer";
 import RudderContext from "../../components/RudderContext";
 import { fetchAPI } from "../../utils/blog/fetch-api";
+import { getAndSetAnonymousIdFromLocalStorage } from "../../utils/rudderstack_initialize";
 import Navbar from "../../views/Navbar";
 
 
@@ -66,7 +67,8 @@ const Profile: NextPage = () => {
 
 	useEffect(() => {
 		fetchData(0, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
-		rudderEventMethods?.page("page-visit", "blog-list-page", { });
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+		rudderEventMethods?.track("absent", "page-visit", { type: "blog-list-page"}, anonymousId);
 	}, [rudderEventMethods, fetchData]);
 
 	if (isLoading) return <Loader />;
