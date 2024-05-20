@@ -46,7 +46,7 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	
 	// extract authors from hunkmap and save in aliases table and repos table
-	saveNewAuthorAliasesFromHunkData(hunkInfo).catch((error) => {
+	await saveNewAuthorAliasesFromHunkData(hunkInfo).catch((error) => {
 		console.error('[hunkHandler] Error saving new author aliases from hunk data:', error);
 	});
 	
