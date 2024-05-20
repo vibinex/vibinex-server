@@ -92,10 +92,10 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
 					<AccordionContent className="flex items-center gap-2">
 						{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
-							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} disabled={isAuthInfoExpired(githubAuthInfo)} />
+							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} disabled={isAuthInfoExpired(githubAuthInfo)} disabledText='This auth has expired' />
 						))}
 						{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
-							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} disabled={isAuthInfoExpired(bitbucketAuthInfo)} />
+							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} disabled={isAuthInfoExpired(bitbucketAuthInfo)} disabledText='This auth has expired' />
 						))}
 						<Button variant="contained" href="/api/auth/signin" className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
 					</AccordionContent>
