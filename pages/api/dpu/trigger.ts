@@ -30,21 +30,19 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			console.error("[triggerHandler] Missing GitHub Personal Access Token");
 			res.status(400).json({ "error": "Missing GitHub Personal Access Token" });
 			const eventProperties = { ...event_properties, response_status: 400 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'github-pat', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 	}
 
 	const userData: DbUser | null = await getUserById(jsonBody.userId).catch(err => {
 		console.error(`[triggerHandler] error in getting user data`, err);
-		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'user-data-for-id', eventStatusFlag: 0, eventProperties });		
 		return null;
 	});
 	if (!userData) {
 		res.status(500).json({ "error": "Internal server error" });
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'user-data-for-id', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	if (userData.topic_name !== null && userData.topic_name !== undefined) {
@@ -52,26 +50,22 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	} else {
 		const generatedTopic = await createTopicName(jsonBody.userId).catch(err => {
 			console.error(`[triggerHandler] error in creating topic name`, err);
-			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'generate-topic', eventStatusFlag: 0, eventProperties });	
 			return;
 		});
 		if (!generatedTopic) {
 			res.status(500).json({ "error": "Internal server error" });
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'generate-topic', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		const gcloudTopic = await createTopicNameInGcloud(generatedTopic).catch(err => {
 			console.error(`[triggerHandler] error in creating topic in google cloud`, err);
-			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'create-topic-in-gcloud', eventStatusFlag: 0, eventProperties });	
 			return;
 		})
 		if (!gcloudTopic) {
 			res.status(500).json({ "error": "Internal server error" });
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'create-topic-in-gcloud', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		topicName = generatedTopic;
@@ -81,7 +75,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			console.error("[triggerHandler] Unable to save topic name in db, ", error);
 			res.status(500).json({ "error": "Internal server error" });
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'save-topic-in-db', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 	}
@@ -92,8 +86,6 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
 		buildStatus = await triggerCloudPatBuildUsingGcloudApi(jsonBody.userId, topicName, jsonBody.github_pat, jsonBody.selectedProvider).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
-			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'run-pat-trigger', eventStatusFlag: 0, eventProperties });	
 			return { success: false, message: 'Unable to trigger build using GCloud API' };
 		});
 		console.info("[triggerHandler] build status: ", buildStatus);
@@ -101,8 +93,6 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	} else if (jsonBody.selectedInstallationType === 'project' && jsonBody.selectedHosting === 'cloud') {
 		buildStatus = await triggerCloudProjectBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
-			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'run-cloud-trigger', eventStatusFlag: 0, eventProperties });	
 			return { success: false, message: 'Unable to trigger build using GCloud API' };
 		});
 		console.info("[triggerHandler] build status: ", buildStatus);
@@ -117,7 +107,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error('[triggerHandler] Error triggering build:', buildStatus.message);
 		res.status(500).json({ "error": buildStatus.message, success: false });
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'build-status', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return
 	}
 	const projectId: string | undefined = process.env.PROJECT_ID;
@@ -126,7 +116,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error('[triggerHandler] Environment variables for projectId and location must be set');
 		res.status(400).json({ "error": "env variables must be set", success: false });
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'env-vars-for-trigger', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const buildId = buildStatus.buildDetails?.id;
@@ -134,25 +124,23 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error('[triggerHandler] No build ID found in buildDetails');
 		res.status(500).json({ error: 'No build ID found', success: false });
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'build-id', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const finalBuildStatus = await pollBuildStatus(projectId, location, buildId).catch(err => {
 		console.error(`[triggerHandler] error in polling build status`, err);
-		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'build-status-poll', eventStatusFlag: 0, eventProperties });
 		return 'ERROR';
 	});
 	if (finalBuildStatus === 'SUCCESS') {
 		res.status(200).json({ message: 'Build completed successfully', success: true });
 		const eventProperties = { ...event_properties, response_status: 200 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'build-status', eventStatusFlag: 1, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 		return;
 	} else {
 		console.error(`[triggerHandler] Build failed with status: ${finalBuildStatus}`);
 		res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'build-status', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 }

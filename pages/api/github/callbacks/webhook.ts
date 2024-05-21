@@ -28,7 +28,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// Verify the event type
 	if (event_type !== "pull_request" && event_type !== "pull_request_review") {
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'event-type', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'invalid-event-header', eventStatusFlag: 0, eventProperties });
 		res.status(400).json({ error: 'Invalid event header' });
 		return;
 	}

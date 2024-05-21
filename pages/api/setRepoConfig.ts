@@ -50,14 +50,14 @@ const setRepoConfigHandler = async (
 	await setRepoConfig(repo, session.user.id, configType, value)
 		.then((queryResponse) => {
 			if (queryResponse) {
-				rudderStackEvents.track(session.user.id!, "", 'set-repo-config', { type: 'setting-changed', eventStatusFlag: 1, name: getAuthUserName(session), eventProperties })
+				rudderStackEvents.track(session.user.id || "absent", "", 'set-repo-config', { type: 'setting-changed', eventStatusFlag: 1, name: getAuthUserName(session), eventProperties })
 				res.status(200).json({ message: 'success' });
 			}
 			else
 				throw new Error('Failed to modify repository configuration');
 		})
 		.catch((err) => {
-			rudderStackEvents.track(session.user.id!, "", 'set-repo-config', { type: 'setting-changed', eventStatusFlag: 0, name: getAuthUserName(session), eventProperties })
+			rudderStackEvents.track(session.user.id || "absent" , "", 'set-repo-config', { type: 'setting-changed', eventStatusFlag: 0, name: getAuthUserName(session), eventProperties })
 			console.error(`[setRepoConfig] Failed to update config for ${repo.repo_provider}/${repo.repo_owner}/${repo.repo_name}`, err);
 			res.status(500).json({ message: 'Internal error: Could not update repository configuration.' })
 		})

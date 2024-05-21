@@ -31,7 +31,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		!("user_id" in req.body)) {
 			const eventProperties = { ...event_properties, response_status: 401 };
 			rudderStackEvents.track("absent", "", 'chrome_extension_relevant-handler', {
-				type: 'relevant-prs',
+				type: 'HTTP-401',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -52,7 +52,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		if (!reviewDb) {
 			const eventProperties = { ...event_properties, response_status: 500 };
 			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant-handler', {
-				type: 'relevant-prs',
+				type: 'HTTP-500',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -70,7 +70,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		if (!("pr_number" in req.body)) {
 			const eventProperties = { ...event_properties, response_status: 400 };
 			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant_handler', {
-				type: 'relevant-file',
+				type: 'HTTP-400',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -93,7 +93,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		if (!("pr_number" in req.body)) {
 			const eventProperties = { ...event_properties, response_status: 400 };
 			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant_handler', {
-				type: 'relevant-hunk',
+				type: 'HTTP-400',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -111,7 +111,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		if (!hunkRes) {
 			const eventProperties = { ...event_properties, response_status: 500 };
 			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant_handler', {
-				type: 'relevant-hunk',
+				type: 'HTTP-500',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -126,6 +126,12 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			eventProperties
 		});
 	}
+	const eventProperties = { ...event_properties, response_status: 200 };
+	rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant_handler', {	
+		type: 'HTTP-200',
+		eventStatusFlag: 1,
+		eventProperties
+	});
 	res.status(200).json(formattedData);
 }
 

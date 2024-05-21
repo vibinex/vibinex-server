@@ -26,7 +26,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
 		console.error(`[pubsubHandler] cannot get userData`);
 		res.status(500).json({ "error": "Internal server error" });
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'user-data-for-id', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	if (!userData.topic_name) {
@@ -35,7 +35,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
 			console.error(`[pubsubHandler] error in creating topic name`);
 			res.status(500).json({ "error": "Internal server error" });
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'generate-topic', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		const gcloudTopic = await createTopicNameInGcloud(generatedTopic)
@@ -43,7 +43,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
 			console.error(`[pubsubHandler] error in creating topic in google cloud`);
 			res.status(500).json({ "error": "Internal server error" });
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'create-topic-in-gcloud', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'create-topic-in-gcloud', eventStatusFlag: 1, event_properties });
@@ -66,7 +66,7 @@ const pubsubHandler = async (req: NextApiRequest, res: NextApiResponse) => { // 
 	res.status(200).json({ "installId": topicName });
 	
 	const eventProperties = { ...event_properties, topicName, response_status: 200 };
-	rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'create-topic', eventStatusFlag: 1, eventProperties });
+	rudderStackEvents.track(jsonBody.userId, "", 'dpu-pubsub', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 	return;
 }
 

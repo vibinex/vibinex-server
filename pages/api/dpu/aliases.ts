@@ -42,13 +42,13 @@ const aliasesPostHandler = async (req: NextApiRequest, res: NextApiResponse) => 
     ).then(() => {
         console.info("[aliasesPostHandler] Aliases saved to DB successfully");
         const eventProperties = { ...event_properties, response_status: 200 };
-		rudderStackEvents.track("absent", "", 'dpu-post-aliases', { type: 'save-aliases-in-db', eventStatusFlag: 1, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-post-aliases', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
         res.status(200).send("OK");
         return;
     }).catch((error) => {
         console.error("[aliasesPostHandler] Unable to save aliases to DB, error: ", error);
         const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track("absent", "", 'dpu-post-aliases', { type: 'save-aliases-in-db', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-post-aliases', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
         res.status(500).json({ "error": "Unable to save aliases to DB" });
         return;
     });
@@ -65,7 +65,7 @@ const aliasesGetHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!repo_name || !repo_owner || !repo_provider) {
         console.error("[aliasesGetHandler] Missing query parameters");
         const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'dpu-get-aliases', { type: 'invalid-query-params', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-get-aliases', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
         res.status(400).json({ "error": "Missing query parameters" });
         return;
     }
@@ -76,14 +76,14 @@ const aliasesGetHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     ).then((aliases) => {
         console.info("[aliasesGetHandler] Aliases retrieved successfully");
         const eventProperties = { ...event_properties, response_status: 200 };
-		rudderStackEvents.track("absent", "", 'dpu-get-aliases', { type: 'get-aliases-from-db', eventStatusFlag: 1, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-get-aliases', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
         res.status(200).json({ aliases });
         return;
     })
     .catch((error) => {
         console.error("[aliasesGetHandler] Unable to retrieve aliases from DB, error: ", error);
         const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track("absent", "", 'dpu-get-aliases', { type: 'get-aliases-from-db', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-get-aliases', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
         res.status(500).json({ "error": "Unable to retrieve aliases from DB" });
         return;
     });

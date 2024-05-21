@@ -28,15 +28,13 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// get user_id for the given install_id
 	const userId = await getUserIdByTopicName(jsonBody.installationId).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
-		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track("absent", "", 'dpu-setup', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
 
 	});
 	if (!userId) {
 		console.error(`[setupHandler/getUserIdByTopicName] NO userId found for topic name: ${jsonBody.installationId} from database.`);
 		res.status(404).json({ "error": "No userId found for given installationId" });
 		const eventProperties = { ...event_properties, response_status: 404 };
-		rudderStackEvents.track("absent", "", 'dpu-setup', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-setup', { type: 'HTTP-404', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 
@@ -46,7 +44,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error(`[setupHandler] Unable to remove previous installations for ${jsonBody.installationId}`, err);
 		res.status(500).json({ "error": "Internal Server Error" });
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'remove-previous-installations', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const allSetupReposPromises = [];
@@ -63,14 +61,14 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			console.error(`[setupHandler] Unable to remove previous repo configurations for ${jsonBody.installationId}`, err);
 			res.status(500).json({ "error": "Internal Server Error" });
 			const eventProperties = { ...event_properties, response_status: 500, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
-			rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'remove-repo-config', eventStatusFlag: 0, eventProperties });
+			rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 			return;
 		}
 		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
 				const eventProperties = { ...event_properties, response_status: 500, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
-				rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'save-setup-repos-in-db', eventStatusFlag: 0, eventProperties });	
+				rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });	
 			});
 		allSetupReposPromises.push(saveSetupReposPromises);
 	}
@@ -80,17 +78,17 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			const res = await publishMessage(jsonBody.installationId, jsonBody.info, "PATSetup");
 			console.info(`[setupHandler] Published msg to ${jsonBody.installationId}`, res);
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'publish-message', eventStatusFlag: 1, eventProperties });
+			rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 1, eventProperties });
 		}
 		res.status(200).send("Ok");
 		const eventProperties = { ...event_properties, response_status: 200 };
-		rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'setup-repos', eventStatusFlag: 1, eventProperties })
+		rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties })
 		return;
 	}).catch((error) => {
 		console.error("[setupHandler] Unable to save all setup info in db, error: ", error);
 		res.status(500).json({ "error": "Unable to save setup info" });
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'setup-repos', eventStatusFlag: 0, eventProperties })
+		rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties })
 		return;
 	});
 }

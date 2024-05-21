@@ -15,7 +15,7 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
     console.info("[extension/triggeHandler] Triggering DPU for ", req.body.url);
     if (req.method !== 'POST') {
         const eventProperties = { response_status: 405 };
-        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
         res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
         return;
     }
@@ -26,7 +26,6 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
         const eventProperties = { ...req.body, response_status: 400 };
         rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
         res.status(400).json({ error: 'Bad Request', message: 'url is required in the request body' });
-
         return;
     }
     const { repoProvider, repoOwner, repoName, prNumber } = parseURL(req.body.url);
@@ -43,7 +42,7 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
     if (!user?.email) {
         console.error("[extension/triggeHandler] Error getting user");
         const eventProperties = { ...event_properties, response_status: 401 };
-        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'user-auth', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
         res.status(401).json({ error: 'Unauthenticated', message: 'Incorrect auth token in request' });
         return;
     }
@@ -53,10 +52,12 @@ export default async function triggeHandler(req: NextApiRequest, res: NextApiRes
     } catch (error) {
         console.error('[extension/triggeHandler] Error triggering dpu for: ' + user.id + ' and pr: ' + url, error);
         const eventProperties = { ...event_properties, response_status: 500 };
-        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'trigger-dpu', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
         res.status(500).json({ error: 'Internal Server Error', message: 'An error occurred while triggering dpu' });
         return;
     }
+    const eventProperties = { ...event_properties, response_status: 200 };
+    rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
     res.status(200).json({ message: "DPU triggered!" });
 }
 async function triggerDPU(url: string, userEmail: string) {

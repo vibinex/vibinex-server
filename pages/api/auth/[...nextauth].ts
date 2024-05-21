@@ -73,9 +73,10 @@ export const authOptions = {
 
 				// signup event
 				account && getUserByProvider(account.provider, account.providerAccountId).then(dbUserFromDb => {
-					rudderStackEvents.track(dbUserFromDb.id ?? "", uuidv4(), "signup", { ...dbUserFromDb, eventStatusFlag: 1 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.
+					rudderStackEvents.track(dbUserFromDb.id ?? "absent", uuidv4(), "auth", {type: "signup", ...dbUserFromDb, eventStatusFlag: 1 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.
 				}).catch(err => {
 					console.error("[signup] Rudderstack event failed: Could not get user id", dbUser, err);
+					rudderStackEvents.track("absent", uuidv4(), "auth", {type: "signup", eventStatusFlag: 0 });
 				});
 				// email send
 				if (user?.name && user?.email) { sendSignupEmail(user.email, user.name); }
@@ -86,8 +87,9 @@ export const authOptions = {
 				const updateObj: DbUser = createUserUpdateObj(user, account, profile, dbUser);
 				await updateUser(dbUser.id!, updateObj).catch(err => {
 					console.error("[signIn] Count not update user in database", err);
+					rudderStackEvents.track("absent", uuidv4(), "auth", {type: "login", ...updateObj, newAuth: !existingAuth, eventtStatusFlag: 1 });
 				})
-				rudderStackEvents.track(dbUser.id!.toString(), uuidv4(), "login", { ...updateObj, newAuth: !existingAuth });
+				rudderStackEvents.track(dbUser.id!.toString(), uuidv4(), "auth", {type: "login", ...updateObj, newAuth: !existingAuth, eventtStatusFlag: 0 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.;
 			}
 			return true;
 		},

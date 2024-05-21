@@ -24,7 +24,7 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const userId = await getUserIdByTopicName(topicId as string).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track("absent", "", 'dpu-repos', { type: 'user-data-for-topic', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'dpu-repos', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return "";
 	});
 	const repoList: RepoIdentifier[] | null = await getUserRepositoriesByTopic(topicId, provider).catch((err) => {
@@ -34,12 +34,12 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (repoList == null) {
 		res.status(500).json({"error": "Unable to get user repos from db"});
 		const eventProperties = { ...event_properties, response_status: 500 };
-		rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'get-user-repos-by-topic-from-db', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	res.status(200).json({repoList: repoList});
-	const eventProperties = { ...event_properties, response_status: 200 };
-	rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'get-user-repos-by-topic-from-db', eventStatusFlag: 1, eventProperties });
+	const eventProperties = { ...event_properties, resultLength: repoList.length, response_status: 200 };
+	rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 	return;
 }
 

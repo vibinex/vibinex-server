@@ -13,7 +13,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 
 	if (req.method !== 'POST') {
 		const eventProperties = { response_status: 405 };
-		rudderStackEvents.track("absent", "", 'chrome-extension-setup', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'chrome-extension-setup', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
 	const { owner, provider, user_id } = req.body;
@@ -30,7 +30,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 		.then((repos: string[]) => {
 			const eventProperties = { ...event_properties, response_status: 200, result_length: repos.length };
 			rudderStackEvents.track(user_id, "", 'chrome-extension-setup', {
-				type: 'repos-in-org-from-db',
+				type: 'HTTP-200',
 				eventStatusFlag: 1,
 				eventProperties
 			});
@@ -40,7 +40,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 			console.error('[extension/setup] Error fetching repositories from database for org: ' + owner + ' and provider: ' + provider, error);
 			const eventProperties = { ...event_properties, response_status: 500 };
 			rudderStackEvents.track(user_id, "", 'chrome_extension_setup', {
-				type: 'repos-in-org-from-db',
+				type: 'HTTP-500',
 				eventStatusFlag: 0,
 				eventProperties
 			});

@@ -10,21 +10,21 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const session = await getServerSession(req, res, authOptions);
 	if (!session) {
         const eventProperties = { response_status: 401 };
-        rudderStackEvents.track("absent", "", 'alias-handler', { type: 'user-auth', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
 		return res.status(401).json({ message: 'Unauthenticated' });
 	}
     if (method === 'GET') {
         const userId = session.user.id;
         if (!userId) {
             const eventProperties = { response_status: 500 };
-            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'user-id', eventStatusFlag: 0, eventProperties });    
+            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
             res.status(500).json({error: "No user id in session"});
             return;
         }
         // check if query object has the expanded element and if it does, then check if it is true or false
         if (query?.expanded && query?.expanded !== "true" && query?.expanded !== "false") {
             const eventProperties = { ...query, response_status: 400 };
-            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'invalid-query-params', eventStatusFlag: 0, eventProperties });    
+            rudderStackEvents.track(userId, "", 'alias-handler', { type: '400', eventStatusFlag: 0, eventProperties });    
             res.status(400).json({ error: "Invalid parameters in query: `expanded` must be true or false." });
             return;
         }
@@ -32,11 +32,11 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         await getGitEmailAliases(userId, expanded)
         .then((aliasProviderMap) => {
             const eventProperties = { ...query, response_status: 200 };
-            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'get-git-email-aliases', eventStatusFlag: 1, eventProperties });    
+            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });    
             res.status(200).json({ aliasProviderMap });
         }).catch((error) => {
             const eventProperties = { ...query, response_status: 500 };
-            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'get-git-email-aliases', eventStatusFlag: 0, eventProperties });    
+            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
             res.status(500).json({error: error});
         });
     } else if (method === 'POST') {
@@ -44,15 +44,17 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         await saveGitAliasMap(aliasHandleMap)
         .then(() => {
             const eventProperties = { response_status: 200 };
-            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'save-git-email-aliases', eventStatusFlag: 1, eventProperties });    
+            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });    
             res.status(200).send('Git alias map saved successfully.');
         }).catch((error) => {
             console.error(`[aliasHandler] Error saving Git alias map: ${error}`);
             const eventProperties = { response_status: 500 };
-            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'save-git-email-aliases', eventStatusFlag: 0, eventProperties });    
+            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
             res.status(500).json({error: error});
         });
     } else {
+        const eventProperties = { ...query, response_status: 405 };
+        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
         res.status(405).send('Method Not Allowed');
     }
 }
