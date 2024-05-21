@@ -1,9 +1,11 @@
 import type { Metadata, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Post, { Article } from '../../../../components/blog/Post';
 import Footer from '../../../../components/Footer';
+import RudderContext from '../../../../components/RudderContext';
 import { fetchAPI } from '../../../../utils/blog/fetch-api';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../../../utils/rudderstack_initialize';
 import Navbar from '../../../../views/Navbar';
 
 async function getPostBySlug(slug: string) {
@@ -44,13 +46,18 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 const PostRoute: NextPage = () => {
 	const [articleInfo, setArticleInfo] = useState<Article>();
 	const router = useRouter();
+	const { rudderEventMethods } = useContext(RudderContext);
 	useEffect(() => {
 		// TODO: check that router.query.slug is a string
-		getPostBySlug(router.query.slug as string).then((data) => {
+		const slug = router.query.slug as string;
+		getPostBySlug(slug).then((data) => {
 			setArticleInfo(data.data[0]);
 		}).catch((error) => { console.error(
-			`[PostRoute] Unable to get post by slug ${router.query.slug}`, error);});
-	}, [router]);
+			`[PostRoute] Unable to get post by slug ${slug}`, error);});
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+		rudderEventMethods?.track("absent", "page-visit",
+			{ type: "blog-article-page", category: router.query.category as string, slug: slug}, anonymousId);
+	}, [rudderEventMethods, router]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
 	return (

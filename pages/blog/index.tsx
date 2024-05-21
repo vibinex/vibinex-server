@@ -1,12 +1,14 @@
 "use client";
 import { NextPage } from "next";
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Loader from "../../components/blog/Loader";
 import PageHeader from "../../components/blog/PageHeader";
 import PostList, { Article } from "../../components/blog/PostList";
 import Button from "../../components/Button";
 import Footer from "../../components/Footer";
+import RudderContext from "../../components/RudderContext";
 import { fetchAPI } from "../../utils/blog/fetch-api";
+import { getAndSetAnonymousIdFromLocalStorage } from "../../utils/rudderstack_initialize";
 import Navbar from "../../views/Navbar";
 
 
@@ -17,10 +19,12 @@ interface Meta {
 		total: number;
 	};
 }
+
 const Profile: NextPage = () => {
 	const [meta, setMeta] = useState<Meta | undefined>();
 	const [data, setData] = useState<Article[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const { rudderEventMethods } = useContext(RudderContext);
 
 	const fetchData = useCallback(async (start: number, limit: number) => {
 		setIsLoading(true);
@@ -63,7 +67,9 @@ const Profile: NextPage = () => {
 
 	useEffect(() => {
 		fetchData(0, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
-	}, [fetchData]);
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+		rudderEventMethods?.track("absent", "page-visit", { type: "blog-list-page"}, anonymousId);
+	}, [rudderEventMethods, fetchData]);
 
 	if (isLoading) return <Loader />;
 

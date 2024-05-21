@@ -1,9 +1,11 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import PageHeader from "../../../components/blog/PageHeader";
 import PostList, { Article } from "../../../components/blog/PostList";
+import RudderContext from "../../../components/RudderContext";
 import { fetchAPI } from "../../../utils/blog/fetch-api";
+import { getAndSetAnonymousIdFromLocalStorage } from "../../../utils/rudderstack_initialize";
 
 
 async function fetchPostsByCategory(filter: string) {
@@ -38,6 +40,7 @@ const CategoryRoute: NextPage = () => {
 	const [categoryDescription, setCategoryDescription] = useState<string>("");
 	const [categoryData, setCategoryData] = useState<Article[]>([]);
 	const router = useRouter();
+	const { rudderEventMethods } = useContext(RudderContext);
 
 	useEffect(() => {
 		async function renderCategory(category: string) {
@@ -48,8 +51,12 @@ const CategoryRoute: NextPage = () => {
 			setCategoryName(catName);
 			setCategoryDescription(catDesc);
 		}
-		renderCategory(router.query.category as string);
-	}, [router]);
+		const category = router.query.category as string 
+		renderCategory(category);
+		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
+		rudderEventMethods?.track("absent", "page-visit",
+			{ type: "blog-category-page", category: category }, anonymousId);
+	}, [rudderEventMethods, router]);
 
 	return (
 		<div>

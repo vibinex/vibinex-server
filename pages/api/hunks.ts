@@ -54,7 +54,7 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	res.status(200).send("Success");
 
 	// extract authors from hunkmap and save in aliases table and repos table
-	saveNewAuthorAliasesFromHunkData(hunkInfo).catch((error) => {
+	await saveNewAuthorAliasesFromHunkData(hunkInfo).catch((error) => {
 		console.error('[hunkHandler] Error saving new author aliases from hunk data:', error);
 		const eventProperties = { hunk: hunkJson };
 		rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'save-author-aliases-from-hunk', eventStatusFlag: 0, eventProperties });    	
