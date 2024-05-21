@@ -45,7 +45,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 			console.error("Error fetching Git email aliases:", error);
 			toast({
 				description: error?.message ?? 'Failed to fetch Git email aliases',
-				variant: "destructive",
+				variant: "error",
 			});
 		}).finally(() => {
 			setLoading(false);
