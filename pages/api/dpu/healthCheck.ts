@@ -27,7 +27,7 @@ async function getHealthCheckStatus(req: NextApiRequest, res: NextApiResponse) {
 
 async function updateHealthCheckStatus(req: NextApiRequest, res: NextApiResponse) {
 	if (req.body?.topicId) {
-		setDpuHealthCheckStatusOnline(req.body.topic_id as string, true);
+		setDpuHealthCheckStatusOnline(req.body.topicId as string, true);
 	} else { res.status(400).json({ "error": "Invalid request body" }); }
 }
 
