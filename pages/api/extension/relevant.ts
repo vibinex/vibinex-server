@@ -30,7 +30,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		!("repo_name" in req.body) ||
 		!("user_id" in req.body)) {
 			const eventProperties = { ...event_properties, response_status: 401 };
-			rudderStackEvents.track("absent", "", 'chrome_extension_relevant-handler', {
+			rudderStackEvents.track("absent", "", 'chrome-extension-relevant-handler', {
 				type: 'HTTP-401',
 				eventStatusFlag: 0,
 				eventProperties
@@ -51,7 +51,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 		if (!reviewDb) {
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_relevant-handler', {
+			rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
 				type: 'HTTP-500',
 				eventStatusFlag: 0,
 				eventProperties
@@ -61,7 +61,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		}
 		formattedData = formatReviewResponse(reviewDb);
 		const eventProperties = { ...event_properties, result_length: Object.entries(formattedData.relevant).length };
-		rudderStackEvents.track(req.body.user_id, "", 'chrome_ extension_relevant-handler', {
+		rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
 			type: 'relevant-prs',
 			eventStatusFlag: 1,
 			eventProperties
