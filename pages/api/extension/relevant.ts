@@ -30,7 +30,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		!("repo_name" in req.body) ||
 		!("user_id" in req.body)) {
 			const eventProperties = { ...event_properties, response_status: 401 };
-			rudderStackEvents.track("absent", "", 'chrome-extension-relevant-handler', {
+			rudderStackEvents.track("absent", "", 'chrome_extension_event', {
 				type: 'HTTP-401',
 				eventStatusFlag: 0,
 				eventProperties
@@ -51,8 +51,9 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 		if (!reviewDb) {
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
+			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 				type: 'HTTP-500',
+				function: 'relevant_prs',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -61,7 +62,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		}
 		formattedData = formatReviewResponse(reviewDb);
 		const eventProperties = { ...event_properties, result_length: Object.entries(formattedData.relevant).length };
-		rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
+		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 			type: 'relevant-prs',
 			eventStatusFlag: 1,
 			eventProperties
@@ -69,8 +70,9 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	} else if (type === 'file') {
 		if (!("pr_number" in req.body)) {
 			const eventProperties = { ...event_properties, response_status: 400 };
-			rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
+			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 				type: 'HTTP-400',
+				function: 'relevant_prs',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -84,16 +86,18 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			user_emails);
 		formattedData = formatFileResponse(fileSet);
 		const eventProperties = { ...event_properties, result_length: formattedData.files.length };
-		rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
+		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 			type: 'relevant-file',
+			function: 'relevant_file',
 			eventStatusFlag: 1,
 			eventProperties
 		});
 	} else if (type === 'hunk') {
 		if (!("pr_number" in req.body)) {
 			const eventProperties = { ...event_properties, response_status: 400 };
-			rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
+			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 				type: 'HTTP-400',
+				function: 'relevant_hunks',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -110,8 +114,9 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 		if (!hunkRes) {
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
+			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 				type: 'HTTP-500',
+				function: 'relevant_hunks',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -120,14 +125,15 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		}
 		formattedData = formatHunkResponse(hunkRes);
 		const eventProperties = { ...event_properties, result_length: formattedData.hunkinfo.length };
-		rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {
+		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 			type: 'relevant-hunks',
+			function: 'relevant_hunks',
 			eventStatusFlag: 1,
 			eventProperties
 		});
 	}
 	const eventProperties = { ...event_properties, response_status: 200 };
-	rudderStackEvents.track(req.body.user_id, "", 'chrome-extension-relevant-handler', {	
+	rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {	
 		type: 'HTTP-200',
 		eventStatusFlag: 1,
 		eventProperties

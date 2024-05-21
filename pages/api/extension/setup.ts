@@ -23,14 +23,15 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	};
 	if (!owner || !provider || !user_id) {
 		const eventProperties = { ...event_properties, response_status: 400 };
-        rudderStackEvents.track("absent", "", 'chrome-extension-setup', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track("absent", "", 'chrome_extension_event', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return res.status(400).json({ error: 'Bad Request', message: 'Invalid request body' });
 	}
 	await getSetupReposFromDbForOwner(owner, provider)
 		.then((repos: string[]) => {
 			const eventProperties = { ...event_properties, response_status: 200, result_length: repos.length };
-			rudderStackEvents.track(user_id, "", 'chrome-extension-setup', {
+			rudderStackEvents.track(user_id, "", 'chrome_extension_event', {
 				type: 'HTTP-200',
+				function: 'repos_in_org',
 				eventStatusFlag: 1,
 				eventProperties
 			});
@@ -39,8 +40,9 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 		.catch((error: Error) => {
 			console.error('[extension/setup] Error fetching repositories from database for org: ' + owner + ' and provider: ' + provider, error);
 			const eventProperties = { ...event_properties, response_status: 500 };
-			rudderStackEvents.track(user_id, "", 'chrome_extension_setup', {
+			rudderStackEvents.track(user_id, "", 'chrome_extension_event', {
 				type: 'HTTP-500',
+				function: 'repos_in_org',
 				eventStatusFlag: 0,
 				eventProperties
 			});
