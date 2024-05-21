@@ -6,7 +6,7 @@ const client = (process.env.NODE_ENV === 'development') ? {
 	track: (event_properties: object) => console.info("[mock-rs] track", event_properties)
 } : new Analytics(process.env.RUDDERSTACK_SERVER_WRITE_KEY!, { dataPlaneUrl: process.env.RUDDERSTACK_SERVER_DATA_PLANE_URL });
 
-const asyncWrapper = (fn: Function, ...args: any[]) => {
+const asyncWrapper = (fn: (...args: any[]) => void, ...args: any[]): Promise<void> => {
     return new Promise<void>((resolve) => {
         setImmediate(() => {
             fn(...args);
