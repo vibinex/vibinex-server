@@ -8,6 +8,8 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
+				background: "hsl(var(--background))",
+				foreground: "hsl(var(--foreground))",
 				primary: {
 					light: '#ffffff',
 					main: '#2196F3',
@@ -30,7 +32,8 @@ module.exports = {
 					DEFAULT: "#11BB00",
 				},
 				error: {
-					DEFAULT: "#BB1100",
+					DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
+					foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
 					dark: "#FF5252",
 				},
 				muted: {
@@ -72,4 +75,4 @@ module.exports = {
 	plugins: [
 		require('@tailwindcss/forms'),
 	],
-}
+};
