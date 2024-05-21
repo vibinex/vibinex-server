@@ -18,7 +18,7 @@ export const dpuHealthCheckStatus = async (topicId: string): Promise<boolean> =>
 }
 
 export const setDpuHealthCheckStatus = async (topicId: string, status: boolean) => {
-	console.debug(`[setDpuHealthCheckStatusOnline] Setting health check status for topic ${topicId} to true`);
+	console.debug(`[setDpuHealthCheckStatusOnline] Setting health check status for topic ${topicId} to ${status}`);
 	const query = `UPDATE dpu
 		SET online = $1
 		WHERE dpu.topic_id = $2;
