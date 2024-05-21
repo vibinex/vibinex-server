@@ -25,7 +25,7 @@ export const setDpuHealthCheckStatus = async (topicId: string, status: boolean) 
 	`;
 	const result = await conn.query(query, [status, topicId]).catch(err => {
 		console.error(
-			`[dpuHealthCheckStatus] Could not set health check to true for ${topicId}`, { pg_query: query }, err);
+			`[setDpuHealthCheckStatusOnline] Could not set health check to true for ${topicId}`, { pg_query: query }, err);
 		throw new Error("Error in setting health check to true from database" + err.message);
 	});
 }
