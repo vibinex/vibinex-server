@@ -24,7 +24,7 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         // check if query object has the expanded element and if it does, then check if it is true or false
         if (query?.expanded && query?.expanded !== "true" && query?.expanded !== "false") {
             const eventProperties = { ...query, response_status: 400 };
-            rudderStackEvents.track(userId, "", 'alias-handler', { type: '400', eventStatusFlag: 0, eventProperties });    
+            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });    
             res.status(400).json({ error: "Invalid parameters in query: `expanded` must be true or false." });
             return;
         }
