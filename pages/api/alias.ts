@@ -13,14 +13,15 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
 		return res.status(401).json({ message: 'Unauthenticated' });
 	}
+    const userId = session.user.id;
+    if (!userId) {
+        const eventProperties = { response_status: 500 };
+        rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
+        res.status(500).json({error: "No user id in session"});
+        return;
+    }
+
     if (method === 'GET') {
-        const userId = session.user.id;
-        if (!userId) {
-            const eventProperties = { response_status: 500 };
-            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
-            res.status(500).json({error: "No user id in session"});
-            return;
-        }
         // check if query object has the expanded element and if it does, then check if it is true or false
         if (query?.expanded && query?.expanded !== "true" && query?.expanded !== "false") {
             const eventProperties = { ...query, response_status: 400 };
@@ -44,17 +45,17 @@ const aliasHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         await saveGitAliasMap(aliasHandleMap)
         .then(() => {
             const eventProperties = { response_status: 200 };
-            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });    
+            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });    
             res.status(200).send('Git alias map saved successfully.');
         }).catch((error) => {
             console.error(`[aliasHandler] Error saving Git alias map: ${error}`);
             const eventProperties = { response_status: 500 };
-            rudderStackEvents.track("absent", "", 'alias-handler', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
+            rudderStackEvents.track(userId, "", 'alias-handler', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
             res.status(500).json({error: error});
         });
     } else {
         const eventProperties = { ...query, response_status: 405 };
-        rudderStackEvents.track("absent", "", 'chrome-extension-trigger', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track(userId, "", 'chrome-extension-trigger', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
         res.status(405).send('Method Not Allowed');
     }
 }
