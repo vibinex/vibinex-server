@@ -89,7 +89,7 @@ export const authOptions = {
 					console.error("[signIn] Count not update user in database", err);
 					rudderStackEvents.track("absent", uuidv4(), "auth", {type: "login", ...updateObj, newAuth: !existingAuth, eventtStatusFlag: 1 });
 				})
-				rudderStackEvents.track(dbUser.id!.toString(), uuidv4(), "auth", {type: "login", ...updateObj, newAuth: !existingAuth, eventtStatusFlag: 0 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.;
+				rudderStackEvents.track(dbUser.id!.toString(), uuidv4(), "auth", {type: "login", ...updateObj, newAuth: !existingAuth, eventStatusFlag: 0 }); //TODO: Get the anonymoudId from the client session so that the random generated anonymoudId doesn't create noise.;
 			}
 			return true;
 		},
