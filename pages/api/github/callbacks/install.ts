@@ -45,7 +45,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!req.query.installation_id) {
 		console.error('[github/installHandler] Installation code not provided for topic: ', topicName);
 		res.status(400).send(constructHtml("Bad Request: GitHub did not send a valid installation ID", "error"));
-		const eventProperties = { ...event_properties, response_status: 400}
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 400}
 		rudderStackEvents.track(userId, "", 'github-app-install-callback', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
@@ -62,13 +62,13 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			return null;
 		});
 	if (result == null) {
-		const eventProperties = { ...event_properties, response_status: 500}
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 500}
 		rudderStackEvents.track(userId, "", 'github-app-install-callback', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		res.status(500).send(constructHtml("Internal Server Error", "error"));
 		return;
 	}
 
-	const eventProperties = { ...event_properties, response_status: 200}
+	const eventProperties = { ...event_properties, topic_name: topicName, response_status: 200}
 	rudderStackEvents.track(userId, "", 'github-app-install-callback', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 	res.write(
 		`<script>

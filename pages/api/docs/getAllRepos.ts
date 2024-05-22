@@ -22,11 +22,11 @@ const getUserRepositoriesHandler = async (req: NextApiRequest, res: NextApiRespo
 		return res.status(500).json({ error: 'Error getting repositories' });
 	}
 	if (repoList.length == 0) {
-		const eventProperties = { response_status: 204, resultLength: repoList.length };
+		const eventProperties = { response_status: 204, result_length: repoList.length };
 		rudderStackEvents.track(session.user.id || "absent", "", 'docs-user-repos-handler', { type: 'HTTP-204', eventStatusFlag: 1, eventProperties });    
 		return res.status(204).json({ error: 'No repositories found' });
 	}
-	const eventProperties = { response_status: 200, resultLength: repoList.length };
+	const eventProperties = { response_status: 200, result_length: repoList.length };
 	rudderStackEvents.track(session.user.id || "absent", "", 'docs-user-repos-handler', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });    
 	return res.status(200).json({ repoList: repoList });
 }

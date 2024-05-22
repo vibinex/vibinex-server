@@ -7,7 +7,7 @@ import rudderStackEvents from '../../events';
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method !== 'POST') {
 		const eventProperties = { response_status: 405 };
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
 		res.status(405).json({ error: 'Method Not Allowed' });
 		return;
 	}
@@ -28,7 +28,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// Verify the event type
 	if (event_type !== "pull_request" && event_type !== "pull_request_review") {
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'invalid-event-header', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		res.status(400).json({ error: 'Invalid event header' });
 		return;
 	}
@@ -39,7 +39,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!topicName) {
 		console.error('Topic name not found in db');
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'get-topic-from-db', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		res.status(400).json({ error: 'Bad Request' });
 		return;
 	}
@@ -55,7 +55,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 	if (!repoConfig) {
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'get-repo-config', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		res.status(400).json({ error: 'Unable to get repoConfig from db' });
 		return;
 	}
@@ -95,11 +95,11 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// Determine the response status code based on the number of failures
 	if (failedCount > 0) {
 		const eventProperties = { ...event_properties, response_status: 500, failed_count: failedCount};
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'publish-webhook-message-for-all-topic', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		res.status(500).json({ error: `Failed to publish ${failedCount} messages to Pub/Sub` });
 	} else {
 		const eventProperties = { ...event_properties, response_status: 200, failed_count: failedCount };
-		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'publish-webhook-message-for-all-topic', eventStatusFlag: 1, eventProperties });
+		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 		res.status(200).send("Success");
 	}
 }

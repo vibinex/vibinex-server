@@ -8,8 +8,8 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const { topicId, provider } = req.query;
 	
 	const event_properties = {
-		topic_name: topicId as string,
-		repo_provider: provider as string,
+		topic_name: topicId || "",
+		repo_provider: provider || "",
 	};
 
 	if (!topicId || !provider 
@@ -38,7 +38,7 @@ const reposHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 	res.status(200).json({repoList: repoList});
-	const eventProperties = { ...event_properties, resultLength: repoList.length, response_status: 200 };
+	const eventProperties = { ...event_properties, result_length: repoList.length, response_status: 200 };
 	rudderStackEvents.track(userId, "", 'dpu-repos', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 	return;
 }

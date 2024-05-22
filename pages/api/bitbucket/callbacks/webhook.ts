@@ -7,7 +7,7 @@ import rudderStackEvents from '../../events';
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method !== 'POST') {
 		const eventProperties = { response_status: 405 };
-		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'api-call-method', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
 		res.status(405).json({ error: 'Method Not Allowed' });
 		return;
 	}
@@ -28,7 +28,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	// Verify the event type
 	if (eventHeader !== 'pullrequest:approved' && eventHeader !== 'pullrequest:created' && eventHeader !== 'pullrequest:updated') {
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'invalid-event-header', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'bitbucket-webhook', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		res.status(400).json({ error: 'Invalid event header' });
 		return;
 	}

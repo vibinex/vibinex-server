@@ -74,7 +74,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		} catch (error) {
 			console.error("[triggerHandler] Unable to save topic name in db, ", error);
 			res.status(500).json({ "error": "Internal server error" });
-			const eventProperties = { ...event_properties, response_status: 500 };
+			const eventProperties = { ...event_properties, topic_name: topicName, response_status: 500 };
 			rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 			return;
 		}
@@ -99,14 +99,14 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	} else {
 		console.error('[triggerHandler] Invalid provider, installation type, or hosting combination');
 		res.status(400).json({ "error": "Invalid provider, installation type, or hosting combination", success: false });
-		const eventProperties = { ...event_properties, response_status: 400 };
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 400 };
 		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	if (!buildStatus.success) {
 		console.error('[triggerHandler] Error triggering build:', buildStatus.message);
 		res.status(500).json({ "error": buildStatus.message, success: false });
-		const eventProperties = { ...event_properties, response_status: 500 };
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 500 };
 		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return
 	}
@@ -115,7 +115,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!projectId || !location) {
 		console.error('[triggerHandler] Environment variables for projectId and location must be set');
 		res.status(400).json({ "error": "env variables must be set", success: false });
-		const eventProperties = { ...event_properties, response_status: 400 };
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 400 };
 		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
@@ -123,7 +123,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!buildId) {
 		console.error('[triggerHandler] No build ID found in buildDetails');
 		res.status(500).json({ error: 'No build ID found', success: false });
-		const eventProperties = { ...event_properties, response_status: 500 };
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 500 };
 		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
@@ -133,13 +133,13 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	});
 	if (finalBuildStatus === 'SUCCESS') {
 		res.status(200).json({ message: 'Build completed successfully', success: true });
-		const eventProperties = { ...event_properties, response_status: 200 };
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 200 };
 		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 		return;
 	} else {
 		console.error(`[triggerHandler] Build failed with status: ${finalBuildStatus}`);
 		res.status(500).json({ error: `Build failed with status: ${finalBuildStatus}`, success: false });
-		const eventProperties = { ...event_properties, response_status: 500 };
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 500 };
 		rudderStackEvents.track(jsonBody.userId, "", 'dpu-trigger', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}

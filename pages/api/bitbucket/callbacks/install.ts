@@ -45,7 +45,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (!req.query.code) {
 		console.error(`[bitbucket/installHandler] Installation code not provided for topic: ${topicName}`);
 		res.status(400).send(constructHtml("Bad Request: Bitbucket did not send a valid auth code", "error"));
-		const eventProperties = { ...event_properties, response_status: 400}
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 400}
 		rudderStackEvents.track(userId, "", 'bitbucket-app-install-callback', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
@@ -63,12 +63,12 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		});
 	if (result == null) {
 		res.status(500).send(constructHtml("Internal Server Error", "error"));
-		const eventProperties = { ...event_properties, response_status: 500}
+		const eventProperties = { ...event_properties, topic_name: topicName, response_status: 500}
 		rudderStackEvents.track(userId, "", 'bitbucket-app-install-callback', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 
-	const eventProperties = { ...event_properties, response_status: 200}
+	const eventProperties = { ...event_properties, topic_name: topicName, response_status: 200}
 	rudderStackEvents.track(userId, "", 'bitbucket-app-install-callback', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 	res.write(
 		`<script>

@@ -20,7 +20,7 @@ const getInstalledReposForUser = async (req: NextApiRequest, res: NextApiRespons
 
 	const { topicId, provider } = query;
 	const event_properties = {
-		topicName: topicId || "",
+		topic_name: topicId || "",
 		repo_provider: provider || ""
 	}
 	// data validation
@@ -41,7 +41,7 @@ const getInstalledReposForUser = async (req: NextApiRequest, res: NextApiRespons
 		rudderStackEvents.track("absent", "", 'docs-installed-repos-for-user', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return res.status(500).json({ error: 'Failed to get repos for topicId' });
 	});
-	const eventProperties = { ...event_properties, resultLength: userReposFromDb?.length, response_status: 200 };
+	const eventProperties = { ...event_properties, result_length: userReposFromDb?.length, response_status: 200 };
 	rudderStackEvents.track("absent", "", 'docs-installed-repos-for-user', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
 	return res.status(200).json({ repoList: userReposFromDb });
 }

@@ -60,7 +60,7 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'save-author-aliases-from-hunk', eventStatusFlag: 0, eventProperties });    	
 	});
 	const eventProperties = { hunk: hunkJson, response_status: 200 };
-	rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'save-hunks', eventStatusFlag: 1, eventProperties });  
+	rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });  
 	res.status(200).send("Success");
 }
 
