@@ -31,12 +31,12 @@ const setRepoConfigHandler = async (
 	// validate request
 	if (req.method !== 'POST') {
 		const eventProperties = { response_status: 405 };
-        rudderStackEvents.track("absent", "", 'set-repo-config', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track(session.user.id, "", 'set-repo-config', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
 		return res.status(405).json({ message: 'setRepoConfig API must be called using POST method' });
 	}
 	if (!isSetRepoConfigReqBody(req.body)) {
 		const eventProperties = { response_status: 400 };
-        rudderStackEvents.track("absent", "", 'set-repo-config', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track(session.user.id, "", 'set-repo-config', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return res.status(400).json({ message: 'setRepoConfig API received invalid values for one or more of its fields' })
 	}
 
