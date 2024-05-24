@@ -13,10 +13,10 @@ const data = [
 const TrustUs = () => {
 	return (
 		<div id='trust' className='w-full text-center py-12 bg-primary'>
-			<h2 className='font-bold text-[2rem]'>Stay calm and get <span className='text-[2rem] text-primary-main font-bold'>Vibinex</span></h2>
+			<h2 className='font-bold text-[2rem]'>Stay calm and get <span className='text-[2rem] text-secondary font-bold'>Vibinex</span></h2>
 			<div className='md:w-2/3 w-[90%] mt-3 p-4 flex flex-col md:flex-row md:justify-center items-center gap-8 mx-auto'>
 				{data.map((item) => (
-					<div key={item.heading} className="flex flex-row md:flex-col md:p-5 p-3 rounded-lg border-2 md:mt-7 m-auto border-primary-main w-full md:w-1/3 md:h-96 md:gap-4">
+					<div key={item.heading} className="flex flex-row md:flex-col md:p-5 p-3 rounded-lg border-2 md:mt-7 m-auto border-secondary w-full md:w-1/3 md:h-96 md:gap-4">
 						<div className='w-10 md:w-3/4 xl:w-1/2 md:mx-auto'>
 							<IconContext.Provider value={{ size: '100%', className: 'm-auto' }}>
 								{item.icon}

@@ -26,7 +26,7 @@ export default function MainAppBar() {
 					url='https://calendly.com/avikalp-gupta/30min'
 					text='Book Demo'
 					rootElement={rootElement}
-					className='mr-4 px-2 py-1 rounded-lg text-sm text-primary-main font-semibold'
+					className='mr-4 px-2 py-1 rounded-lg text-sm text-secondary font-semibold'
 				/> : null}
 			<LoginLogout />
 		</AppBar>

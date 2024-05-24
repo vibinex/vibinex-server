@@ -6,7 +6,7 @@ import MainAppBar from "../views/MainAppBar";
 import RepoList from '../views/RepoList';
 
 const ExpandedGitAliasFormPage: React.FC = () => {
-	const tabTriggerClassNames = "py-2 h-11 flex-1 flex grow-0 ps-4 items-center justify-start text-sm leading-none select-none rounded-s-md hover:bg-primary/50 data-[state=active]:text-primary-main data-[state=active]:font-medium data-[state=active]:bg-primary outline-none cursor-default";
+	const tabTriggerClassNames = "py-2 h-11 flex-1 flex grow-0 ps-4 items-center justify-start text-sm leading-none select-none rounded-s-md hover:bg-primary/50 data-[state=active]:text-secondary data-[state=active]:font-medium data-[state=active]:bg-primary outline-none cursor-default";
 	const tabContentClassNames = "grow px-5 bg-background rounded-r-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black";
 	return <>
 		<MainAppBar />

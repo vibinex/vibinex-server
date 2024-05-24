@@ -36,7 +36,7 @@ const FeatureList = [
 const Features = () => {
 	return (
 		<div id='features' className='w-full text-center py-12 bg-primary'>
-			<h2 className='font-bold text-[2rem]'>Vibinex  <span className='text-[2rem] text-primary-main font-bold'>Features</span></h2>
+			<h2 className='font-bold text-[2rem]'>Vibinex  <span className='text-[2rem] text-secondary font-bold'>Features</span></h2>
 			<div className='w-full lg:w-4/5 m-auto'>
 				<Carousel opts={{ loop: true }} plugins={[Autoplay({ playOnInit: true, delay: 3000 })]} controls='dots'>
 					{FeatureList.map((item) => (

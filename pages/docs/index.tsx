@@ -131,7 +131,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 							<AccordionContent>
 								{isGetInstallIdLoading ? (
 									<>
-										<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
+										<div className='inline-block border-4 border-t-secondary rounded-full w-6 h-6 animate-spin mx-2'></div>
 										Generating topic name...
 									</>
 								) : installId ? (

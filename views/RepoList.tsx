@@ -51,7 +51,7 @@ const RepoList = () => {
 
 	if (loading) {
 		return (
-			<div className='border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin'> </div>
+			<div className='border-4 border-t-secondary rounded-full w-6 h-6 animate-spin'> </div>
 		);
 	}
 	if (repoList.length === 0) {
@@ -87,7 +87,7 @@ const RepoList = () => {
 							<TableCell className="text-center"><ProviderLogo provider={repoProvider} theme={theme} className="mx-auto" /></TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => setConfig(repo_id, 'auto_assign', !config.auto_assign)} disabled={configLoading} /></TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => setConfig(repo_id, 'comment', !config.comment)} disabled={configLoading} /></TableCell>
-							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repoAddr}`}>Link</Link></TableCell>
+							<TableCell className="text-secondary"><Link href={`/repo?repo_name=${repoAddr}`}>Link</Link></TableCell>
 						</tr>
 					)
 				}
