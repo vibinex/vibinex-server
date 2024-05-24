@@ -47,8 +47,8 @@ const CarouselControls = ({ controls, autoMovementPlugins }: { controls?: 'none'
 						key={scrollSnap}
 						variant="text"
 						onClick={() => onAnyButtonClick(() => onDotButtonClick(index))}
-						className={'bg-transparent touch-manipulation inline-flex flex-col cursor-pointer border-0 p-0 m-0 w-10 h-10 items-center justify-center rounded-full after:border after:border-solid after:border-primary-text after:w-4 after:h-4 after:rounded-full after:flex after:items-center'.concat(
-							index === selectedIndex ? ' after:bg-primary-text' : ''
+						className={'bg-transparent touch-manipulation inline-flex flex-col cursor-pointer border-0 p-0 m-0 w-10 h-10 items-center justify-center rounded-full after:border after:border-solid after:border-muted-foreground after:w-4 after:h-4 after:rounded-full after:flex after:items-center'.concat(
+							index === selectedIndex ? ' after:bg-muted-foreground' : ''
 						)}
 					></CarouselDot>
 				))}

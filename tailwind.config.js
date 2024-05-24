@@ -20,9 +20,6 @@ module.exports = {
 					DEFAULT: "hsl(var(--background-shade))",
 					foreground: "hsl(var(--foreground-shade))",
 					light: '#ffffff',
-					dark: '#1e1e1f',
-					text: '#9E9E9E',
-					darktext: '#000000'
 				},
 				secondary: {
 					DEFAULT: '#2196F3',
