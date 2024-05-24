@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import Select from '../components/Select';
 import { Theme } from '../utils/theme';
 
-const AppearanceSettings: React.FC = () => {
-	const [theme, setTheme] = useState<Theme>(localStorage.getItem('preferredTheme') as Theme || 'system');
+type ThemeOptions = Theme | 'system';
 
-	const handleThemeChange = (newTheme: Theme) => {
+const AppearanceSettings: React.FC = () => {
+	const [theme, setTheme] = useState<ThemeOptions>(localStorage.getItem('preferredTheme') as ThemeOptions || 'system');
+
+	const handleThemeChange = (newTheme: ThemeOptions) => {
 		setTheme(newTheme);
 		localStorage.setItem('preferredTheme', newTheme);
 
 		window.location.reload();
 	};
 
-	const options: { value: Theme, label: string }[] = [
+	const options: { value: ThemeOptions, label: string }[] = [
 		{ value: 'system', label: 'System default' },
 		{ value: 'dark', label: 'Dark mode' },
 		{ value: 'light', label: 'Light mode' },

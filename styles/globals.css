@@ -8,8 +8,10 @@
 		color: hsl(222.2, 47.4%, 11.2%);
 
 		--background: 0 0% 100%;
-		--background-shade: 220 14% 96%;
 		--foreground: 222.2 47.4% 11.2%;
+
+		--background-shade: 220 14% 96%;
+		--foreground-shade: 240 2% 0%;
 
 		--muted: 210 40% 96.1%;
 		--muted-foreground: 215.4 16.3% 46.9%;
@@ -49,8 +51,10 @@
 		color: hsl(213, 31%, 91%);
 
 		--background: 240 0 0%;
-		--background-shade: 240 2% 12%;
 		--foreground: 213 31% 91%;
+
+		--background-shade: 240 2% 12%;
+		--foreground-shade: 240 12% 100%;
 
 		--muted: 223 47% 11%;
 		--muted-foreground: 215.4 16.3% 56.9%;

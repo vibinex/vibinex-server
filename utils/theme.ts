@@ -1,12 +1,17 @@
 import { useEffect } from 'react';
 
-export type Theme = 'dark' | 'light' | 'system';
+export type Theme = 'dark' | 'light';
 const DEFAULT_THEME: Theme = 'light';
 
-export const getPreferredTheme = () => {
+export const getPreferredTheme = () : Theme => {
 	const preferredTheme = localStorage.getItem('preferredTheme') || 'system';
 	if (preferredTheme !== 'system') {
-		return preferredTheme;
+		// check if the preferredTheme is a valid value
+		if (preferredTheme !== 'dark' && preferredTheme !== 'light') {
+			console.error('[getPreferredTheme] Invalid theme: ' + preferredTheme);
+			return DEFAULT_THEME;
+		}
+		return preferredTheme as Theme;
 	}
 	
 	if (window.matchMedia) {
@@ -16,7 +21,7 @@ export const getPreferredTheme = () => {
 			return 'light';
 		}
 	}
-	
+
 	// If the media query is not supported or the user has no preference, return default theme
 	return DEFAULT_THEME;
 }
@@ -35,7 +40,7 @@ export const applyTheme = () => {
 			root.classList.add('light');
 			break;
 		default:
-			console.error('Invalid theme: ' + preferredTheme);
+			console.error('[applyTheme] Invalid theme: ' + preferredTheme);
 			break;
 	}
 };
