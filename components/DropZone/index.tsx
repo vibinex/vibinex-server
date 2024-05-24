@@ -79,7 +79,7 @@ export default function DropZone({ data, dispatch }: { data: DropZoneData, dispa
     return (
         <div>
             <div
-                className='bg-secondary-main p-3 h-[10rem] rounded-lg my-2 items-center flex justify-center'
+                className='bg-primary p-3 h-[10rem] rounded-lg my-2 items-center flex justify-center'
                 onDragEnter={(e) => handleDragEnter(e)}
                 onDragOver={(e) => handleDragOver(e)}
                 onDragLeave={(e) => handleDragLeave(e)}
