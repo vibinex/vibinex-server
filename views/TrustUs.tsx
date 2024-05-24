@@ -12,7 +12,7 @@ const data = [
 
 const TrustUs = () => {
 	return (
-		<div id='trust' className='w-full text-center py-12 bg-secondary-main'>
+		<div id='trust' className='w-full text-center py-12 bg-primary'>
 			<h2 className='font-bold text-[2rem]'>Stay calm and get <span className='text-[2rem] text-primary-main font-bold'>Vibinex</span></h2>
 			<div className='md:w-2/3 w-[90%] mt-3 p-4 flex flex-col md:flex-row md:justify-center items-center gap-8 mx-auto'>
 				{data.map((item) => (

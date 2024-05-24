@@ -10,7 +10,12 @@ module.exports = {
 			colors: {
 				background: "hsl(var(--background))",
 				foreground: "hsl(var(--foreground))",
+				border: "hsl(var(--border))",
+				input: "hsl(var(--input))",
+				ring: "hsl(var(--ring))",
 				primary: {
+					DEFAULT: "hsl(var(--background-shade))",
+					foreground: "hsl(var(--foreground))",
 					light: '#ffffff',
 					main: '#2196F3',
 					dark: '#1e1e1f',
@@ -18,8 +23,8 @@ module.exports = {
 					darktext: '#000000'
 				},
 				secondary: {
-					main: '#f3f4f6',
-					dark: '#000000',
+					DEFAULT: '#2196F3',
+					foreground: "hsl(var(--foreground)",
 					light: '#00c2e0'
 				},
 				action: {
