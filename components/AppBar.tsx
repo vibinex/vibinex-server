@@ -18,7 +18,7 @@ const AppBar = (props: PropsWithChildren<{
 
 	return (
 		<>
-			<header ref={headerRef} className={props.position + " w-full box-border z-20 top-0 right-0 left-auto shrink-0 print:absolute border-b-secondary-dark border-b-2 " + props.backdropClassName}>
+			<header ref={headerRef} className={props.position + " w-full box-border z-20 top-0 right-0 left-auto shrink-0 print:absolute border-b-border-dark border-b-2 " + props.backdropClassName}>
 				<Banner />
 				<div className={"relative flex items-center px-2 " + props.className}>
 					{props.children}
