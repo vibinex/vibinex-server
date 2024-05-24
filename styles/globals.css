@@ -8,7 +8,7 @@
 		color: hsl(222.2, 47.4%, 11.2%);
 
 		--background: 0 0% 100%;
-		--background-shade: 0 0% 100%;
+		--background-shade: 220 14% 96%;
 		--foreground: 222.2 47.4% 11.2%;
 
 		--muted: 210 40% 96.1%;
@@ -18,6 +18,7 @@
 		--popover-foreground: 0 0% 0%;
 
 		--border: 214.3 31.8% 91.4%;
+		--border-dark: 0 0% 50%;
 		--input: 214.3 31.8% 91.4%;
 
 		--card: 220 14% 96%;
@@ -61,6 +62,7 @@
 		--popover-foreground: 215 20.2% 65.1%;
 
 		--border: 216 34% 17%;
+		--border-dark: 0 0% 50%;
 		--input: 216 34% 17%;
 
 		--card: 224 71% 4%;

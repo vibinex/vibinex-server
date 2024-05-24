@@ -10,7 +10,10 @@ module.exports = {
 			colors: {
 				background: "hsl(var(--background))",
 				foreground: "hsl(var(--foreground))",
-				border: "hsl(var(--border))",
+				border: {
+					DEFAULT: "hsl(var(--border))",
+					dark: "hsl(var(--border-dark))",
+				},
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",
 				primary: {
