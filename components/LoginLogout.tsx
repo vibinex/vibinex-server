@@ -12,7 +12,6 @@ export default function LoginLogout() {
 	const [session, setSession] = useState<Session | null>(null);
 	const { rudderEventMethods } = useContext(RudderContext);
 
-
 	// FIXME: Ideally, this should have been automatically accomplished using useSession provided by NextAuth. But that is not working.
 	useEffect(() => {
 		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
@@ -46,22 +45,23 @@ export default function LoginLogout() {
 		};
 	}, [rudderEventMethods, session]);
 
+	const menuItemClassName = 'border-b-2 border-b-border last-of-type:border-0 p-2 text-center';
 	if (session?.user) return (
 		<>
 			<Image src={getAuthUserImage(session)} onClick={() => setShowMenu(prev => !prev)} alt="Display picture" title={getAuthUserName(session)} width={300} height={300} className="h-full w-auto hover:cursor-pointer rounded-xl cursor-pointer max-h-8 mx-auto" />
 			{/* Log out Pop up  */}
 			{showMenu ?
-				<ol className='w-[40%] sm:w-[15%] rounded-md absolute right-5 sm:right-10 top-16 border-2 bg-primary-light text-primary-darktext'>
-					<li className='border-b-2 border-b-gray-200 p-2 text-center'>
+				<ol className='w-[40%] sm:w-[15%] rounded-md absolute right-5 sm:right-10 top-16 border-2 border-border bg-background text-primary-foreground'>
+					<li className={menuItemClassName}>
 						<Link href='/u' className='cursor-pointer w-full'>Profile</Link>
 					</li>
-					<li id='contribute-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
+					<li id='contribute-link' className={menuItemClassName}>
 						<Link href='https://github.com/Alokit-Innovations/' target='_blank' className='cursor-pointer w-full'>Contribute</Link>
 					</li>
-					<li id='settings-link' className='border-b-2 border-b-gray-200 p-2 text-center'>
+					<li id='settings-link' className={menuItemClassName}>
 						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
 					</li>
-					<li id='logout-link' className='p-2 text-center cursor-pointer' onClick={() => (logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods ?? null)))}>
+					<li id='logout-link' className={`cursor-pointer ${menuItemClassName}`} onClick={() => (logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods ?? null)))}>
 						Logout
 					</li>
 				</ol>
@@ -71,7 +71,7 @@ export default function LoginLogout() {
 		</>
 	)
 	else return (
-		<Button variant='contained' onClick={() => (login(getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods ?? null)))} className="rounded bg-inherit sm:bg-primary-main text-secondary-main py-2 px-4 font-semibold">
+		<Button variant='contained' onClick={() => (login(getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods ?? null)))} className="rounded bg-inherit sm:bg-secondary text-secondary-foreground py-2 px-4 font-semibold">
 			Login/Signup
 		</Button>
 	)

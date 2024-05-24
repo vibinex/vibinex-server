@@ -5,11 +5,13 @@ import ProviderLogo from "../components/ProviderLogo";
 import SwitchSubmit from "../components/SwitchSubmit";
 import { TableCell, TableHeaderCell } from "../components/Table";
 import type { DbRepoSerializable, RepoIdentifier } from "../types/repository";
+import { getPreferredTheme, Theme } from "../utils/theme";
 
 const RepoList = () => {
 	const [loading, setLoading] = useState(false);
 	const [configLoading, setConfigLoading] = useState(false); // while loading user can't send another api request to change setting
 	const [repoList, setRepoList] = useState<DbRepoSerializable[]>([]);
+	const [theme, setTheme] = useState<Theme>('light')
 
 	useEffect(() => {
 		setLoading(true);
@@ -24,6 +26,8 @@ const RepoList = () => {
 			.finally(() => {
 				setLoading(false);
 			});
+
+		setTheme(getPreferredTheme());
 	}, [])
 
 	const setConfig = (repo: RepoIdentifier, configType: 'auto_assign' | 'comment', value: boolean) => {
@@ -57,7 +61,7 @@ const RepoList = () => {
 	}
 	return (<>
 		<h2 className="text-xl font-semibold my-2">Added Repositories</h2>
-		<table className="min-w-full divide-y divide-gray-200">
+		<table className="min-w-full divide-y divide-border">
 			<thead>
 				<tr>
 					<TableHeaderCell>Repo Name</TableHeaderCell>
@@ -68,7 +72,7 @@ const RepoList = () => {
 					<TableHeaderCell>Stats</TableHeaderCell>
 				</tr>
 			</thead>
-			<tbody className="bg-white divide-y divide-gray-200">
+			<tbody className="bg-backgroudn divide-y divide-border">
 				{repoList.map(({ repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, config }) => {
 					const repoAddr = `${repoProvider}/${repoOwner}/${repoName}`;
 					const repo_id: RepoIdentifier = {
@@ -80,7 +84,7 @@ const RepoList = () => {
 						<tr key={repoAddr}>
 							<TableCell>{repoName}</TableCell>
 							<TableCell>{repoOwner}</TableCell>
-							<TableCell className="text-center"><ProviderLogo provider={repoProvider} theme="dark" className="mx-auto" /></TableCell>
+							<TableCell className="text-center"><ProviderLogo provider={repoProvider} theme={theme} className="mx-auto" /></TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.auto_assign} toggleFunction={() => setConfig(repo_id, 'auto_assign', !config.auto_assign)} disabled={configLoading} /></TableCell>
 							<TableCell className="text-center"><SwitchSubmit checked={config.comment} toggleFunction={() => setConfig(repo_id, 'comment', !config.comment)} disabled={configLoading} /></TableCell>
 							<TableCell className="text-primary-main"><Link href={`/repo?repo_name=${repoAddr}`}>Link</Link></TableCell>
