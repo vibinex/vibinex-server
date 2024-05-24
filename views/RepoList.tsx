@@ -72,7 +72,7 @@ const RepoList = () => {
 					<TableHeaderCell>Stats</TableHeaderCell>
 				</tr>
 			</thead>
-			<tbody className="bg-backgroudn divide-y divide-border">
+			<tbody className="bg-background divide-y divide-border">
 				{repoList.map(({ repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, config }) => {
 					const repoAddr = `${repoProvider}/${repoOwner}/${repoName}`;
 					const repo_id: RepoIdentifier = {
