@@ -4,11 +4,11 @@ export type Theme = 'dark' | 'light';
 const DEFAULT_THEME: Theme = 'light';
 
 export const getPreferredTheme = () : Theme => {
-	const preferredTheme = localStorage.getItem('preferredTheme') || 'system';
+	const preferredTheme = localStorage.getItem('preferredTheme') ?? 'system';
 	if (preferredTheme !== 'system') {
 		// check if the preferredTheme is a valid value
 		if (preferredTheme !== 'dark' && preferredTheme !== 'light') {
-			console.error('[getPreferredTheme] Invalid theme: ' + preferredTheme);
+			console.error(`[getPreferredTheme] Invalid theme: ${preferredTheme}`);
 			return DEFAULT_THEME;
 		}
 		return preferredTheme as Theme;
@@ -17,7 +17,8 @@ export const getPreferredTheme = () : Theme => {
 	if (window.matchMedia) {
 		if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
 			return 'dark';
-		} else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+		}
+		if (window.matchMedia('(prefers-color-scheme: light)').matches) {
 			return 'light';
 		}
 	}
@@ -40,7 +41,7 @@ export const applyTheme = () => {
 			root.classList.add('light');
 			break;
 		default:
-			console.error('[applyTheme] Invalid theme: ' + preferredTheme);
+			console.error(`[applyTheme] Invalid theme: ${preferredTheme}`);
 			break;
 	}
 };
