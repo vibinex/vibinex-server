@@ -6,6 +6,7 @@ import RudderContext from '../components/RudderContext';
 import { Toaster } from '../components/Toast/toaster';
 import '../styles/globals.css';
 import { rudderEventMethods, RudderstackClientSideEvents } from '../utils/rudderstack_initialize';
+import { useTheme } from '../utils/theme';
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 	const keywords = [
@@ -28,6 +29,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
 
 		initializeRudder();
 	}, []);
+	useTheme();
 	return (
 		<RudderContext.Provider value={{ rudderEventMethods: rudderMethods }}>
 			<SessionProvider session={session}>
