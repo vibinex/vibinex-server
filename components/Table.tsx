@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 
 const TableHeaderCell = ({ className, children }: PropsWithChildren<{ className?: string }>) => (
-	<th className={"px-6 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider " + className}>
+	<th className={"px-6 py-3 bg-primary text-left text-xs font-semibold text-gray-500 uppercase tracking-wider " + className}>
 		{children}
 	</th>
 );

@@ -107,7 +107,7 @@ const Banner = () => {
 		};
 	}, [rudderEventMethods, session, bannerHTML]);
 
-	return (<div className={`w-full ${bannerHeight} bg-primary-main flex justify-center align-middle text-primary-light`} >
+	return (<div className={`w-full ${bannerHeight} bg-secondary flex justify-center align-middle text-primary-light`} >
 		{(bannerHeight) ? bannerHTML : null}
 	</div>)
 }

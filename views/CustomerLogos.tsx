@@ -27,10 +27,10 @@ const data = [
 
 const Customers = () => {
 	return (
-		<div id='customers' className='w-full text-center py-12 bg-secondary-main'>
+		<div id='customers' className='w-full text-center py-12 bg-primary'>
 			<h2 className='px-4 font-bold text-[2rem] relative'>
 				{'Trusted by '}
-				<span className='relative text-transparent bg-clip-text bg-gradient-to-r from-primary-main to-[#6f117b]'>
+				<span className='relative text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#6f117b]'>
 					fast-moving
 				</span>
 				{' teams'}

@@ -28,7 +28,7 @@ const Footer = (props: { className?: string }) => {
 		setRootElement(document.getElementById('__root__')!);
 	}, [])
 	return (
-		<footer className={'bg-secondary-main p-10 w-full mt-20 ' + props.className}>
+		<footer className={`bg-primary p-10 w-full mt-20 ${props.className}`}>
 			<div className='flex gap-x-40 gap-y-5 my-10 flex-wrap'>
 				{/* Social  */}
 				<div>
