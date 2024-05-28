@@ -145,11 +145,7 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 						<>
 							<AccordionTrigger>Set up triggers</AccordionTrigger>
 							<AccordionContent>
-								{ selectedProvider === 'github' && selectedHosting === 'cloud' && selectedInstallation === 'individual' ? (
-									<>You are all set! </>
-								) : (
-									<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation} />
-								)}
+								<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation} />
 							</AccordionContent>
 						</>
 					)}
