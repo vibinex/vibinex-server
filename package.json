@@ -1,6 +1,6 @@
 {
 	"name": "vibinex-website",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"private": false,
 	"homepage": "https://vibinex.com",
 	"description": "A plugin that works with GitHub, Bitbucket and GitLab to personalize and data-enrich their code review interfaces",
