@@ -56,9 +56,6 @@ const hunkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(500).json({ error: 'Failed to save hunk to db' });
 		return;
 	}
-	const event_properties = { ...eventProps, response_status: 200 };
-	rudderStackEvents.track("absent", "", 'hunks-handler', { type: 'HTTP-200', eventStatusFlag: 1, event_properties });    	
-	res.status(200).send("Success");
 
 	// extract authors from hunkmap and save in aliases table and repos table
 	await saveNewAuthorAliasesFromHunkData(hunkInfo).catch((error) => {

@@ -32,6 +32,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			const eventProperties = { ...event_properties, response_status: 401 };
 			rudderStackEvents.track("absent", "", 'chrome_extension_event', {
 				type: 'HTTP-401',
+				function:'relevant_handler',
 				eventStatusFlag: 0,
 				eventProperties
 			});
@@ -64,6 +65,7 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		const eventProperties = { ...event_properties, result_length: Object.entries(formattedData.relevant).length };
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
 			type: 'relevant-prs',
+			function: 'relevant_prs',
 			eventStatusFlag: 1,
 			eventProperties
 		});

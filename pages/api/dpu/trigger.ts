@@ -21,7 +21,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.error("[triggerHandler] Invalid request body");
 		res.status(400).json({ "error": "Invalid request body" });
 		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track("absent", "", 'dpu-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track(jsonBody?.userId ?? "absent", "", 'dpu-trigger', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 

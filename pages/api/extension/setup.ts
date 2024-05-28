@@ -13,7 +13,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 
 	if (req.method !== 'POST') {
 		const eventProperties = { response_status: 405 };
-		rudderStackEvents.track("absent", "", 'chrome-extension-setup', { type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'chrome_extension_event', { function: "setup_handler", type: 'HTTP-405', eventStatusFlag: 0, eventProperties });
 		return res.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are allowed' });
 	}
 	const { owner, provider, user_id } = req.body;
@@ -23,7 +23,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	};
 	if (!owner || !provider || !user_id) {
 		const eventProperties = { ...event_properties, response_status: 400 };
-        rudderStackEvents.track("absent", "", 'chrome_extension_event', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
+        rudderStackEvents.track(user_id??"absent", "", 'chrome_extension_event', { function: "setup_handler", type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return res.status(400).json({ error: 'Bad Request', message: 'Invalid request body' });
 	}
 	await getSetupReposFromDbForOwner(owner, provider)
