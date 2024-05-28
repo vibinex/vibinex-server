@@ -70,7 +70,7 @@ const GitAliasForm: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	}
 	if (expanded) {
 		return (
-			<div className="h-screen-1/2 text-primary-text flex flex-col items-center justify-center" >
+			<div className="h-screen-1/2 text-muted-foreground flex flex-col items-center justify-center" >
 				<p className="font-bold text-lg">No aliases found</p>
 				<p>Please setup a repository from this account to view aliases</p>
 			</div>

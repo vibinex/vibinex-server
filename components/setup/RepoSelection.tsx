@@ -94,7 +94,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 					setIsGetReposLoading(false);
 				});
 			}
-	}, [repoProvider, installId])
+	}, [repoProvider, installId, isNewAccordion])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
 		if (event.target.checked) {
@@ -144,7 +144,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 		<div>
 			<h4 className='my-2 font-semibold'>Select Repositories</h4>
 			{isGetReposLoading ?
-				(<div className='border-4 border-t-primary-main rounded-full w-12 h-12 animate-spin mx-auto'> </div>) :
+				(<div className='border-4 border-t-secondary rounded-full w-12 h-12 animate-spin mx-auto'> </div>) :
 				allRepos.length === 0 ?
 					(<p>No repositories found</p>) :
 					allRepos.map((repo) => (
