@@ -29,7 +29,9 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 			json_build_object(
 				'auto_assign', rc.auto_assign,
 				'comment', rc.comment_setting
-			) AS config
+			) AS config,
+			r.install_id AS install_id,
+			r.aliases AS aliases
 		FROM 
 			repos r
 		JOIN 

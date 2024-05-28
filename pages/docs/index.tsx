@@ -28,12 +28,14 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 	const [loading, setLoading] = useState(true);
 	const [session, setSession] = useState<Session | null>(null);
 	const [installId, setInstallId] = useState<string | null>(null);
+	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
 	const { rudderEventMethods } = React.useContext(RudderContext);
 
 	useEffect(() => {
 		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
 			const sessionVal: Session | null = await res.json();
 			setSession(sessionVal);
+			setIsGetInstallIdLoading(true);
 			const userId = await getAuthUserId(sessionVal);
 			axios.post('/api/dpu/pubsub', { userId }).then(async (response) => {
 				if (response.data.installId) {
@@ -41,6 +43,8 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				}
 			}).catch((error) => {
 				console.error(`[docs] Unable to get topic name for user ${userId} - ${error.message}`);
+			}).finally(() => {
+				setIsGetInstallIdLoading(false);
 			});
 		}).catch((err) => {
 			console.error(`[docs] Error in getting session`, err);
@@ -92,10 +96,10 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 					<AccordionTrigger>Login using the target provider</AccordionTrigger>
 					<AccordionContent className="flex items-center gap-2">
 						{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
-							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} disabled={isAuthInfoExpired(githubAuthInfo)} />
+							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} disabled={isAuthInfoExpired(githubAuthInfo)} disabledText='This auth has expired' />
 						))}
 						{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
-							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} disabled={isAuthInfoExpired(bitbucketAuthInfo)} />
+							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} disabled={isAuthInfoExpired(bitbucketAuthInfo)} disabledText='This auth has expired' />
 						))}
 						<Button variant="contained" href="/api/auth/signin" className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
 					</AccordionContent>
@@ -125,8 +129,13 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 						<>
 							<AccordionTrigger>Repository Selection</AccordionTrigger>
 							<AccordionContent>
-								{installId ? (
-									<RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} isNewAccordion={true}/>
+								{isGetInstallIdLoading ? (
+									<>
+										<div className='inline-block border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin mx-2'></div>
+										Generating topic name...
+									</>
+								) : installId ? (
+									<RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} isNewAccordion={true} />
 								) : (
 									<>User Info not found, please refresh and try again.</>
 								)}

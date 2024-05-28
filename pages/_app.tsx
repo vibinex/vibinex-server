@@ -1,9 +1,10 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
-import Head from 'next/head'
-import { SessionProvider } from 'next-auth/react'
-import React, { useEffect, useState } from 'react';
+import { SessionProvider } from 'next-auth/react';
+import type { AppProps } from 'next/app';
+import Head from 'next/head';
+import { useEffect, useState } from 'react';
 import RudderContext from '../components/RudderContext';
+import { Toaster } from '../components/Toast/toaster';
+import '../styles/globals.css';
 import { rudderEventMethods, RudderstackClientSideEvents } from '../utils/rudderstack_initialize';
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
@@ -50,6 +51,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
 
 				</Head>
 				<Component {...pageProps} />
+				<Toaster />
 			</SessionProvider>
 		</RudderContext.Provider>
 	)

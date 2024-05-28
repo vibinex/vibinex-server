@@ -14,9 +14,9 @@ const RepoList = () => {
 	useEffect(() => {
 		setLoading(true);
 		// get the list of repositories of the user
-		axios.get<{repoList: DbRepoSerializable[]}>("/api/repoList")
+		axios.get<{ repoList: DbRepoSerializable[] }>(`/api/repoList?nonce=${Math.random()}`) // adding query parameter to bypass cache
 			.then((res) => {
-				setRepoList(res.data.repoList);
+				if (res?.data && typeof res.data === 'object' && res.data.repoList) setRepoList(res.data.repoList);
 			})
 			.catch(err => {
 				console.error("[RepoList] fetching repo list failed", err);
