@@ -11,12 +11,12 @@ const events = (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(405).json({ message: 'Method not allowed' });
 	}
 	if (!req.body.userId) {
-		rudderStackEvents.track("absent", "", 'chrome_extension_event', { eventStatusFlag: 0, ...req.body });
+		rudderStackEvents.track("absent", "", 'chrome_extension_event', { type: "HTTP-400", eventStatusFlag: 0, ...req.body });
 		return res.status(400).json({ message: 'Missing userId in request body' });
 	}
 
 	const userId = req.body.userId;
-	rudderStackEvents.track(userId, "", 'chrome_extension_event', { eventStatusFlag: 1, ...req.body });
+	rudderStackEvents.track(userId, "", 'chrome_extension_event', { type: "HTTP-200", eventStatusFlag: 1, ...req.body });
 	res.status(200).json({ message: "success" });
 }
 

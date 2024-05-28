@@ -15,7 +15,7 @@ const SwitchSubmit = (props: PropsWithChildren<{
 			checked={props.checked}
 			onCheckedChange={props.toggleFunction}
 		>
-			<Switch.Thumb className="block w-[21px] h-[21px] bg-secondary-main rounded-full transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
+			<Switch.Thumb className="block w-[21px] h-[21px] bg-primary rounded-full transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
 		</Switch.Root>
 	)
 }

@@ -21,7 +21,7 @@ interface BuildInstructionProps {
 const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBuildButtonDisabled: boolean }> = ({ buildStatus, isTriggerBuildButtonDisabled }) => {
 	if (buildStatus === null) {
 		if (isTriggerBuildButtonDisabled) {
-			return (<div className='border-4 border-t-primary-main rounded-full w-6 h-6 animate-spin'> </div>)
+			return (<div className='border-4 border-t-secondary rounded-full w-6 h-6 animate-spin'> </div>)
 		}
 		return (<></>)
 	} else if (buildStatus.success) {

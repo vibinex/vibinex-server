@@ -5,9 +5,9 @@ const LoadingOverlay = ({ text, type = 'loading' }: { text?: string, type?: 'loa
 				<div className="before:rotate-45 after:-rotate-45 before:absolute after:absolute before:w-2 after:w-2 -translate-x-1 before:h-10 after:h-10 -translate-y-5 before:bg-primary-light after:bg-primary-light"></div>
 			</div>
 			:
-			<div className="border-4 border-t-primary-main rounded-full w-32 h-32 animate-spin"></div>
+			<div className="border-4 border-t-secondary rounded-full w-32 h-32 animate-spin"></div>
 		}
-		<div className="my-5 text-secondary-main">{text ?? "Loading..."}</div>
+		<div className="my-5 text-secondary-foreground">{text ?? "Loading..."}</div>
 	</div>
 );
 

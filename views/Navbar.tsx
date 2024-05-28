@@ -88,7 +88,7 @@ const Navbar = (props: { transparent: boolean }) => {
 
 	return (
 		<AppBar position='fixed' className='mx-auto p-4 justify-between items-center max-w-7xl'
-			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-primary-light text-secondary-dark' : ' bg-black text-primary-light')}
+			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-background text-foreground' : ' bg-black text-foreground text-primary-light border-b-0')}
 		>
 			<Link href='/' className='flex items-center'>
 				<Image src={VibinexDarkLogo} alt="Vibinex logo" className="inline w-10 mr-2" priority></Image>
@@ -122,7 +122,7 @@ const Navbar = (props: { transparent: boolean }) => {
 			{/* Mobile Button */}
 			<Button onClick={changeNavbar} variant='text'
 				className={
-					'block sm:hidden z-10' + (scrollDown || !props.transparent ? ' text-secondary-dark' : ' text-primary-light')
+					'block sm:hidden z-10' + (showNavbar || scrollDown || !props.transparent ? ' text-primary-foreground' : ' text-primary-light')
 				}
 			>
 				{showNavbar ? (
@@ -134,21 +134,21 @@ const Navbar = (props: { transparent: boolean }) => {
 			{/* Mobile Menu */}
 			<div
 				className={
-					'sm:hidden absolute flex justify-center items-center w-full h-screen bg-secondary-dark text-center ease-in duration-300' +
+					'sm:hidden absolute flex justify-center items-center w-full h-screen bg-primary text-center ease-in duration-300' +
 					(showNavbar ? ' left-0 top-0 right-0 bottom-0' : ' left-[-100%] top-0 right-0 bottom-0')
 				}
 			>
 				<ul>
-					<li id="docs-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li id="docs-link" className='p-4 text-4xl text-primary-foreground hover:text-secondary-light'>
 						<Link href='/docs'>Docs</Link>
 					</li>
-					<li id="contribute-link" className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li id="contribute-link" className='p-4 text-4xl text-primary-foreground hover:text-secondary-light'>
 						<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
 					</li>
-					<li id='pricing-link' className='p-4 text-4xl text-secondary-main hover:text-secondary-light'>
+					<li id='pricing-link' className='p-4 text-4xl text-primary-foreground hover:text-secondary-light'>
 						<Link href='/pricing'>Pricing</Link>
 					</li>
-					<li id='login-logout-link' className='p-4 text-secondary-main hover:text-secondary-light'>
+					<li id='login-logout-link' className='p-4 text-primary-foreground hover:text-secondary-light'>
 						<LoginLogout />
 					</li>
 				</ul>

@@ -1,10 +1,11 @@
 import Image from "next/image";
 import type { RepoProvider } from "../utils/providerAPI";
 import React from "react";
+import { Theme } from "../utils/theme";
 
-export const getProviderLogoSrc = (provider: RepoProvider, theme: "light" | "dark") => `/${provider}${theme === 'dark' ? "-dark" : ""}.svg`;
+export const getProviderLogoSrc = (provider: RepoProvider, theme: Theme) => `/${provider}${theme !== 'dark' ? "-dark" : ""}.svg`;
 
-const ProviderLogo: React.FC<{ provider: RepoProvider, theme: "light" | "dark", className?: string }> = ({ provider, theme, className }) => {
+const ProviderLogo: React.FC<{ provider: RepoProvider, theme: Theme, className?: string }> = ({ provider, theme, className }) => {
 	return (
 		<Image
 			loading="lazy"
