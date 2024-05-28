@@ -24,7 +24,7 @@ export default async function setupRepos(req: NextApiRequest, res: NextApiRespon
 	if (!owner || !provider || !user_id) {
 		const eventProperties = { ...event_properties, response_status: 400 };
 		rudderStackEvents.track(user_id ?? "absent", "", 'chrome_extension_event', { function: "setup_handler", type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
-		return res.status(400).json({ error: 'Bad Request', message: 'Invalid request body' });
+		return res.status(400).json({ error: 'Bad Request', message: 'Missing required fields: owner, provider, or user_id' });
 	}
 	await getSetupReposFromDbForOwner(owner, provider)
 		.then((repos: string[]) => {
