@@ -8,16 +8,22 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
+				background: "hsl(var(--background))",
+				foreground: "hsl(var(--foreground))",
+				border: {
+					DEFAULT: "hsl(var(--border))",
+					dark: "hsl(var(--border-dark))",
+				},
+				input: "hsl(var(--input))",
+				ring: "hsl(var(--ring))",
 				primary: {
+					DEFAULT: "hsl(var(--background-shade))",
+					foreground: "hsl(var(--foreground-shade))",
 					light: '#ffffff',
-					main: '#2196F3',
-					dark: '#1e1e1f',
-					text: '#9E9E9E',
-					darktext: '#000000'
 				},
 				secondary: {
-					main: '#f3f4f6',
-					dark: '#000000',
+					DEFAULT: '#2196F3',
+					foreground: "hsl(213, 31%, 91%)",
 					light: '#00c2e0'
 				},
 				action: {
@@ -30,8 +36,13 @@ module.exports = {
 					DEFAULT: "#11BB00",
 				},
 				error: {
-					DEFAULT: "#BB1100",
+					DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
+					foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
 					dark: "#FF5252",
+				},
+				warning: {
+					DEFAULT: "hsl(var(--warning) / <alpha-value>)",
+					foreground: "hsl(var(--warning-foreground) / <alpha-value>)",
 				},
 				muted: {
 					DEFAULT: "hsl(var(--muted))",
@@ -72,4 +83,4 @@ module.exports = {
 	plugins: [
 		require('@tailwindcss/forms'),
 	],
-}
+};

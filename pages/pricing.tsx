@@ -144,8 +144,8 @@ const Pricing = () => {
 			<div className='mb-16'>
 				<Navbar transparent={false} />
 			</div>
-			<div id='pricing' className='w-full py-12 bg-primary-light'>
-				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-primary-main font-bold'>Plans</span></h2>
+			<div id='pricing' className='w-full py-12'>
+				<h2 className='font-bold text-center text-[2rem]'>Pricing <span className='text-[2rem] text-secondary font-bold'>Plans</span></h2>
 				{(today <= pricingStartDate) ? (<p className='text-center -mt-2'><small>(Applicable after {readableDate(pricingStartDate)})</small></p>) : null}
 
 				<div className='m-auto md:grid w-4/5 mt-3 md:p-4 grid-cols-2 gap-5 h-fit'>
@@ -155,11 +155,11 @@ const Pricing = () => {
 						<SwitchSubmitWithText optionsList={installationOptions} selectedOption={selectedInstallation} setSelectedOption={setSelectedInstallation} />
 						<SwitchSubmitWithText optionsList={termOptions} selectedOption={term} setSelectedOption={onAnyPricingConfigClick(setTerm)} />
 					</div>
-					<div key={pricingPlans[pricingPlanIndex].buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full lg:w-5/6 xl:w-4/5 m-auto border-primary-main bg-primary-light shadow-md flex flex-col h-full">
+					<div key={pricingPlans[pricingPlanIndex].buttonText} className="md:p-5 p-3 rounded-lg border-2 mt-7 w-full lg:w-5/6 xl:w-4/5 m-auto border-secondary bg-background shadow-md flex flex-col h-full">
 						<h2 className='mx-auto font-semibold text-2xl text-center'>{pricingPlans[pricingPlanIndex].pricingName}</h2>
 
 						<div className='text-center h-16'>
-							<p className='mt-2 font-medium text-xl text-primary-main'>{(pricingPlans[pricingPlanIndex].pricing) ? pricingPlans[pricingPlanIndex].pricing : getPriceString(term)}</p>
+							<p className='mt-2 font-medium text-xl text-secondary'>{(pricingPlans[pricingPlanIndex].pricing) ? pricingPlans[pricingPlanIndex].pricing : getPriceString(term)}</p>
 							<p className='text-base'>{((pricingPlans[pricingPlanIndex].duration && selectedInstallation === 'project') ? 'per user/month' : pricingPlans[pricingPlanIndex].duration)}</p>
 						</div>
 
@@ -167,7 +167,7 @@ const Pricing = () => {
 							{features.map((feature) => {
 								return (
 									<li key={feature} className='text-lg ml-1 mb-2'>
-										<AiOutlineCheckCircle className='text-primary-main w-5 inline mr-1' size={20} />
+										<AiOutlineCheckCircle className='text-secondary w-5 inline mr-1' size={20} />
 										{feature}
 									</li>
 								)

@@ -25,9 +25,9 @@ const Button = (props: ButtonProps) => {
 	}
 	const basicClass = 'inline-flex items-center justify-center relative cursor-pointer align-middle disabled:cursor-default box-border min-w-max py-1 px-4 rounded-md transition-all ';
 	const variantClasses = {
-		'contained': "bg-primary-main text-secondary-main disabled:bg-action-inactive disabled:hover:bg-transparent hover:bg-primary-dark ",
-		'outlined': "border-secondary-main border-2 rounded ",
-		'text': "",
+		contained: "bg-secondary text-secondary-foreground disabled:bg-action-inactive disabled:hover:bg-transparent hover:bg-secondary-light ",
+		outlined: "border-secondary-foreground border-2 rounded hover:bg-muted ",
+		text: "",
 	}
 
 	return (

@@ -22,7 +22,9 @@ export type DbRepo = {
 	config: {
 		auto_assign: boolean,
 		comment: boolean,
-	}
+	},
+	install_id: string[],
+	aliases: string[],
 }
 
 export type DbRepoSerializable = {
