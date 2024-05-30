@@ -127,6 +127,9 @@ export const authOptions = {
 	theme: {
 		brandColor: "#2196F3",
 		logo: "https://vibinex.com/favicon.ico"
+	},
+	pages: {
+		signIn: '/auth/signin'
 	}
 }
 
