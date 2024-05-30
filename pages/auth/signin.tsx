@@ -1,26 +1,51 @@
 "use client";
 
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import { getServerSession } from "next-auth/next";
-import { getProviders, signIn } from "next-auth/react";
+import { ClientSafeProvider, getProviders, signIn } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Button from "../../components/Button";
+import LoadingOverlay from "../../components/LoadingOverlay";
 import { getProviderLogoSrc } from "../../components/ProviderLogo";
+import { useToast } from "../../components/Toast/use-toast";
 import VibinexDarkLogo from '../../public/vibinex-dark-logo.png';
 import VibinexLightLogo from '../../public/vibinex-light-logo.png';
 import type { RepoProvider } from "../../utils/providerAPI";
 import { getPreferredTheme, type Theme } from "../../utils/theme";
-import { authOptions } from "../api/auth/[...nextauth]";
 
-const SignInPage = ({ providers }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const SignInPage = () => {
 	const vibinexLogo = (theme: Theme) => theme === 'dark' ? VibinexDarkLogo : VibinexLightLogo;
+	const { toast } = useToast();
+
+	const DEFAULT_CALLBACK_URL = "/u";
+	const callbackUrlReceived = typeof window !== "undefined" ? new URL(window.location.href).searchParams.get("callbackUrl") : null;
+	const callbackUrl = callbackUrlReceived ?? DEFAULT_CALLBACK_URL;
+
+	const [loading, setLoading] = useState(true);
 	const [theme, setTheme] = useState<Theme>('light');
+	const [providers, setProviders] = useState<ClientSafeProvider[]>([]);
 
 	useEffect(() => {
+		setLoading(true);
 		setTheme(getPreferredTheme());
+
+		// get the list of providers
+		getProviders()
+			.then((receivedProviders) => {
+				setProviders(receivedProviders ? Object.values(receivedProviders) : []);
+			})
+			.catch(err => {
+				const errorMessage = "Failed to fetch providers";
+				console.error(errorMessage, err);
+				toast({
+					description: errorMessage,
+					variant: "error",
+				});
+			})
+			.finally(() => {
+				setLoading(false);
+			})
 	}, [])
 
 	return (
@@ -32,9 +57,11 @@ const SignInPage = ({ providers }: InferGetServerSidePropsType<typeof getServerS
 				<div className="p-4 text-center flex flex-col">
 					<Image src={vibinexLogo(theme)} alt='login page illustration' className="m-auto w-24" />
 					<h2 className="font-bold text-[30px] m-5">Sign in to Vibinex</h2>
-
-					{Object.values(providers).map((provider) => (
-						<Button variant="outlined" onClick={() => signIn(provider.id)} key={provider.name} className="mx-auto my-2 max-w-xs w-full py-4 px-4 bg-primary">
+					{(providers.length === 0) ? (<>
+						{loading ? <LoadingOverlay /> : <LoadingOverlay type="error" text="Failed to fetch providers. Please refresh this page." />}
+						<div className="block h-56" />
+					</>) : providers.map((provider) => (
+						<Button variant="outlined" onClick={() => signIn(provider.id, { callbackUrl })} key={provider.name} className="mx-auto my-2 max-w-xs w-full py-4 px-4 bg-primary">
 							<div className="flex">
 								<Image src={getProviderLogoSrc(provider.id as RepoProvider, theme)} alt={provider.name} width={28} height={28} />
 								<span className="grow text-lg">Sign in with {provider.name}</span>
@@ -49,23 +76,6 @@ const SignInPage = ({ providers }: InferGetServerSidePropsType<typeof getServerS
 			</div>
 		</div>
 	);
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-	const session = await getServerSession(context.req, context.res, authOptions);
-
-	// If the user is already logged in, redirect.
-	// Note: Make sure not to redirect to the same page
-	// To avoid an infinite loop!
-	if (session) {
-		return { redirect: { destination: "/u" } };
-	}
-
-	const providers = await getProviders();
-
-	return {
-		props: { providers: providers ?? [] },
-	}
 }
 
 export default SignInPage;
