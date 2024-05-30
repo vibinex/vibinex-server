@@ -32,7 +32,6 @@ const SignInPage = ({ providers }: InferGetServerSidePropsType<typeof getServerS
 				<div className="p-4 text-center flex flex-col">
 					<Image src={vibinexLogo(theme)} alt='login page illustration' className="m-auto w-24" />
 					<h2 className="font-bold text-[30px] m-5">Sign in to Vibinex</h2>
-					<p className="mb-10">Sign in with your code-hosting provider. This helps us get your alias emails and repositories names.</p>
 
 					{Object.values(providers).map((provider) => (
 						<Button variant="outlined" onClick={() => signIn(provider.id)} key={provider.name} className="mx-auto my-2 max-w-xs w-full py-4 px-4 bg-primary">
