@@ -45,7 +45,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 	useEffect(() => {
 		setIsGetReposLoading(true);
 		if (isNewAccordion) {
-			axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
+			axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getInstalledRepos?nonce=${Math.random()}`, { params: { topicId: installId, provider: repoProvider } })
 				.then((response) => {
 					return response.data.repoList;
 				})
@@ -61,7 +61,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 				});
 		}
 		else {
-			axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getAllRepos')
+			axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getAllRepos?nonce=${Math.random()}`)
 				.then((response) => {
 					return response.data.repoList;
 				})
@@ -70,7 +70,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 					setAllRepos(providerReposForUser)
 
 					// automatically check the repositories that are already installed by the user
-					axios.get<{ repoList: RepoIdentifier[] }>('/api/docs/getInstalledRepos', { params: { topicId: installId, provider: repoProvider } })
+					axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getInstalledRepos?nonce=${Math.random()}`, { params: { topicId: installId, provider: repoProvider } })
 						.then((response) => {
 							return response.data.repoList;
 						})
@@ -116,7 +116,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 		setIsRepoSubmitButtonDisabled(true)
 		setDisableAllRepos(true);
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
-		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
+		axios.post('/api/docs/userSelectedRepos', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
 			.then((response) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);

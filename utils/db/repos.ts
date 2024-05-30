@@ -3,6 +3,36 @@ import conn from '.';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
 import { convert } from './converter';
 
+export const saveRepoIdentifierToDb = async (repos: RepoIdentifier[], topicId: string) => {
+	const insertRepoQuery = `
+		INSERT INTO repos (
+			repo_provider,
+			repo_owner,
+			repo_name,
+			install_id,
+			is_installed,
+			created_at
+		) VALUES
+		${repos.map(repo => `(
+			${convert(repo.repo_provider)},
+			${convert(repo.repo_owner)},
+			${convert(repo.repo_name)},
+			${convert(topicId)},
+			${convert(false)},
+			NOW()
+		)`).join(', ')}
+		ON CONFLICT (repo_provider, repo_owner, repo_name)
+		DO UPDATE SET
+			install_id = EXCLUDED.install_id,
+			is_installed = EXCLUDED.is_installed,
+	`;
+
+	await conn.query(insertRepoQuery).catch(err => {
+		console.error(`[saveRepos] Error in inserting/updating repositories`, { query: insertRepoQuery }, err);
+		throw new Error(`Error in inserting/updating repositories. Error: ${err.message}`);
+	});
+};
+
 export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => {
 	const userId = session.user.id;
 	if (!userId) {
