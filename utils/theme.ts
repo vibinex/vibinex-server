@@ -3,8 +3,12 @@ import { useEffect } from 'react';
 export type Theme = 'dark' | 'light';
 const DEFAULT_THEME: Theme = 'light';
 
-export const getPreferredTheme = () : Theme => {
-	const preferredTheme = localStorage.getItem('preferredTheme') ?? 'system';
+export const getPreferredTheme = (): Theme => {
+	if (typeof window === 'undefined') {
+		return DEFAULT_THEME;
+	}
+
+	const preferredTheme = localStorage?.getItem('preferredTheme') ?? 'system';
 	if (preferredTheme !== 'system') {
 		// check if the preferredTheme is a valid value
 		if (preferredTheme !== 'dark' && preferredTheme !== 'light') {
@@ -13,7 +17,7 @@ export const getPreferredTheme = () : Theme => {
 		}
 		return preferredTheme as Theme;
 	}
-	
+
 	if (window.matchMedia) {
 		if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
 			return 'dark';
