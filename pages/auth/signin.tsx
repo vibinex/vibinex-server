@@ -46,7 +46,7 @@ const SignInPage = () => {
 			.finally(() => {
 				setLoading(false);
 			})
-	}, [])
+	}, [toast])
 
 	return (
 		<div className="h-screen  p-4 pt-10">
