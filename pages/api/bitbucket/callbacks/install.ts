@@ -17,7 +17,7 @@ const installHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		const eventProperties = { ...event_properties, response_status: 500 };
 		rudderStackEvents.track("absent", "", 'bitbucket-app-install-callback', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		res.status(500).send(constructHtml(
-			`Please <a href="${getURLWithParams('/api/auth/signin', { callbackUrl: req.url })}">sign in</a> on Vibinex`,
+			`Please <a href="${getURLWithParams('/auth/signin', { callbackUrl: req.url })}">sign in</a> on Vibinex`,
 			"error"
 		));
 		return;
