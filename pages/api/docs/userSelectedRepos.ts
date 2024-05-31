@@ -15,21 +15,22 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(401).json({ error: 'Unauthenticated' });
 	}
     const userId = session.user.id;
-    if (!Array.isArray(jsonBody.info) || !jsonBody.installationId) {
+    const provider = jsonBody.info.length > 0 ? jsonBody.info[0].provider : null;
+    if (!Array.isArray(jsonBody.info) || !jsonBody.installationId || !provider) {
 		console.error("[UserSelectedRepos] Invalid request body", jsonBody);
-		res.status(400).json({ "error": "Invalid request body" });
+		res.status(400).json({ error: "Invalid request body" });
 		const eventProperties = { response_status: 400 };
 		rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
 	const event_properties = {
-		repo_provider: jsonBody.info.length > 0 ? jsonBody.info[0].provider : "",
+		repo_provider: provider,
 		topic_name: jsonBody.installationId || "",
 		is_pat: jsonBody.isPublish || false,
 	};
 
 	try {
-		await removePreviousSelections(jsonBody.installationId, jsonBody.info[0].provider);
+		await removePreviousSelections(jsonBody.installationId, provider);
 	} catch (err) {
 		console.error(`[UserSelectedRepos] Unable to remove previous installations for ${jsonBody.installationId}`, err);
 		res.status(500).json({ "error": "Internal Server Error" });
@@ -39,9 +40,9 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	const allSelectedReposPromises = [];
 	for (const ownerInfo of jsonBody.info) {
-		let setupReposArgs: SetupReposArgs = {
+		const setupReposArgs: SetupReposArgs = {
 			repo_owner: ownerInfo.owner,
-			repo_provider: ownerInfo.provider,
+			repo_provider: provider,
 			repo_names: ownerInfo.repos,
 			install_id: jsonBody.installationId
 		}
