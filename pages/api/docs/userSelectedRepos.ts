@@ -40,7 +40,7 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	const allSelectedReposPromises = [];
 	for (const ownerInfo of jsonBody.info) {
-		let setupReposArgs: SetupReposArgs = {
+		const setupReposArgs: SetupReposArgs = {
 			repo_owner: ownerInfo.owner,
 			repo_provider: provider,
 			repo_names: ownerInfo.repos,
