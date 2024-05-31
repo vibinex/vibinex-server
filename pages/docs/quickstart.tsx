@@ -16,6 +16,7 @@ import TriggerContent from '../../components/setup/TriggerContent';
 import { getAuthUserId, getAuthUserName, hasValidAuthInfo, isAuthInfoExpired } from '../../utils/auth';
 import { RepoProvider } from '../../utils/providerAPI';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
+import { getURLWithParams } from '../../utils/url_utils';
 import DocsSideBar from '../../views/docs/DocsSideBar';
 import MainAppBar from '../../views/MainAppBar';
 
@@ -106,7 +107,7 @@ const QuickStartGuide = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_ur
 							{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
 								<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} disabled={isAuthInfoExpired(bitbucketAuthInfo)} disabledText='This auth has expired' />
 							))}
-							<Button variant="contained" href="/api/auth/signin" className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
+							<Button variant="contained" href={getURLWithParams('/auth/signin', { callbackUrl: "/docs" })} className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
 						</AccordionContent>
 					</AccordionItem>
 					<AccordionItem value="instruction-2">

@@ -18,11 +18,24 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(200).send("Ok");
 		return;
 	}
+
+	const event_properties = {
+		repo_provider: req.body.repo_provider || "",
+		repo_owner: req.body.repo_owner || "",
+		repo_name: req.body.repo_name || "",
+	}
 	// For normal requests
 	if (!("repo_provider" in req.body) ||
 		!("repo_owner" in req.body) ||
 		!("repo_name" in req.body) ||
 		!("user_id" in req.body)) {
+		const eventProperties = { ...event_properties, response_status: 401 };
+		rudderStackEvents.track("absent", "", 'chrome_extension_event', {
+			type: 'HTTP-401',
+			function: 'relevant_handler',
+			eventStatusFlag: 0,
+			eventProperties
+		});
 		res.status(401).json({ error: 'Invalid request body' });
 	}
 	console.info("[extension/relevant] Getting relevant info for ", req.body.repo_name);
@@ -38,23 +51,33 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			console.error("[extension/relevant] Error getting review data", err);
 		});
 		if (!reviewDb) {
+			const eventProperties = { ...event_properties, response_status: 500 };
 			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
-				...req.body,
+				type: 'HTTP-500',
 				function: 'relevant_prs',
-				eventStatusFlag: 0
+				eventStatusFlag: 0,
+				eventProperties
 			});
 			res.status(500).json({ error: 'Internal server error' });
 			return;
 		}
 		formattedData = formatReviewResponse(reviewDb);
+		const eventProperties = { ...event_properties, result_length: Object.entries(formattedData.relevant).length };
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
-			...req.body,
+			type: 'HTTP-200',
 			function: 'relevant_prs',
-			resultLength: Object.entries(formattedData.relevant).length,
-			eventStatusFlag: 1
+			eventStatusFlag: 1,
+			eventProperties
 		});
 	} else if (type === 'file') {
 		if (!("pr_number" in req.body)) {
+			const eventProperties = { ...event_properties, response_status: 400 };
+			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
+				type: 'HTTP-400',
+				function: 'relevant_prs',
+				eventStatusFlag: 0,
+				eventProperties
+			});
 			res.status(400).json({ error: 'Invalid request body' });
 			return;
 		}
@@ -64,14 +87,22 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			req.body.pr_number,
 			user_emails);
 		formattedData = formatFileResponse(fileSet);
+		const eventProperties = { ...event_properties, result_length: formattedData.files.length };
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
-			...req.body,
+			type: 'HTTP-200',
 			function: 'relevant_file',
-			resultLength: formattedData.files.length,
-			eventStatusFlag: 1
+			eventStatusFlag: 1,
+			eventProperties
 		});
 	} else if (type === 'hunk') {
 		if (!("pr_number" in req.body)) {
+			const eventProperties = { ...event_properties, response_status: 400 };
+			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
+				type: 'HTTP-400',
+				function: 'relevant_hunks',
+				eventStatusFlag: 0,
+				eventProperties
+			});
 			res.status(400).json({ error: 'Invalid request body' });
 			return;
 		}
@@ -84,20 +115,23 @@ const relevantHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			console.error("[extension/relevant] Error getting hunk data", err);
 		});
 		if (!hunkRes) {
+			const eventProperties = { ...event_properties, response_status: 500 };
 			rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
-				...req.body,
+				type: 'HTTP-500',
 				function: 'relevant_hunks',
-				eventStatusFlag: 0
+				eventStatusFlag: 0,
+				eventProperties
 			});
 			res.status(500).json({ error: 'Internal server error' });
 			return;
 		}
 		formattedData = formatHunkResponse(hunkRes);
+		const eventProperties = { ...event_properties, result_length: formattedData.hunkinfo.length };
 		rudderStackEvents.track(req.body.user_id, "", 'chrome_extension_event', {
-			...req.body,
+			type: 'HTTP-200',
 			function: 'relevant_hunks',
-			resultLength: formattedData.hunkinfo.length,
-			eventStatusFlag: 1
+			eventStatusFlag: 1,
+			eventProperties
 		});
 	}
 	res.status(200).json(formattedData);

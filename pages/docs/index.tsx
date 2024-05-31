@@ -1,7 +1,5 @@
 import type { Session } from 'next-auth';
 import React, { useEffect, useState } from 'react';
-import Markdown from 'react-markdown';
-import remarkGfm from "remark-gfm";
 import Footer from '../../components/Footer';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { RenderMarkdown } from '../../components/RenderMarkdown';
