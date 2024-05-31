@@ -61,7 +61,7 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req
 	if (!session) {
 		return {
 			redirect: {
-				destination: getURLWithParams('/api/auth/signin', {
+				destination: getURLWithParams('/auth/signin', {
 					callbackUrl: `${process.env.NEXTAUTH_URL}/u`
 				}),
 				permanent: false
