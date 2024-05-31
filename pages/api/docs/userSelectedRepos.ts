@@ -22,12 +22,6 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 		rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
-    if (!userId) {
-        const eventProperties = { response_status: 500 };
-        rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
-        res.status(500).json({error: "No user id in session"});
-        return;
-    }
 	const event_properties = {
 		repo_provider: jsonBody.info.length > 0 ? jsonBody.info[0].provider : "",
 		topic_name: jsonBody.installationId || "",
