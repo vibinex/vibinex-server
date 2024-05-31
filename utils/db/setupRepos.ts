@@ -60,17 +60,17 @@ export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): 
 export const saveSelectedReposInDb = async (args: SetupReposArgs, userId: string): Promise<boolean> => {
 	const { repo_owner, repo_provider, repo_names, install_id } = args;
 	const insertReposQuery = `
-		INSERT INTO repos (repo_name, user_selected, repo_owner, repo_provider)
-		SELECT repo_name, ARRAY[${convert(install_id)}], ${convert(repo_owner)}, ${convert(repo_provider)}
+		INSERT INTO repos (repo_provider, repo_owner, repo_name, user_selected)
+		SELECT ${convert(repo_provider)}, ${convert(repo_owner)}, repo_name, ARRAY[${convert(install_id)}]}}
 		FROM unnest(${convert(repo_names)}::TEXT[]) AS t(repo_name)
-		ON CONFLICT (repo_name, repo_owner, repo_provider) DO UPDATE
+		ON CONFLICT (repo_provider, repo_owner, repo_name) DO UPDATE
 			SET user_selected = CASE
 			WHEN NOT (repos.user_selected && ARRAY[${convert(install_id)}]) -- user's install_id not present
 			THEN repos.user_selected || ARRAY[${convert(install_id)}] -- append user's install_id
 			ELSE repos.user_selected -- no update needed
 			END,
-			repo_owner = ${convert(repo_owner)},
-			repo_provider = ${convert(repo_provider)}
+			repo_provider = ${convert(repo_provider)},
+			repo_owner = ${convert(repo_owner)}
 		RETURNING id AS repo_id;
 	`;
 	try {
