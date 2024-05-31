@@ -17,7 +17,7 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
     const userId = session.user.id;
     if (!Array.isArray(jsonBody.info) || !jsonBody.installationId) {
 		console.error("[UserSelectedRepos] Invalid request body", jsonBody);
-		res.status(400).json({ "error": "Invalid request body" });
+		res.status(400).json({ error: "Invalid request body" });
 		const eventProperties = { response_status: 400 };
 		rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
