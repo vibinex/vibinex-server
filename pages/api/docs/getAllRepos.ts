@@ -32,17 +32,7 @@ const getUserRepositoriesHandler = async (req: NextApiRequest, res: NextApiRespo
 	const eventProperties = { response_status: 200, result_length: repoList.length };
 	rudderStackEvents.track(session?.user?.id ?? "absent", "", 'user-repos-from-providers', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });    
   	res.status(200).json({ repoList: repoList });
-	const userId = getAuthUserId(session);
-	const userData: DbUser | null = await getUserById(userId).catch((err) => {
-		console.error('[getUserRepositoriesHandler] Error in getting user db data', err);
-		return null;
-	});
-	if (!userData?.topic_name) {
-		console.error(`[getUserRepositoriesHandler] Error in getting user topic from db`);
-		return;
-	}
-	const topicName = userData.topic_name;
-	await saveRepoIdentifierToDb(repoList, topicName);
+	await saveRepoIdentifierToDb(repoList);
 }
 
 export default getUserRepositoriesHandler;
