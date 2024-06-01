@@ -207,6 +207,7 @@ export const getUserRepositories = async (session: Session) => {
 			if (repoProvider === 'github') {
                 (providerRepos as RepoIdentifier[]).forEach((repo) => allRepos.add(repo));
             } else if (repoProvider === 'bitbucket') {
+				console.log(`[getUserRepositories] ==================<><><><><> providerRepos = ${JSON.stringify(providerRepos)}`);
                 const { bitbucketReposObjs: bbRepos, repoIdentifiers: bitbucketRepoIdentifiers } = providerRepos as BitbucketReposResult;
                 bitbucketRepoIdentifiers.forEach((repo: RepoIdentifier) => allRepos.add(repo));
                 bbRepos.forEach((repo) => bitbucketReposObjs.add(repo));
