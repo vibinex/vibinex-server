@@ -61,7 +61,7 @@ export const saveSelectedReposInDb = async (args: SetupReposArgs, userId: string
 	const { repo_owner, repo_provider, repo_names, install_id } = args;
 	const insertReposQuery = `
 		INSERT INTO repos (repo_provider, repo_owner, repo_name, user_selected)
-		SELECT ${convert(repo_provider)}, ${convert(repo_owner)}, repo_name, ARRAY[${convert(install_id)}]}}
+		SELECT ${convert(repo_provider)}, ${convert(repo_owner)}, repo_name, ARRAY[${convert(install_id)}]
 		FROM unnest(${convert(repo_names)}::TEXT[]) AS t(repo_name)
 		ON CONFLICT (repo_provider, repo_owner, repo_name) DO UPDATE
 			SET user_selected = CASE
