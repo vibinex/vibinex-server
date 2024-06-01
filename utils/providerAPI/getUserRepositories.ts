@@ -159,6 +159,7 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 		}));
 		repoIdentifiers.push(...allBitbucketRepoIdentifiers);
 	}
+	console.log(`[getUserRepositoriesForBitbucket] <><><><><><><><><><>========== bitbucketRepos = ${JSON.stringify(bitbucketRepos)}`);
 	return { bitbucketReposObjs: bitbucketRepos, repoIdentifiers: repoIdentifiers };
 }
 
