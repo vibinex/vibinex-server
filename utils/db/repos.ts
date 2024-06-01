@@ -286,11 +286,13 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 		(repo_obj->>'is_private')::BOOLEAN AS is_private,
 		repo_obj->'project' AS project,
 		jsonb_set('{}', '{uuid}', to_jsonb(repo_obj->>'uuid')) AS metadata
-	FROM unnest(
+		FROM unnest(
 			ARRAY [
-				${repos.map((x: string | number | object) => `(${convert(x)}::JSONB)`).join(', ')}
+				${repos.map((x: string | number | object, index: number, array: any[]) => {
+					return index === array.length - 1 ? `(${convert(x)}::JSONB)` : `(${convert(x)}::JSONB),`;
+				}).join('')}
 			]
-		) AS t(repo_obj)
+		) AS t(repo_obj)		
 	ON CONFLICT (repo_name, repo_owner, repo_provider) 
 	DO UPDATE SET
 		workspace = EXCLUDED.workspace,
