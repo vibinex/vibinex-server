@@ -101,7 +101,7 @@ export const getUserRepositoriesByTopic = async (topicId: string, provider: stri
 			project->>'name' AS project_name,
 			project->>'type' AS project_type,
 			is_private,
-			metadata->>'uuid',
+			metadata->>'uuid' as uuid,
 			workspace
 		FROM repos
 		WHERE repo_provider = ${convert(provider)} AND ${convert(topicId)} = ANY(user_selected)
@@ -265,30 +265,36 @@ export const removeRepoConfigForInstallIdForOwner = async (installId: string, re
 
 export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise<boolean> => {
 	const insertReposQuery = `
-		INSERT INTO repos (
-			repo_name,
-			repo_owner,
-			repo_provider,
-			workspace,
-			clone_ssh_url,
-			is_private,
-			project,
-			metadata
-		)
-		SELECT 
-			repo_obj->>'name' AS repo_name,
-			repo_obj->'workspace'->>'slug' AS repo_owner,
-			'bitbucket' AS repo_provider,
-			repo_obj->'workspace'->>'slug' AS workspace,
-			(SELECT clone->>'href' 
-			FROM json_array_elements(repo_obj->'links'->'clone') AS clone 
-			WHERE clone->>'name' = 'ssh') AS clone_ssh_url,
-			(repo_obj->>'is_private')::BOOLEAN AS is_private,
-			repo_obj->'project' AS project,
-			json_set('{}', '{uuid}', to_json(repo_obj->>'uuid')) AS metadata
-		FROM unnest(${convert(repos)}) AS t(repo_obj)
-		ON CONFLICT (repo_name, repo_owner, repo_provider) DO NOTHING
-		RETURNING id as repo_id;	
+	INSERT INTO repos (
+		repo_name,
+		repo_owner,
+		repo_provider,
+		workspace,
+		clone_ssh_url,
+		is_private,
+		project,
+		metadata
+	)
+	SELECT 
+		repo_obj->>'name' AS repo_name,
+		repo_obj->'workspace'->>'slug' AS repo_owner,
+		'bitbucket' AS repo_provider,
+		repo_obj->'workspace'->>'slug' AS workspace,
+		(SELECT clone->>'href' 
+		 FROM json_array_elements(repo_obj->'links'->'clone') AS clone 
+		 WHERE clone->>'name' = 'ssh') AS clone_ssh_url,
+		(repo_obj->>'is_private')::BOOLEAN AS is_private,
+		repo_obj->'project' AS project,
+		json_build_object('uuid', repo_obj->>'uuid') AS metadata
+	FROM unnest(${convert(repos)}) AS t(repo_obj)
+	ON CONFLICT (repo_name, repo_owner, repo_provider) 
+	DO UPDATE SET
+		workspace = EXCLUDED.workspace,
+		clone_ssh_url = EXCLUDED.clone_ssh_url,
+		is_private = EXCLUDED.is_private,
+		project = EXCLUDED.project,
+		metadata = EXCLUDED.metadata
+	RETURNING id as repo_id;		
 	`
 	try {
 		await conn.query('BEGIN');
