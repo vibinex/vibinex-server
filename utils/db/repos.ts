@@ -298,7 +298,7 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 		is_private = EXCLUDED.is_private,
 		project = EXCLUDED.project,
 		metadata = EXCLUDED.metadata
-	RETURN id as repo_id;		
+	RETURNING id as repo_id;		
 	`
 	try {
 		await conn.query('BEGIN');
