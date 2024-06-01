@@ -281,14 +281,14 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 			'bitbucket' AS repo_provider,
 			repo_obj->'workspace'->>'slug' AS workspace,
 			(SELECT clone->>'href' 
-			FROM jsonb_array_elements(repo_obj->'links'->'clone') AS clone 
+			FROM json_array_elements(repo_obj->'links'->'clone') AS clone 
 			WHERE clone->>'name' = 'ssh') AS clone_ssh_url,
 			(repo_obj->>'is_private')::BOOLEAN AS is_private,
-			repo_obj->'project' AS project
-			jsonb_set('{}', '{uuid}', to_jsonb(repo_obj->>'uuid')) AS metadata
+			repo_obj->'project' AS project,
+			json_set('{}', '{uuid}', to_json(repo_obj->>'uuid')) AS metadata
 		FROM unnest(${convert(repos)}) AS t(repo_obj)
 		ON CONFLICT (repo_name, repo_owner, repo_provider) DO NOTHING
-		return id as repo_id;
+		RETURNING id as repo_id;	
 	`
 	try {
 		await conn.query('BEGIN');
