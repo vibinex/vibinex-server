@@ -98,7 +98,7 @@ export const getUserRepositoriesByTopic = async (topicId: string, provider: stri
 			repo_owner, 
 			repo_provider, 
 			clone_ssh_url, 
-			project->>'name' AS project_name,  //not sure if this needs to be extracted or the below type
+			project->>'name' AS project_name,
 			project->>'type' AS project_type,
 			is_private,
 			metadata->>'uuid',
