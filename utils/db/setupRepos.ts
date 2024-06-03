@@ -76,7 +76,7 @@ export const saveSelectedReposInDb = async (args: SetupReposArgs, userId: string
     try {
         await conn.query('BEGIN');
         console.debug(`[saveSelectedReposInDb] insert query: `, insertReposQuery);
-        const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery)
+        const { rowCount: reposRowCount } = await conn.query(insertReposQuery)
             .catch(err => {
                 console.error(`[saveSelectedReposInDb] Could not insert selected repos for user (${userId}) in the ${args.repo_owner} workspace on ${args.repo_provider}`, { pg_query: insertReposQuery }, err);
                 throw err;

@@ -305,7 +305,7 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 	try {
 		await conn.query('BEGIN');
 		console.debug(`[saveBitbucketReposInDb] insert query: `, insertReposQuery);
-		const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery)
+		const { rowCount: reposRowCount } = await conn.query(insertReposQuery)
 			.catch(err => {
 				console.error(`[saveBitbucketReposInDb] Could not insert repos in the db`, { pg_query: insertReposQuery }, err);
 				throw err;
