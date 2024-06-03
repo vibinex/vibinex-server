@@ -138,7 +138,11 @@ export const saveGitAliasMapToDB = async (aliasMap: AliasMap) => {
 };
 
 const updateOrInsertAliasInAliasesTable = async (alias: string, provider: string, handle: string) => {
-	const query = `
+	if (!handle || handle === '') {
+        console.error(`[updateOrInsertAliasInAliasesTable] Empty handle value`);
+        return;
+    }
+    const query = `
 		INSERT INTO aliases (git_alias, ${provider})
 		VALUES ($1, ARRAY[$2::text])
 		ON CONFLICT (git_alias) DO UPDATE
