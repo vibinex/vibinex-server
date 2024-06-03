@@ -150,6 +150,7 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 	const repoIdentifiers: RepoIdentifier[] = [];
 	for (const workspace of workspaces) {
 		const repositoriesData = await Bitbucket.retrieveAllPages<BitbucketRepoObj>(`/repositories/${workspace}`, access_key, authId);
+		console.debug(`[getUserRepositoriesForBitbucket] repositoriesData = ${repositoriesData}`);
 		bitbucketRepos.push(...repositoriesData);
 		const allBitbucketRepoIdentifiers = repositoriesData.map(repoObj => ({
 			repo_provider: supportedProviders[1],
