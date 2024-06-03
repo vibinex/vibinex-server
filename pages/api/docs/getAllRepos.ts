@@ -1,18 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { RepoIdentifier } from '../../../types/repository';
+import { saveRepoIdentifierToDb } from '../../../utils/db/repos';
 import { getUserRepositories } from "../../../utils/providerAPI/getUserRepositories";
 import { authOptions } from '../auth/[...nextauth]';
-import { getAuthUserId } from '../../../utils/auth';
-import { DbUser, getUserById } from '../../../utils/db/users';
-import { saveRepoIdentifierToDb } from '../../../utils/db/repos';
 import rudderStackEvents from '../events';
 
 const getUserRepositoriesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const session = await getServerSession(req, res, authOptions);
 	if (!session) {
 		const eventProperties = { response_status: 401 };
-        rudderStackEvents.track("absent", "", 'user-repos-from-providers', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'user-repos-from-providers', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
 		return res.status(401).json({ error: 'Unauthenticated' });
 	}
 	const repoList: RepoIdentifier[] | null = await getUserRepositories(session).catch(err => {
@@ -21,17 +19,17 @@ const getUserRepositoriesHandler = async (req: NextApiRequest, res: NextApiRespo
 	})
 	if (!repoList) {
 		const eventProperties = { response_status: 500 };
-		rudderStackEvents.track(session?.user?.id ?? "absent", "", 'user-repos-from-providers', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });    
+		rudderStackEvents.track(session?.user?.id ?? "absent", "", 'user-repos-from-providers', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		return res.status(500).json({ error: 'Error getting repositories' });
 	}
 	if (repoList.length == 0) {
 		const eventProperties = { response_status: 204, result_length: repoList.length };
-		rudderStackEvents.track(session?.user?.id ?? "absent", "", 'user-repos-from-providers', { type: 'HTTP-204', eventStatusFlag: 1, eventProperties });    
+		rudderStackEvents.track(session?.user?.id ?? "absent", "", 'user-repos-from-providers', { type: 'HTTP-204', eventStatusFlag: 1, eventProperties });
 		return res.status(204).json({ error: 'No repositories found' });
 	}
 	const eventProperties = { response_status: 200, result_length: repoList.length };
-	rudderStackEvents.track(session?.user?.id ?? "absent", "", 'user-repos-from-providers', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });    
-  	res.status(200).json({ repoList: repoList });
+	rudderStackEvents.track(session?.user?.id ?? "absent", "", 'user-repos-from-providers', { type: 'HTTP-200', eventStatusFlag: 1, eventProperties });
+	res.status(200).json({ repoList: repoList });
 	await saveRepoIdentifierToDb(repoList);
 }
 
