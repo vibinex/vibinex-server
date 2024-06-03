@@ -163,8 +163,9 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 
 export const getUserRepositories = async (session: Session) => {
 	const allUserReposPromises = [];
-	for (const repoProvider of supportedProviders) {
-		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) {
+	const userProviders = supportedProviders.filter(provider => Object.keys(session.user.auth_info!).includes(provider));
+	for (const repoProvider of userProviders) {
+		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) { // FIXME: this is not required anymore
 			console.warn(`[getUserRepositories] ${repoProvider} provider not present`);
 			continue;
 		}
@@ -201,7 +202,7 @@ export const getUserRepositories = async (session: Session) => {
 				console.error(`[getUserRepositories] Failed to get repositories of the user (id: ${session.user.id}, name: ${session.user.name}) from one of the providers`, result.reason);
 				return;
 			}
-			const repoProvider = supportedProviders[index];
+			const repoProvider = userProviders[index];
 			const providerRepos = result.value;
 			if (repoProvider === 'github') {
 				(providerRepos as RepoIdentifier[]).forEach((repo) => allRepos.add(repo));
