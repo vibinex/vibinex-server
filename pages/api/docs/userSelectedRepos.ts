@@ -1,22 +1,22 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import rudderStackEvents from "../events";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
-import { publishMessage } from "../../../utils/pubsub/pubsubClient";
 import { SetupReposArgs, removePreviousSelections, saveSelectedReposInDb } from "../../../utils/db/setupRepos";
+import { publishMessage } from "../../../utils/pubsub/pubsubClient";
+import { authOptions } from "../auth/[...nextauth]";
+import rudderStackEvents from "../events";
 
 const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[UserSelectedRepos] Saving setup info in db...");
 	const jsonBody = req.body;
-    const session = await getServerSession(req, res, authOptions);
-	if (!session?.user.id) {
+	const session = await getServerSession(req, res, authOptions);
+	if (!session?.user?.id) {
 		const eventProperties = { response_status: 401 };
-        rudderStackEvents.track("absent", "", 'user-selected-repos', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
+		rudderStackEvents.track("absent", "", 'user-selected-repos', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
 		return res.status(401).json({ error: 'Unauthenticated' });
 	}
-    const userId = session.user.id;
-    const provider = jsonBody.info.length > 0 ? jsonBody.info[0].provider : null;
-    if (!Array.isArray(jsonBody.info) || !jsonBody.installationId || !provider) {
+	const userId = session.user.id;
+	const provider = jsonBody.info.length > 0 ? jsonBody.info[0].provider : null;
+	if (!Array.isArray(jsonBody.info) || !jsonBody.installationId || !provider) {
 		console.error("[UserSelectedRepos] Invalid request body", jsonBody);
 		res.status(400).json({ error: "Invalid request body" });
 		const eventProperties = { response_status: 400 };
@@ -49,8 +49,8 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 		const saveSelectedReposPromises = saveSelectedReposInDb(setupReposArgs, userId)
 			.catch((err) => {
 				console.error("[UserSelectedRepos] Unable to save setup info, ", err);
-				const eventProperties = { ...event_properties, response_status: 500, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
-				rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });	
+				const eventProperties = { ...event_properties, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
+				rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'saveSelectedReposInDb-error', eventStatusFlag: 0, eventProperties });
 			});
 		allSelectedReposPromises.push(saveSelectedReposPromises);
 	}
