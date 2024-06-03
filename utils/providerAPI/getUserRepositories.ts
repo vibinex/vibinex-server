@@ -216,7 +216,6 @@ export const getUserRepositories = async (session: Session) => {
 		await saveBitbucketReposInDb(Array.from(bitbucketReposObjs)).then((result) => {
 			if (result) {
 				console.info(`[getUserRepositories] Successfully saved bitbucket repos in the db`);
-				return;
 			} else {
 				console.error(`[getUserRepositories] Failed to save bitbucket repos in the db`);
 			}

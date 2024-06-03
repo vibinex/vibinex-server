@@ -316,7 +316,6 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 			return false;
 		}
 
-		const repoIds = rows.map((row) => row.repo_id);
 		await conn.query('COMMIT');
 		console.debug(`[saveBitbucketReposInDb] repos info saved successfully in db`)
 		return true;
