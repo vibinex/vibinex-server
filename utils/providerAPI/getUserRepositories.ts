@@ -164,7 +164,7 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 
 export const getUserRepositories = async (session: Session) => {
 	const allUserReposPromises = [];
-	const userProviders = supportedProviders.filter(provider => Object.keys(session.user.auth_info!).includes(repoProvider));
+	const userProviders = supportedProviders.filter(provider => Object.keys(session.user.auth_info!).includes(provider));
 	for (const repoProvider of userProviders) {
 		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) { // FIXME: this is not required anymore
 			console.warn(`[getUserRepositories] ${repoProvider} provider not present`);
