@@ -276,7 +276,7 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 		metadata
 	)
 	SELECT 
-		repo_obj->>'name' AS repo_name,
+		repo_obj->>'slug' AS repo_name,
 		repo_obj->'workspace'->>'slug' AS repo_owner,
 		'bitbucket' AS repo_provider,
 		repo_obj->'workspace'->>'slug' AS workspace,
