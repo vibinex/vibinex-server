@@ -150,7 +150,6 @@ export const getUserRepositoriesForBitbucket = async (access_key: string, authId
 	const repoIdentifiers: RepoIdentifier[] = [];
 	for (const workspace of workspaces) {
 		const repositoriesData = await Bitbucket.retrieveAllPages<BitbucketRepoObj>(`/repositories/${workspace}`, access_key, authId);
-		console.debug(`[getUserRepositoriesForBitbucket] repositoriesData = ${repositoriesData}`);
 		bitbucketRepos.push(...repositoriesData);
 		const allBitbucketRepoIdentifiers = repositoriesData.map(repoObj => ({
 			repo_provider: supportedProviders[1],
@@ -199,7 +198,6 @@ export const getUserRepositories = async (session: Session) => {
 
 	await Promise.allSettled(allUserReposPromises).then((results) => {
 		results.forEach((result, index) => {
-			console.debug(`[getUserRepositories] ===============================><><><><>< result = ${JSON.stringify(result)}`);
 			if (result.status !== 'fulfilled') {
 				console.error(`[getUserRepositories] Failed to get repositories of the user (id: ${session.user.id}, name: ${session.user.name}) from one of the providers`, result.reason);
 				return;
