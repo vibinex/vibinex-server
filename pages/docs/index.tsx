@@ -122,7 +122,16 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 				<AccordionItem value="instruction-3" disabled={selectedHosting === '' || !selectedProvider || selectedInstallation === ''}>
 					<AccordionTrigger>Set up DPU</AccordionTrigger>
 					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider!!} session={session} installId={installId} />
+						{isGetInstallIdLoading ? (
+							<>
+								<div className='inline-block border-4 border-t-secondary rounded-full w-6 h-6 animate-spin mx-2'></div>
+								Generating topic name...
+							</>
+						) : installId ? (
+							<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider!!} session={session} installId={installId} />
+						) : (
+							<>User Info not found, please refresh and try again.</>
+						)}
 					</AccordionContent>
 				</AccordionItem>
 				<AccordionItem value="instruction-4" disabled={!selectedProvider}>
