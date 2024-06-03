@@ -197,6 +197,7 @@ export const getUserRepositories = async (session: Session) => {
 
 	await Promise.allSettled(allUserReposPromises).then((results) => {
 		results.forEach((result, index) => {
+			console.debug(`[getUserRepositories] ===============================><><><><>< result = ${JSON.stringify(result)}`);
 			if (result.status !== 'fulfilled') {
 				console.error(`[getUserRepositories] Failed to get repositories of the user (id: ${session.user.id}, name: ${session.user.name}) from one of the providers`, result.reason);
 				return;
