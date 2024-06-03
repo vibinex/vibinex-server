@@ -49,8 +49,8 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 		const saveSelectedReposPromises = saveSelectedReposInDb(setupReposArgs, userId)
 			.catch((err) => {
 				console.error("[UserSelectedRepos] Unable to save setup info, ", err);
-				const eventProperties = { ...event_properties, response_status: 500, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
-				rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
+				const eventProperties = { ...event_properties, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
+				rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'saveSelectedReposInDb-error', eventStatusFlag: 0, eventProperties });
 			});
 		allSelectedReposPromises.push(saveSelectedReposPromises);
 	}

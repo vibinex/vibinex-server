@@ -67,8 +67,8 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
-				const eventProperties = { ...event_properties, response_status: 500, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
-				rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });	
+				const eventProperties = { ...event_properties, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
+				rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'saveSetupReposInDb-error', eventStatusFlag: 0, eventProperties });	
 			});
 		allSetupReposPromises.push(saveSetupReposPromises);
 	}
