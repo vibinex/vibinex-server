@@ -1,9 +1,10 @@
 import axios from "axios";
 import type { Session } from "next-auth";
-import { baseURL, supportedProviders } from ".";
+import { supportedProviders } from ".";
 import type { RepoIdentifier } from "../../types/repository";
-import { bitbucketAccessToken } from "./auth";
+import { saveBitbucketReposInDb } from "../db/repos";
 import { Bitbucket } from "./Bitbucket";
+import { bitbucketAccessToken } from "./auth";
 
 type GithubRepoObj = {
 	name: string;
@@ -35,7 +36,7 @@ type BitbucketWorkspaceObj = {
 	last_accessed: string
 }
 
-type BitbucketRepoObj = {
+export type BitbucketRepoObj = {
 	type: 'repository',
 	full_name: string,
 	links: object[],
@@ -55,6 +56,11 @@ type BitbucketRepoObj = {
 	project: object,
 	uuid: string,
 }
+
+type BitbucketReposResult = {
+	bitbucketReposObjs: BitbucketRepoObj[];
+	repoIdentifiers: RepoIdentifier[];
+};
 
 // type GitlabRepoObj = {
 // }
@@ -126,7 +132,7 @@ const getUserRepositoriesForGitHub = async (access_token: string, authId?: strin
 	} while (hasNextPage);
 
 	// Sort repositories by repo_owner and then by repo_name
-	allGitHubRepositories.sort((a , b) => {
+	allGitHubRepositories.sort((a, b) => {
 		if (a.repo_owner === b.repo_owner) {
 			return a.repo_name.localeCompare(b.repo_name);
 		}
@@ -136,27 +142,30 @@ const getUserRepositoriesForGitHub = async (access_token: string, authId?: strin
 	return allGitHubRepositories;
 }
 
-export const getUserRepositoriesForBitbucket = async (access_key: string, authId?: string): Promise<RepoIdentifier[]> => {
+export const getUserRepositoriesForBitbucket = async (access_key: string, authId?: string): Promise<BitbucketReposResult> => {
 	const workspacesData = await Bitbucket.retrieveAllPages<BitbucketWorkspaceObj>(`/user/permissions/workspaces`, access_key, authId);
 	const workspaces = workspacesData.map((workspaceObj) => workspaceObj.workspace.slug);
 
-	const repositories: RepoIdentifier[] = [];
+	const bitbucketRepos: BitbucketRepoObj[] = [];
+	const repoIdentifiers: RepoIdentifier[] = [];
 	for (const workspace of workspaces) {
 		const repositoriesData = await Bitbucket.retrieveAllPages<BitbucketRepoObj>(`/repositories/${workspace}`, access_key, authId);
+		bitbucketRepos.push(...repositoriesData);
 		const allBitbucketRepoIdentifiers = repositoriesData.map(repoObj => ({
 			repo_provider: supportedProviders[1],
 			repo_owner: repoObj.workspace.slug,
 			repo_name: repoObj.slug
 		}));
-		repositories.push(...allBitbucketRepoIdentifiers);
+		repoIdentifiers.push(...allBitbucketRepoIdentifiers);
 	}
-	return repositories;
+	return { bitbucketReposObjs: bitbucketRepos, repoIdentifiers: repoIdentifiers };
 }
 
 export const getUserRepositories = async (session: Session) => {
 	const allUserReposPromises = [];
-	for (const repoProvider of supportedProviders) {
-		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) {
+	const userProviders = supportedProviders.filter(provider => Object.keys(session.user.auth_info!).includes(provider));
+	for (const repoProvider of userProviders) {
+		if (!Object.keys(session.user.auth_info!).includes(repoProvider)) { // FIXME: this is not required anymore
 			console.warn(`[getUserRepositories] ${repoProvider} provider not present`);
 			continue;
 		}
@@ -185,15 +194,36 @@ export const getUserRepositories = async (session: Session) => {
 	}
 
 	const allRepos: Set<RepoIdentifier> = new Set();
+	const bitbucketReposObjs: Set<BitbucketRepoObj> = new Set();
+
 	await Promise.allSettled(allUserReposPromises).then((results) => {
-		results.forEach((result) => {
+		results.forEach((result, index) => {
 			if (result.status !== 'fulfilled') {
 				console.error(`[getUserRepositories] Failed to get repositories of the user (id: ${session.user.id}, name: ${session.user.name}) from one of the providers`, result.reason);
 				return;
 			}
+			const repoProvider = userProviders[index];
 			const providerRepos = result.value;
-			providerRepos.forEach((repo: RepoIdentifier) => allRepos.add(repo));
+			if (repoProvider === 'github') {
+				(providerRepos as RepoIdentifier[]).forEach((repo) => allRepos.add(repo));
+			} else if (repoProvider === 'bitbucket') {
+				const { bitbucketReposObjs: bbRepos, repoIdentifiers: bitbucketRepoIdentifiers } = providerRepos as BitbucketReposResult;
+				bitbucketRepoIdentifiers.forEach((repo: RepoIdentifier) => allRepos.add(repo));
+				bbRepos.forEach((repo) => bitbucketReposObjs.add(repo));
+			}
 		})
 	})
+	if (bitbucketReposObjs.size > 0) {
+		await saveBitbucketReposInDb(Array.from(bitbucketReposObjs)).then((result) => {
+			if (result) {
+				console.info(`[getUserRepositories] Successfully saved bitbucket repos in the db`);
+			} else {
+				console.error(`[getUserRepositories] Failed to save bitbucket repos in the db`);
+			}
+		}).catch((err) => {
+			console.error(`[getUserRepositories] Failed to save bitbucket repos in the db`, err);
+		});
+	}
+
 	return Array.from(allRepos);
 }
