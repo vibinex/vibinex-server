@@ -44,56 +44,38 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 
 	useEffect(() => {
 		setIsGetReposLoading(true);
-		if (isNewAccordion) {
-			axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getInstalledRepos?nonce=${Math.random()}`, { params: { topicId: installId, provider: repoProvider } })
-				.then((response) => {
-					return response.data.repoList;
-				})
-				.then((allRepos) => {
-					const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
-					setAllRepos(providerReposForUser)
-				})
-				.catch((err) => {
-					console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
-				})
-				.finally(() => {
-					setIsGetReposLoading(false);
-				});
-		}
-		else {
-			axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getAllRepos?nonce=${Math.random()}`)
-				.then((response) => {
-					return response.data.repoList;
-				})
-				.then((allRepos) => {
-					const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
-					setAllRepos(providerReposForUser)
+		axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getAllRepos?nonce=${Math.random()}`)
+			.then((response) => {
+				return response.data.repoList;
+			})
+			.then((allRepos) => {
+				const providerReposForUser = allRepos.filter(repo => repo.repo_provider === repoProvider);
+				setAllRepos(providerReposForUser)
 
-					// automatically check the repositories that are already installed by the user
-					axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getInstalledRepos?nonce=${Math.random()}`, { params: { topicId: installId, provider: repoProvider } })
-						.then((response) => {
-							return response.data.repoList;
-						})
-						.then((repos) => {
-							const filteredRepos = providerReposForUser.filter(repo => repos.some(selectedRepo =>
-								selectedRepo.repo_provider === repo.repo_provider &&
-								selectedRepo.repo_owner === repo.repo_owner &&
-								selectedRepo.repo_name === repo.repo_name
-							)); // this is important because we are matching object references when we compare values in the checkbox
-							setSelectedRepos(filteredRepos);
-						})
-						.catch((err) => {
-							console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
-						})
-				})
-				.catch(err => {
-					console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
-					setError("Failed to get repositories")
-				})
-				.finally(() => {
-					setIsGetReposLoading(false);
-				});
-			}
+				// automatically check the repositories that are already installed by the user
+				axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getInstalledRepos?nonce=${Math.random()}`, { params: { topicId: installId, provider: repoProvider } })
+					.then((response) => {
+						return response.data.repoList;
+					})
+					.then((repos) => {
+						const filteredRepos = providerReposForUser.filter(repo => repos.some(selectedRepo =>
+							selectedRepo.repo_provider === repo.repo_provider &&
+							selectedRepo.repo_owner === repo.repo_owner &&
+							selectedRepo.repo_name === repo.repo_name
+						)); // this is important because we are matching object references when we compare values in the checkbox
+						setSelectedRepos(filteredRepos);
+					})
+					.catch((err) => {
+						console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
+					})
+			})
+			.catch(err => {
+				console.error(`[RepoSelection] getUserReposForProvider failed:`, err);
+				setError("Failed to get repositories")
+			})
+			.finally(() => {
+				setIsGetReposLoading(false);
+			});
 	}, [repoProvider, installId, isNewAccordion])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
@@ -116,14 +98,14 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 		setIsRepoSubmitButtonDisabled(true)
 		setDisableAllRepos(true);
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
-		axios.post('/api/dpu/setup', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
+		axios.post('/api/docs/userSelectedRepos', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
 			.then((response) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);
 					setError('Something went wrong');
 				} else {
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
-					if(setIsRepoSelectionDone) {setIsRepoSelectionDone(true) }
+					if (setIsRepoSelectionDone) { setIsRepoSelectionDone(true) }
 					if (isNewAccordion) { setSubmitButtonText("Submitted") }
 				}
 			})
@@ -133,7 +115,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
 			.finally(() => {
-				if (!isNewAccordion) { setIsRepoSubmitButtonDisabled(false);}
+				if (!isNewAccordion) { setIsRepoSubmitButtonDisabled(false); }
 			})
 	};
 

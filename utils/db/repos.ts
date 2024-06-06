@@ -1,7 +1,31 @@
 import type { Session } from 'next-auth';
 import conn from '.';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
+import { BitbucketRepoObj } from '../providerAPI/getUserRepositories';
 import { convert } from './converter';
+import { BitbucketDBRepo } from '../../types/bitbucket';
+
+export const saveRepoIdentifierToDb = async (repos: RepoIdentifier[]) => {
+	const insertRepoQuery = `
+		INSERT INTO repos (
+			repo_provider,
+			repo_owner,
+			repo_name
+		) VALUES
+		${repos.map(repo => `(
+			${convert(repo.repo_provider)},
+			${convert(repo.repo_owner)},
+			${convert(repo.repo_name)}
+		)`).join(', ')}
+		ON CONFLICT (repo_provider, repo_owner, repo_name)
+		DO NOTHING
+	`;
+
+	await conn.query(insertRepoQuery).catch(err => {
+		console.error(`[saveRepoIdentifierToDb] Error in inserting/updating repositories`, { query: insertRepoQuery }, err);
+		throw new Error(`Error in inserting/updating repositories. Error: ${err.message}`);
+	});
+};
 
 export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => {
 	const userId = session.user.id;
@@ -67,16 +91,33 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 	return allDbRepos;
 }
 
-export const getUserRepositoriesByTopic = async (topicId: string, provider: string) => {
-	const getRepoQuery = `SELECT repo_name, repo_owner, repo_provider
-	FROM repos
-	WHERE repo_provider = ${convert(provider)} AND ${convert(topicId)} = ANY(install_id)`;
-	const repos: RepoIdentifier[] = await conn.query(getRepoQuery)
+export const getUserRepositoriesByTopic = async (topicId: string, provider: string): Promise<BitbucketDBRepo[]> => {
+	const getRepoQuery = `
+		SELECT 
+			repo_name, 
+			repo_owner, 
+			repo_provider, 
+			clone_ssh_url, 
+			project->>'name' AS project_name,
+			project->>'type' AS project_type,
+			is_private,
+			metadata->>'uuid' as uuid,
+			workspace
+		FROM repos
+		WHERE repo_provider = ${convert(provider)} AND ${convert(topicId)} = ANY(user_selected)
+	`;
+
+	const repos = await conn.query(getRepoQuery)
 		.then((dbResponse) => {
 			return dbResponse.rows.map((row) => ({
 				repo_name: row.repo_name,
 				repo_owner: row.repo_owner,
 				repo_provider: row.repo_provider,
+				clone_ssh_url: row.clone_ssh_url,
+				project: row.project,
+				is_private: row.is_private,
+				uuid: row.uuid,
+				workspace: row.workspace
 			}));
 		})
 		.catch((err: Error) => {
@@ -220,4 +261,67 @@ export const removeRepoConfigForInstallIdForOwner = async (installId: string, re
 		console.error(`[removeRepoConfig] No repo config found to remove`);
 	}
 	console.debug(`[removeRepoConfig] Previous repoConfig removed for ${installId} and ${userId}`);
+}
+
+export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise<boolean> => {
+	const insertReposQuery = `
+	INSERT INTO repos (
+		repo_name,
+		repo_owner,
+		repo_provider,
+		workspace,
+		clone_ssh_url,
+		is_private,
+		project,
+		metadata
+	)
+	SELECT 
+		repo_obj->>'slug' AS repo_name,
+		repo_obj->'workspace'->>'slug' AS repo_owner,
+		'bitbucket' AS repo_provider,
+		repo_obj->'workspace'->>'slug' AS workspace,
+		(SELECT clone->>'href' 
+		FROM jsonb_array_elements(repo_obj->'links'->'clone') AS clone 
+		WHERE clone->>'name' = 'ssh') AS clone_ssh_url,
+		(repo_obj->>'is_private')::BOOLEAN AS is_private,
+		repo_obj->'project' AS project,
+		jsonb_set('{}', '{uuid}', to_jsonb(repo_obj->>'uuid')) AS metadata
+		FROM unnest(
+			ARRAY [
+				${repos.map((x: string | number | object, index: number, array: any[]) => {
+					return index === array.length - 1 ? `(${convert(x)}::JSONB)` : `(${convert(x)}::JSONB),`;
+				}).join('')}
+			]
+		) AS t(repo_obj)		
+	ON CONFLICT (repo_name, repo_owner, repo_provider) 
+	DO UPDATE SET
+		workspace = EXCLUDED.workspace,
+		clone_ssh_url = EXCLUDED.clone_ssh_url,
+		is_private = EXCLUDED.is_private,
+		project = EXCLUDED.project,
+		metadata = EXCLUDED.metadata
+	RETURNING id as repo_id;		
+	`
+	try {
+		await conn.query('BEGIN');
+		console.debug(`[saveBitbucketReposInDb] insert query: `, insertReposQuery);
+		const { rowCount: reposRowCount } = await conn.query(insertReposQuery)
+			.catch(err => {
+				console.error(`[saveBitbucketReposInDb] Could not insert repos in the db`, { pg_query: insertReposQuery }, err);
+				throw err;
+			});
+		if (reposRowCount === 0) {
+			await conn.query('ROLLBACK');
+			console.error(`[saveBitbucketReposInDb] No repositories were inserted or updated in db`);
+			return false;
+		}
+
+		await conn.query('COMMIT');
+		console.debug(`[saveBitbucketReposInDb] repos info saved successfully in db`)
+		return true;
+	} catch (err) {
+		await conn.query('ROLLBACK');
+		console.error(`[saveBitbucketReposInDb] Could not save setup repos`, { pg_query: insertReposQuery }, err);
+		return false;
+	}
 }
