@@ -252,6 +252,23 @@ export const getAuthInfoFromDb = async function (user_id: string): Promise<AuthI
 	return authinfo_promise.authInfo;
 }
 
+export const getUserTopicFromDb = async function (userId: string): Promise<string | null> {
+	const user_auth_search_q = `SELECT topic_name
+		FROM users
+		WHERE id = $1`;
+	const params = [userId];
+	const topic_promise = await conn.query(user_auth_search_q, params)
+		.then((result): { topic: string | null } => {
+			return result.rows[0];
+		})
+		.catch((error): { topic: string | null } => {
+			console.error(`[getUserTopicFromDb] Error in getting topic from the database`,
+				{ pg_query: user_auth_search_q }, error);
+			return {topic: null};
+		});
+	return topic_promise.topic;
+}
+
 export const getUserIdByTopicName = async function (topic_name: string) {
 	const query = `SELECT id FROM users WHERE topic_name = $1`;
 	const params = [topic_name];
