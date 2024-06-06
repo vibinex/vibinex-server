@@ -1,13 +1,6 @@
 import axios from "axios";
 import type { Session } from "next-auth";
 import React, { useEffect, useState } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../../components/Accordion";
-import Button from "../../components/Button";
 import Chip from "../../components/Chip";
 import Footer from "../../components/Footer";
 import LoadingOverlay from "../../components/LoadingOverlay";
@@ -27,8 +20,11 @@ import {
 import { RepoProvider } from "../../utils/providerAPI";
 import { getAndSetAnonymousIdFromLocalStorage } from "../../utils/rudderstack_initialize";
 import { getURLWithParams } from "../../utils/url_utils";
-import DocsSideBar from "../../views/docs/DocsSideBar";
 import MainAppBar from "../../views/MainAppBar";
+import Button from "../../components/Button";
+// @ts-ignore
+import Stepper from "react-stepper-horizontal";
+import DocsSideBar from "../../views/docs/DocsSideBar";
 
 const verifySetup = [
   "In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
@@ -36,7 +32,7 @@ const verifySetup = [
   "Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow.",
 ];
 
-const QuickStartGuide = ({
+const Docs = ({
   bitbucket_auth_url,
   image_name,
 }: {
@@ -48,9 +44,6 @@ const QuickStartGuide = ({
   const [installId, setInstallId] = useState<string | null>(null);
   const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
   const { rudderEventMethods } = React.useContext(RudderContext);
-
-  const architecturalDiagram =
-    "https://github.com/Alokit-Innovations/.github/assets/7858932/d5a97883-64ef-498f-b97a-318b6675ac87";
 
   useEffect(() => {
     fetch("/api/auth/session", { cache: "no-store" })
@@ -68,7 +61,7 @@ const QuickStartGuide = ({
           })
           .catch((error) => {
             console.error(
-              `[quickstart] Unable to get topic name for user ${userId} - ${error.message}`
+              `[docs] Unable to get topic name for user ${userId} - ${error.message}`
             );
           })
           .finally(() => {
@@ -76,7 +69,7 @@ const QuickStartGuide = ({
           });
       })
       .catch((err) => {
-        console.error(`[quickstart] Error in getting session`, err);
+        console.error(`[docs] Error in getting session`, err);
       })
       .finally(() => {
         setLoading(false);
@@ -87,7 +80,7 @@ const QuickStartGuide = ({
     const anonymousId = getAndSetAnonymousIdFromLocalStorage();
     rudderEventMethods?.track(
       getAuthUserId(session),
-      "quickstart page",
+      "docs page",
       { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) },
       anonymousId
     );
@@ -99,7 +92,7 @@ const QuickStartGuide = ({
         {
           type: "link",
           eventStatusFlag: 1,
-          source: "quickstart",
+          source: "docs",
           name: getAuthUserName(session),
         },
         anonymousId
@@ -113,7 +106,7 @@ const QuickStartGuide = ({
         {
           type: "button",
           eventStatusFlag: 1,
-          source: "quickstart",
+          source: "docs",
           name: getAuthUserName(session),
         },
         anonymousId
@@ -157,6 +150,162 @@ const QuickStartGuide = ({
   const [selectedInstallation, setSelectedInstallation] = useState<string>("");
   const [selectedHosting, setSelectedHosting] = useState<string>("");
 
+  const steps = [
+    "Login",
+    "Configure",
+    "Setup DPU",
+    "Setup Triggers",
+    "Install Chrome Extension",
+    "Verify Setup",
+  ];
+
+  const [activeStep, setActiveStep] = React.useState(0);
+
+  const StepComponent1 = () => (
+    <div>
+      <h1>Login using the target provider</h1>
+      <div className="flex items-center gap-2">
+        {Object.values(session?.user?.auth_info?.github ?? {}).map(
+          (githubAuthInfo) => (
+            <Chip
+              key={githubAuthInfo.handle}
+              name={githubAuthInfo.handle ?? "unknown"}
+              avatar={"/github-dark.svg"}
+              disabled={isAuthInfoExpired(githubAuthInfo)}
+              disabledText="This auth has expired"
+            />
+          )
+        )}
+        {Object.values(session?.user?.auth_info?.bitbucket ?? {}).map(
+          (bitbucketAuthInfo) => (
+            <Chip
+              key={bitbucketAuthInfo.handle}
+              name={bitbucketAuthInfo.handle ?? "unknown"}
+              avatar={"/bitbucket-dark.svg"}
+              disabled={isAuthInfoExpired(bitbucketAuthInfo)}
+              disabledText="This auth has expired"
+            />
+          )
+        )}
+        <Button
+          variant="contained"
+          href={getURLWithParams("/auth/signin", {
+            callbackUrl: "/docs",
+          })}
+          className="px-4 py-2 w-full mt-8 sm:flex-grow-0"
+        >
+          Add login
+        </Button>
+      </div>
+    </div>
+  );
+  const StepComponent2 = () => (
+    <div>
+      <h1>Configure DPU</h1>
+      <div className="flex flex-col gap-2 pl-4">
+        <label className="flex justify-between font-semibold text-sm">
+          Provider:
+          <ProviderSelector
+            providerOptions={providerOptions}
+            selectedProvider={selectedProvider}
+            setSelectedProvider={setSelectedProvider}
+          />
+        </label>
+        <label className="flex justify-between font-semibold text-sm">
+          Installation Type:
+          <InstallationSelector
+            selectedInstallation={selectedInstallation}
+            setSelectedInstallation={setSelectedInstallation}
+          />
+        </label>
+        <label className="font-semibold text-sm w-full flex justify-between">
+          Hosting:
+          <HostingSelector
+            selectedHosting={selectedHosting}
+            setSelectedHosting={setSelectedHosting}
+          />
+        </label>
+      </div>
+    </div>
+  );
+  const StepComponent3 = () => (
+    <div>
+      <h1>Set up DPU</h1>
+      <div>
+        <BuildInstruction
+          selectedHosting={selectedHosting}
+          userId={getAuthUserId(session)}
+          selectedInstallationType={selectedInstallation}
+          selectedProvider={selectedProvider!!}
+          session={session}
+          installId={installId}
+        />
+      </div>
+    </div>
+  );
+  const StepComponent4 = () => (
+    <div>
+      <h1>Set up triggers</h1>
+    </div>
+  );
+  const StepComponent5 = () => (
+    <div>
+      <h1>Install browser extension</h1>
+      <div>
+        <a href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1">
+          <Button variant={"text"}>Link</Button>
+        </a>
+      </div>
+    </div>
+  );
+  const StepComponent6 = () => (
+    <div>
+      <h1>Verify Setup</h1>
+      <div>
+        Once you have set up your repositories, installed the browser extension
+        and signed in, you can verify if everything is correctly set up.
+        <ol>
+          {verifySetup.map((checkItem, index) => (
+            <li
+              key={checkItem}
+              className="mt-2 ml-1"
+              dangerouslySetInnerHTML={{ __html: `${index + 1}. ${checkItem}` }}
+            />
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+
+  const stepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return <StepComponent1 />;
+      case 1:
+        return <StepComponent2 />;
+      case 2:
+        return <StepComponent3 />;
+      case 3:
+        return <StepComponent4 />;
+      case 4:
+        return <StepComponent5 />;
+      case 5:
+        return <StepComponent6 />;
+      default:
+        return "Unknown step";
+    }
+  };
+
+  const handleNext = () => {
+    setActiveStep((prevStep) =>
+      prevStep < steps.length - 1 ? prevStep + 1 : prevStep
+    );
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevStep) => (prevStep > 0 ? prevStep - 1 : prevStep));
+  };
+
   return (
     <div>
       <MainAppBar />
@@ -168,171 +317,81 @@ const QuickStartGuide = ({
           text="Could not get session. Please reload"
         />
       ) : null}
-      <div className="flex">
-        <DocsSideBar className="w-full sm:w-80" />
 
-        {/* Center content */}
-        <Accordion
-          type="single"
-          defaultValue="instruction-1"
-          className="sm:w-2/3 mx-auto mt-8 px-2 py-2"
-        >
-          <AccordionItem value="instruction-1">
-            <AccordionTrigger>Login using the target provider</AccordionTrigger>
-            <AccordionContent className="flex items-center gap-2">
-              {Object.values(session?.user?.auth_info?.github ?? {}).map(
-                (githubAuthInfo) => (
-                  <Chip
-                    key={githubAuthInfo.handle}
-                    name={githubAuthInfo.handle ?? "unknown"}
-                    avatar={"/github-dark.svg"}
-                    disabled={isAuthInfoExpired(githubAuthInfo)}
-                    disabledText="This auth has expired"
-                  />
-                )
-              )}
-              {Object.values(session?.user?.auth_info?.bitbucket ?? {}).map(
-                (bitbucketAuthInfo) => (
-                  <Chip
-                    key={bitbucketAuthInfo.handle}
-                    name={bitbucketAuthInfo.handle ?? "unknown"}
-                    avatar={"/bitbucket-dark.svg"}
-                    disabled={isAuthInfoExpired(bitbucketAuthInfo)}
-                    disabledText="This auth has expired"
-                  />
-                )
-              )}
-              <Button
-                variant="contained"
-                href={getURLWithParams("/auth/signin", {
-                  callbackUrl: "/docs",
-                })}
-                className="px-4 py-2 flex-1 sm:flex-grow-0"
-              >
-                Add login
-              </Button>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="instruction-2">
-            <AccordionTrigger>Configure your DPU</AccordionTrigger>
-            <AccordionContent className="flex flex-col gap-2 pl-4">
-              <label className="flex justify-between font-semibold text-sm">
-                Provider:
-                <ProviderSelector
-                  providerOptions={providerOptions}
-                  selectedProvider={selectedProvider}
-                  setSelectedProvider={setSelectedProvider}
-                />
-              </label>
-              <label className="flex justify-between font-semibold text-sm">
-                Installation Type:
-                <InstallationSelector
-                  selectedInstallation={selectedInstallation}
-                  setSelectedInstallation={setSelectedInstallation}
-                />
-              </label>
-              <label className="font-semibold text-sm w-full flex justify-between">
-                Hosting:
-                <HostingSelector
-                  selectedHosting={selectedHosting}
-                  setSelectedHosting={setSelectedHosting}
-                />
-              </label>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="instruction-3"
-            disabled={
-              selectedHosting === "" ||
-              !selectedProvider ||
-              selectedInstallation === ""
-            }
-          >
-            <AccordionTrigger>Set up DPU</AccordionTrigger>
-            <AccordionContent>
-              <BuildInstruction
-                selectedHosting={selectedHosting}
-                userId={getAuthUserId(session)}
-                selectedInstallationType={selectedInstallation}
-                selectedProvider={selectedProvider!!}
-                session={session}
-                installId={installId}
-              />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="instruction-4" disabled={!selectedProvider}>
-            {selectedProvider === "github" &&
-            selectedHosting === "selfhosting" &&
-            selectedInstallation === "individual" ? (
-              <>
-                <AccordionTrigger>Repository Selection</AccordionTrigger>
-                <AccordionContent>
-                  {isGetInstallIdLoading ? (
-                    <>
-                      <div className="inline-block border-4 border-t-secondary rounded-full w-6 h-6 animate-spin mx-2"></div>
-                      Generating topic name...
-                    </>
-                  ) : installId ? (
-                    <RepoSelection
-                      repoProvider={selectedProvider as RepoProvider}
-                      installId={installId as string}
-                      setIsRepoSelectionDone={null}
-                      isNewAccordion={true}
-                    />
-                  ) : (
-                    <>User Info not found, please refresh and try again.</>
-                  )}
-                </AccordionContent>
-              </>
-            ) : (
-              <>
-                <AccordionTrigger>Set up triggers</AccordionTrigger>
-                <AccordionContent>
-                  <TriggerContent
-                    selectedProvider={selectedProvider}
-                    bitbucket_auth_url={bitbucket_auth_url}
-                    selectedHosting={selectedHosting}
-                    selectedInstallationType={selectedInstallation}
-                  />
-                </AccordionContent>
-              </>
-            )}
-          </AccordionItem>
-          <AccordionItem value="instruction-5">
-            <AccordionTrigger>Install browser extension</AccordionTrigger>
-            <AccordionContent>
-              <a href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1">
-                <Button variant={"text"}>Link</Button>
-              </a>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="verify-setup">
-            <AccordionTrigger>Verify your setup</AccordionTrigger>
-            <AccordionContent>
-              Once you have set up your repositories, installed the browser
-              extension and signed in, you can verify if everything is correctly
-              set up.
-              <ol>
-                {verifySetup.map((checkItem, index) => (
-                  <li
-                    key={checkItem}
-                    className="mt-2 ml-1"
-                    dangerouslySetInnerHTML={{
-                      __html: `${index + 1}. ${checkItem}`,
-                    }}
-                  />
-                ))}
-              </ol>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+      <div className="flex">
+        <DocsSideBar className="w-full  sm:w-80" />
+        <div className="flex-initial w-full">
+          <Stepper
+            steps={steps.map((step) => ({ title: step }))}
+            activeStep={activeStep}
+            completeColor="#018c77"
+            activeTitleColor="#fff"
+            completeBarColor="#018c77"
+            completeTitleColor="#757575"
+            defaultColor="#5096FF"
+            activeColor="#4b4e54"
+          />
+          <div className="flex items-center justify-between p-4">
+            <Button
+              onClick={handleBack}
+              disabled={activeStep === 0}
+              variant="contained"
+            >
+              &laquo; Back
+            </Button>
+            <div className="flex flex-row min-h-96 justify-center items-center flex-grow mx-32">
+              {stepContent(activeStep)}
+            </div>
+            <Button
+              onClick={handleNext}
+              disabled={activeStep === steps.length - 1}
+              variant="contained"
+            >
+              Next &raquo;
+            </Button>
+          </div>
+        </div>
       </div>
-      <Footer />
     </div>
+
+    //  {/* Center content */}
+    //  <Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
+    //
+    //
+    //    <AccordionItem value="instruction-4" disabled={!selectedProvider}>
+    //      {selectedProvider === 'github' && selectedHosting === 'selfhosting' && selectedInstallation === 'individual' ? (
+    //        <>
+    //          <AccordionTrigger>Repository Selection</AccordionTrigger>
+    //          <AccordionContent>
+    //            {isGetInstallIdLoading ? (
+    //              <>
+    //                <div className='inline-block border-4 border-t-secondary rounded-full w-6 h-6 animate-spin mx-2'></div>
+    //                Generating topic name...
+    //              </>
+    //            ) : installId ? (
+    //              <RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} isNewAccordion={true} />
+    //            ) : (
+    //              <>User Info not found, please refresh and try again.</>
+    //            )}
+    //          </AccordionContent>
+    //        </>
+    //      ) : (
+    //        <>
+    //          <AccordionTrigger>Set up triggers</AccordionTrigger>
+    //          <AccordionContent>
+    //            <TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation} />
+    //          </AccordionContent>
+    //        </>
+    //      )}
+    //    </AccordionItem>
+    //  </Accordion>
+
+    //  <Footer />
+    // </div>
   );
 };
 
-QuickStartGuide.getInitialProps = async () => {
+Docs.getInitialProps = async () => {
   const baseUrl = "https://bitbucket.org/site/oauth2/authorize";
   const redirectUri = "https://vibinex.com/api/bitbucket/callbacks/install";
   const scopes = "repository";
@@ -347,4 +406,4 @@ QuickStartGuide.getInitialProps = async () => {
   };
 };
 
-export default QuickStartGuide;
+export default Docs;
