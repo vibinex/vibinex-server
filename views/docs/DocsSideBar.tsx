@@ -7,9 +7,7 @@ const navItems: SidebarNavItem[] = [
 		label: 'User Guide',
 		href: '',
 		children: [
-			{ label: 'Getting Started', href: '/docs/quickstart' },
-			{ label: 'Installation for GitHub', href: '/docs/github-installation' },
-			{ label: 'Installation for Bitbucket', href: '/docs/bitbucket-installation' },
+			{ label: 'Getting Started', href: '/docs/setup/providerLogin' },
 			{
 				label: 'Troubleshooting', href: '/docs/troubleshooting', children: [
 					{ label: 'Unable to run docker command', href: '/docs/troubleshooting/unable-to-run-docker-command' },
