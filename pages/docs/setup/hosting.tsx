@@ -60,10 +60,11 @@ const HostingSelection: React.FC<HostingSelectorProps> = () => {
     const currentQueryParams = router.query;
 
     const hostingOptionsExplainedMD = `## Hosting Options
-Selecting the right login lets Vibinex set up the correct set of repositories for you.
-Please ensure that you are logged in using an account that has at least read permissions for the desired repositories.
-Proceed by choosing one of the options below or adding another login.
-`; //TODO: Change the content
+We provide two hosting options for you to choose from.
+Self hosting and cloud hosting.
+In case of self hosting, the docker will run on your machine only and we will not get any piece of your code. It will be a complete privacy and security for you.
+In case of cloud hosting, we will get access to your code and we will be able to run it on our infrastructure.
+`;
     
     return (
         <div>
