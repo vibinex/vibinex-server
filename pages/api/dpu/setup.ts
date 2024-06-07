@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { removeRepoConfigForInstallIdForOwner } from '../../../utils/db/repos';
-import { removePreviousInstallations, saveSetupReposInDb, SetupReposArgs } from '../../../utils/db/setupRepos';
+import { SetupReposArgs, removePreviousInstallations, saveSetupReposInDb } from '../../../utils/db/setupRepos';
 import { getUserIdByTopicName } from '../../../utils/db/users';
 import { publishMessage } from '../../../utils/pubsub/pubsubClient';
 import rudderStackEvents from '../events';
@@ -24,7 +24,7 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		rudderStackEvents.track("absent", "", 'dpu-setup', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
 		return;
 	}
-	
+
 	// get user_id for the given install_id
 	const userId = await getUserIdByTopicName(jsonBody.installationId).catch((error: any) => {
 		console.error("[setupHandler/getUserIdByTopicName] Failed to fetch userId from the database.", error);
@@ -67,8 +67,8 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		const saveSetupReposPromises = saveSetupReposInDb(setupReposArgs, userId)
 			.catch((err) => {
 				console.error("[setupHandler] Unable to save setup info, ", err);
-				const eventProperties = { ...event_properties, response_status: 500, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
-				rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });	
+				const eventProperties = { ...event_properties, repo_owner: ownerInfo.owner, repos: ownerInfo.repos };
+				rudderStackEvents.track(userId, "", 'dpu-setup', { type: 'saveSetupReposInDb-error', eventStatusFlag: 0, eventProperties });
 			});
 		allSetupReposPromises.push(saveSetupReposPromises);
 	}
