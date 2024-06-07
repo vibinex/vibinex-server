@@ -81,7 +81,7 @@ Proceed by choosing one of the options below or adding another login.
 						/>
 					))}
 					<Button variant="contained" href={getURLWithParams('/auth/signin', { callbackUrl: "/docs/setup/providerLogin" })} className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
-					<Button variant="contained" href={selectedProvider === "bitbucket" ? getURLWithParams('/docs/setup/repositories', { provider: selectedProvider }) : getURLWithParams('/docs/setup/hosting', { provider: selectedProvider })} className='px-4 py-2 flex-1 sm:flex-grow-0'>Next</Button>
+					<Button variant="contained" href={selectedProvider === "bitbucket" ? getURLWithParams('/docs/setup/repositories', { provider: selectedProvider }) : getURLWithParams('/docs/setup/installation', { provider: selectedProvider })} className='px-4 py-2 flex-1 sm:flex-grow-0'>Next</Button>
 				</div>
 			</div>
 			<Footer />
