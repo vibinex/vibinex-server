@@ -55,10 +55,10 @@ Please click on the extension icon to verify that you are logged in. If you are 
                     <div className='flex flex-col items-start'>
                         <Button
                             variant="contained"
-                            href={getURLWithParams('/docs/setup/dockerInstructions', {...currentQueryParams, hosting: hosting })}
+                            href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1"
                             className='px-4 py-2 mt-4'
                         >
-                            Next
+                        Install Vibinex Chrome Extension   
                         </Button>
                     </div>
                 </div>
