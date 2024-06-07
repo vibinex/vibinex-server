@@ -331,24 +331,29 @@ const Docs = ({
             defaultColor="#5096FF"
             activeColor="#4b4e54"
           />
-          <div className="flex items-center justify-between p-4">
-            <Button
-              onClick={handleBack}
-              disabled={activeStep === 0}
-              variant="contained"
-            >
-              &laquo; Back
-            </Button>
-            <div className="flex flex-row min-h-96 justify-center items-center flex-grow mx-32">
+          <div className="flex items-center justify-between p-4 relative ">
+            <div className="absolute bottom-0 left-0 m-16">
+              <Button
+                onClick={handleBack}
+                disabled={activeStep === 0}
+                variant="text"
+                className="bg-blue-500 "
+              >
+                &laquo; Previous
+              </Button>
+            </div>
+            <div className="flex flex-row min-h-96 justify-center items-center flex-grow mx-32 ">
               {stepContent(activeStep)}
             </div>
-            <Button
-              onClick={handleNext}
-              disabled={activeStep === steps.length - 1}
-              variant="contained"
-            >
-              Next &raquo;
-            </Button>
+            <div className="absolute bottom-0 right-0 m-16">
+              <Button
+                onClick={handleNext}
+                disabled={activeStep === steps.length - 1}
+                variant="contained"
+              >
+                Next &raquo;
+              </Button>
+            </div>
           </div>
         </div>
       </div>
