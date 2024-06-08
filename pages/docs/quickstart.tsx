@@ -358,41 +358,6 @@ const Docs = ({
         </div>
       </div>
     </div>
-
-    //  {/* Center content */}
-    //  <Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
-    //
-    //
-    //    <AccordionItem value="instruction-4" disabled={!selectedProvider}>
-    //      {selectedProvider === 'github' && selectedHosting === 'selfhosting' && selectedInstallation === 'individual' ? (
-    //        <>
-    //          <AccordionTrigger>Repository Selection</AccordionTrigger>
-    //          <AccordionContent>
-    //            {isGetInstallIdLoading ? (
-    //              <>
-    //                <div className='inline-block border-4 border-t-secondary rounded-full w-6 h-6 animate-spin mx-2'></div>
-    //                Generating topic name...
-    //              </>
-    //            ) : installId ? (
-    //              <RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} isNewAccordion={true} />
-    //            ) : (
-    //              <>User Info not found, please refresh and try again.</>
-    //            )}
-    //          </AccordionContent>
-    //        </>
-    //      ) : (
-    //        <>
-    //          <AccordionTrigger>Set up triggers</AccordionTrigger>
-    //          <AccordionContent>
-    //            <TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation} />
-    //          </AccordionContent>
-    //        </>
-    //      )}
-    //    </AccordionItem>
-    //  </Accordion>
-
-    //  <Footer />
-    // </div>
   );
 };
 
