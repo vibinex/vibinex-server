@@ -62,7 +62,9 @@ const Repositories = () => {
 				</div>
 				<div className="absolute bottom-0 right-0 mb-2 mr-2">
 					<Button
-						href={getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories' })}
+						href={provider === 'github'
+							? getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', installation: 'pat', provider: 'github'})
+							: getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', provider: 'bitbucket' })}
 						variant="contained"
 						className='px-4 py-2 flex-1 sm:flex-grow-0'
 					>

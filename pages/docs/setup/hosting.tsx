@@ -18,6 +18,8 @@ import { useToast } from "../../../components/Toast/use-toast";
 import InstructionsToGeneratePersonalAccessToken from "../../../components/setup/InstructionsToGeneratePersonalAccessToken";
 import { RenderMarkdown } from "../../../components/RenderMarkdown";
 import BuildInstruction from "../../../components/setup/BuildInstruction";
+import Button from "../../../components/Button";
+import { getURLWithParams } from "../../../utils/url_utils";
 
 const Hosting = () => {
 	const [session, setSession] = useState<Session | null>(null);
@@ -72,13 +74,26 @@ If you do not wnat to host your own docker and are comfortable in giving us acce
 				(!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
 			<div className="flex flex-col sm:flex-row">
 				<DocsSideBar className='w-full sm:w-80' />
-                <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
+                <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
                     <DockerInstructions selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} installId={installId as string} />
                     {installation && installation === 'pat' ? 
                         <InstructionsToGeneratePersonalAccessToken selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string}/> 
                     : <> </>}
                     <RenderMarkdown markdownText={cloudBuildExplainedMD} />
-                    <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
+					<div className='pb-16'>
+                    	<BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
+					</div>
+					<div className="absolute bottom-0 right-0 mb-2 mr-2">
+						<Button
+							href={installation === 'pat'
+								? getURLWithParams('/docs/setup/chromeExtension', { srcSuffix: '/docs/setup/hosting'})
+								: getURLWithParams('/docs/setup/providerAppInstall', { srcSuffix: '/docs/setup/hosting', provider: provider, installation: installation})}
+							variant="contained"
+							className='px-4 py-2 flex-1 sm:flex-grow-0'
+						>
+							Next &raquo;
+						</Button>
+					</div>
                 </div>
 			</div>
 			<Footer />

@@ -57,22 +57,24 @@ In case of project, you must have all the required permissions to run the tool o
             {loading ? <LoadingOverlay type='loading' /> : (!session ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null)}
             <div className="flex flex-col sm:flex-row">
                 <DocsSideBar className='w-full sm:w-80' />
-                <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
+                <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
                     <RenderMarkdown markdownText={providerOauthAppInstallationExplainedMD} />
-                    <div className='flex flex-col items-start'>
+                    <div className='flex flex-col items-start pb-16'>
                         <TriggerContent
                             selectedProvider={provider as RepoProvider}
                             bitbucket_auth_url={bitbucket_auth_url}
                             selectedHosting={hosting as string}
                             selectedInstallationType={installation as string}
                         />
-                        <Button
-                            variant="contained"
-                            href={getURLWithParams('/docs/setup/dockerInstructions', {...currentQueryParams, hosting: hosting })}
-                            className='px-4 py-2 mt-4'
-                        >
-                            Next
-                        </Button>
+                        <div className="absolute bottom-0 right-0 mb-2 mr-2">
+                            <Button
+                                href={getURLWithParams('/docs/setup/chromeExtension', { srcSuffix: '/docs/setup/hosting'})}
+                                variant="contained"
+                                className='px-4 py-2 flex-1 sm:flex-grow-0'
+                            >
+                                Next &raquo;
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
