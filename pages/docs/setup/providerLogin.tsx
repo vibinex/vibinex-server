@@ -56,32 +56,52 @@ Proceed by choosing one of the options below or adding another login.
 				(!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
 			<div className="flex flex-col sm:flex-row">
 				<DocsSideBar className='w-full sm:w-80' />
-				<div className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
-					<RenderMarkdown markdownText={loginExplanationMD} />
-					{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
-						<Chip
-							key={githubAuthInfo.handle}
-							name={githubAuthInfo.handle ?? "unknown"}
-							avatar={"/github-dark.svg"}
-							disabled={isAuthInfoExpired(githubAuthInfo)}
-							disabledText='This auth has expired'
-							onClick={githubAuthInfo.handle ? () => handleChipClick("github") : undefined}
-							selected={selectedProvider === "github"}
-						/>
-					))}
-					{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
-						<Chip
-							key={bitbucketAuthInfo.handle}
-							name={bitbucketAuthInfo.handle ?? "unknown"}
-							avatar={"/bitbucket-dark.svg"}
-							disabled={isAuthInfoExpired(bitbucketAuthInfo)}
-							disabledText='This auth has expired'
-							onClick={bitbucketAuthInfo.handle ? () => handleChipClick("bitbucket") : undefined}
-							selected={selectedProvider === "bitbucket"}
-						/>
-					))}
-					<Button variant="contained" href={getURLWithParams('/auth/signin', { callbackUrl: "/docs/setup/providerLogin" })} className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
-					<Button variant="contained" href={selectedProvider === "bitbucket" ? getURLWithParams('/docs/setup/repositories', { provider: selectedProvider }) : getURLWithParams('/docs/setup/installation', { provider: selectedProvider })} className='px-4 py-2 flex-1 sm:flex-grow-0'>Next</Button>
+				<div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
+					<div className="pb-16">
+						<RenderMarkdown markdownText={loginExplanationMD} />
+						<Button 
+							variant="contained" 
+							href={
+								getURLWithParams('/auth/signin', 
+									{ callbackUrl: "/docs/setup/providerLogin" })} 
+							className='px-4 py-2 flex-1 sm:flex-grow-0 mb-4'>
+								Add login
+						</Button>
+						{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
+							<Chip
+								key={githubAuthInfo.handle}
+								name={githubAuthInfo.handle ?? "unknown"}
+								avatar={"/github-dark.svg"}
+								disabled={isAuthInfoExpired(githubAuthInfo)}
+								disabledText='This auth has expired'
+								onClick={githubAuthInfo.handle ? () => handleChipClick("github") : undefined}
+								selected={selectedProvider === "github"}
+							/>
+						))}
+						{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
+							<Chip
+								key={bitbucketAuthInfo.handle}
+								name={bitbucketAuthInfo.handle ?? "unknown"}
+								avatar={"/bitbucket-dark.svg"}
+								disabled={isAuthInfoExpired(bitbucketAuthInfo)}
+								disabledText='This auth has expired'
+								onClick={bitbucketAuthInfo.handle ? () => handleChipClick("bitbucket") : undefined}
+								selected={selectedProvider === "bitbucket"}
+							/>
+						))}
+					</div>
+					<div className="absolute bottom-0 right-0 mb-2 mr-2">
+						<Button
+							href={selectedProvider === "bitbucket"
+								? getURLWithParams('/docs/setup/repositories', { provider: selectedProvider, srcSuffix: '/docs/setup/providerLogin' })
+								: getURLWithParams('/docs/setup/installation', { provider: selectedProvider, srcSuffix: '/docs/setup/providerLogin' })}
+							variant="contained"
+							className='px-4 py-2 flex-1 sm:flex-grow-0'
+							disabled={selectedProvider === null}
+						>
+							Next &raquo;
+						</Button>
+					</div>
 				</div>
 			</div>
 			<Footer />

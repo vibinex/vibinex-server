@@ -232,14 +232,14 @@ const Docs = ({
     <div>
       <h1>Set up DPU</h1>
       <div>
-        <BuildInstruction
+        {/* <BuildInstruction
           selectedHosting={selectedHosting}
           userId={getAuthUserId(session)}
           selectedInstallationType={selectedInstallation}
           selectedProvider={selectedProvider!!}
           session={session}
           installId={installId}
-        />
+        /> */}
       </div>
     </div>
   );

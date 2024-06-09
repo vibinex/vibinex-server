@@ -12,13 +12,15 @@ import MainAppBar from "../../../views/MainAppBar";
 import { useRouter } from "next/router";
 import RepoSelection from "../../../components/setup/RepoSelection";
 import { RepoProvider, supportedProviders } from "../../../utils/providerAPI";
+import Button from "../../../components/Button";
+import { getURLWithParams } from "../../../utils/url_utils";
 
 const Repositories = () => {
 	const [session, setSession] = useState<Session | null>(null);
 	const [theme, setTheme] = useState<Theme>('light');
 	const [loading, setLoading] = useState(true);
 	const router = useRouter();
-	const { provider } = router.query;
+	const { provider, srcSuffix } = router.query;
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const [repoProvider, setRepoProvider] = useState<RepoProvider>();
 
@@ -53,9 +55,20 @@ const Repositories = () => {
 			<MainAppBar />
 			{(loading) ? <LoadingOverlay type='loading' /> :
 				(!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
-			<div className="flex flex-col sm:flex-row">
+			<div className="flex flex-col sm:flex-row relative">
 				<DocsSideBar className='w-full sm:w-80' />
-				{repoProvider && <RepoSelection repoProvider={repoProvider as RepoProvider} />}
+				<div className="dynamic-div pb-16">
+					{repoProvider && <RepoSelection repoProvider={repoProvider as RepoProvider} />}
+				</div>
+				<div className="absolute bottom-0 right-0 mb-2 mr-2">
+					<Button
+						href={getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories' })}
+						variant="contained"
+						className='px-4 py-2 flex-1 sm:flex-grow-0'
+					>
+						Next &raquo;
+					</Button>
+				</div>
 			</div>
 			<Footer />
 		</div>
