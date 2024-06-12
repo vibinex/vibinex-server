@@ -1,51 +1,32 @@
-import axios from 'axios';
 import type { Session } from 'next-auth';
 import React, { useEffect, useState } from 'react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/Accordion";
-import Button from "../../components/Button";
-import Chip from '../../components/Chip';
 import Footer from '../../components/Footer';
 import LoadingOverlay from '../../components/LoadingOverlay';
+import { RenderMarkdown } from '../../components/RenderMarkdown';
 import RudderContext from '../../components/RudderContext';
-import BuildInstruction from '../../components/setup/BuildInstruction';
-import HostingSelector from '../../components/setup/HostingSelector';
-import InstallationSelector from '../../components/setup/InstallationSelector';
-import ProviderSelector from '../../components/setup/ProviderSelector';
-import RepoSelection from '../../components/setup/RepoSelection';
-import TriggerContent from '../../components/setup/TriggerContent';
-import { getAuthUserId, getAuthUserName, hasValidAuthInfo, isAuthInfoExpired } from '../../utils/auth';
-import { RepoProvider } from '../../utils/providerAPI';
+import { getAuthUserId, getAuthUserName } from '../../utils/auth';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../utils/rudderstack_initialize';
+import { getPreferredTheme, Theme } from '../../utils/theme';
+import ProductDemo from '../../views/Demo';
+import DocsSideBar from '../../views/docs/DocsSideBar';
 import MainAppBar from '../../views/MainAppBar';
 
-const verifySetup = [
-	"In your organization's repository list, you will see the Vibinex logo in front of the repositories that are correctly set up with Vibinex.",
-	"When you view the list of pull requests, the relevant ones will get highlighted in yellow, with details that help you choose where to start",
-	"Inside the pull request, where you can see the file changes, you will see the parts that are relevant for you highlighted in yellow."
-]
-
-const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, image_name: string }) => {
+const Docs = () => {
 	const [loading, setLoading] = useState(true);
 	const [session, setSession] = useState<Session | null>(null);
-	const [installId, setInstallId] = useState<string | null>(null);
-	const [isGetInstallIdLoading, setIsGetInstallIdLoading] = useState(false);
+	const [theme, setTheme] = useState<Theme>('light');
 	const { rudderEventMethods } = React.useContext(RudderContext);
 
+	const CHROME_EXTENSION_LINK = "https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc";
+	const architecturalDiagramLightMode = "https://github.com/Alokit-Innovations/.github/assets/7858932/d5a97883-64ef-498f-b97a-318b6675ac87";
+	const architecturalDiagramDarkMode = "https://github.com/Alokit-Innovations/.github/assets/7858932/493b3052-b462-4bb8-a9cd-ffa8e1018960";
+	const architecturalDiagram = (theme: Theme) => theme === 'light' ? architecturalDiagramLightMode : architecturalDiagramDarkMode;
+
 	useEffect(() => {
+		setTheme(getPreferredTheme());
 		fetch("/api/auth/session", { cache: "no-store" }).then(async (res) => {
 			const sessionVal: Session | null = await res.json();
 			setSession(sessionVal);
-			setIsGetInstallIdLoading(true);
-			const userId = await getAuthUserId(sessionVal);
-			axios.post('/api/dpu/pubsub', { userId }).then(async (response) => {
-				if (response.data.installId) {
-					setInstallId(response.data.installId);
-				}
-			}).catch((error) => {
-				console.error(`[docs] Unable to get topic name for user ${userId} - ${error.message}`);
-			}).finally(() => {
-				setIsGetInstallIdLoading(false);
-			});
 		}).catch((err) => {
 			console.error(`[docs] Error in getting session`, err);
 		}).finally(() => {
@@ -56,137 +37,69 @@ const Docs = ({ bitbucket_auth_url, image_name }: { bitbucket_auth_url: string, 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
 		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
-
-		const handleGitHubAppClick = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Install github app", { type: "link", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
-		};
-
-		const handleAuthoriseBitbucketOauthButton = () => {
-			rudderEventMethods?.track(getAuthUserId(session), "Authorise bitbucket consumer", { type: "button", eventStatusFlag: 1, source: "docs", name: getAuthUserName(session) }, anonymousId)
-		};
-
-		const githubAppInstallLink = document.getElementById('github-app-install');
-		const authoriseBitbucketOauth = document.getElementById('authorise-bitbucket-oauth-consumer');
-
-		githubAppInstallLink?.addEventListener('click', handleGitHubAppClick);
-		authoriseBitbucketOauth?.addEventListener('click', handleAuthoriseBitbucketOauthButton);
-		return () => {
-			githubAppInstallLink?.removeEventListener('click', handleGitHubAppClick);
-			authoriseBitbucketOauth?.removeEventListener('click', handleAuthoriseBitbucketOauthButton);
-		};
 	}, [rudderEventMethods, session]);
 
-	const providerOptions = [
-		{ value: 'github' as RepoProvider, label: 'Github', disabled: !hasValidAuthInfo(session, 'github') },
-		{ value: 'bitbucket' as RepoProvider, label: 'Bitbucket', disabled: !hasValidAuthInfo(session, 'bitbucket') },
-	];
-	const [selectedProvider, setSelectedProvider] = useState<RepoProvider | undefined>(undefined);
-	const [selectedInstallation, setSelectedInstallation] = useState<string>('');
-	const [selectedHosting, setSelectedHosting] = useState<string>('');
+	const introductionMD = `## What is Vibinex?
+Vibinex helps you understand the changes in your codebase.
+Vibinex helps you:
+- Get your pull request merged quickly
+- Understand the changes in a pull request faster and better
+- Reduce the average time to first review by 50%
+`
+
+	const featuresMD = `### Features
+1. **Relevant Reviewers Comment**: Vibinex automatically identifies the relevant reviewers for your pull request and publishes the list of reviewers in the pull request as a comment, establishing it as common knowledge.
+2. **Automatic Review Assignment**: Vibinex automatically assigns the relevant team members as reviewers to your pull request.
+3. **Highlighted Changes**: Vibinex highlights the file names and the changes in your pull request that you have previously worked on and understand deeply.
+4. **Highlighted Pull Requests**: Vibinex highlights the pull requests that have changes relevant to you from the list of pull requests on the repository.
+
+You can choose to turn on/off each feature individually.
+There are **Feature Flags** on the [Vibinex settings page](https://vibinex.com/settings) to turn the PR comment or the automatic review assignment on or off.
+The highlighting features are delivered through the [Chrome extension](${CHROME_EXTENSION_LINK}), which you can disable if you don't want to see the highlights.
+`
+	const architectureMD = `### Architecture
+The diagram below describes the architecture of Vibinex. It consists of 3 components:
+3. [Vibinex DPU](https://github.com/Alokit-Innovations/vibi-dpu): Marked as the "Backend #1" in the below diagram, the DPU (Data Processing Unit) is docker container the processes your code. It has no public endpoints for maximum privacy & security.
+2. [Vibinex server](https://github.com/Alokit-Innovations/vibinex-server): Marked as the "Backend #2" in the below diagram, the server is the main backend of Vibinex. It triggers the DPU when a PR is created or changed and acts as the backend for the browser extension.
+1. [Vibinex Browser extension](https://github.com/Alokit-Innovations/chrome-extension): It modifies the GitHub/Bitbucket UI to show the highlighted PRs and file changes to help you better navigate and understand the changes in your pull request.
+
+![Vibinex Architecture](${architecturalDiagram(theme)})
+
+#### What is a DPU?
+A DPU stands for Data Processing Unit. It is a docker container that processes all the sensitive data, i.e. your codebase. Self-hosting the DPU on your own VMs provides the highest privacy.
+`
+
+	const setupMD = `### Setup steps
+There are just 2 steps to setting up Vibinex:
+1. Setup the DPU 
+2. Install the browser extension
+
+You can set up the DPU on your repositories either as an owner of the repository or a member. When you set it up as an owner, webhooks are added on your repository that automatically trigger DPU when a pull request is created or updated. When you set it up as a member, you need to manually trigger the DPU when a pull request when you want to process it.
+
+Follow [this guide](/docs/quickstart) for a quick set up.
+	`
 
 	return (
 		<div>
 			<MainAppBar />
 			{(loading) ? <LoadingOverlay type='loading' /> :
 				(!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
+			<div className="flex flex-col sm:flex-row">
+				<DocsSideBar className='w-full sm:w-80' />
 
-			{/* Center content */}
-			<Accordion type="single" defaultValue="instruction-1" className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
-				<AccordionItem value="instruction-1">
-					<AccordionTrigger>Login using the target provider</AccordionTrigger>
-					<AccordionContent className="flex items-center gap-2">
-						{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
-							<Chip key={githubAuthInfo.handle} name={githubAuthInfo.handle ?? "unknown"} avatar={"/github-dark.svg"} disabled={isAuthInfoExpired(githubAuthInfo)} disabledText='This auth has expired' />
-						))}
-						{Object.values(session?.user?.auth_info?.bitbucket ?? {}).map((bitbucketAuthInfo) => (
-							<Chip key={bitbucketAuthInfo.handle} name={bitbucketAuthInfo.handle ?? "unknown"} avatar={"/bitbucket-dark.svg"} disabled={isAuthInfoExpired(bitbucketAuthInfo)} disabledText='This auth has expired' />
-						))}
-						<Button variant="contained" href="/api/auth/signin" className='px-4 py-2 flex-1 sm:flex-grow-0'>Add login</Button>
-					</AccordionContent>
-				</AccordionItem>
-				<AccordionItem value="instruction-2">
-					<AccordionTrigger>Configure your DPU</AccordionTrigger>
-					<AccordionContent className='flex flex-col gap-2 pl-4'>
-						<label className='flex justify-between font-semibold text-sm'>Provider:
-							<ProviderSelector providerOptions={providerOptions} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} />
-						</label>
-						<label className='flex justify-between font-semibold text-sm'>Installation Type:
-							<InstallationSelector selectedInstallation={selectedInstallation} setSelectedInstallation={setSelectedInstallation} />
-						</label>
-						<label className='font-semibold text-sm w-full flex justify-between'>Hosting:
-							<HostingSelector selectedHosting={selectedHosting} setSelectedHosting={setSelectedHosting} />
-						</label>
-					</AccordionContent>
-				</AccordionItem>
-				<AccordionItem value="instruction-3" disabled={selectedHosting === '' || !selectedProvider || selectedInstallation === ''}>
-					<AccordionTrigger>Set up DPU</AccordionTrigger>
-					<AccordionContent>
-						<BuildInstruction selectedHosting={selectedHosting} userId={getAuthUserId(session)} selectedInstallationType={selectedInstallation} selectedProvider={selectedProvider!!} session={session} installId={installId} />
-					</AccordionContent>
-				</AccordionItem>
-				<AccordionItem value="instruction-4" disabled={!selectedProvider}>
-					{selectedProvider === 'github' && selectedHosting === 'selfhosting' && selectedInstallation === 'individual' ? (
-						<>
-							<AccordionTrigger>Repository Selection</AccordionTrigger>
-							<AccordionContent>
-								{isGetInstallIdLoading ? (
-									<>
-										<div className='inline-block border-4 border-t-secondary rounded-full w-6 h-6 animate-spin mx-2'></div>
-										Generating topic name...
-									</>
-								) : installId ? (
-									<RepoSelection repoProvider={selectedProvider as RepoProvider} installId={installId as string} setIsRepoSelectionDone={null} isNewAccordion={true} />
-								) : (
-									<>User Info not found, please refresh and try again.</>
-								)}
-							</AccordionContent>
-						</>
-					) : (
-						<>
-							<AccordionTrigger>Set up triggers</AccordionTrigger>
-							<AccordionContent>
-								<TriggerContent selectedProvider={selectedProvider} bitbucket_auth_url={bitbucket_auth_url} selectedHosting={selectedHosting} selectedInstallationType={selectedInstallation} />
-							</AccordionContent>
-						</>
-					)}
-				</AccordionItem>
-				<AccordionItem value="instruction-5">
-					<AccordionTrigger>Install browser extension</AccordionTrigger>
-					<AccordionContent>
-						<a href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1">
-							<Button variant={'text'}>Link</Button>
-						</a>
-					</AccordionContent>
-				</AccordionItem>
-				<AccordionItem value="verify-setup">
-					<AccordionTrigger>Verify your setup</AccordionTrigger>
-					<AccordionContent>
-						Once you have set up your repositories, installed the browser extension and signed in, you can verify if everything is correctly set up.
-						<ol>
-							{verifySetup.map((checkItem, index) => (<li key={checkItem} className='mt-2 ml-1' dangerouslySetInnerHTML={{ __html: `${index + 1}. ${checkItem}` }} />))}
-						</ol>
-					</AccordionContent>
-				</AccordionItem>
-			</Accordion>
+				<div className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
+					<RenderMarkdown markdownText={introductionMD} />
+					<RenderMarkdown markdownText={featuresMD} />
+					<ProductDemo />
+					<RenderMarkdown markdownText={architectureMD} />
+					{/* <Image src={architecturalDiagram(theme)} alt="Vibinex Setup" width={800} height={800} className="mx-auto my-4 w-full max-w-screen-md" /> */}
+					<RenderMarkdown markdownText={setupMD} />
+				</div>
 
+			</div>
 			<Footer />
 		</div>
 	)
-}
-
-Docs.getInitialProps = async () => {
-	const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
-	const redirectUri = 'https://vibi-test-394606.el.r.appspot.com/api/bitbucket/callbacks/install';
-	const scopes = 'repository';
-	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
-	const image_name = process.env.DPU_IMAGE_NAME;
-
-	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
-	console.debug(`[getInitialProps] url: `, url)
-	return {
-		bitbucket_auth_url: url,
-		image_name: image_name
-	}
 }
 
 export default Docs

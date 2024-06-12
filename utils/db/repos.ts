@@ -276,7 +276,7 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 		metadata
 	)
 	SELECT 
-		repo_obj->>'name' AS repo_name,
+		repo_obj->>'slug' AS repo_name,
 		repo_obj->'workspace'->>'slug' AS repo_owner,
 		'bitbucket' AS repo_provider,
 		repo_obj->'workspace'->>'slug' AS workspace,
@@ -305,7 +305,7 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 	try {
 		await conn.query('BEGIN');
 		console.debug(`[saveBitbucketReposInDb] insert query: `, insertReposQuery);
-		const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery)
+		const { rowCount: reposRowCount } = await conn.query(insertReposQuery)
 			.catch(err => {
 				console.error(`[saveBitbucketReposInDb] Could not insert repos in the db`, { pg_query: insertReposQuery }, err);
 				throw err;
@@ -316,7 +316,6 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 			return false;
 		}
 
-		const repoIds = rows.map((row) => row.repo_id);
 		await conn.query('COMMIT');
 		console.debug(`[saveBitbucketReposInDb] repos info saved successfully in db`)
 		return true;

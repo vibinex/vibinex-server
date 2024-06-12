@@ -38,6 +38,11 @@ const nextConfig = {
 				hostname: process.env.NEXT_PUBLIC_STRAPI_API_URL, // Blog server
 				pathname: '/uploads/**',
 			},
+			{
+				protocol: 'https',
+				hostname: 'github.com', // GitHub README images
+				pathname: '/Alokit-Innovations/.github/assets/**'
+			}
 		],
 	},
 	webpack: (config, { isServer }) => {

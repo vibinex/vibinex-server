@@ -14,19 +14,18 @@ export interface BitbucketProfile {
 }
 
 export interface BitbucketDBRepo {
-    repo_name: string;
-    repo_owner: string;
-    repo_provider: string;
-    clone_ssh_url: string;
-    project: {
-        name: string;
-        type: string;
-    };
-    is_private: boolean;
-    uuid: string;
-    workspace: string;
+	repo_name: string;
+	repo_owner: string;
+	repo_provider: string;
+	clone_ssh_url: string;
+	project: {
+		name: string;
+		type: string;
+	};
+	is_private: boolean;
+	uuid: string;
+	workspace: string;
 }
-
 
 export interface BitbucketProfileLinks {
 	self: BitbucketAvatarResource;

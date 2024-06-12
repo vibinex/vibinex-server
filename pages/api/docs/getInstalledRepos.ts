@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { getUserRepositoriesByTopic } from '../../../utils/db/repos';
 import { authOptions } from '../auth/[...nextauth]';
 import rudderStackEvents from '../events';
+import { getUserTopicFromDb } from '../../../utils/db/users';
 
 const getInstalledReposForUser = async (req: NextApiRequest, res: NextApiResponse) => {
 	const { query, method } = req;
@@ -12,22 +13,23 @@ const getInstalledReposForUser = async (req: NextApiRequest, res: NextApiRespons
 		return res.status(405).json({ error: 'Method not allowed' });
 	}
 	const session = await getServerSession(req, res, authOptions);
-	if (!session) {
+	if (!session || !session.user || !session.user.id) {
 		const eventProperties = { response_status: 401 };
 		rudderStackEvents.track("absent", "", 'installed-repos-for-user', { type: 'HTTP-401', eventStatusFlag: 0, eventProperties });
 		return res.status(401).json({ error: 'Unauthenticated' });
 	}
 
-	const { topicId, provider } = query;
+	const { provider } = query;
+	const topicId = await getUserTopicFromDb(session.user.id);
 	const event_properties = {
 		topic_name: topicId || "",
 		repo_provider: provider || ""
 	}
 	// data validation
-	if (!topicId || typeof topicId !== 'string') {
-		const eventProperties = { ...event_properties, response_status: 400 };
-		rudderStackEvents.track(session?.user?.id ?? "absent", "", 'installed-repos-for-user', { type: 'HTTP-400', eventStatusFlag: 0, eventProperties });
-		return res.status(400).json({ error: 'Topic ID is required and must be a string' });
+	if (!topicId ) {
+		const eventProperties = { ...event_properties, response_status: 500 };
+		rudderStackEvents.track(session?.user?.id ?? "absent", "", 'installed-repos-for-user', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
+		return res.status(500).json({ error: 'Failed to get Topic ID from db' });
 	}
 	if (!provider || typeof provider !== 'string') {
 		const eventProperties = { ...event_properties, response_status: 400 };
