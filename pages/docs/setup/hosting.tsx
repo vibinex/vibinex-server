@@ -75,13 +75,16 @@ If you do not wnat to host your own docker and are comfortable in giving us acce
                 <DocsSideBar className='w-full sm:w-80' />
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
                     <DockerInstructions selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} installId={installId as string} />
-                    {installation && installation === 'pat' ?
+                    {installation && installation === 'pat' && provider && provider === 'github' ?
                         <InstructionsToGeneratePersonalAccessToken selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
                         : <> </>}
                     <RenderMarkdown markdownText={cloudBuildExplainedMD} />
-                    <div className='pb-16'>
-                        <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
-                    </div>
+                    {installation && installation === 'pat' && provider && provider === 'github' ?
+                        <div className='pb-16'>
+                            <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
+                        </div>
+                        :
+                        <div className='pb-16'> </div>}
                     <div className="absolute bottom-0 right-0 mb-2 mr-2">
                         <Button
                             href={installation === 'pat'
