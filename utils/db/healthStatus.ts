@@ -1,9 +1,9 @@
 import conn from ".";
 
-export const saveHealthStatusToDB = async (healthStatus: string, ts: string, topicId: string) => {
+export const saveHealthStatusToDB = async (healthStatus: string, ts: Date, topicId: string) => {
 	const healthStatusQuery = `
 	UPDATE users
-	SET health_status = $1
+	SET health_status = $1,
 		dpu_health_status_updated_at = $2
 	WHERE topic_name = $3;
 	`;
@@ -11,7 +11,8 @@ export const saveHealthStatusToDB = async (healthStatus: string, ts: string, top
 	// const timestamp = new Date(ts).toISOString();
 	try {
 		console.log(`[saveHealthStatusToDB] saving health status for ${topicId}:`, ts);
-		const { rows } = await conn.query(healthStatusQuery, [healthStatus, ts, topicId]);
+		const rows  = await conn.query(healthStatusQuery, [healthStatus, ts, topicId]);
+		console.log(`[saveHealthStatusToDB] rows = ${JSON.stringify(rows)}`)
 	} catch (err) {
 		console.error(`[saveHealthStatusToDB] error in saving dpu health status for ${topicId}:`, err);
 		throw new Error("Error saving health status to the database");

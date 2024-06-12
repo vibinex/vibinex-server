@@ -85,7 +85,7 @@ In case of project, you must have all the required permissions to run the tool o
 
 ProviderAppInstall.getInitialProps = async () => {
 	const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
-	const redirectUri = 'http://localhost:3000/api/bitbucket/callbacks/install';
+	const redirectUri = 'https://vibi-test-394606.el.r.appspot.com/api/bitbucket/callbacks/install';
 	const scopes = 'repository';
 	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
 
