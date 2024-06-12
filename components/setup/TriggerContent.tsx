@@ -4,12 +4,20 @@ import Button from '../Button';
 
 interface TriggerContentProps {
     selectedProvider?: RepoProvider;
-    bitbucket_auth_url: string;
     selectedInstallationType: string;
     selectedHosting: string;
 }
 
-const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, bitbucket_auth_url, selectedHosting, selectedInstallationType }) => {
+const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, selectedHosting, selectedInstallationType }) => {
+    const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
+	const redirectUri = 'https://vibinex.com/api/bitbucket/callbacks/install';
+	const scopes = 'repository';
+	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
+	const image_name = process.env.DPU_IMAGE_NAME;
+
+	const bitbucket_auth_url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
+	console.debug(`[getInitialProps] url: `, bitbucket_auth_url)
+
     const triggerContent = () => {
         if (selectedProvider === 'github') {
             if (selectedInstallationType === 'individual'){
