@@ -15,7 +15,7 @@ import TriggerContent from '../../../components/setup/TriggerContent';
 import { RepoProvider } from '../../../utils/providerAPI';
 import { RenderMarkdown } from '../../../components/RenderMarkdown';
 
-const ProviderAppInstall: React.FC = () => {
+const ProviderAppInstall = ({bitbucket_auth_url}: {bitbucket_auth_url: string}) => {
     const router = useRouter();
     const { provider, installation, ...restQueryParams } = router.query;
     const hosting = "cloud";
@@ -39,6 +39,7 @@ const ProviderAppInstall: React.FC = () => {
     useEffect(() => {
         const anonymousId = getAndSetAnonymousIdFromLocalStorage();
         rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId);
+        console.debug(`[useEffect] url: `, bitbucket_auth_url)
     }, [rudderEventMethods, session]);
 
     const currentQueryParams = router.query;
@@ -63,6 +64,7 @@ In case of project, you must have all the required permissions to run the tool o
                             selectedProvider={provider as RepoProvider}
                             selectedHosting={hosting as string}
                             selectedInstallationType={installation as string}
+                            bitbucket_auth_url={bitbucket_auth_url}
                         />
                         <div className="absolute bottom-0 right-0 mb-2 mr-2">
                             <Button
@@ -80,5 +82,19 @@ In case of project, you must have all the required permissions to run the tool o
         </div>
     );
 };
+
+ProviderAppInstall.getInitialProps = async () => {
+	const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
+	const redirectUri = 'http://localhost:3000/api/bitbucket/callbacks/install';
+	const scopes = 'repository';
+	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
+
+	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
+	console.debug(`[getInitialProps] url: `, url)
+	return {
+		bitbucket_auth_url: url,
+	}
+}
+
 
 export default ProviderAppInstall;
