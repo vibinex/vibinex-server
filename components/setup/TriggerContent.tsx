@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { RepoProvider } from '../../utils/providerAPI';
 import Button from '../Button';
 
@@ -6,21 +6,13 @@ interface TriggerContentProps {
     selectedProvider?: RepoProvider;
     selectedInstallationType: string;
     selectedHosting: string;
+    bitbucket_auth_url: string;
 }
 
-const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, selectedHosting, selectedInstallationType }) => {
-    const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
-	const redirectUri = 'https://vibi-test-394606.el.r.appspot.com/api/bitbucket/callbacks/install';
-	const scopes = 'repository';
-	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
-	const image_name = process.env.DPU_IMAGE_NAME;
-
-	const bitbucket_auth_url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
-	console.debug(`[getInitialProps] url: `, bitbucket_auth_url)
-
+const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, selectedHosting, selectedInstallationType, bitbucket_auth_url }) => {
     const triggerContent = () => {
         if (selectedProvider === 'github') {
-            if (selectedInstallationType === 'individual'){
+            if (selectedInstallationType === 'individual') {
                 return (
                     <div>You are all set!</div>
                 )
@@ -39,11 +31,12 @@ const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, selec
                 </>
             );
         } else if (selectedProvider === 'bitbucket') {
-            if (selectedHosting == 'selfhosting' && selectedInstallationType == 'individual'){
+            if (selectedHosting == 'selfhosting' && selectedInstallationType == 'individual') {
                 return (
                     <div>Coming Soon!</div>
                 )
             }
+            console.debug(`[TriggerContent] url: `, bitbucket_auth_url)
             return (
                 <>
                     <Button
@@ -51,6 +44,7 @@ const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, selec
                         variant="contained"
                         href={bitbucket_auth_url}
                         target='_blank'
+                        disabled={!bitbucket_auth_url}
                     >
                         Authorise Bitbucket OAuth Consumer
                     </Button>
