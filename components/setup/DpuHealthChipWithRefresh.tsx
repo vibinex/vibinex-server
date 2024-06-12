@@ -8,10 +8,10 @@ interface DpuHealthStates {
 }
 
 const dpuHealthStates: DpuHealthStates = {
-    healthy: 'green',
-    warning: 'yellow',
-    error: 'red',
-    unknown: 'grey',
+    Start: 'yellow',
+    Failed: 'red',
+    Success: 'green',
+    Unknown: 'grey',
 };
 
 interface DpuHealthChipWithRefreshProps {
@@ -29,11 +29,11 @@ const DpuHealthChipWithRefresh: React.FC<DpuHealthChipWithRefreshProps> = ({ use
             if (dpuHealthStates[healthStatus]) {
                 setHealthStatus(healthStatus);
             } else {
-                setHealthStatus('unknown');
+                setHealthStatus('Unknown');
             }
         } catch (error) {
             console.error('Error fetching DPU health status:', error);
-            setHealthStatus('unknown');
+            setHealthStatus('Unknown');
         } finally {
             setIsLoading(false);
         }
