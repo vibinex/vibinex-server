@@ -42,7 +42,6 @@ const ProviderAppInstall: React.FC = () => {
     }, [rudderEventMethods, session]);
 
     const currentQueryParams = router.query;
-    const bitbucket_auth_url = 'https://bitbucket.org/site/oauth2/authorize';
     const providerOauthAppInstallationExplainedMD = `## Provider Oauth App Installation
 There are two types of installation options:
 Individual and Project.
@@ -62,7 +61,6 @@ In case of project, you must have all the required permissions to run the tool o
                     <div className='flex flex-col items-start pb-16'>
                         <TriggerContent
                             selectedProvider={provider as RepoProvider}
-                            bitbucket_auth_url={bitbucket_auth_url}
                             selectedHosting={hosting as string}
                             selectedInstallationType={installation as string}
                         />
