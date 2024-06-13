@@ -18,9 +18,9 @@ interface DockerInstructionsProps {
 const DockerInstructions: React.FC<DockerInstructionsProps> = ({ selectedInstallationType, selectedProvider, installId }) => {
 	const selfHostingCode = `
 docker run \\\\\\
--e INSTALL_ID=${installId} \\\\\\
 -v ~/.config/vibinex:/app/config \\\\\\
-${selectedProvider === 'github' && selectedInstallationType === 'pat' ? `-e PROVIDER=<your_provider_here> \\
+-e INSTALL_ID=${installId} \\\\\\
+${selectedProvider === 'github' && selectedInstallationType === 'pat' ? `-e PROVIDER=github \\
 -e GITHUB_PAT=<Your gh cli token> \\\\\\
 ` : ''}asia.gcr.io/vibi-prod/dpu/dpu
   `;
