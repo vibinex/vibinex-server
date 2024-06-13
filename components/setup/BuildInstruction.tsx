@@ -113,7 +113,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, s
 					value={isInputDisabled ? maskedGithubPat : handleGithubPatInputValue}
 					onChange={handleGithubPatInput}
 					disabled={isInputDisabled}
-					className="grow h-8"
+					className={`grow h-8 ${isInputDisabled ? 'text-gray-500' : 'text-black'}`}
 				/>
 				<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
 					Deploy on Vibinex Cloud

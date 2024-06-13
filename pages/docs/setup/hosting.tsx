@@ -72,7 +72,7 @@ Run our docker image locally or in your own cloud infrastructure. It will clone 
 ### Instructions to Setup DPU:
     `;
     
-    const cloudBuildExplainedMD = `### Host on Vibinex
+    const cloudBuildExplainedMD = `## Host on Vibinex
 Too much hassle? Host DPU on Vibinex Cloud. The docker runs on Vibinex's infrastructure. 
 We recommend this option for public repositories, it is the fastest way to set up.`;
     
@@ -86,10 +86,12 @@ We recommend this option for public repositories, it is the fastest way to set u
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
                 <RenderMarkdown markdownText={hostingExplainedMD} />
                     <DockerInstructions selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} installId={installId as string} />
-                    {installation && installation === 'pat' && provider && provider === 'github' ?
-                        <InstructionsToGeneratePersonalAccessToken selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
-                        :  provider && provider === 'github' ?
+                    {provider && provider === 'github' ?
                         <div className='pb-16'>
+                            {installation && installation === 'pat' && 
+                                <InstructionsToGeneratePersonalAccessToken 
+                                    selectedProvider={provider as RepoProvider}
+                                    selectedInstallationType={installation as string} />}
                             <RenderMarkdown markdownText={cloudBuildExplainedMD} />
                             <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
                         </div>
