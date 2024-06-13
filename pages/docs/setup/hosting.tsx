@@ -19,6 +19,8 @@ import { Theme, getPreferredTheme } from "../../../utils/theme";
 import { getURLWithParams } from "../../../utils/url_utils";
 import MainAppBar from "../../../views/MainAppBar";
 import DocsSideBar from "../../../views/docs/DocsSideBar";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const Hosting = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -63,24 +65,34 @@ const Hosting = () => {
         rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
     }, [rudderEventMethods, session]);
 
-    const cloudBuildExplainedMD = `
-If you do not wnat to host your own docker and are comfortable in giving us access to your code, please click on the button below.`;
-
+    
+    const hostingExplainedMD = `## Setup Vibinex Docker
+You don't have to share your code or give any sensitive information to Vibinex.
+Run our docker image locally or in your own cloud infrastructure. It will clone your code and run our algortihms to calculate metrics. We fondly call it DPU (Data Processing Unit)
+### Instructions to Setup DPU:
+    `;
+    
+    const cloudBuildExplainedMD = `## Host on Vibinex
+Too much hassle? Host DPU on Vibinex Cloud. The docker runs on Vibinex's infrastructure. 
+We recommend this option for public repositories, it is the fastest way to set up.`;
+    
     return (
         <div>
             <MainAppBar />
             {(loading) ? <LoadingOverlay type='loading' /> :
                 (!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
             <div className="flex flex-col sm:flex-row">
-                <DocsSideBar className='w-full sm:w-80' />
+                <DocsSideBar className='w-full sm:w-80' session={session}/>
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
+                <RenderMarkdown markdownText={hostingExplainedMD} />
                     <DockerInstructions selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} installId={installId as string} />
-                    {installation && installation === 'pat' && provider && provider === 'github' ?
-                        <InstructionsToGeneratePersonalAccessToken selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
-                        : <> </>}
-                    <RenderMarkdown markdownText={cloudBuildExplainedMD} />
-                    {installation && installation === 'pat' && provider && provider === 'github' ?
+                    {provider && provider === 'github' ?
                         <div className='pb-16'>
+                            {installation && installation === 'pat' && 
+                                <InstructionsToGeneratePersonalAccessToken 
+                                    selectedProvider={provider as RepoProvider}
+                                    selectedInstallationType={installation as string} />}
+                            <RenderMarkdown markdownText={cloudBuildExplainedMD} />
                             <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
                         </div>
                         :
@@ -96,9 +108,6 @@ If you do not wnat to host your own docker and are comfortable in giving us acce
                             Next &raquo;
                         </Button>
                     </div>
-                </div>
-                <div className='absolute top-15 right-7 z-99'>
-                    <DpuHealthChipWithRefresh userId={getAuthUserId(session)} />
                 </div>
             </div>
             <Footer />

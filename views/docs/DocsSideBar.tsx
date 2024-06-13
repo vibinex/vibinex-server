@@ -1,5 +1,8 @@
 import React from 'react';
 import SideBar, { SidebarNavItem } from '../../components/SideBar';
+import { Session } from 'next-auth';
+import DpuHealthChipWithRefresh from '../../components/setup/DpuHealthChipWithRefresh';
+import { getAuthUserId } from '../../utils/auth';
 
 const navItems: SidebarNavItem[] = [
 	{ label: 'Introduction', href: '/docs' },
@@ -29,8 +32,13 @@ const navItems: SidebarNavItem[] = [
 	},
 ];
 
-const DocsSideBar: React.FC<{ className?: string }> = ({ className }) => {
-	return <SideBar navItems={navItems} className={className} />;
+const DocsSideBar: React.FC<{ className?: string, session?: Session | null }> = ({ className, session }) => {
+	return (
+		<div className={className}>
+			<SideBar navItems={navItems} />
+			{(session) ? <DpuHealthChipWithRefresh userId={getAuthUserId(session)} /> : null}
+		</ div>
+	);
 };
 
 export default DocsSideBar;
