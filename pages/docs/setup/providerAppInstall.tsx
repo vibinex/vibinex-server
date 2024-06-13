@@ -44,11 +44,9 @@ const ProviderAppInstall = ({bitbucket_auth_url}: {bitbucket_auth_url: string}) 
     }, [rudderEventMethods, session]);
 
     const currentQueryParams = router.query;
-    const providerOauthAppInstallationExplainedMD = `## Provider Oauth App Installation
-There are two types of installation options:
-Individual and Project.
-In case of individual installation, you will be able to setup the vibinex tool on your personal repositories where you have all the required permissions to run the tool on your chose code provider.
-In case of project, you must have all the required permissions to run the tool on your chosen code provider.
+    const providerOauthAppInstallationExplainedMD = `## Oauth App Installation
+Give the docker permissions to clone your repositories, add comments, assign reviewers and add a webhook. Only the docker container gets these permissions. 
+Refresh the DPU status in the side bar after a few minutes to check if setup succeded
 `; //TODO: change content 
     
 
@@ -57,7 +55,7 @@ In case of project, you must have all the required permissions to run the tool o
             <MainAppBar />
             {loading ? <LoadingOverlay type='loading' /> : (!session ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null)}
             <div className="flex flex-col sm:flex-row">
-                <DocsSideBar className='w-full sm:w-80' />
+                <DocsSideBar className='w-full sm:w-80' session={session}/>
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
                     <RenderMarkdown markdownText={providerOauthAppInstallationExplainedMD} />
                     <div className='flex flex-col items-start pb-16'>
@@ -75,9 +73,6 @@ In case of project, you must have all the required permissions to run the tool o
                             >
                                 Next &raquo;
                             </Button>
-                        </div>
-                        <div className='absolute bottom-0 left-0 mb-2 ml-2'>
-                            <DpuHealthChipWithRefresh userId={getAuthUserId(session)} />
                         </div>
                     </div>
                 </div>
