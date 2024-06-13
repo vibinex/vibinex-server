@@ -14,6 +14,7 @@ import { getURLWithParams } from '../../../utils/url_utils';
 import TriggerContent from '../../../components/setup/TriggerContent';
 import { RepoProvider } from '../../../utils/providerAPI';
 import { RenderMarkdown } from '../../../components/RenderMarkdown';
+import DpuHealthChipWithRefresh from '../../../components/setup/DpuHealthChipWithRefresh';
 
 const ChromeExtension: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -50,9 +51,9 @@ Please click on the extension icon to verify that you are logged in. If you are 
             {loading ? <LoadingOverlay type='loading' /> : (!session ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null)}
             <div className="flex flex-col sm:flex-row">
                 <DocsSideBar className='w-full sm:w-80' />
-                <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2'>
+                <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 gap-2'>
                     <RenderMarkdown markdownText={chromeExtensionExplainedMD} />
-                    <div className='flex flex-col items-start'>
+                    <div className='flex flex-col items-mid'>
                         <Button
                             variant="contained"
                             href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1"
@@ -60,6 +61,9 @@ Please click on the extension icon to verify that you are logged in. If you are 
                         >
                         Install Vibinex Chrome Extension   
                         </Button>
+                    </div>
+                    <div className='flex item-start mt-4'>
+                    <DpuHealthChipWithRefresh userId={getAuthUserId(session)} />
                     </div>
                 </div>
             </div>

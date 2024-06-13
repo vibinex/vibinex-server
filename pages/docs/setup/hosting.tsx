@@ -96,9 +96,9 @@ If you do not wnat to host your own docker and are comfortable in giving us acce
                             Next &raquo;
                         </Button>
                     </div>
-                </div>
-                <div className='absolute top-15 right-7 z-99'>
-                    <DpuHealthChipWithRefresh userId={getAuthUserId(session)} />
+                    <div className='absolute bottom-0 left-0 mb-2 ml-2'>
+                        <DpuHealthChipWithRefresh userId={getAuthUserId(session)} />
+                    </div>
                 </div>
             </div>
             <Footer />

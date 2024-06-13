@@ -14,6 +14,7 @@ import { getURLWithParams } from '../../../utils/url_utils';
 import TriggerContent from '../../../components/setup/TriggerContent';
 import { RepoProvider } from '../../../utils/providerAPI';
 import { RenderMarkdown } from '../../../components/RenderMarkdown';
+import DpuHealthChipWithRefresh from '../../../components/setup/DpuHealthChipWithRefresh';
 
 const ProviderAppInstall = ({bitbucket_auth_url}: {bitbucket_auth_url: string}) => {
     const router = useRouter();
@@ -74,6 +75,9 @@ In case of project, you must have all the required permissions to run the tool o
                             >
                                 Next &raquo;
                             </Button>
+                        </div>
+                        <div className='absolute bottom-0 left-0 mb-2 ml-2'>
+                            <DpuHealthChipWithRefresh userId={getAuthUserId(session)} />
                         </div>
                     </div>
                 </div>
