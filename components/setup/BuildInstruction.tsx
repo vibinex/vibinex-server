@@ -99,7 +99,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, s
 		return (
 			<div className="flex items-center gap-4">
 				<Button variant="contained" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled}>
-					Trigger Cloud Build
+					Deploy on Vibinex Cloud
 				</Button>
 				<BuildStatus buildStatus={buildStatus} isTriggerBuildButtonDisabled={isTriggerBuildButtonDisabled} />
 			</div>
@@ -116,7 +116,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, s
 					className="grow h-8"
 				/>
 				<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
-					Deploy
+					Deploy on Vibinex Cloud
 				</Button>
 			</div>
 			{errorMessage && (

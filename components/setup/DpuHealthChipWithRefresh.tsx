@@ -46,7 +46,7 @@ const DpuHealthChipWithRefresh: React.FC<DpuHealthChipWithRefreshProps> = ({ use
 
     const displayHealthStatus = String(healthStatus);
     return (
-        <div className="flex items-center gap-0 border p-1">
+        <div className="flex flex-row justify-center items-center border rounded-full p-2">
             DPU Status:
             <Button variant="text" onClick={fetchDpuHealth} disabled={isLoading}>
                 {isLoading ? (
