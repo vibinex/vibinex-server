@@ -39,10 +39,9 @@ const ChromeExtension: React.FC = () => {
         rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId);
     }, [rudderEventMethods, session]);
 
-    const chromeExtensionExplainedMD = `## Chrome Extension Link
-Please install the chrome extension using the following link which enables highlights for your pull requests.
-Once you install the extension, you will be able to see the extension icon in the top right corner of your browser.
-Please click on the extension icon to verify that you are logged in. If you are not logged in, please login using the same credentials you used to login to vibinex.com.
+    const chromeExtensionExplainedMD = `## Install Chrome Extension
+The chrome extension enables highlights for your pull requests. It can be installed and used by all team members contributing to a repository on which Vibinex is set up. They do not need to set up their own DPU
+Once you install the extension, click on the extension icon in the top right corner of your browser to verify that you are logged in. If you are not logged in, login using the same credentials you used to login to vibinex.com.
 `;
 
     return (
@@ -50,7 +49,7 @@ Please click on the extension icon to verify that you are logged in. If you are 
             <MainAppBar />
             {loading ? <LoadingOverlay type='loading' /> : (!session ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null)}
             <div className="flex flex-col sm:flex-row">
-                <DocsSideBar className='w-full sm:w-80' />
+                <DocsSideBar className='w-full sm:w-80' session={session}/>
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 gap-2'>
                     <RenderMarkdown markdownText={chromeExtensionExplainedMD} />
                     <div className='flex flex-col items-mid'>
@@ -61,9 +60,6 @@ Please click on the extension icon to verify that you are logged in. If you are 
                         >
                         Install Vibinex Chrome Extension   
                         </Button>
-                    </div>
-                    <div className='flex item-start mt-4'>
-                    <DpuHealthChipWithRefresh userId={getAuthUserId(session)} />
                     </div>
                 </div>
             </div>
