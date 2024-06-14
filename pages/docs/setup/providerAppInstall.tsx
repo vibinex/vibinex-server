@@ -83,7 +83,7 @@ Refresh the DPU status in the side bar after a few minutes to check if setup suc
 
 ProviderAppInstall.getInitialProps = async () => {
 	const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
-	const redirectUri = 'https://vibi-test-394606.el.r.appspot.com/api/bitbucket/callbacks/install';
+	const redirectUri = 'https://vibinex.com/api/bitbucket/callbacks/install';
 	const scopes = 'repository';
 	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
 
