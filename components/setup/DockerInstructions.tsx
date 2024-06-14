@@ -20,7 +20,7 @@ const DockerInstructions: React.FC<DockerInstructionsProps> = ({ selectedInstall
 docker run \\\\\\
 -v ~/.config/vibinex:/app/config \\\\\\
 -e INSTALL_ID=${installId} \\\\\\
-${selectedProvider === 'github' && selectedInstallationType === 'pat' ? `-e PROVIDER=github \\
+${selectedProvider === 'github' && selectedInstallationType === 'pat' ? `-e PROVIDER=github \\\\
 -e GITHUB_PAT=<Your gh cli token> \\\\\\
 ` : ''}asia.gcr.io/vibi-prod/dpu/dpu
   `;
