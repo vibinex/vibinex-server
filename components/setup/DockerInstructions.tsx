@@ -1,13 +1,10 @@
 "use client";
 
-import type { Session } from "next-auth";
 import React from 'react';
 
+import { RenderMarkdown } from "../RenderMarkdown";
 import CodeWithCopyButton from './CodeWithCopyButton';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
-import { RenderMarkdown } from "../RenderMarkdown";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 interface DockerInstructionsProps {
 	selectedProvider: string;
@@ -40,14 +37,6 @@ ${selectedProvider === 'github' && selectedInstallationType === 'pat' ? `-e PROV
 		}
 	];
 
-	const minimumConfigMarkdown = ` 
-Note: Minimum config required for running docker image:
-\`\`\`
-  	RAM: 2 GB
-  	CPU: 2v or 4v CPU
-  	Storage: Depends on codebase size, maximum supported - 20 GB
-\`\`\`
-`;
 
 	return (
 		<div className='p-4 relative'>
@@ -55,7 +44,7 @@ Note: Minimum config required for running docker image:
 				<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
 			)}
 			{instructions.map((instruction, index) => (
-				<div key={index}>
+				<div key={`instruction-${index}`}>
 					<RenderMarkdown markdownText={instruction.markdown} />
 					<CodeWithCopyButton text={instruction.command} />
 				</div>
