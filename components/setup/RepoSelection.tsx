@@ -39,7 +39,7 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 	const [error, setError] = useState<string>("");
 	const [submitButtonText, setSubmitButtonText] = useState<string>("Submit");
 
-	useEffect(() => {
+	const getRepoList = async () => {
 		setIsGetReposLoading(true);
 		axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getAllRepos?nonce=${Math.random()}`)
 			.then((response) => {
@@ -73,6 +73,10 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 			.finally(() => {
 				setIsGetReposLoading(false);
 			});
+	}
+	
+	useEffect(() => {
+		getRepoList();
 	}, [repoProvider])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
@@ -111,17 +115,31 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 			})
 	};
 
+	const handleRefresh = () => {
+		getRepoList();
+	}
+
 	if (error.length > 0) {
 		return (<p className="text-error">{error}</p>)
 	}
 	return (
 		<div>
 			<h4 className='my-2 font-semibold'>Select Repositories</h4>
-			{isGetReposLoading ?
-				(<div className='border-4 border-t-secondary rounded-full w-12 h-12 animate-spin mx-auto'> </div>) :
-				allRepos.length === 0 ?
-					(<p>No repositories found</p>) :
-					allRepos.map((repo) => (
+			{isGetReposLoading ? (
+				<div className='border-4 border-t-secondary rounded-full w-12 h-12 animate-spin mx-auto'></div>
+			) : allRepos.length === 0 ? (
+				<p>No repositories found</p>
+			) : (
+				<div>
+					<div className='flex gap-2 py-2'>
+						<Button variant='outlined' onClick={handleRefresh}>
+							&#x21bb; Refresh
+						</Button>
+						<Button variant='outlined' onClick={handleSelectAll}>
+							{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
+						</Button>
+					</div>
+					{allRepos.map((repo) => (
 						<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
 							<input
 								type="checkbox"
@@ -133,18 +151,15 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 							/>
 							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
 						</div>
-					))
-			}
-			<div className='flex gap-2 py-2'>
-				<Button variant='outlined' onClick={handleSelectAll}>
-					{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
-				</Button>
+					))}
+				</div>
+			)}
+			<div className='py-2'>
 				<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
 					{submitButtonText}
 				</Button>
 			</div>
 		</div>
-
 	);
 };
 
