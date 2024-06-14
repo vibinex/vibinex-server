@@ -9,10 +9,9 @@ interface SetupReposApiBodyArgs {
 	owner: string,
 	provider: string,
 	repos: string[],
-	installationId: string
 }
 
-function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: string) {
+function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[]) {
 	// Group by repo_owner and generate setup args
 	const setupArgsMap: Map<string, SetupReposApiBodyArgs> = new Map();
 	repos.forEach(repo => {
@@ -22,7 +21,6 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 				owner: repo.repo_owner,
 				provider: repo.repo_provider,
 				repos: [],
-				installationId: install_id
 			});
 		}
 		setupArgsMap.get(key)?.repos.push(repo.repo_name);
@@ -32,8 +30,7 @@ function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[], install_id: 
 }
 
 
-const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewAccordion }:
-	{ repoProvider: RepoProvider, installId: string, setIsRepoSelectionDone: Function | null, isNewAccordion: boolean }) => {
+const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 	const [selectedRepos, setSelectedRepos] = useState<RepoIdentifier[]>([]);
 	const [disableAllRepos, setDisableAllRepos] = useState<boolean>(false);
 	const [allRepos, setAllRepos] = useState<RepoIdentifier[]>([]);
@@ -42,7 +39,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 	const [error, setError] = useState<string>("");
 	const [submitButtonText, setSubmitButtonText] = useState<string>("Submit");
 
-	useEffect(() => {
+	const getRepoList = async () => {
 		setIsGetReposLoading(true);
 		axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getAllRepos?nonce=${Math.random()}`)
 			.then((response) => {
@@ -53,7 +50,7 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 				setAllRepos(providerReposForUser)
 
 				// automatically check the repositories that are already installed by the user
-				axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getInstalledRepos?nonce=${Math.random()}`, { params: { topicId: installId, provider: repoProvider } })
+				axios.get<{ repoList: RepoIdentifier[] }>(`/api/docs/getInstalledRepos?nonce=${Math.random()}`, { params: { provider: repoProvider } })
 					.then((response) => {
 						return response.data.repoList;
 					})
@@ -76,7 +73,11 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 			.finally(() => {
 				setIsGetReposLoading(false);
 			});
-	}, [repoProvider, installId, isNewAccordion])
+	}
+	
+	useEffect(() => {
+		getRepoList();
+	}, [repoProvider])
 
 	const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, repo: RepoIdentifier) => {
 		if (event.target.checked) {
@@ -97,39 +98,47 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 	const handleSubmit = () => {
 		setIsRepoSubmitButtonDisabled(true)
 		setDisableAllRepos(true);
-		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos, installId);
-		axios.post('/api/docs/userSelectedRepos', { info: reposListInSetupArgs, installationId: installId, isPublish: isNewAccordion })
+		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos);
+		axios.post('/api/docs/userSelectedRepos', { info: reposListInSetupArgs })
 			.then((response) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);
 					setError('Something went wrong');
 				} else {
+					// TODO - route to next page
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
-					if (setIsRepoSelectionDone) { setIsRepoSelectionDone(true) }
-					if (isNewAccordion) { setSubmitButtonText("Submitted") }
 				}
 			})
 			.catch((error) => {
 				setError(`Unable to submit selected repos, \nPlease refresh this page and try again.`);
-				if (setIsRepoSelectionDone) { setIsRepoSelectionDone(false); }
 				console.error(`[RepoSelection] Unable to save selected repos in db - ${error.message}`);
 			})
-			.finally(() => {
-				if (!isNewAccordion) { setIsRepoSubmitButtonDisabled(false); }
-			})
 	};
+
+	const handleRefresh = () => {
+		getRepoList();
+	}
 
 	if (error.length > 0) {
 		return (<p className="text-error">{error}</p>)
 	}
 	return (
 		<div>
-			<h4 className='my-2 font-semibold'>Select Repositories</h4>
-			{isGetReposLoading ?
-				(<div className='border-4 border-t-secondary rounded-full w-12 h-12 animate-spin mx-auto'> </div>) :
-				allRepos.length === 0 ?
-					(<p>No repositories found</p>) :
-					allRepos.map((repo) => (
+			{isGetReposLoading ? (
+				<div className='border-4 border-t-secondary rounded-full w-12 h-12 animate-spin mx-auto'></div>
+			) : allRepos.length === 0 ? (
+				<p>No repositories found</p>
+			) : (
+				<div>
+					<div className='flex gap-2 py-2'>
+						<Button variant='outlined' onClick={handleRefresh}>
+							&#x21bb; Refresh
+						</Button>
+						<Button variant='outlined' onClick={handleSelectAll}>
+							{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
+						</Button>
+					</div>
+					{allRepos.map((repo) => (
 						<div key={`${repo.repo_owner}/${repo.repo_name}`} className='flex items-center gap-2'>
 							<input
 								type="checkbox"
@@ -141,18 +150,15 @@ const RepoSelection = ({ repoProvider, installId, setIsRepoSelectionDone, isNewA
 							/>
 							<label htmlFor={JSON.stringify(repo)}>{repo.repo_provider}/{repo.repo_owner}/{repo.repo_name}</label>
 						</div>
-					))
-			}
-			<div className='flex gap-2 py-2'>
-				<Button variant='outlined' onClick={handleSelectAll}>
-					{selectedRepos.length === allRepos.length ? "Unselect All" : "Select All"}
-				</Button>
+					))}
+				</div>
+			)}
+			<div className='py-2'>
 				<Button variant='contained' onClick={handleSubmit} disabled={selectedRepos.length === 0 || isRepoSubmitButtonDisabled}>
 					{submitButtonText}
 				</Button>
 			</div>
 		</div>
-
 	);
 };
 
