@@ -12,6 +12,7 @@ import MainAppBar from '../../../views/MainAppBar';
 import DocsSideBar from '../../../views/docs/DocsSideBar';
 import { getURLWithParams } from '../../../utils/url_utils';
 import { RenderMarkdown } from '../../../components/RenderMarkdown';
+import RadioCard from '../../../components/setup/RadioCard';
 
 const InstallationType = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -39,17 +40,13 @@ const InstallationType = () => {
         rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId); //TODO: discuss the correct event-type and name for all client side events
     }, [rudderEventMethods, session]);
 
-    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.checked) {
-            setSelectedInstallation(event.target.value);
-        } else {
-            setSelectedInstallation('');
-        }
+    const handleCardSelect = (value: string) => {
+        setSelectedInstallation(value);
     };
 
     const installations = [
-        { value: 'app', label: 'Project' },
-        { value: 'pat', label: 'Individual' },
+        { value: 'app', label: 'Project In case of project, you must have all the required permissions to run the tool on your chosen code provider.' },
+        { value: 'pat', label: 'Individual In case of individual installation, you will be able to setup the vibinex tool on your personal repositories where you have all the required permissions to run the tool on your chose code provider.' },
     ];
 
     const currentQueryParams = router.query;
@@ -73,20 +70,19 @@ In case of project, you must have all the required permissions to run the tool o
                         <div className='space-y-4 my-4'>
                             {installations.map((option) => (
                                 <div key={option.value} className='flex items-center gap-2'>
-                                    <input
-                                        type="radio"
-                                        id={option.value}
+                                    <RadioCard
+                                        key={option.value}
                                         value={option.value}
-                                        checked={selectedInstallation === option.value}
-                                        onChange={handleCheckboxChange}
-                                    />
-                                    <label htmlFor={option.value}>{option.label}</label>
+                                        label={option.label}
+                                        selected={selectedInstallation === option.value}
+                                        onSelect={handleCardSelect}
+                                />
                                 </div>
                             ))}
                         </div>
                         <Button 
                             variant="contained" 
-                            href={getURLWithParams('/hosting', { ...currentQueryParams, installation: selectedInstallation })} 
+                            href={getURLWithParams('/docs/setup/providerAppInstall', { ...currentQueryParams, installation: selectedInstallation })} 
                             className='px-4 py-2' 
                             disabled={!selectedInstallation}
                         >
