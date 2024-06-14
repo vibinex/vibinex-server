@@ -62,7 +62,6 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 			if (handleInputValue.provider !== provider) return handleInputValue;
 			const filteredHandles = handleInputValue.handles.filter(handle => !invalidValues.has(handle));
 			// check if the new value is a duplicate
-			console.log(`[handleAdd] filteredHandles = ${filteredHandles}`);
 			const isDuplicate = filteredHandles.some(handle => handle === chipData.text);
 			if (isDuplicate) {
 				console.warn('Duplicate values are not allowed');
