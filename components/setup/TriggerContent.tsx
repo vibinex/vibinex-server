@@ -4,15 +4,15 @@ import Button from '../Button';
 
 interface TriggerContentProps {
     selectedProvider?: RepoProvider;
-    bitbucket_auth_url: string;
     selectedInstallationType: string;
     selectedHosting: string;
+    bitbucket_auth_url: string;
 }
 
-const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, bitbucket_auth_url, selectedHosting, selectedInstallationType }) => {
+const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, selectedHosting, selectedInstallationType, bitbucket_auth_url }) => {
     const triggerContent = () => {
         if (selectedProvider === 'github') {
-            if (selectedInstallationType === 'individual'){
+            if (selectedInstallationType === 'individual') {
                 return (
                     <div>You are all set!</div>
                 )
@@ -31,11 +31,12 @@ const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, bitbu
                 </>
             );
         } else if (selectedProvider === 'bitbucket') {
-            if (selectedHosting == 'selfhosting' && selectedInstallationType == 'individual'){
+            if (selectedHosting == 'selfhosting' && selectedInstallationType == 'individual') {
                 return (
                     <div>Coming Soon!</div>
                 )
             }
+            console.debug(`[TriggerContent] url: `, bitbucket_auth_url)
             return (
                 <>
                     <Button
@@ -43,6 +44,7 @@ const TriggerContent: React.FC<TriggerContentProps> = ({ selectedProvider, bitbu
                         variant="contained"
                         href={bitbucket_auth_url}
                         target='_blank'
+                        disabled={!bitbucket_auth_url}
                     >
                         Authorise Bitbucket OAuth Consumer
                     </Button>

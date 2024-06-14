@@ -14,10 +14,10 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		repo_owner: jsonBody.repo_owner || "",
 		repo_provider: jsonBody.selectedProvider || "",
 		installation_type: jsonBody.selectedInstallationType || "",
-		hosting: jsonBody.selectedHosting || "",
+		hosting: "cloud",
 	};
 
-	if (!jsonBody.selectedProvider || !jsonBody.selectedInstallationType || !jsonBody.selectedHosting || !jsonBody.userId) {
+	if (!jsonBody.selectedProvider || !jsonBody.selectedInstallationType || !jsonBody.userId) { //TODO: Get userId from req auth
 		console.error("[triggerHandler] Invalid request body");
 		res.status(400).json({ "error": "Invalid request body" });
 		const eventProperties = { ...event_properties, response_status: 400 };
@@ -25,7 +25,7 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return;
 	}
 
-	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
+	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' ) {
 		if (!jsonBody.github_pat) {
 			console.error("[triggerHandler] Missing GitHub Personal Access Token");
 			res.status(400).json({ "error": "Missing GitHub Personal Access Token" });
@@ -83,14 +83,14 @@ const triggerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	//check if already a build exists in users table for the user, if yes? check status else continue
 	let buildStatus: CloudBuildStatus;
-	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' && jsonBody.selectedHosting === 'cloud') {
+	if (jsonBody.selectedProvider === 'github' && jsonBody.selectedInstallationType === 'individual' ) {
 		buildStatus = await triggerCloudPatBuildUsingGcloudApi(jsonBody.userId, topicName, jsonBody.github_pat, jsonBody.selectedProvider).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
 			return { success: false, message: 'Unable to trigger build using GCloud API' };
 		});
 		console.info("[triggerHandler] build status: ", buildStatus);
 
-	} else if (jsonBody.selectedInstallationType === 'project' && jsonBody.selectedHosting === 'cloud') {
+	} else if (jsonBody.selectedInstallationType === 'project' ) {
 		buildStatus = await triggerCloudProjectBuildUsingGcloudApi(jsonBody.userId, topicName).catch(err => {
 			console.error(`[triggerHandler] error in triggering build`, err);
 			return { success: false, message: 'Unable to trigger build using GCloud API' };

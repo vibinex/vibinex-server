@@ -1,69 +1,62 @@
 "use client";
 
-import type { Session } from "next-auth";
 import React from 'react';
 
+import { RenderMarkdown } from "../RenderMarkdown";
 import CodeWithCopyButton from './CodeWithCopyButton';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 
 interface DockerInstructionsProps {
-	userId: string;
 	selectedProvider: string;
-	selectedInstallationType: string;
-	session: Session | null;
+	selectedInstallationType: string | null;
 	installId: string;
 }
 
-const DockerInstructions: React.FC<DockerInstructionsProps> = ({ userId, selectedInstallationType, selectedProvider, session, installId }) => {
-	let selfHostingCode;
-	if (selectedInstallationType === 'individual' && selectedProvider === 'github') {
-		if (!session) {
-			console.error(`[DockerInstructions] could not get session for userId: ${userId}`);
-			selfHostingCode = `Unable to get topic name for user\nPlease refresh this page and try again.`;
-		} else {
-			selfHostingCode = `
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-docker run -e INSTALL_ID=${installId} \\
--e PROVIDER=<your_provider_here> \\
--e GITHUB_PAT=<Your gh cli token> \\
-asia.gcr.io/vibi-prod/dpu/dpu
-					`;
+const DockerInstructions: React.FC<DockerInstructionsProps> = ({ selectedInstallationType, selectedProvider, installId }) => {
+	const selfHostingCode = `
+docker run \\\\\\
+-v ~/.config/vibinex:/app/config \\\\\\
+-e INSTALL_ID=${installId} \\\\\\
+${selectedProvider === 'github' && selectedInstallationType === 'pat' ? `-e PROVIDER=github \\\\
+-e GITHUB_PAT=<Your gh cli token> \\\\\\
+` : ''}asia.gcr.io/vibi-prod/dpu/dpu
+  `;
+
+	const instructions = [
+		{
+			markdown: `1. **Pull the Vibinex DPU image**`,
+			command: `docker pull asia.gcr.io/vibi-prod/dpu/dpu`,
+		},
+		{
+			markdown: `2. **Create a config directory. This helps us restart the image from previous state in case of any issues**`,
+			command: `mkdir -p ~/.config/vibinex`,
+		},
+		{
+			markdown: `3. **Run the image with the options given below. These are unique to you. Refresh the DPU Status in the side bar to check if dpu started**`,
+			command: selfHostingCode,
 		}
-	} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket') {
-		selfHostingCode = `Coming Soon!`
-	} else if (selectedInstallationType === 'project' && selectedProvider === 'bitbucket') {
-		if (!session) {
-			console.error(`[DockerInstructions] could not get session for userId: ${userId}`);
-			selfHostingCode = `Unable to get topic name for user\nPlease refresh this page and try again.`;
-		} else {
-			selfHostingCode = `
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-mkdir -p ~/.config/vibinex &&\n
-docker run -e INSTALL_ID=${installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
-					`;
-		}
-	} else {
-		selfHostingCode = `
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-mkdir -p ~/.config/vibinex &&\n
-docker run -e INSTALL_ID=${installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
-					`;
-	}
-	
+	];
+
 
 	return (
-		<div className='relative'>
-			{selectedInstallationType === 'individual' ?
+		<div className='p-4 relative'>
+			{selectedInstallationType === 'individual' && (
 				<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
-				: null
-			}
-			<CodeWithCopyButton text={selfHostingCode} />
-			<p className="text-xs mt-2">Minimum config required for running docker image:</p>
-			<ul className="text-xs">
-				<li>RAM: 2 GB</li>
-				<li>CPU: 2v or 4v CPU</li>
-				<li>Storage: Depends on codebase size, maximum supported - 20 GB</li>
-			</ul>
+			)}
+			{instructions.map((instruction, index) => (
+				<div key={`instruction-${index}`}>
+					<RenderMarkdown markdownText={instruction.markdown} />
+					<CodeWithCopyButton text={instruction.command} />
+				</div>
+			))}
+			<div className="text-xs p-4 border-l-4 border-gray-500">
+				<p><strong>Note:</strong> Minimum config required for running docker image:</p>
+				<ul className="p-2 rounded">
+					<li>RAM: 2 GB</li>
+					<li>CPU: 2v or 4v CPU</li>
+					<li>Storage: Depends on codebase size, maximum supported - 20 GB</li>
+				</ul>
+			</div>
 		</div>
 	);
 }

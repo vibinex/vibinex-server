@@ -5,17 +5,10 @@ import { encrypt } from '../../utils/encryptDecrypt';
 import { RepoProvider } from '../../utils/providerAPI';
 import { CloudBuildStatus } from '../../utils/trigger';
 import Button from '../Button';
-import DockerInstructions from './DockerInstructions';
-import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
-import RepoSelection from './RepoSelection';
 
 interface BuildInstructionProps {
-	selectedHosting: string;
 	selectedProvider: RepoProvider;
 	selectedInstallationType: string;
-	userId: string;
-	session: Session | null;
-	installId: string | null;
 }
 
 const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBuildButtonDisabled: boolean }> = ({ buildStatus, isTriggerBuildButtonDisabled }) => {
@@ -31,10 +24,9 @@ const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBui
 	}
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, userId, selectedProvider, selectedInstallationType, session, installId }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, selectedInstallationType }) => {
 	const [isTriggerBuildButtonDisabled, setIsTriggerBuildButtonDisabled] = useState<boolean>(false);
 	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
-	const [isRepoSelectionDone, setIsRepoSelectionDone] = useState<boolean>(false);
 	const [handleGithubPatInputValue, setHandleGithubPatInputValue] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [maskedGithubPat, setMaskedGithubPat] = useState('');
@@ -81,7 +73,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			return;
 		}
 
-		axios.post('/api/dpu/trigger', { userId, selectedHosting, selectedInstallationType, selectedProvider, github_pat: encryptedGithubPat })
+		axios.post('/api/dpu/trigger', { selectedInstallationType, selectedProvider, github_pat: encryptedGithubPat })
 			.then((response) => {
 				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 				setBuildStatus(response.data);
@@ -103,55 +95,36 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedHosting, us
 			})
 	};
 
-	if (!installId) {
-		return (<div className="flex items-center gap-4">
-			<p>Something went wrong while fetching install id.</p>
-		</div>);
-	}
-	if (selectedHosting === 'selfhosting') {
-		if (!isRepoSelectionDone && (
-			(selectedProvider === 'bitbucket' && selectedInstallationType === 'project'))) {
-			return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} isNewAccordion={false} />)
-		}
-		return <DockerInstructions userId={userId} selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} session={session} installId={installId} />
-	} else if (selectedHosting === 'cloud') {
-		if (selectedInstallationType === 'project') {
-			return (
-				<div className="flex items-center gap-4">
-					<Button variant="contained" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled}>
-						Trigger Cloud Build
-					</Button>
-					<BuildStatus buildStatus={buildStatus} isTriggerBuildButtonDisabled={isTriggerBuildButtonDisabled} />
-				</div>
-			);
-		} else {
-			if (!isRepoSelectionDone) {
-				return (<RepoSelection repoProvider={selectedProvider} installId={installId} setIsRepoSelectionDone={setIsRepoSelectionDone} isNewAccordion={false} />)
-			}
-			return (<>
-				<div className="flex items-center gap-2 py-2">
-					<input
-						type="text"
-						placeholder='Enter your Personal Access Token'
-						value={isInputDisabled ? maskedGithubPat : handleGithubPatInputValue}
-						onChange={handleGithubPatInput}
-						disabled={isInputDisabled}
-						className="grow h-8"
-					/>
-					<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
-						Deploy
-					</Button>
-				</div>
-				{errorMessage && (
-					<div className="text-error mt-2">
-						{errorMessage}
-					</div>
-				)}
-				<InstructionsToGeneratePersonalAccessToken selectedInstallationType={selectedInstallationType} selectedProvider={selectedProvider} />
-			</>);
-		}
+	if (selectedInstallationType === 'app') {
+		return (
+			<div className="flex items-center gap-4">
+				<Button variant="contained" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled}>
+					Deploy on Vibinex Cloud
+				</Button>
+				<BuildStatus buildStatus={buildStatus} isTriggerBuildButtonDisabled={isTriggerBuildButtonDisabled} />
+			</div>
+		);
 	} else {
-		return <div>Select a hosting option to view instructions.</div>;
+		return (<>
+			<div className="flex items-center gap-2 py-2">
+				<input
+					type="text"
+					placeholder='Enter your Personal Access Token'
+					value={isInputDisabled ? maskedGithubPat : handleGithubPatInputValue}
+					onChange={handleGithubPatInput}
+					disabled={isInputDisabled}
+					className={`grow h-8 ${isInputDisabled ? 'text-gray-500' : 'text-black'}`}
+				/>
+				<Button variant="contained" className="h-8" onClick={handleBuildButtonClick} disabled={isTriggerBuildButtonDisabled || !handleGithubPatInputValue.trim()}>
+					Deploy on Vibinex Cloud
+				</Button>
+			</div>
+			{errorMessage && (
+				<div className="text-error mt-2">
+					{errorMessage}
+				</div>
+			)}
+		</>);
 	}
 };
 
