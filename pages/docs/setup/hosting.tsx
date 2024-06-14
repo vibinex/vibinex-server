@@ -10,7 +10,6 @@ import RudderContext from "../../../components/RudderContext";
 import { useToast } from "../../../components/Toast/use-toast";
 import BuildInstruction from "../../../components/setup/BuildInstruction";
 import DockerInstructions from "../../../components/setup/DockerInstructions";
-import DpuHealthChipWithRefresh from "../../../components/setup/DpuHealthChipWithRefresh";
 import InstructionsToGeneratePersonalAccessToken from "../../../components/setup/InstructionsToGeneratePersonalAccessToken";
 import { getAuthUserId, getAuthUserName } from "../../../utils/auth";
 import { RepoProvider } from "../../../utils/providerAPI";
@@ -19,8 +18,6 @@ import { Theme, getPreferredTheme } from "../../../utils/theme";
 import { getURLWithParams } from "../../../utils/url_utils";
 import MainAppBar from "../../../views/MainAppBar";
 import DocsSideBar from "../../../views/docs/DocsSideBar";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 const Hosting = () => {
     const [session, setSession] = useState<Session | null>(null);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { RepoProvider } from '../../utils/providerAPI';
 import Button from '../Button';
 

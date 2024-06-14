@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { Session } from "next-auth";
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import Button from '../../../components/Button';
-import MainAppBar from '../../../views/MainAppBar';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import DocsSideBar from '../../../views/docs/DocsSideBar';
 import Footer from '../../../components/Footer';
-import { Theme, getPreferredTheme } from '../../../utils/theme';
-import { getAndSetAnonymousIdFromLocalStorage, rudderEventMethods } from '../../../utils/rudderstack_initialize';
-import { getAuthUserId, getAuthUserName } from '../../../utils/auth';
-import RudderContext from '../../../components/RudderContext';
-import { getURLWithParams } from '../../../utils/url_utils';
-import TriggerContent from '../../../components/setup/TriggerContent';
-import { RepoProvider } from '../../../utils/providerAPI';
+import LoadingOverlay from '../../../components/LoadingOverlay';
 import { RenderMarkdown } from '../../../components/RenderMarkdown';
-import DpuHealthChipWithRefresh from '../../../components/setup/DpuHealthChipWithRefresh';
+import RudderContext from '../../../components/RudderContext';
+import TriggerContent from '../../../components/setup/TriggerContent';
+import { getAuthUserId, getAuthUserName } from '../../../utils/auth';
+import { RepoProvider } from '../../../utils/providerAPI';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../../utils/rudderstack_initialize';
+import { Theme, getPreferredTheme } from '../../../utils/theme';
+import { getURLWithParams } from '../../../utils/url_utils';
+import MainAppBar from '../../../views/MainAppBar';
+import DocsSideBar from '../../../views/docs/DocsSideBar';
 
 const ProviderAppInstall = ({bitbucket_auth_url}: {bitbucket_auth_url: string}) => {
     const router = useRouter();
