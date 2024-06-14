@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { Session } from "next-auth";
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import Button from '../../../components/Button';
-import MainAppBar from '../../../views/MainAppBar';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import DocsSideBar from '../../../views/docs/DocsSideBar';
 import Footer from '../../../components/Footer';
-import { Theme, getPreferredTheme } from '../../../utils/theme';
-import { getAndSetAnonymousIdFromLocalStorage, rudderEventMethods } from '../../../utils/rudderstack_initialize';
-import { getAuthUserId, getAuthUserName } from '../../../utils/auth';
-import RudderContext from '../../../components/RudderContext';
-import { getURLWithParams } from '../../../utils/url_utils';
-import TriggerContent from '../../../components/setup/TriggerContent';
-import { RepoProvider } from '../../../utils/providerAPI';
+import LoadingOverlay from '../../../components/LoadingOverlay';
 import { RenderMarkdown } from '../../../components/RenderMarkdown';
+import RudderContext from '../../../components/RudderContext';
+import TriggerContent from '../../../components/setup/TriggerContent';
+import { getAuthUserId, getAuthUserName } from '../../../utils/auth';
+import { RepoProvider } from '../../../utils/providerAPI';
+import { getAndSetAnonymousIdFromLocalStorage } from '../../../utils/rudderstack_initialize';
+import { Theme, getPreferredTheme } from '../../../utils/theme';
+import { getURLWithParams } from '../../../utils/url_utils';
+import MainAppBar from '../../../views/MainAppBar';
+import DocsSideBar from '../../../views/docs/DocsSideBar';
 
-const ProviderAppInstall: React.FC = () => {
+const ProviderAppInstall = ({bitbucket_auth_url}: {bitbucket_auth_url: string}) => {
     const router = useRouter();
     const { provider, installation, ...restQueryParams } = router.query;
     const hosting = "cloud";
@@ -39,15 +39,13 @@ const ProviderAppInstall: React.FC = () => {
     useEffect(() => {
         const anonymousId = getAndSetAnonymousIdFromLocalStorage();
         rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId);
+        console.debug(`[useEffect] url: `, bitbucket_auth_url)
     }, [rudderEventMethods, session]);
 
     const currentQueryParams = router.query;
-    const bitbucket_auth_url = 'https://bitbucket.org/site/oauth2/authorize';
-    const providerOauthAppInstallationExplainedMD = `## Provider Oauth App Installation
-There are two types of installation options:
-Individual and Project.
-In case of individual installation, you will be able to setup the vibinex tool on your personal repositories where you have all the required permissions to run the tool on your chose code provider.
-In case of project, you must have all the required permissions to run the tool on your chosen code provider.
+    const providerOauthAppInstallationExplainedMD = `## Oauth App Installation
+Give the docker permissions to clone your repositories, add comments, assign reviewers and add a webhook. Only the docker container gets these permissions. 
+Refresh the DPU status in the side bar after a few minutes to check if setup succeded
 `; //TODO: change content 
     
 
@@ -56,15 +54,15 @@ In case of project, you must have all the required permissions to run the tool o
             <MainAppBar />
             {loading ? <LoadingOverlay type='loading' /> : (!session ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null)}
             <div className="flex flex-col sm:flex-row">
-                <DocsSideBar className='w-full sm:w-80' />
+                <DocsSideBar className='w-full sm:w-80' session={session}/>
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
                     <RenderMarkdown markdownText={providerOauthAppInstallationExplainedMD} />
                     <div className='flex flex-col items-start pb-16'>
                         <TriggerContent
                             selectedProvider={provider as RepoProvider}
-                            bitbucket_auth_url={bitbucket_auth_url}
                             selectedHosting={hosting as string}
                             selectedInstallationType={installation as string}
+                            bitbucket_auth_url={bitbucket_auth_url}
                         />
                         <div className="absolute bottom-0 right-0 mb-2 mr-2">
                             <Button
@@ -82,5 +80,19 @@ In case of project, you must have all the required permissions to run the tool o
         </div>
     );
 };
+
+ProviderAppInstall.getInitialProps = async () => {
+	const baseUrl = 'https://bitbucket.org/site/oauth2/authorize';
+	const redirectUri = 'https://vibi-test-394606.el.r.appspot.com/api/bitbucket/callbacks/install';
+	const scopes = 'repository';
+	const clientId = process.env.BITBUCKET_OAUTH_CLIENT_ID;
+
+	const url = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`;
+	console.debug(`[getInitialProps] url: `, url)
+	return {
+		bitbucket_auth_url: url,
+	}
+}
+
 
 export default ProviderAppInstall;

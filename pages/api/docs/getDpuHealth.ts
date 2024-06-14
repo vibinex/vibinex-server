@@ -15,3 +15,5 @@ const getDpuHealth = async (req: NextApiRequest, res: NextApiResponse) => {
     const healthStatus = await getHealthStatusFromDB(user_id);
     res.status(200).json({healthStatus: healthStatus.health_status, healthTs: healthStatus.timestamp});
 }
+
+export default getDpuHealth;

@@ -14,6 +14,7 @@ import RepoSelection from "../../../components/setup/RepoSelection";
 import { RepoProvider, supportedProviders } from "../../../utils/providerAPI";
 import Button from "../../../components/Button";
 import { getURLWithParams } from "../../../utils/url_utils";
+import { RenderMarkdown } from "../../../components/RenderMarkdown";
 
 const Repositories = () => {
 	const [session, setSession] = useState<Session | null>(null);
@@ -50,6 +51,10 @@ const Repositories = () => {
         console.log(`repoProvider state changed: ${repoProvider}`);
     }, [provider]);
 
+	const repoSelectionExplanationMD = `## Set up Repositories
+Select the Repositories on which you want to set up Vibinex
+	`;
+
 	return (
 		<div>
 			<MainAppBar />
@@ -58,6 +63,7 @@ const Repositories = () => {
 			<div className="flex flex-col sm:flex-row relative">
 				<DocsSideBar className='w-full sm:w-80' />
 				<div className="dynamic-div pb-16">
+					<RenderMarkdown markdownText={repoSelectionExplanationMD} />
 					{repoProvider && <RepoSelection repoProvider={repoProvider as RepoProvider} />}
 				</div>
 				<div className="absolute bottom-0 right-0 mb-2 mr-2">
