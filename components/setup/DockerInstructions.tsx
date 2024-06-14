@@ -7,47 +7,25 @@ import CodeWithCopyButton from './CodeWithCopyButton';
 import InstructionsToGeneratePersonalAccessToken from './InstructionsToGeneratePersonalAccessToken';
 
 interface DockerInstructionsProps {
-	userId: string;
 	selectedProvider: string;
-	selectedInstallationType: string;
-	session: Session | null;
+	selectedInstallationType: string | null;
 	installId: string;
 }
 
-const DockerInstructions: React.FC<DockerInstructionsProps> = ({ userId, selectedInstallationType, selectedProvider, session, installId }) => {
-	let selfHostingCode;
-	if (selectedInstallationType === 'individual' && selectedProvider === 'github') {
-		if (!session) {
-			console.error(`[DockerInstructions] could not get session for userId: ${userId}`);
-			selfHostingCode = `Unable to get topic name for user\nPlease refresh this page and try again.`;
-		} else {
-			selfHostingCode = `
+const DockerInstructions: React.FC<DockerInstructionsProps> = ({ selectedInstallationType, selectedProvider, installId }) => {
+	let selfHostingCode = `
+docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
+mkdir -p ~/.config/vibinex &&\n
+docker run -e INSTALL_ID=${installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
+	`;
+	if (selectedProvider === 'github' && selectedInstallationType === 'pat') {
+		selfHostingCode = `
 docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
 docker run -e INSTALL_ID=${installId} \\
 -e PROVIDER=<your_provider_here> \\
 -e GITHUB_PAT=<Your gh cli token> \\
 asia.gcr.io/vibi-prod/dpu/dpu
-					`;
-		}
-	} else if (selectedInstallationType === 'individual' && selectedProvider === 'bitbucket') {
-		selfHostingCode = `Coming Soon!`
-	} else if (selectedInstallationType === 'project' && selectedProvider === 'bitbucket') {
-		if (!session) {
-			console.error(`[DockerInstructions] could not get session for userId: ${userId}`);
-			selfHostingCode = `Unable to get topic name for user\nPlease refresh this page and try again.`;
-		} else {
-			selfHostingCode = `
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-mkdir -p ~/.config/vibinex &&\n
-docker run -e INSTALL_ID=${installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
-					`;
-		}
-	} else {
-		selfHostingCode = `
-docker pull asia.gcr.io/vibi-prod/dpu/dpu &&\n
-mkdir -p ~/.config/vibinex &&\n
-docker run -e INSTALL_ID=${installId} -v ~/.config/vibinex:/app/config asia.gcr.io/vibi-prod/dpu/dpu
-					`;
+			`;
 	}
 	
 

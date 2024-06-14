@@ -82,7 +82,7 @@ In case of project, you must have all the required permissions to run the tool o
                         </div>
                         <Button 
                             variant="contained" 
-                            href={getURLWithParams('/docs/setup/providerAppInstall', { ...currentQueryParams, installation: selectedInstallation })} 
+                            href={getURLWithParams('/docs/setup/hosting', { ...currentQueryParams, installation: selectedInstallation })} 
                             className='px-4 py-2' 
                             disabled={!selectedInstallation}
                         >
