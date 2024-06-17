@@ -22,7 +22,7 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text }) => {
 	};
 
 	return (
-		<div className='relative bg-gray-900 p-4 my-4'>
+		<div className='relative border p-4 my-4'>
 			<Markdown remarkPlugins={[remarkGfm]}>
 				{text}
 			</Markdown>
