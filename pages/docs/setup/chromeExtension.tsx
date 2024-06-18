@@ -35,8 +35,10 @@ const ChromeExtension: React.FC = () => {
     }, [rudderEventMethods, session]);
 
     const chromeExtensionExplainedMD = `## Install Chrome Extension
-The chrome extension enables highlights for your pull requests. It can be installed and used by all team members contributing to a repository on which Vibinex is set up. They do not need to set up their own DPU
-Once you install the extension, click on the extension icon in the top right corner of your browser to verify that you are logged in. If you are not logged in, login using the same credentials you used to login to vibinex.com.
+The chrome extension enables highlights for your pull requests. 
+- It can be installed and used by all team members contributing to a repository on which Vibinex is set up. They do not need to set up their own DPU
+- Once you install the extension, click on the extension icon in the top right corner of your browser to verify that you are logged in. If you are not logged in, login using the same credentials you used to login to vibinex.com.
+- Ask all your team mates to set their git name and email in their local dev environment, to track commits consistently.
 `;
 
     return (

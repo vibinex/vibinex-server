@@ -41,7 +41,7 @@ const Hosting = () => {
                     setInstallId(response.data.installId);
                 }
             }).catch((error) => {
-                console.error(`[quickstart] Unable to get topic name for user ${userId} - ${error.message}`);
+                console.error(`[hosting] Unable to get topic name for user ${userId} - ${error.message}`);
                 toast({
                     description: "Unable to get topic name, please reload the page",
                     variant: "error",
@@ -51,7 +51,7 @@ const Hosting = () => {
                 setLoading(false);
             });
         }).catch((err) => {
-            console.error(`[quickstart] Error in getting session`, err);
+            console.error(`[hosting] Error in getting session`, err);
         }).finally(() => {
             setLoading(false);
         });

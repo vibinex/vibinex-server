@@ -76,7 +76,7 @@ There are just 2 steps to setting up Vibinex:
 
 You can set up the DPU on your repositories either as an owner of the repository or a member. When you set it up as an owner, webhooks are added on your repository that automatically trigger DPU when a pull request is created or updated. When you set it up as a member, you need to manually trigger the DPU when a pull request when you want to process it.
 
-Follow [this guide](/docs/quickstart) for a quick set up.
+Follow [this guide](/docs/setup/providerLogin) for a quick set up.
 	`
 
 	return (
