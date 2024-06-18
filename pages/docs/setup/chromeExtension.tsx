@@ -10,6 +10,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from '../../../utils/rudderstack
 import { Theme, getPreferredTheme } from '../../../utils/theme';
 import MainAppBar from '../../../views/MainAppBar';
 import DocsSideBar from '../../../views/docs/DocsSideBar';
+import { getURLWithParams } from "../../../utils/url_utils";
 
 const ChromeExtension: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -56,6 +57,15 @@ The chrome extension enables highlights for your pull requests.
                             className='px-4 py-2 mt-4'
                         >
                         Install Vibinex Chrome Extension   
+                        </Button>
+                    </div>
+                    <div className="absolute bottom-0 right-0 mb-8 mr-2">
+                        <Button
+                            href={getURLWithParams('/u', {})}
+                            variant="contained"
+                            className='px-4 py-2 flex-1 sm:flex-grow-0'
+                        >
+                            Next &raquo;
                         </Button>
                     </div>
                 </div>
