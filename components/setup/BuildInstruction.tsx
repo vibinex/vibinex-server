@@ -9,6 +9,7 @@ import Button from '../Button';
 interface BuildInstructionProps {
 	selectedProvider: RepoProvider;
 	selectedInstallationType: string;
+	session: Session | null;
 }
 
 const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBuildButtonDisabled: boolean }> = ({ buildStatus, isTriggerBuildButtonDisabled }) => {
@@ -24,7 +25,7 @@ const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBui
 	}
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, selectedInstallationType }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, selectedInstallationType, session }) => {
 	const [isTriggerBuildButtonDisabled, setIsTriggerBuildButtonDisabled] = useState<boolean>(false);
 	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 	const [handleGithubPatInputValue, setHandleGithubPatInputValue] = useState<string>("");
@@ -72,27 +73,28 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, s
 			setIsTriggerBuildButtonDisabled(false);
 			return;
 		}
-
-		axios.post('/api/dpu/trigger', { selectedInstallationType, selectedProvider, github_pat: encryptedGithubPat })
-			.then((response) => {
-				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
-				setBuildStatus(response.data);
-				setIsTriggerBuildButtonDisabled(false);
-				if (!response.data.success) {
-					setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
-				}
-				if (response.data.success) {
-					setMaskedGithubPat(maskGithubPat(handleGithubPatInputValue)); // Mask the GitHub PAT
-					return;
-				}
-			})
-			.catch((error) => {
-				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
-				setErrorMessage('API request failed: ' + error.message);
-				setIsTriggerBuildButtonDisabled(false);
-				setIsInputDisabled(false);
-				setBuildStatus({ success: false, message: 'API request failed' });
-			})
+		if (session?.user?.id) {
+			axios.post('/api/dpu/trigger', { selectedInstallationType, selectedProvider, github_pat: encryptedGithubPat, userId: session.user.id})
+				.then((response) => {
+					console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
+					setBuildStatus(response.data);
+					setIsTriggerBuildButtonDisabled(false);
+					if (!response.data.success) {
+						setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
+					}
+					if (response.data.success) {
+						setMaskedGithubPat(maskGithubPat(handleGithubPatInputValue)); // Mask the GitHub PAT
+						return;
+					}
+				})
+				.catch((error) => {
+					console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
+					setErrorMessage('API request failed: ' + error.message);
+					setIsTriggerBuildButtonDisabled(false);
+					setIsInputDisabled(false);
+					setBuildStatus({ success: false, message: 'API request failed' });
+				})
+		}
 	};
 
 	if (selectedInstallationType === 'app') {

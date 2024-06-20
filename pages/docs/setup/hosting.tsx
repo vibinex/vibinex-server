@@ -90,7 +90,7 @@ We recommend this option for public repositories, it is the fastest way to set u
                                     selectedProvider={provider as RepoProvider}
                                     selectedInstallationType={installation as string} />}
                             <RenderMarkdown markdownText={cloudBuildExplainedMD} />
-                            <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} />
+                            <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} session={session} />
                         </div>
                         :
                         <div className='pb-16'> </div>}
