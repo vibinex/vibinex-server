@@ -10,6 +10,7 @@ import { getAndSetAnonymousIdFromLocalStorage } from '../../../utils/rudderstack
 import { Theme, getPreferredTheme } from '../../../utils/theme';
 import MainAppBar from '../../../views/MainAppBar';
 import DocsSideBar from '../../../views/docs/DocsSideBar';
+import { getURLWithParams } from "../../../utils/url_utils";
 
 const ChromeExtension: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
@@ -35,8 +36,10 @@ const ChromeExtension: React.FC = () => {
     }, [rudderEventMethods, session]);
 
     const chromeExtensionExplainedMD = `## Install Chrome Extension
-The chrome extension enables highlights for your pull requests. It can be installed and used by all team members contributing to a repository on which Vibinex is set up. They do not need to set up their own DPU
-Once you install the extension, click on the extension icon in the top right corner of your browser to verify that you are logged in. If you are not logged in, login using the same credentials you used to login to vibinex.com.
+The chrome extension enables highlights for your pull requests. 
+- It can be installed and used by all team members contributing to a repository on which Vibinex is set up. They do not need to set up their own DPU
+- Once you install the extension, click on the extension icon in the top right corner of your browser to verify that you are logged in. If you are not logged in, login using the same credentials you used to login to vibinex.com.
+- Ask all your team mates to set their git name and email in their local dev environment, to track commits consistently.
 `;
 
     return (
@@ -54,6 +57,15 @@ Once you install the extension, click on the extension icon in the top right cor
                             className='px-4 py-2 mt-4'
                         >
                         Install Vibinex Chrome Extension   
+                        </Button>
+                    </div>
+                    <div className="absolute bottom-0 right-0 mb-8 mr-2">
+                        <Button
+                            href={getURLWithParams('/u', {})}
+                            variant="contained"
+                            className='px-4 py-2 flex-1 sm:flex-grow-0'
+                        >
+                            Next &raquo;
                         </Button>
                     </div>
                 </div>

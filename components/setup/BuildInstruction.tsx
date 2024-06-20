@@ -9,6 +9,14 @@ import Button from '../Button';
 interface BuildInstructionProps {
 	selectedProvider: RepoProvider;
 	selectedInstallationType: string;
+	session: Session | null;
+}
+
+type BodyType = {
+	selectedInstallationType: string;
+	selectedProvider: RepoProvider;
+	userId: string | undefined;
+	github_pat?: string; // Optional property
 }
 
 const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBuildButtonDisabled: boolean }> = ({ buildStatus, isTriggerBuildButtonDisabled }) => {
@@ -24,7 +32,7 @@ const BuildStatus: React.FC<{ buildStatus: CloudBuildStatus | null, isTriggerBui
 	}
 }
 
-const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, selectedInstallationType }) => {
+const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, selectedInstallationType, session }) => {
 	const [isTriggerBuildButtonDisabled, setIsTriggerBuildButtonDisabled] = useState<boolean>(false);
 	const [buildStatus, setBuildStatus] = useState<CloudBuildStatus | null>(null);
 	const [handleGithubPatInputValue, setHandleGithubPatInputValue] = useState<string>("");
@@ -64,35 +72,43 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, s
 		setBuildStatus(null);
 		setErrorMessage(null);
 		setIsInputDisabled(true);
-		let encryptedGithubPat = await encryptGithubPat(handleGithubPatInputValue);
-
-		if (!encryptedGithubPat) {
-			setErrorMessage('Failed to encrypt GitHub PAT. Please try again.');
-			setIsInputDisabled(false);
-			setIsTriggerBuildButtonDisabled(false);
-			return;
+		let body: BodyType = {
+			selectedInstallationType,
+			selectedProvider,
+			userId: session?.user?.id
 		}
-
-		axios.post('/api/dpu/trigger', { selectedInstallationType, selectedProvider, github_pat: encryptedGithubPat })
-			.then((response) => {
-				console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
-				setBuildStatus(response.data);
-				setIsTriggerBuildButtonDisabled(false);
-				if (!response.data.success) {
-					setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
-				}
-				if (response.data.success) {
-					setMaskedGithubPat(maskGithubPat(handleGithubPatInputValue)); // Mask the GitHub PAT
-					return;
-				}
-			})
-			.catch((error) => {
-				console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
-				setErrorMessage('API request failed: ' + error.message);
-				setIsTriggerBuildButtonDisabled(false);
+		if (handleGithubPatInputValue != "") {
+			let encryptedGithubPat = await encryptGithubPat(handleGithubPatInputValue);
+			if (!encryptedGithubPat) {
+				setErrorMessage('Failed to encrypt GitHub PAT. Please try again.');
 				setIsInputDisabled(false);
-				setBuildStatus({ success: false, message: 'API request failed' });
-			})
+				setIsTriggerBuildButtonDisabled(false);
+				return;
+			}
+			body = {...body, github_pat: encryptedGithubPat};
+		}
+		if (session?.user?.id) {
+			axios.post('/api/dpu/trigger', body)
+				.then((response) => {
+					console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
+					setBuildStatus(response.data);
+					setIsTriggerBuildButtonDisabled(false);
+					if (!response.data.success) {
+						setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
+					}
+					if (response.data.success) {
+						setMaskedGithubPat(maskGithubPat(handleGithubPatInputValue)); // Mask the GitHub PAT
+						return;
+					}
+				})
+				.catch((error) => {
+					console.error('[handleBuildButtonClick] /api/dpu/trigger request failed:', error);
+					setErrorMessage('API request failed: ' + error.message);
+					setIsTriggerBuildButtonDisabled(false);
+					setIsInputDisabled(false);
+					setBuildStatus({ success: false, message: 'API request failed' });
+				})
+		}
 	};
 
 	if (selectedInstallationType === 'app') {

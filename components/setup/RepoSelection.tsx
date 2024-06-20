@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { RepoIdentifier } from "../../types/repository";
 import { RepoProvider } from "../../utils/providerAPI";
 import Button from "../Button";
+import { useRouter } from "next/router";
+import { getURLWithParams } from "../../utils/url_utils";
 
 
 interface SetupReposApiBodyArgs {
@@ -38,6 +40,7 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 	const [isRepoSubmitButtonDisabled, setIsRepoSubmitButtonDisabled] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 	const [submitButtonText, setSubmitButtonText] = useState<string>("Submit");
+	const router = useRouter();
 
 	const getRepoList = async () => {
 		setIsGetReposLoading(true);
@@ -104,9 +107,13 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);
 					setError('Something went wrong');
+					setIsRepoSubmitButtonDisabled(false)
 				} else {
-					// TODO - route to next page
 					console.info(`[RepoSelection/handleSubmit] repos data saved successfully in db`);
+					const nextPage = repoProvider === 'github' 
+					? getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', installation: 'pat', provider: 'github'})
+					: getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', provider: 'bitbucket' });
+        			router.push(nextPage);
 				}
 			})
 			.catch((error) => {
