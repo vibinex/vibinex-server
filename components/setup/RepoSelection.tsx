@@ -13,6 +13,11 @@ interface SetupReposApiBodyArgs {
 	repos: string[],
 }
 
+interface RepoSelectionRequestBody {
+    info: SetupReposApiBodyArgs[];
+    isPublish?: boolean;
+}
+
 function formatRepoListInSaveSetupArgsForm(repos: RepoIdentifier[]) {
 	// Group by repo_owner and generate setup args
 	const setupArgsMap: Map<string, SetupReposApiBodyArgs> = new Map();
@@ -102,7 +107,11 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 		setIsRepoSubmitButtonDisabled(true)
 		setDisableAllRepos(true);
 		const reposListInSetupArgs = formatRepoListInSaveSetupArgsForm(selectedRepos);
-		axios.post('/api/docs/userSelectedRepos', { info: reposListInSetupArgs })
+		let postBody: RepoSelectionRequestBody = { info: reposListInSetupArgs };
+		if (repoProvider === 'github') {
+			postBody = { isPublish: true, ...postBody };
+		}
+		axios.post('/api/docs/userSelectedRepos', postBody)
 			.then((response) => {
 				if (response.status != 200) {
 					console.error(`[RepoSelection/handleSubmit] something went wrong while saving repos data in db`);
