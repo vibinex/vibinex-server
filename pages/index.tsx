@@ -8,12 +8,12 @@ import Features from '../views/Features'
 import TrustUs from '../views/TrustUs'
 import RudderContext from '../components/RudderContext'
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize'
-import JoinSlack from '../views/JoinSlack'
 import { useSession } from 'next-auth/react'
 import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
 import ProductDemo from '../views/Demo'
 import Customers from '../views/CustomerLogos'
 import Testimonials from '../views/Testimonials'
+import JoinDiscord from '../views/JoinDiscord'
 
 export default function Home() {
 	const session: Session | null = useSession().data;
@@ -39,7 +39,7 @@ export default function Home() {
 			<WhyUs />
 			<TrustUs />
 			<Testimonials />
-			<JoinSlack />
+			<JoinDiscord />
 			<Footer />
 		</div>
 	)

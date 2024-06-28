@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link'
-import { BsFacebook, BsLinkedin, BsInstagram, BsTwitter, BsWhatsapp, BsSlack, BsCalendarDate } from 'react-icons/bs'
+import { BsFacebook, BsLinkedin, BsInstagram, BsTwitter, BsWhatsapp, BsDiscord, BsCalendarDate } from 'react-icons/bs'
 import { FiMail } from "react-icons/fi";
 import { PopupButton } from "react-calendly";
 
@@ -19,7 +19,7 @@ const quickLinks = [
 const contactUs = [
 	{ name: 'contact@vibinex.com', icon: FiMail, link: 'mailto:contact@vibinex.com' },
 	{ name: '85115 57566', icon: BsWhatsapp, link: 'https://wa.me/918511557566' },
-	{ name: 'Join Slack', icon: BsSlack, link: 'https://join.slack.com/t/vibinex/shared_invite/zt-1sysjjso3-1ftC6deRcOgQXW9hD4ozWg' },
+	{ name: 'Join Discord', icon: BsDiscord, link: 'https://discord.gg/BrcVPWAA' },
 ]
 
 const Footer = (props: { className?: string }) => {
