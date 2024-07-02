@@ -10,7 +10,7 @@ interface RichTextProps {
 
 const RichText: React.FC<RichTextProps> = ({ data }: RichTextProps	) => {
 	return (
-		<div className="rich-text py-6 dark:bg-black dark:text-gray-50 ">
+		<div className="rich-text py-6 ">
 			<Markdown remarkPlugins={[remarkGfm]}>
 				{data.body}
 			</Markdown>

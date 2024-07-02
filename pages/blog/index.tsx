@@ -83,8 +83,8 @@ const Profile: NextPage = () => {
 						<div className="flex justify-center">
 							<Button
 								type="button"
-								className="px-6 py-3 text-sm rounded-lg hover:underline dark:bg-gray-900 dark:text-gray-400"
-								onClick={loadMorePosts} variant={"text"}							>
+								className="px-6 py-3 text-sm rounded-lg hover:underline"
+								onClick={loadMorePosts} variant="outlined"							>
 								Load more posts...
 							</Button>
 						</div>
