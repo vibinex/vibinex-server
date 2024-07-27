@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import { Investors } from "../../../utils/about";
 
