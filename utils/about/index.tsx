@@ -10,7 +10,7 @@ export const Principles = [
         body: "Everything you need to know about the product and billing. Can’t find the answer you’re looking for? Please chat to our friendly team."
     },
     {
-        img: "/feedback.svg",
+        img: "/rocket.svg",
         title: "Feedback",
         body: "Everything you need to know about the product and billing. Can’t find the answer you’re looking for? Please chat to our friendly team."
     },
