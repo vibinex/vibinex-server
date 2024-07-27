@@ -15,14 +15,8 @@ const OurPrinciples = () => {
             key={item.title}
             className="flex flex-col justify-between h-[500px] w-96 p-5"
           >
-            <div className="glow-effect">
-              <Image
-                src={item.img}
-                alt={item.title}
-                width={383}
-                height={383}
-                className="h-96 w-96"
-              />
+            <div className="glow-effect h-96 w-96">
+              <Image src={item.img} alt={item.title} fill={true} />
             </div>
             <div className="flex flex-col gap-4 justify-center items-center">
               <div className="font-semibold text-3xl text-[#1EEBBA] font-lato glow">
