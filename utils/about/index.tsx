@@ -10,7 +10,8 @@ export const Principles = [
     body: "Everything you need to know about the product and billing. Can’t find the answer you’re looking for? Please chat to our friendly team.",
   },
   {
-    img: "/feedback.svg",
+    img: "/rocket.svg",
+
     title: "Feedback",
     body: "Everything you need to know about the product and billing. Can’t find the answer you’re looking for? Please chat to our friendly team.",
   },
@@ -26,6 +27,21 @@ export const Principles = [
   },
 ];
 
+export const Investors = [
+  {
+    id: 1,
+    img: "/vibinex-dark-logo.png",
+  },
+  {
+    id: 2,
+    img: "/vibinex-dark-logo.png",
+  },
+  {
+    id: 3,
+    img: "/vibinex-dark-logo.png",
+
+  },
+];
 export const teamMembers = [
   {
     name: "John Doe",
@@ -42,5 +58,6 @@ export const teamMembers = [
     github: "https://github.com/janedoe",
     linkedIn: "https://linkedin.com/in/janedoe",
     mailId: "janedoe@example.com",
+
   },
 ];
