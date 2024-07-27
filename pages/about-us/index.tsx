@@ -1,3 +1,4 @@
+import AdSec from "../../components/aboutus/ad-section";
 import OurInvestors from "../../components/aboutus/our-investors";
 import OurPrinciples from "../../components/aboutus/our-principles";
 import OurTeam from "../../components/aboutus/our-team";
@@ -12,6 +13,7 @@ const AboutUs = () => {
         <OurPrinciples />
         <OurTeam />
         <OurInvestors />
+        <AdSec />
       </div>
       <Footer />
     </div>
