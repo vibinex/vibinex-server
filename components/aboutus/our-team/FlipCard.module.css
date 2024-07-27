@@ -2,10 +2,10 @@
   perspective: 1000px;
 }
 
-.backface-hidden {
+.backfacehidden {
   backface-visibility: hidden;
 }
 
-.rotate-y-180 {
+.rotate180 {
   transform: rotateY(180deg);
 }

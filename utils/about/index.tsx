@@ -39,25 +39,23 @@ export const Investors = [
   {
     id: 3,
     img: "/vibinex-dark-logo.png",
-
   },
 ];
 export const teamMembers = [
   {
     name: "John Doe",
     role: "CEO",
-    image: "https://via.placeholder.com/150",
+    image: "/testUser.svg",
     github: "https://github.com/johndoe",
     linkedIn: "https://linkedin.com/in/johndoe",
     mailId: "johndoe@example.com",
   },
   {
-    name: "Jane Doe",
+    name: "John Doe",
     role: "CTO",
-    image: "https://via.placeholder.com/150",
+    image: "/testUser.svg",
     github: "https://github.com/janedoe",
     linkedIn: "https://linkedin.com/in/janedoe",
     mailId: "janedoe@example.com",
-
   },
 ];

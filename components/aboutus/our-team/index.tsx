@@ -1,24 +1,25 @@
-import React, { useState } from "react";
+import React from "react";
 import FlipCard from "./FlipCard";
 import { teamMembers } from "../../../utils/about";
 
 const OurTeam = () => {
   return (
-    <>
-      <div className="text-4xl text-center font-bold mt-10">
-        Our
-        <span className="text-blue-500"> Team</span>
+    <div className="flex flex-col p-10 items-center">
+      <div>
+        <h1 className="font-medium text-5xl tracking-normal font-lato">
+          Our <span className="text-[#6B4CFF]">Team</span>
+        </h1>
       </div>
-      <div className="text-lg text-center mt-4">
+      <div className="font-lato font-normal text-3xl text-center mt-10">
         We are a team of passionate individuals who are working towards a common
-        goal
+        goal.
       </div>
-      <div className="flex flex-wrap justify-center gap-6">
+      <div className="w-full flex flex-wrap justify-center gap-48 items-center p-5 mt-24">
         {teamMembers.map((member) => (
           <FlipCard key={member.name} member={member} />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 
