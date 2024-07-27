@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import { Investors } from "../../../utils/about";
 
@@ -18,7 +17,7 @@ const OurInvestors = () => {
             review automation.
           </p>
         </div>
-        <div className="flex flex-wrap justify-evenly gap-60UA p-5">
+        <div className="flex flex-wrap justify-evenly gap-60 p-5">
           {Investors.map((member) => (
             <div key={member.id} className="flex relative h-48 w-52">
               <Image

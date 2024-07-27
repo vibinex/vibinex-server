@@ -16,23 +16,28 @@ const FlipCard = ({ member }: { member: Member }) => {
 
   return (
     <div
-      className="relative w-48 h-64 styles.perspective"
+      className={`relative w-48 h-64 ${styles.perspective}`}
       onClick={() => setIsFlipped(!isFlipped)}
     >
       <div
         className={`relative w-full h-full text-center transition-transform duration-500 transform ${
-          isFlipped ? "rotate-y-180" : ""
+          isFlipped ? styles.rotate180 : ""
         }`}
       >
-        <div className="absolute w-full h-full styles.backface-hidden">
+        {/* Front Side */}
+        <div className={`absolute w-full h-full ${styles.backfacehidden}`}>
           <Image
             src={member.image}
             alt={member.name}
-            className="w-full h-full object-cover"
             fill={true}
+            className="object-cover"
           />
         </div>
-        <div className="absolute w-full h-full styles.backface-hidden bg-gray-200 p-4 transform styles.rotate-y-180 flex flex-col justify-center gap-2">
+
+        {/* Back Side */}
+        <div
+          className={`absolute w-full h-full ${styles.backfacehidden} bg-gray-200 p-4 transform ${styles.rotate180} flex flex-col justify-center gap-2`}
+        >
           <div>
             <div className="text-lg font-bold">{member.name}</div>
             <div className="text-sm text-gray-600">{member.role}</div>
@@ -54,7 +59,7 @@ const FlipCard = ({ member }: { member: Member }) => {
             >
               LinkedIn
             </a>
-            <a href={`mailto:${member.mailid}`} className="text-blue-600">
+            <a href={`mailto:${member.mailId}`} className="text-blue-600">
               Email
             </a>
           </div>
