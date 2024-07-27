@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./FlipCard.module.css";
+import Image from "next/image";
 
 interface Member {
   image: string;
@@ -7,7 +8,7 @@ interface Member {
   role: string;
   github: string;
   linkedIn: string;
-  mailid: string;
+  mailId: string;
 }
 
 const FlipCard = ({ member }: { member: Member }) => {
@@ -24,10 +25,11 @@ const FlipCard = ({ member }: { member: Member }) => {
         }`}
       >
         <div className="absolute w-full h-full styles.backface-hidden">
-          <img
+          <Image
             src={member.image}
             alt={member.name}
             className="w-full h-full object-cover"
+            fill={true}
           />
         </div>
         <div className="absolute w-full h-full styles.backface-hidden bg-gray-200 p-4 transform styles.rotate-y-180 flex flex-col justify-center gap-2">

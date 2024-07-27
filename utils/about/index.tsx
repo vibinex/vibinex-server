@@ -33,7 +33,7 @@ export const teamMembers = [
     image: "https://via.placeholder.com/150",
     github: "https://github.com/johndoe",
     linkedIn: "https://linkedin.com/in/johndoe",
-    mailid: "johndoe@example.com",
+    mailId: "johndoe@example.com",
   },
   {
     name: "Jane Doe",
@@ -41,6 +41,6 @@ export const teamMembers = [
     image: "https://via.placeholder.com/150",
     github: "https://github.com/janedoe",
     linkedIn: "https://linkedin.com/in/janedoe",
-    mailid: "janedoe@example.com",
+    mailId: "janedoe@example.com",
   },
 ];
