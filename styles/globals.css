@@ -239,3 +239,6 @@
     border-radius: 50%;
   }
   
+  .box-shadow{
+	box-shadow: inset -5px -20px 20px 8px black;
+  }
