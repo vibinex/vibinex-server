@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const ProductVision = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-6">
+    <div className="flex flex-col items-center p-10 min-h-screen gap-6">
       <div className="flex absolute justify-between w-[100vw] h-[100vh] overflow-hidden -left-[10%]">
         <Image
           src="/AboutUsDesignCircles.svg"

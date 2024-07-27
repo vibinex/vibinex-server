@@ -12,7 +12,7 @@ const AboutUs = () => {
     <div>
       <MainAppBar />
 
-      <div className=" bg-black">
+      <div className=" bg-black ">
         <PurposeOfCompany />
         <ProductVision />
         <OurPrinciples />

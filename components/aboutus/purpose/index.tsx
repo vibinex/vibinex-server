@@ -18,14 +18,14 @@ const PurposeOfCompany = () => {
           alt="aboutus"
           height={800}
           width={800}
-          className="absolute -right-[10%] top-50%"
+          className="absolute -right-[10%] "
         />
         <Image
           src="/AboutUsDesignGradientFull.svg"
           alt="aboutus"
           height={800}
           width={800}
-          className="absolute -right-[25%] top-50% "
+          className="absolute -right-[25%]  "
         />
         <Image
           src="/AboutUsDesignStars.svg"
