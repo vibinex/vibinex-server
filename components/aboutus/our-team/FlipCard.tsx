@@ -1,5 +1,6 @@
-import { useState } from "react";
-import styles from "./FlipCard.module.css";
+import { BsLinkedin } from "react-icons/bs";
+import { BiEnvelope } from "react-icons/bi";
+import { BsGithub } from "react-icons/bs";
 import Image from "next/image";
 
 interface Member {
@@ -12,58 +13,51 @@ interface Member {
 }
 
 const FlipCard = ({ member }: { member: Member }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
-
   return (
     <div
-      className={`relative w-48 h-64 ${styles.perspective}`}
-      onClick={() => setIsFlipped(!isFlipped)}
+      className={`flex justify-start bg-gradient-to-r from-[#3f4041] to-[#253d4d] rounded-lg p-2.5 shadow-lg w-[25rem] h-[12rem] text-white font-lato`}
     >
-      <div
-        className={`relative w-full h-full text-center transition-transform duration-500 transform ${
-          isFlipped ? styles.rotate180 : ""
-        }`}
-      >
-        {/* Front Side */}
-        <div className={`absolute w-full h-full ${styles.backfacehidden}`}>
-          <Image
-            src={member.image}
-            alt={member.name}
-            fill={true}
-            className="object-cover"
-          />
+      <div className="flex flex-col justify-between px-[1.2rem] py-[1rem] w-56">
+        <div className="flex-2">
+          <h3 className="text-[1.7rem] font-semibold m-0">{member.name}</h3>
+          <p className="text-[1rem] font-normal m-0 opacity-55">
+            {member.role}
+          </p>
         </div>
-
-        {/* Back Side */}
-        <div
-          className={`absolute w-full h-full ${styles.backfacehidden} bg-gray-200 p-4 transform ${styles.rotate180} flex flex-col justify-center gap-2`}
-        >
-          <div>
-            <div className="text-lg font-bold">{member.name}</div>
-            <div className="text-sm text-gray-600">{member.role}</div>
-          </div>
-          <div className="flex flex-col gap-1 mt-4">
-            <a
-              href={member.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600"
-            >
-              GitHub
-            </a>
-            <a
-              href={member.linkedIn}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600"
-            >
-              LinkedIn
-            </a>
-            <a href={`mailto:${member.mailId}`} className="text-blue-600">
-              Email
-            </a>
-          </div>
+        <div className="flex gap-4 mt-4">
+          <a
+            href={member.linkedIn}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-6 h-6 hover:opacity-45"
+          >
+            <BsLinkedin size={20} />
+          </a>
+          <a
+            href={member.mailId}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-6 h-6 hover:opacity-45"
+          >
+            <BiEnvelope size={20} />
+          </a>
+          <a
+            href={member.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-6 h-6 hover:opacity-45"
+          >
+            <BsGithub size={20} />
+          </a>
         </div>
+      </div>
+      <div className="relative w-[16rem] h-[17.3rem] -mr-[18rem] -mt-[5.5rem] shadow-lg box-shadow">
+        <Image
+          src={member.image}
+          alt={member.name}
+          fill
+          className="rounded-full"
+        />
       </div>
     </div>
   );
