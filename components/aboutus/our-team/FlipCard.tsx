@@ -20,7 +20,7 @@ const FlipCard = ({ member }: { member: Member }) => {
       <div className="flex flex-col justify-between px-[1.2rem] py-[1rem] w-56">
         <div className="flex-2">
           <h3 className="text-[1.7rem] font-semibold m-0">{member.name}</h3>
-          <p className="text-[1rem] font-normal m-0 opacity-55">
+          <p className="text-[1rem] font-normal m-0  text-[#1EEBBA]">
             {member.role}
           </p>
         </div>

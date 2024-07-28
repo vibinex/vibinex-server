@@ -3,7 +3,7 @@ import { Principles } from "../../../utils/about";
 
 const OurPrinciples = () => {
   return (
-    <div className="flex flex-col p-10 items-center">
+    <div className="flex flex-col items-center p-10 min-h-screen">
       <div>
         <h1 className="font-medium text-5xl tracking-normal font-lato">
           Our <span className="text-[#6B4CFF]">Core Principles</span>

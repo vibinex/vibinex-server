@@ -3,7 +3,24 @@ import { Investors } from "../../../utils/about";
 
 const OurInvestors = () => {
   return (
-    <div className="flex flex-col p-10 items-center gap-10">
+    <div className="flex flex-col p-10 min-h-screen items-center gap-10">
+      <div className="flex absolute justify-between w-[100vw] h-[100vh] overflow-hidden">
+        <Image
+          src="/AboutUsDesignGradientFull.svg"
+          alt="aboutus"
+          height={800}
+          width={800}
+          className="absolute  -left-[20%]"
+        />
+
+        <Image
+          src="/AboutUsDesignStarBig.svg"
+          alt="aboutus"
+          height={600}
+          width={600}
+          className="absolute -right-[5%] "
+        />
+      </div>
       <div>
         <h1 className="font-medium text-5xl tracking-normal font-lato">
           Our <span className="text-[#6B4CFF]">Investors</span>
