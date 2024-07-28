@@ -17,7 +17,7 @@ const ProductVision = () => {
           Product <span className="text-[#6B4CFF]">Vision</span>
         </h1>
       </div>
-      <p className="font-lato text-center text-2xl w-[40%] px-10">
+      <p className="font-lato text-center text-2xl w-full md:w-[40%] px-10">
         To revolutionize the way software is being built to reduce the cost of
         innovation.
       </p>

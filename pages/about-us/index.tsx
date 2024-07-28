@@ -1,4 +1,5 @@
 import AdSec from "../../components/aboutus/ad-section";
+import OurCommunity from "../../components/aboutus/our-community";
 import OurInvestors from "../../components/aboutus/our-investors";
 import OurPrinciples from "../../components/aboutus/our-principles";
 import OurTeam from "../../components/aboutus/our-team";
@@ -11,15 +12,13 @@ const AboutUs = () => {
   return (
     <div>
       <MainAppBar />
-
-      <div className=" bg-black ">
-        <PurposeOfCompany />
-        <ProductVision />
-        <OurPrinciples />
-        <OurTeam />
-        <OurInvestors />
-        <AdSec />
-      </div>
+      <PurposeOfCompany />
+      <ProductVision />
+      <OurPrinciples />
+      <OurTeam />
+      <OurInvestors />
+      <OurCommunity />
+      <AdSec />
       <Footer />
     </div>
   );
