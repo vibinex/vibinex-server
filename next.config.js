@@ -42,7 +42,12 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'github.com', // GitHub README images
 				pathname: '/Alokit-Innovations/.github/assets/**'
-			}
+			},
+			{
+				protocol: 'https',
+				hostname: 'via.placeholder.com', // Placeholder images
+				pathname: '/**',
+			},
 		],
 	},
 	webpack: (config, { isServer }) => {

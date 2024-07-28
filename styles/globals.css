@@ -1,6 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 /* TODO: we should verify the colors used in the base layer and consolidate it with the colors in tailwind.config.js */
 @layer base {
 	:root {
@@ -216,3 +219,25 @@
 .react-slideshow-container [aria-label="Next Slide"] {
 	margin-right: 1rem;
 }
+
+
+.glow-effect {
+	position: relative;
+  }
+  
+  .glow-effect::before {
+	content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 110%;
+    height: 46%;
+    transform: translate(-50%, -50%);
+    background: rgba(229, 229, 230, 0.6);
+    filter: blur(74px);
+    border-radius: 50%;
+  }
+  
+  .box-shadow{
+	box-shadow: inset -5px -20px 20px 8px black;
+  }
