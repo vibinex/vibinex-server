@@ -9,13 +9,13 @@ const OurPrinciples = () => {
           Our <span className="text-[#6B4CFF]">Core Principles</span>
         </h1>
       </div>
-      <div className="w-5xl flex flex-wrap justify-center gap-14 items-center p-5">
+      <div className="w-5xl flex flex-wrap justify-center gap-14 items-center pt-0  md:pt-28">
         {Principles.map((item) => (
           <div
             key={item.title}
-            className="flex flex-col justify-between h-[500px] w-96 p-5"
+            className="flex flex-col justify-between items-center h-[500px] w-96 p-5"
           >
-            <div className="glow-effect h-96 w-96">
+            <div className="glow-effect h-72 w-72 md:h-96 md:w-96">
               <Image src={item.img} alt={item.title} fill={true} />
             </div>
             <div className="flex flex-col gap-4 justify-center items-center">

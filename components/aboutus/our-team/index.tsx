@@ -19,7 +19,7 @@ const OurTeam = () => {
           alt="aboutus"
           height={500}
           width={500}
-          className="absolute right-0 -top-[5%]"
+          className="absolute -right-[10%] -top-[5%]"
         />
       </div>
       <div>
@@ -31,7 +31,7 @@ const OurTeam = () => {
         We are a team of passionate individuals who are working towards a common
         goal.
       </div>
-      <div className="w-full flex flex-wrap justify-center gap-48 items-center p-5 mt-24">
+      <div className="w-full flex flex-wrap justify-center gap-20 md:gap-48 items-center p-5 mt-24">
         {teamMembers.map((member) => (
           <FlipCard key={member.name} member={member} />
         ))}
@@ -41,50 +41,3 @@ const OurTeam = () => {
 };
 
 export default OurTeam;
-
-// import React from "react";
-
-// const OurTeam = () => {
-//   const teamMembers = [
-//     {
-//       name: "John Doe",
-//       role: "CEO",
-//       image: "https://via.placeholder.com/150",
-//       github: "",
-//       linkedIn: "",
-//       mailid: "",
-//     },
-//     {
-//       name: "Jane Doe",
-//       role: "CTO",
-//       image: "https://via.placeholder.com/150",
-//       github: "",
-//       linkedIn: "",
-//       mailid: "",
-//     },
-//   ];
-//   return (
-//     <div>
-//       {teamMembers.map((member) => (
-//         <div key={member.name} className="flex">
-//           <div>
-//             <img src={member.image} alt={member.name} />
-//           </div>
-//           <div className="flex flex-col justify-center gap-2">
-//             <div>
-//               <div>{member.name}</div>
-//               <div>{member.role}</div>
-//             </div>
-//             <div className="flex">
-//               <div>{member.github}</div>
-//               <div>{member.linkedIn}</div>
-//               <div>{member.mailid}</div>
-//             </div>
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default OurTeam;
