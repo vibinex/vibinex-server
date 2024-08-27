@@ -124,7 +124,6 @@ const RepoSelection = ({ repoProvider }: { repoProvider: RepoProvider }) => {
 	}
 	return (
 		<div>
-			<h4 className='my-2 font-semibold'>Select Repositories</h4>
 			{isGetReposLoading ? (
 				<div className='border-4 border-t-secondary rounded-full w-12 h-12 animate-spin mx-auto'></div>
 			) : allRepos.length === 0 ? (
