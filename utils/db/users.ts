@@ -258,15 +258,15 @@ export const getUserTopicFromDb = async function (userId: string): Promise<strin
 		WHERE id = $1`;
 	const params = [userId];
 	const topic_promise = await conn.query(user_auth_search_q, params)
-		.then((result) => {
-			return result.rows[0].topic_name;
+		.then((result): { topic: string | null } => {
+			return result.rows[0];
 		})
 		.catch((error): { topic: string | null } => {
 			console.error(`[getUserTopicFromDb] Error in getting topic from the database`,
 				{ pg_query: user_auth_search_q }, error);
 			return {topic: null};
 		});
-	return topic_promise;
+	return topic_promise.topic;
 }
 
 export const getUserIdByTopicName = async function (topic_name: string) {

@@ -4,7 +4,6 @@ import { SetupReposArgs, removePreviousSelections, saveSelectedReposInDb } from 
 import { publishMessage } from "../../../utils/pubsub/pubsubClient";
 import { authOptions } from "../auth/[...nextauth]";
 import rudderStackEvents from "../events";
-import { getUserTopicFromDb } from "../../../utils/db/users";
 
 const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 	console.info("[UserSelectedRepos] Saving setup info in db...");
@@ -16,16 +15,8 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(401).json({ error: 'Unauthenticated' });
 	}
 	const userId = session.user.id;
-	const topicId = await getUserTopicFromDb(userId).catch(err => {
-		console.error("[UserSelectedRepos] Error getting topic id", err);
-		return null;
-	});
-	if (!topicId) {
-		console.error("[UserSelectedRepos] Error getting topic id");
-		return res.status(500).json({ error: 'Error getting topic id' });
-	}
 	const provider = jsonBody.info.length > 0 ? jsonBody.info[0].provider : null;
-	if (!Array.isArray(jsonBody.info) || !provider) {
+	if (!Array.isArray(jsonBody.info) || !jsonBody.installationId || !provider) {
 		console.error("[UserSelectedRepos] Invalid request body", jsonBody);
 		res.status(400).json({ error: "Invalid request body" });
 		const eventProperties = { response_status: 400 };
@@ -34,14 +25,14 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 	}
 	const event_properties = {
 		repo_provider: provider,
-		topic_name: topicId || "",
+		topic_name: jsonBody.installationId || "",
 		is_pat: jsonBody.isPublish || false,
 	};
 
 	try {
-		await removePreviousSelections(topicId, provider);
+		await removePreviousSelections(jsonBody.installationId, provider);
 	} catch (err) {
-		console.error(`[UserSelectedRepos] Unable to remove previous installations for ${topicId}`, err);
+		console.error(`[UserSelectedRepos] Unable to remove previous installations for ${jsonBody.installationId}`, err);
 		res.status(500).json({ "error": "Internal Server Error" });
 		const eventProperties = { ...event_properties, response_status: 500 };
 		rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
@@ -53,7 +44,7 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 			repo_owner: ownerInfo.owner,
 			repo_provider: provider,
 			repo_names: ownerInfo.repos,
-			install_id: topicId
+			install_id: jsonBody.installationId
 		}
 		const saveSelectedReposPromises = saveSelectedReposInDb(setupReposArgs, userId)
 			.catch((err) => {
@@ -66,8 +57,8 @@ const UserSelectedRepos = async (req: NextApiRequest, res: NextApiResponse) => {
 	await Promise.all(allSelectedReposPromises).then(async () => {
 		console.info("[UserSelectedRepos] All selected repos saved succesfully...")
 		if (jsonBody.isPublish) {
-			const res = await publishMessage(topicId, jsonBody.info, "PATSetup");
-			console.info(`[UserSelectedRepos] Published msg to ${topicId}`, res);
+			const res = await publishMessage(jsonBody.installationId, jsonBody.info, "PATSetup");
+			console.info(`[UserSelectedRepos] Published msg to ${jsonBody.installationId}`, res);
 			const eventProperties = { ...event_properties, response_status: 500 };
 			rudderStackEvents.track(userId, "", 'user-selected-repos', { type: 'HTTP-500', eventStatusFlag: 1, eventProperties });
 		}
