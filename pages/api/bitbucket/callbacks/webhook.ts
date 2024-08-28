@@ -16,7 +16,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 	const eventHeader = req.headers['x-event-key'];
 	const owner = jsonBody.repository.owner.username; 
 	const provider = "bitbucket";
-	const repo_name = jsonBody.repository.name;
+	const repo_name = jsonBody.repository.name.toLowerCase(); // TODO: make sure that repo_name is stored as lowercase everywhere else as well
 
 	const event_properties = {
 		repo_name: repo_name,
