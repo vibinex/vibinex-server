@@ -157,7 +157,7 @@ export const getTopicNameFromDB = async (provider: string, owner: string, repoNa
 	const query = `
     SELECT install_id 
     FROM repos 
-    WHERE repo_provider = '${provider}' AND LOWER(repo_owner) = LOWER('${owner}') AND LOWER(repo_name) = LOWER('${repoName}')
+    WHERE repo_provider = '${provider}' AND repo_owner = '${owner}' AND repo_name = '${repoName}'
   `;
 	const result = await conn.query(query).catch(err => {
 		console.error(`[getTopicNameFromDB] Could not get the install-id for repository: ${provider}/${owner}/${repoName}`, { pg_query: query }, err);
