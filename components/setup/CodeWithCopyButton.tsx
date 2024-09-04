@@ -11,7 +11,13 @@ interface CodeWithCopyButtonProps {
 const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text }) => {
 	const [isCopied, setIsCopied] = useState<boolean>(false);
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-	
+
+	// Function to clean up the text before copying
+	const cleanUpText = (text: string) => {
+		// Replace multiple newlines with a single newline
+		return text.replace(/\n{2,}/g, '\n');
+	};
+
 	const handleCopyClick = () => {
 		setIsButtonDisabled(true);
 	};
@@ -26,9 +32,9 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text }) => {
 			<Markdown remarkPlugins={[remarkGfm]}>
 				{text}
 			</Markdown>
-			<CopyToClipboard text={text} onCopy={handleCopy}>
+			<CopyToClipboard text={cleanUpText(text)} onCopy={handleCopy}>
 				<button
-		          	className="absolute top-0 right-0 p-1 cursor-pointer bg-transparent border-none"
+					className="absolute top-0 right-0 p-1 cursor-pointer bg-transparent border-none"
 					onClick={handleCopyClick}
 					disabled={isButtonDisabled}
 				>
