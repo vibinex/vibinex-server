@@ -19,7 +19,7 @@ const quickLinks = [
 const contactUs = [
 	{ name: 'contact@vibinex.com', icon: FiMail, link: 'mailto:contact@vibinex.com' },
 	{ name: '85115 57566', icon: BsWhatsapp, link: 'https://wa.me/918511557566' },
-	{ name: 'Join Discord', icon: BsDiscord, link: 'https://discord.gg/BrcVPWAA' },
+	{ name: 'Join Discord', icon: BsDiscord, link: 'https://discord.gg/caVSraCvpk' },
 ]
 
 const Footer = (props: { className?: string }) => {

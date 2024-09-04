@@ -45,7 +45,7 @@ const Post: React.FC<{ article: Article["attributes"] }> = ({ article }) => {
 	}
 	// TODO - add placeholder image and/or author image
 	return (
-		<div className="space-y-8 dark:bg-black dark:text-gray-50">
+		<div className="space-y-8">
 			{imageUrl && (
 				<Image
 					src={imageUrl}
@@ -57,7 +57,7 @@ const Post: React.FC<{ article: Article["attributes"] }> = ({ article }) => {
 			)}
 			<div className="space-y-6">
 				<h1 className="leading-tight text-5xl font-bold ">{title}</h1>
-				<div className="flex flex-col items-start justify-between w-full md:flex-row md:items-center dark:text-gray-400">
+				<div className="flex flex-col items-start justify-between w-full md:flex-row md:items-center text-primary-foreground">
 					<div className="flex items-center md:space-x-2">
 						{authorImgUrl && (
 							<Image
@@ -65,17 +65,17 @@ const Post: React.FC<{ article: Article["attributes"] }> = ({ article }) => {
 								alt="article cover image"
 								width={400}
 								height={400}
-								className="w-14 h-14 border rounded-full dark:bg-gray-500 dark:border-gray-700"
+								className="w-14 h-14 border rounded-full bg-muted border-border"
 							/>
 						)}
-						<p className="text-md dark:text-violet-400">
+						<p className="text-md text-secondary">
 							{author?.name} • {formatDate(publishedAt)}
 						</p>
 					</div>
 				</div>
 			</div>
 
-			<div className="dark:text-gray-100">
+			<div className="text-muted-foreground">
 				<p>{description}</p>
 
 				{blocks.map((section: any, index: number) => postRenderer(section, index))}

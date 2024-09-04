@@ -4,6 +4,7 @@ import { getRepoConfigByUserAndRepo } from '../../../utils/db/repos';
 import { DbUser, getUserByAlias } from '../../../utils/db/users';
 import { publishMessage } from '../../../utils/pubsub/pubsubClient';
 import rudderStackEvents from '../events';
+import { defaultRepoConfigForIndividuals } from '../../../types/RepoConfig';
 
 export default async function triggeHandler(req: NextApiRequest, res: NextApiResponse) {
     // For cors prefetch options request
@@ -82,7 +83,7 @@ async function triggerDPU(url: string, userEmail: string) {
     const repoConfig = await getRepoConfigByUserAndRepo(repoProvider, repoName, repoOwner, userId)
         .catch((err) => {
             console.error(`[triggerDPU] Unable to fetch repo config`, err);
-            return { auto_assign: false, comment: false };
+            return defaultRepoConfigForIndividuals;
         });
     // prepare body
     const triggerBody = { repo_provider: repoProvider, repo_owner: repoOwner, repo_name: repoName, pr_number: prNumber, repo_config: repoConfig };
