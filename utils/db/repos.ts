@@ -1,9 +1,10 @@
 import type { Session } from 'next-auth';
 import conn from '.';
+import { BitbucketDBRepo } from '../../types/bitbucket';
+import { defaultRepoConfigForIndividuals, defaultRepoConfigForTeams, RepoConfigDbMap, RepoConfigOptions } from '../../types/RepoConfig';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
 import { BitbucketRepoObj } from '../providerAPI/getUserRepositories';
 import { convert } from './converter';
-import { BitbucketDBRepo } from '../../types/bitbucket';
 
 export const saveRepoIdentifierToDb = async (repos: RepoIdentifier[]) => {
 	const insertRepoQuery = `
@@ -51,8 +52,9 @@ export const getRepos = async (allRepos: RepoIdentifier[], session: Session) => 
 			r.metadata AS metadata,
 			r.created_at AS created_at,
 			json_build_object(
-				'auto_assign', rc.auto_assign,
-				'comment', rc.comment_setting
+				${Object.entries(RepoConfigDbMap).map(([repoConfigOption, repoConfigDbName]) => 
+					`'${repoConfigOption}', rc.${repoConfigDbName}`
+				).join(', ')}
 			) AS config,
 			r.install_id AS install_id,
 			r.aliases AS aliases
@@ -127,12 +129,13 @@ export const getUserRepositoriesByTopic = async (topicId: string, provider: stri
 	return repos;
 }
 
-export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: 'auto_assign' | 'comment', value: boolean) => {
-	const configTypeColumn = configType === 'comment' ? 'comment_setting' : 'auto_assign';
-	const update_repo_config_q = `UPDATE repo_config
+export const setRepoConfig = async (repo: RepoIdentifier, userId: string, configType: RepoConfigOptions, value: boolean) => {
+	const configTypeColumn = RepoConfigDbMap[configType];
+	const update_repo_config_q = `UPDATE repo_config 
 	SET 
-		comment_setting = CASE WHEN '${configTypeColumn}' = 'comment_setting' THEN ${convert(value)} ELSE comment_setting END,
-		auto_assign = CASE WHEN '${configTypeColumn}' = 'auto_assign' THEN ${convert(value)} ELSE auto_assign END
+	${Object.values(RepoConfigDbMap).map((repoConfigDbName) =>
+		`${repoConfigDbName} = CASE WHEN '${configTypeColumn}' = '${repoConfigDbName}' THEN ${convert(value)} ELSE ${repoConfigDbName} END`
+	).join(', ')}
 	WHERE 
 		repo_id = (
 			SELECT id FROM public.repos 
@@ -158,8 +161,9 @@ export const setRepoConfig = async (repo: RepoIdentifier, userId: string, config
 export const getRepoConfig = async (repo: RepoIdentifier) => {
 	const get_repo_config_q = `
 		select json_build_object(
-			'auto_assign', rc.auto_assign,
-			'comment', rc.comment_setting
+			${Object.entries(RepoConfigDbMap).map(([repoConfigOption, repoConfigDbName]) => 
+				`'${repoConfigOption}', rc.${repoConfigDbName}`
+			).join(', ')}
 		) AS config
 		from repo_config rc
 		WHERE rc.repo_id = (SELECT id FROM repos WHERE repo_provider = $1
@@ -185,8 +189,9 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	console.info(`[getRepoConfig] Getting repo config for user: ${userId} and repo: ${repoName}`);
 	const query = `
 	SELECT json_build_object(
-		'auto_assign', rc.auto_assign,
-		'comment', rc.comment_setting
+		${Object.entries(RepoConfigDbMap).map(([repoConfigOption, repoConfigDbName]) => 
+			`'${repoConfigOption}', rc.${repoConfigDbName}`
+		).join(', ')}
 	) AS config,
 	rc.user_id AS user_id
 	FROM repo_config rc
@@ -209,16 +214,21 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	const userRows = result.rows.filter((rowVal) => rowVal.user_id === userId);
 	if (userRows.length === 0) {
 		// return some default
-		console.error(`[getRepoConfigByUserAndRepo] Repo config not found for user: ${userId}. Sending default configuration: {auto_assign: false, comment: false}.`);
-		return { auto_assign: false, comment: false };
+		console.error(`[getRepoConfigByUserAndRepo] Repo config not found for user: ${userId}. Sending default configuration: ${JSON.stringify(defaultRepoConfigForIndividuals)}.`);
+		return defaultRepoConfigForIndividuals;
 	}
 	return userRows[0].config;
 }
 
 export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
+	const configEntries = Object.entries(RepoConfigDbMap).map(([key, dbName]) => {
+		const defaultValue = defaultRepoConfigForTeams[key as RepoConfigOptions];
+		return [dbName, defaultValue];
+	});
+	  
 	const query = `
-		INSERT INTO repo_config (repo_id, user_id, auto_assign, comment_setting)
-		SELECT id, $1, true, true
+		INSERT INTO repo_config (repo_id, user_id, ${configEntries.map(([dbName, _]) => dbName).join(', ')})
+		SELECT id, $1, ${configEntries.map(([_, defaultValue]) => defaultValue).join(', ')}
 		FROM unnest($2::INT[]) AS t(id)
 		ON CONFLICT DO NOTHING
 		`;
@@ -289,8 +299,8 @@ export const saveBitbucketReposInDb = async (repos: BitbucketRepoObj[]): Promise
 		FROM unnest(
 			ARRAY [
 				${repos.map((x: string | number | object, index: number, array: any[]) => {
-					return index === array.length - 1 ? `(${convert(x)}::JSONB)` : `(${convert(x)}::JSONB),`;
-				}).join('')}
+		return index === array.length - 1 ? `(${convert(x)}::JSONB)` : `(${convert(x)}::JSONB),`;
+	}).join('')}
 			]
 		) AS t(repo_obj)		
 	ON CONFLICT (repo_name, repo_owner, repo_provider) 

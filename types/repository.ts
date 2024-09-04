@@ -1,4 +1,5 @@
 import { supportedProviders, type RepoProvider } from "../utils/providerAPI";
+import type { RepoConfig } from "./RepoConfig";
 
 export type RepoIdentifier = { repo_provider: RepoProvider, repo_owner: string, repo_name: string }
 
@@ -19,10 +20,7 @@ export type DbRepo = {
 	git_url: string[],
 	metadata: object,
 	created_at: Date,
-	config: {
-		auto_assign: boolean,
-		comment: boolean,
-	},
+	config: RepoConfig,
 	install_id: string[],
 	aliases: string[],
 }
@@ -39,8 +37,5 @@ export type DbRepoSerializable = {
 	git_url: string[],
 	metadata: object,
 	created_at: string,
-	config: {
-		auto_assign: boolean,
-		comment: boolean,
-	}
+	config: RepoConfig
 }
