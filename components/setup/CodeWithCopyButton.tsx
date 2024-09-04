@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { MdContentCopy } from "react-icons/md";
 import Markdown from 'react-markdown';
@@ -12,10 +12,10 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text }) => {
 	const [isCopied, setIsCopied] = useState<boolean>(false);
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 
-	// Function to clean up the text before copying
+	// Function to clean up the text before displaying
 	const cleanUpText = (text: string) => {
-		// Replace multiple newlines with a single newline
-		return text.replace(/\n{2,}/g, '\n');
+		// Make sure that backslashes are properly escaped for Markdown
+		return text.replace(/\\/g, '\\\\');
 	};
 
 	const handleCopyClick = () => {
@@ -27,12 +27,25 @@ const CodeWithCopyButton: React.FC<CodeWithCopyButtonProps> = ({ text }) => {
 		setIsButtonDisabled(false);
 	};
 
+	useEffect(() => {
+ 		let timer: NodeJS.Timeout;
+ 		if (isCopied) {
+ 			timer = setTimeout(() => {
+ 				setIsCopied(false);
+				setIsButtonDisabled(false);
+ 			}, 2000); // Reset after 2 seconds
+ 		}
+ 		return () => clearTimeout(timer);
+ 	}, [isCopied]);
+ 
 	return (
 		<div className='relative border p-4 my-4'>
-			<Markdown remarkPlugins={[remarkGfm]}>
-				{text}
-			</Markdown>
-			<CopyToClipboard text={cleanUpText(text)} onCopy={handleCopy}>
+			<pre style={{ whiteSpace: 'pre-wrap' }}>
+				<Markdown remarkPlugins={[remarkGfm]}>
+					{cleanUpText(text)}
+				</Markdown>
+			</pre>
+			<CopyToClipboard text={text} onCopy={handleCopy}>
 				<button
 					className="absolute top-0 right-0 p-1 cursor-pointer bg-transparent border-none"
 					onClick={handleCopyClick}
