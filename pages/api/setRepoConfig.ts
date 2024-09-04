@@ -5,15 +5,16 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import rudderStackEvents from "./events";
 import { getAuthUserName } from '../../utils/auth';
+import { isValidConfigOption, RepoConfigOptions } from '../../types/RepoConfig';
 
 type SetRepoConfigReqBody = {
 	repo: RepoIdentifier,
-	configType: 'auto_assign' | 'comment',
+	configType: RepoConfigOptions,
 	value: boolean
 }
 
 const isSetRepoConfigReqBody = (x: any): x is SetRepoConfigReqBody => {
-	return x && isRepoIdentifier(x.repo) && (x.configType === "auto_assign" || x.configType === "comment") && typeof x.value === "boolean";
+	return x && isRepoIdentifier(x.repo) && isValidConfigOption(x.configType) && typeof x.value === "boolean";
 }
 
 const setRepoConfigHandler = async (
