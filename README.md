@@ -1,6 +1,6 @@
 # Vibinex Website
 
-This is the project for the [Vibinex website](https://vibinex.com) and the primary backend for the [Vibinex Browser Extension](https://github.com/Alokit-Innovations/chrome-extension). It's a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is the project for the [Vibinex website](https://vibinex.com) and the primary backend for the [Vibinex Browser Extension](https://github.com/vibinex/chrome-extension). It's a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Introduction
 

@@ -56,7 +56,7 @@ export default function LoginLogout() {
 						<Link href='/u' className='cursor-pointer w-full'>Profile</Link>
 					</li>
 					<li id='contribute-link' className={menuItemClassName}>
-						<Link href='https://github.com/Alokit-Innovations/' target='_blank' className='cursor-pointer w-full'>Contribute</Link>
+						<Link href='https://github.com/vibinex/' target='_blank' className='cursor-pointer w-full'>Contribute</Link>
 					</li>
 					<li id='settings-link' className={menuItemClassName}>
 						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
