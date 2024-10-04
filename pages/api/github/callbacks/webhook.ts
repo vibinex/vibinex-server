@@ -43,7 +43,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		res.status(400).json({ error: 'Bad Request' });
 		return;
 	}
-	
+
 	console.info("[webookHandler] Received github webhook event for ", name);
 	const repoConfig = await getRepoConfig({
 		repo_provider: provider,
@@ -77,13 +77,13 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		console.debug(`[webookHandler] repoConfig = ${JSON.stringify(repoConfig)}`);
 
 		const result: string | null = await publishMessage(installId, data, msgType)
-		.catch((error) => {
-			const eventProperties = { ...event_properties, topic_name: installId };
-			rudderStackEvents.track("absent", "", 'github-webhook', { type: 'publish-webhook-message', eventStatusFlag: 0, eventProperties });	
-			console.error('[webookHandler] Failed to publish message:', error);
-			failedCount++;
-			return null;
-		});
+			.catch((error: Error) => {
+				const eventProperties = { ...event_properties, topic_name: installId };
+				rudderStackEvents.track("absent", "", 'github-webhook', { type: 'publish-webhook-message', eventStatusFlag: 0, eventProperties });
+				console.error('[webookHandler] Failed to publish message:', error);
+				failedCount++;
+				return null;
+			});
 
 		if (result === null) continue;
 
@@ -94,7 +94,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	// Determine the response status code based on the number of failures
 	if (failedCount > 0) {
-		const eventProperties = { ...event_properties, response_status: 500, failed_count: failedCount};
+		const eventProperties = { ...event_properties, response_status: 500, failed_count: failedCount };
 		rudderStackEvents.track("absent", "", 'github-webhook', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties });
 		res.status(500).json({ error: `Failed to publish ${failedCount} messages to Pub/Sub` });
 	} else {

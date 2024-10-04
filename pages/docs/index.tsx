@@ -18,8 +18,8 @@ const Docs = () => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 
 	const CHROME_EXTENSION_LINK = "https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc";
-	const architecturalDiagramLightMode = "https://github.com/Alokit-Innovations/.github/assets/7858932/d5a97883-64ef-498f-b97a-318b6675ac87";
-	const architecturalDiagramDarkMode = "https://github.com/Alokit-Innovations/.github/assets/7858932/493b3052-b462-4bb8-a9cd-ffa8e1018960";
+	const architecturalDiagramLightMode = "https://github.com/vibinex/.github/assets/7858932/d5a97883-64ef-498f-b97a-318b6675ac87";
+	const architecturalDiagramDarkMode = "https://github.com/vibinex/.github/assets/7858932/493b3052-b462-4bb8-a9cd-ffa8e1018960";
 	const architecturalDiagram = (theme: Theme) => theme === 'light' ? architecturalDiagramLightMode : architecturalDiagramDarkMode;
 
 	useEffect(() => {
@@ -59,9 +59,9 @@ The highlighting features are delivered through the [Chrome extension](${CHROME_
 `
 	const architectureMD = `### Architecture
 The diagram below describes the architecture of Vibinex. It consists of 3 components:
-3. [Vibinex DPU](https://github.com/Alokit-Innovations/vibi-dpu): Marked as the "Backend #1" in the below diagram, the DPU (Data Processing Unit) is docker container the processes your code. It has no public endpoints for maximum privacy & security.
-2. [Vibinex server](https://github.com/Alokit-Innovations/vibinex-server): Marked as the "Backend #2" in the below diagram, the server is the main backend of Vibinex. It triggers the DPU when a PR is created or changed and acts as the backend for the browser extension.
-1. [Vibinex Browser extension](https://github.com/Alokit-Innovations/chrome-extension): It modifies the GitHub/Bitbucket UI to show the highlighted PRs and file changes to help you better navigate and understand the changes in your pull request.
+3. [Vibinex DPU](https://github.com/vibinex/vibi-dpu): Marked as the "Backend #1" in the below diagram, the DPU (Data Processing Unit) is docker container the processes your code. It has no public endpoints for maximum privacy & security.
+2. [Vibinex server](https://github.com/vibinex/vibinex-server): Marked as the "Backend #2" in the below diagram, the server is the main backend of Vibinex. It triggers the DPU when a PR is created or changed and acts as the backend for the browser extension.
+1. [Vibinex Browser extension](https://github.com/vibinex/chrome-extension): It modifies the GitHub/Bitbucket UI to show the highlighted PRs and file changes to help you better navigate and understand the changes in your pull request.
 
 ![Vibinex Architecture](${architecturalDiagram(theme)})
 
@@ -71,7 +71,7 @@ A DPU stands for Data Processing Unit. It is a docker container that processes a
 
 	const setupMD = `### Setup steps
 There are just 2 steps to setting up Vibinex:
-1. Setup the DPU 
+1. Setup the DPU
 2. Install the browser extension
 
 You can set up the DPU on your repositories either as an owner of the repository or a member. When you set it up as an owner, webhooks are added on your repository that automatically trigger DPU when a pull request is created or updated. When you set it up as a member, you need to manually trigger the DPU when a pull request when you want to process it.

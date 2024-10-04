@@ -41,7 +41,7 @@ const nextConfig = {
 			{
 				protocol: 'https',
 				hostname: 'github.com', // GitHub README images
-				pathname: '/Alokit-Innovations/.github/assets/**'
+				pathname: '/vibinex/.github/assets/**'
 			}
 		],
 	},
@@ -54,7 +54,7 @@ const nextConfig = {
 			'pg-native': false,
 		};
 
-		// Exclude pg-cloudflare from client-side bundles 
+		// Exclude pg-cloudflare from client-side bundles
 		if (!isServer) { config.externals.push('pg-cloudflare'); }
 		return config;
 	},

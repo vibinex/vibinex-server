@@ -104,7 +104,7 @@ const Navbar = (props: { transparent: boolean }) => {
 					<Link href='/blog'>Blog</Link>
 				</li>
 				<li id="contribute-link" className='p-3 lg:p-4'>
-					<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
+					<Link href='https://github.com/vibinex' target='blank'>Contribute</Link>
 				</li>
 				<li className='p-3 lg:p-4' id='pricing-link'>
 					<Link href='/pricing'>Pricing</Link>
@@ -143,7 +143,7 @@ const Navbar = (props: { transparent: boolean }) => {
 						<Link href='/docs'>Docs</Link>
 					</li>
 					<li id="contribute-link" className='p-4 text-4xl text-primary-foreground hover:text-secondary-light'>
-						<Link href='https://github.com/Alokit-Innovations' target='blank'>Contribute</Link>
+						<Link href='https://github.com/vibinex' target='blank'>Contribute</Link>
 					</li>
 					<li id='pricing-link' className='p-4 text-4xl text-primary-foreground hover:text-secondary-light'>
 						<Link href='/pricing'>Pricing</Link>
