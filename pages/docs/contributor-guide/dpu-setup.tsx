@@ -5,7 +5,7 @@ import DocsSideBar from '../../../views/docs/DocsSideBar';
 import { RenderMarkdown } from '../../../components/RenderMarkdown';
 
 
-const Terms = () => {
+const DpuSetupDocs = () => {
 	const [contributorGuideContent, setContributorGuideContent] = React.useState('');
 
 	React.useEffect(() => {
@@ -31,4 +31,4 @@ const Terms = () => {
 	)
 }
 
-export default Terms
+export default DpuSetupDocs
