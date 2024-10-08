@@ -3,6 +3,7 @@ import Image from 'next/image'
 import RelevanceComment from '../public/relevanceComment.png'
 import PRprioritization from '../public/highlightPR.png'
 import HunkLevelHighlight from '../public/highlightFile.png'
+import DiffGraph from '../public/DiffGraph.png'
 import Carousel from '../components/Carousel'
 import Autoplay from 'embla-carousel-autoplay'
 
@@ -15,6 +16,14 @@ const FeatureList = [
 			"with the percentage relevance of the reviewer to the pull request." +
 			"They are also automatically assigned as reviewers in the PR. " +
 			"Individually assigning the reviewers leads to faster response."
+	},
+	{
+		src: DiffGraph,
+		text: 'DiffGraph: function-call changes',
+		description: "Vibinex adds a comment to the pull request with a " +
+			"color-coded graph of the changes in the function calls in the pull request. " +
+			"This helps you understand the changes in the pull request at a function-call level, " +
+			"which is more granular than the line-level changes."
 	},
 	{
 		src: HunkLevelHighlight,
