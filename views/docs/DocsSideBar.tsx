@@ -20,13 +20,13 @@ const navItems: SidebarNavItem[] = [
 		],
 	},
 	{
-		label: 'Developer Guide',
+		label: 'Contributor Guide',
 		href: '',
 		children: [
-			{ label: 'Overview', href: '/docs/developer-guide' },
-			{ label: 'Environment Setup', href: '/docs/developer-guide/environment-setup' },
-			{ label: 'Code Overview', href: '/docs/developer-guide/code-overview' },
-			{ label: 'Contribution Guide', href: '/docs/developer-guide/contribution-guide' },
+			{ label: 'Overview', href: '/docs/contributor-guide' },
+			{ label: 'Server Setup', href: '/docs/contributor-guide/server-setup' },
+			{ label: 'Modifying the browser extension', href: '/docs/contributor-guide/extension-setup' },
+			{ label: 'Environment Setup for DPU', href: '/docs/contributor-guide/dpu-setup' },
 			// Add more developer-specific items here
 		],
 	},
