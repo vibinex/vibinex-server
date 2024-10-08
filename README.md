@@ -1,4 +1,8 @@
 # Vibinex Website
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fvibinex.com)](https://vibinex.com)
+![Website version](https://img.shields.io/github/package-json/v/vibinex/vibinex-server)
+![Website activity](https://img.shields.io/github/commit-activity/y/vibinex/vibinex-server)
+![Website contributors](https://img.shields.io/github/contributors/vibinex/chrome-extension)
 
 This is the project for the [Vibinex website](https://vibinex.com) and the primary backend for the [Vibinex Browser Extension](https://github.com/vibinex/chrome-extension). It's a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
