@@ -40,7 +40,7 @@ export default function Home() {
 			<TrustUs />
 			<Testimonials />
 			<JoinDiscord />
-			<Footer />
+			<Footer className='!mt-0' />
 		</div>
 	)
 }
