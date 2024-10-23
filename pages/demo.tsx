@@ -38,9 +38,9 @@ const Demo = () => {
 		<div>
 			<Navbar transparent={false} />
 			<ProductDemo />
-			<div className='w-full text-center py-12'>
-				<h2 className='font-bold text-[2rem]'>Book a <span className='text-[2rem] text-secondary font-bold'>Live Demo</span> with the Founder</h2>
-				<div className='w-full md:w-2/3 m-auto'>
+			<div className='w-full text-center mt-12'>
+				<h2 className='font-bold text-[2rem] px-8'>Book a <span className='text-[2rem] text-secondary font-bold'>Live Demo</span> with the Founder</h2>
+				<div className='m-auto rounded-lg overflow-hidden w-[90%] mt-8 sm:w-[80%] md:w-full md:mt-0'>
 					<InlineWidget
 						url="https://calendly.com/avikalp-gupta/30min"
 						pageSettings={{
@@ -50,10 +50,19 @@ const Demo = () => {
 							email: getAuthUserEmail(session),
 							name: session ? getAuthUserName(session) : undefined, // don't add "User" if session is null
 						}}
+						styles={{
+							height: "720px",
+							width: "100%",
+							overflow: "hidden",
+							display: "block",
+							position: "relative",
+							zIndex: "1",
+							boxSizing: "border-box",
+						}}
 					/>
 				</div>
 			</div>
-			<Footer />
+			<Footer className='mt-0' />
 		</div>
 	)
 }
