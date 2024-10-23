@@ -10,8 +10,8 @@ import RudderContext from '../components/RudderContext';
 import { getAuthUserEmail, getAuthUserId, getAuthUserName } from '../utils/auth';
 
 const Demo = () => {
-	const [loading, setLoading] = useState(true);
 	const [session, setSession] = useState<Session | null>(null);
+	const [anonymousId, setAnonymousId] = useState<string>("");
 	const { rudderEventMethods } = React.useContext(RudderContext);
 
 	useEffect(() => {
@@ -20,21 +20,18 @@ const Demo = () => {
 			setSession(sessionVal);
 		}).catch((err) => {
 			console.error(`[docs] Error in getting session`, err);
-		}).finally(() => {
-			setLoading(false);
 		});
 	}, [])
 
 	React.useEffect(() => {
-		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
-		rudderEventMethods?.track(getAuthUserId(session), "docs page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
+		setAnonymousId(getAndSetAnonymousIdFromLocalStorage());
+		rudderEventMethods?.track(getAuthUserId(session), "demo page", { type: "page", eventStatusFlag: 1, name: getAuthUserName(session) }, anonymousId)
 	}, [rudderEventMethods, session]);
 
 	useCalendlyEventListener({
-		onProfilePageViewed: () => console.log("onProfilePageViewed"),
-		onDateAndTimeSelected: () => console.log("onDateAndTimeSelected"),
-		onEventTypeViewed: () => console.log("onEventTypeViewed"),
-		onEventScheduled: (e) => console.log(e.data.payload),
+		onEventTypeViewed: () => rudderEventMethods?.track(getAuthUserId(session), "calendly_event_type_viewed", { type: "interaction", eventStatusFlag: 1, source: "demo-page", name: getAuthUserName(session) }, anonymousId),
+		onDateAndTimeSelected: () => rudderEventMethods?.track(getAuthUserId(session), "calendly_date_time_selected", { type: "interaction", eventStatusFlag: 1, source: "demo-page", name: getAuthUserName(session) }, anonymousId),
+		onEventScheduled: (e) => rudderEventMethods?.track(getAuthUserId(session), "calendly_demo_scheduled", { type: "interaction", eventStatusFlag: 1, source: "demo-page", name: getAuthUserName(session), payload: e.data.payload }, anonymousId),
 	});
 
 	return (
@@ -51,7 +48,7 @@ const Demo = () => {
 						}}
 						prefill={{
 							email: getAuthUserEmail(session),
-							name: getAuthUserName(session),
+							name: session ? getAuthUserName(session) : undefined, // don't add "User" if session is null
 						}}
 					/>
 				</div>
