@@ -47,8 +47,8 @@ const Hero = (props: { ctaLink: string }) => {
 					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px]'>
 						Get Started
 					</Button>
-					<Button id="book-demo-btn" variant="outlined" href="https://calendly.com/avikalp-gupta/30min" target="_blank" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px]'>
-						Book demo
+					<Button id="book-demo-btn" variant="outlined" href="/demo" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px]'>
+						Watch Demo
 					</Button>
 				</div>
 				<p className="text-lg sm:text-lg mb-10 text-gray-300" title="100% privacy & data protection">
