@@ -35,7 +35,7 @@ const JoinDiscord = () => {
 					Connect with us for any help or support.<br />Join our Discord community.
 				</p>
 			</div>
-			<Link id='join-discord' href={'https://discord.gg/caVSraCvpk'} target='blank' className='bg-secondary m-auto w-[50%] sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5 inline-block flex text-primary-light justify-center items-center'>
+			<Link id='join-discord' href={'https://discord.gg/caVSraCvpk'} target='blank' className='bg-secondary m-auto w-[50%] sm:p-5 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] mt-5 flex text-primary-light justify-center items-center'>
 				<h2 className='sm:text-[1.5rem] text-[1rem] mr-4'>Join Now</h2>
 				<BsDiscord size={20} />
 			</Link>
