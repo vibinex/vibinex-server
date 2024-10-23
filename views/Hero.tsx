@@ -37,13 +37,13 @@ const Hero = (props: { ctaLink: string }) => {
 	return (
 		<div className='flex items-center justify-center h-fit bg-black'>
 			<section className='p-5 text-primary-light my-auto pt-1 md:w-2/3 xl:w-1/2 text-center'>
-				<h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 mt-8'>{'Merge PRs with'}
-					<span className='text-secondary font-bold block'>Confidence</span>
+				<h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 mt-8'>{'Understand pull requests'}
+					<span className='text-secondary font-bold block'>10x faster</span>
 				</h1>
 				<p className="text-xl sm:text-2xl text-gray-300">
-					Auto-assign the <span className="text-secondary">right reviewers</span>, highlight code <span className="text-secondary">relevant to you</span>, and boost collaboration to ship <span className="text-secondary">3x faster</span>.
+					Navigate file-changes <span className="text-secondary">graphically</span> and see a PR interface <span className="text-secondary">personalized to you</span>.
 				</p>
-				<div className="w-full flex space-x-4 my-5">
+				<div className="w-full flex space-x-4 my-5 justify-center">
 					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px]'>
 						Get Started
 					</Button>
