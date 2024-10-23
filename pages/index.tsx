@@ -10,7 +10,6 @@ import RudderContext from '../components/RudderContext'
 import { getAndSetAnonymousIdFromLocalStorage } from '../utils/rudderstack_initialize'
 import { useSession } from 'next-auth/react'
 import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
-import ProductDemo from '../views/Demo'
 import Customers from '../views/CustomerLogos'
 import Testimonials from '../views/Testimonials'
 import JoinDiscord from '../views/JoinDiscord'
@@ -34,7 +33,6 @@ export default function Home() {
 			<Navbar transparent={true} />
 			<Hero ctaLink={'/u'} />
 			<Customers />
-			<ProductDemo />
 			<Features />
 			<WhyUs />
 			<TrustUs />
