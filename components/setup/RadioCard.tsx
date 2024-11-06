@@ -11,7 +11,7 @@ interface RadioCardProps {
 const RadioCard: React.FC<RadioCardProps> = ({ value, label, selected, onSelect }) => {
     return (
         <div
-            className={`border p-4 rounded-lg cursor-pointer flex items-start ${selected ? 'border-blue-500' : 'border-gray-300'}`}
+            className={`border p-4 w-full rounded-lg cursor-pointer flex items-start ${selected ? 'border-blue-500' : 'border-gray-300'}`}
             onClick={() => onSelect(value)}
         >
             <input

@@ -45,17 +45,14 @@ const InstallationType = () => {
 	};
 
 	const installations = [
-		{ value: 'app', label: 'Project In case of project, you must have all the required permissions to run the tool on your chosen code provider.' },
-		{ value: 'pat', label: 'Individual In case of individual installation, you will be able to setup the vibinex tool on your personal repositories where you have all the required permissions to run the tool on your chose code provider.' },
+		{ value: 'app', label: 'Team Installation: Enjoy all the features of Vibinex on your repositories. \n\nRequires **Vibinex Github App** to be installed by owner or admin user' },
+		{ value: 'pat', label: 'Individual Installation: Try out Vibinex with a limited set of features for individual developers, before pitching it to your team. Can be installed by anyone having read permissions on repositories. \n\nRequires a **Github Personal Access Token**' },
 	];
 
 	const currentQueryParams = router.query;
 
-	const hostingOptionsExplainedMD = `## Installation Options
-There are two types of installation options:
-Individual and Project.
-In case of individual installation, you will be able to setup the vibinex tool on your personal repositories where you have all the required permissions to run the tool on your chose code provider.
-In case of project, you must have all the required permissions to run the tool on your chosen code provider.
+	const hostingOptionsExplainedMD = `## Installation Mode
+There are two ways of setting up Vibinex
 `;
 	
 	return (

@@ -1,36 +1,24 @@
+import { RenderMarkdown } from "../RenderMarkdown";
 
-interface InstructionsToGeneratePersonalAccessTokenProps { 
+interface InstructionsToGeneratePersonalAccessTokenProps {
 	selectedInstallationType: string;
 	selectedProvider: string;
 }
 
 const InstructionsToGeneratePersonalAccessToken: React.FC<InstructionsToGeneratePersonalAccessTokenProps> = ({ selectedInstallationType, selectedProvider }) => {
-    //TODO: convert all the texts in markdown
-    return (
-        <>
-            <p className="text-xs mt-2">Instructions to generate your gh cli token for Individual GitHub setup:</p>
-            <ul className="text-xs">
-                <li>Kindly install gh cli using the instructions provided by Github.
-                    <br />
-                    <a href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style={{ color: 'blue', textDecoration: 'underline' }}>
-                    Link to the Github Docs
-                    </a> 
-                </li>
-                <li style={{ marginTop: '2px' }} >Once you have gh cli setup in your machine, follow the below steps to generate your gh cli token.
-                    <br/> 
-                    <span className="text-xs mt-2">
-                        <ul className="text-xs">
-                        <li>Complete github authentication: &nbsp;<code>gh auth login</code></li>
-                        <li>Generate token: &nbsp;<code>gh auth token</code></li>
-                        </ul>
-                    </span>
-                </li>
-            </ul>
-        </>
-    );
+	const patInstructionMD = `## Generate Github PAT:
+Don't know how to get your github PAT? Don't worry! We have you covered
+- Install gh cli using the [instructions provided by GitHub](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
+- Complete GitHub authentication: \`gh auth login\`
+- Generate token: \`gh auth token\` Check in \` ~/.config \` directory for the token if the command doesn't work.
+  `;
+	return (
+		<>
+		<div className="pb-16">
+			<RenderMarkdown markdownText={patInstructionMD} />
+		</div>
+		</>
+	);
 }
 
 export default InstructionsToGeneratePersonalAccessToken;
