@@ -3,6 +3,7 @@
 ![Website version](https://img.shields.io/github/package-json/v/vibinex/vibinex-server)
 ![Website activity](https://img.shields.io/github/commit-activity/y/vibinex/vibinex-server)
 ![Website contributors](https://img.shields.io/github/contributors/vibinex/vibinex-server)
+[![License](https://img.shields.io/badge/license-AGPLv3-purple)](https://github.com/vibinex/vibinex-server/blob/main/LICENSE)
 
 This is the project for the [Vibinex website](https://vibinex.com) and the primary backend for the [Vibinex Browser Extension](https://github.com/vibinex/chrome-extension). It's a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
