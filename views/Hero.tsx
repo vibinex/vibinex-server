@@ -6,6 +6,7 @@ import RudderContext from "../components/RudderContext";
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import ProviderLogo from "../components/ProviderLogo";
+import { motion } from "framer-motion";
 
 const Hero = (props: { ctaLink: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
@@ -35,36 +36,78 @@ const Hero = (props: { ctaLink: string }) => {
 		};
 	}, [rudderEventMethods, session]);
 	return (
-		<div className='flex items-center justify-center h-fit bg-black'>
+		<motion.div
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ duration: 0.5 }}
+			className='flex items-center justify-center h-fit bg-black'
+		>
 			<section className='p-5 text-primary-light my-auto pt-1 md:w-2/3 xl:w-1/2 text-center'>
-				<h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 mt-8'>{'Understand code changes'}
-					<span className='text-secondary font-bold block'>10x faster</span>
-				</h1>
-				<p className="text-xl sm:text-2xl text-gray-300">
+				<motion.h1
+					initial={{ y: -20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ duration: 0.7, delay: 0.2 }}
+					className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 mt-8'
+				>
+					{'Understand code changes'}
+					<motion.span
+						initial={{ scale: 0.9, opacity: 0 }}
+						animate={{ scale: 1, opacity: 1 }}
+						transition={{ duration: 0.5, delay: 0.5 }}
+						className='text-secondary font-bold block'
+					>
+						10x faster
+					</motion.span>
+				</motion.h1>
+				<motion.p
+					initial={{ y: 20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ duration: 0.7, delay: 0.7 }}
+					className="text-xl sm:text-2xl text-gray-300"
+				>
 					Navigate file-changes <span className="text-secondary">graphically</span> and see a code review interface <span className="text-secondary">personalized to you</span>.
-				</p>
-				<div className="w-full flex space-x-4 my-5 justify-center">
-					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px]'>
+				</motion.p>
+				<motion.div
+					initial={{ y: 20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ duration: 0.7, delay: 0.9 }}
+					className="w-full flex space-x-4 my-5 justify-center"
+				>
+					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] hover:scale-105 transition-transform'>
 						Get Started
 					</Button>
-					<Button id="book-demo-btn" variant="outlined" href="/demo" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px]'>
+					<Button id="book-demo-btn" variant="outlined" href="/demo" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] hover:scale-105 transition-transform'>
 						Watch Demo
 					</Button>
-				</div>
-				<p className="text-lg sm:text-lg mb-10 text-gray-300" title="100% privacy & data protection">
+				</motion.div>
+				<motion.p
+					initial={{ y: 20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ duration: 0.7, delay: 1.1 }}
+					className="text-lg sm:text-lg mb-10 text-gray-300"
+					title="100% privacy & data protection"
+				>
 					Your code <span className="text-secondary">never leaves your systems</span> by design
-				</p>
-				<div className="my-10 w-full relative">
-					{/*Overlay*/}
+				</motion.p>
+				<motion.div
+					initial={{ y: 20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ duration: 0.7, delay: 1.3 }}
+					className="my-10 w-full relative"
+				>
 					<div className='absolute bg-black/50 z-10 h-full w-full' />
 					<p>Supported Providers:</p>
 					<div className="flex gap-4 mt-2 justify-center">
-						<ProviderLogo provider="github" theme="dark" className="w-10 h-12" />
-						<ProviderLogo provider="bitbucket" theme="light" className="w-10 h-12" />
+						<motion.div whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
+							<ProviderLogo provider="github" theme="dark" className="w-10 h-12" />
+						</motion.div>
+						<motion.div whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
+							<ProviderLogo provider="bitbucket" theme="light" className="w-10 h-12" />
+						</motion.div>
 					</div>
-				</div>
+				</motion.div>
 			</section>
-		</div>
+		</motion.div>
 	)
 }
 export default Hero;

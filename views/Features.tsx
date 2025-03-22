@@ -6,6 +6,7 @@ import HunkLevelHighlight from '../public/highlightFile.png'
 import DiffGraph from '../public/DiffGraph.png'
 import Carousel from '../components/Carousel'
 import Autoplay from 'embla-carousel-autoplay'
+import { motion } from 'framer-motion'
 
 const FeatureList = [
 	{
@@ -44,25 +45,57 @@ const FeatureList = [
 
 const Features = () => {
 	return (
-		<div id='features' className='w-full text-center py-12 bg-primary'>
-			<h2 className='font-bold text-[2rem]'>Vibinex  <span className='text-[2rem] text-secondary font-bold'>Features</span></h2>
+		<motion.div
+			initial={{ opacity: 0 }}
+			whileInView={{ opacity: 1 }}
+			transition={{ duration: 0.8 }}
+			viewport={{ once: true }}
+			id='features'
+			className='w-full text-center py-12 bg-primary'
+		>
+			<motion.h2
+				initial={{ y: -20, opacity: 0 }}
+				whileInView={{ y: 0, opacity: 1 }}
+				transition={{ duration: 0.5, delay: 0.2 }}
+				viewport={{ once: true }}
+				className='font-bold text-[2rem]'
+			>
+				Vibinex <span className='text-[2rem] text-secondary font-bold'>Features</span>
+			</motion.h2>
 			<div className='w-full lg:w-4/5 m-auto'>
 				<Carousel opts={{ loop: true }} plugins={[Autoplay({ playOnInit: true, delay: 3000 })]} controls='dots'>
 					{FeatureList.map((item) => (
-						<div className='flex flex-col lg:flex-row' key={item.text}>
-							<div className='grow lg:grow-0 lg:w-full mt-8 rounded-md lg:mx-0 pl-4'>
+						<motion.div
+							initial={{ opacity: 0, x: 20 }}
+							whileInView={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.5 }}
+							viewport={{ once: true }}
+							className='flex flex-col lg:flex-row'
+							key={item.text}
+						>
+							<motion.div
+								whileHover={{ scale: 1.02 }}
+								transition={{ type: "spring", stiffness: 400, damping: 10 }}
+								className='grow lg:grow-0 lg:w-full mt-8 rounded-md lg:mx-0 pl-4'
+							>
 								<h3 className='block lg:hidden font-bold text-[1.3rem] mb-4'>{item.text}</h3>
 								<Image priority src={item.src} alt={item.text} className='rounded-md object-left-top object-cover w-full h-72 lg:h-screen-1/2 mx-auto max-w-2xl' />
-							</div>
-							<div className='grow lg:grow-0 lg:w-full mt-8 rounded-md lg:ml-0 flex flex-col items-center justify-normal'>
+							</motion.div>
+							<motion.div
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.5, delay: 0.3 }}
+								viewport={{ once: true }}
+								className='grow lg:grow-0 lg:w-full mt-8 rounded-md lg:ml-0 flex flex-col items-center justify-normal'
+							>
 								<h3 className='hidden lg:block font-bold text-[1.3rem] my-4 lg:text-2xl xl:text-3xl'>{item.text}</h3>
 								<p className='text-center mx-4 lg:text-lg xl:text-xl'>{item.description}</p>
-							</div>
-						</div>
+							</motion.div>
+						</motion.div>
 					))}
 				</Carousel>
 			</div>
-		</div>
+		</motion.div>
 	)
 }
 export default Features
