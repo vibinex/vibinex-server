@@ -12,6 +12,8 @@ import BlanceLogo from '../public/blance-full-logo-new.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
 import LifioLogo from '../public/lifio-logo.png'
 import RevRagLogo from '../public/revrag_logo.png'
+import TagMangoLogo from '../public/tagmango_logo.svg'
+import SimplifyMoneyLogo from '../public/simplifymoney-logo.png'
 
 const data = [
 	{ logo: AbleJobsLogo, heading: 'Able' },
@@ -23,7 +25,9 @@ const data = [
 	{ logo: KhiladiProLogo, heading: 'Khiladi Pro' },
 	{ logo: LifioLogo, heading: 'Lifio' },
 	{ logo: RevRagLogo, heading: 'RevRag' },
+	{ logo: SimplifyMoneyLogo, heading: 'SimplifyMoney' },
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
+	{ logo: TagMangoLogo, heading: 'TagMango' },
 	{ logo: VyapLogo, heading: 'Vyap' },
 ]
 
