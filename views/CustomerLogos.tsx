@@ -37,7 +37,6 @@ const Customers = () => {
 	const [currentTheme, setCurrentTheme] = useState('light');
 
 	useEffect(() => {
-		console.log(getPreferredTheme())
 		setCurrentTheme(getPreferredTheme());
 	}, [])
 
@@ -45,7 +44,7 @@ const Customers = () => {
 		<div id='customers' className='w-full text-center py-12 bg-primary'>
 			<h4 className='px-4 text-[1rem] relative'>
 				{'Trusted by '}
-				<span className={currentTheme === 'light' ? 'relative text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#6f117b]' : ''}>
+				<span className={currentTheme === 'light' ? 'relative text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#6f117b]' : 'relative text-secondary font-semibold'}>
 					fast-moving
 				</span>
 				{' teams'}
