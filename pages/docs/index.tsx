@@ -10,6 +10,7 @@ import { getPreferredTheme, Theme } from '../../utils/theme';
 import ProductDemo from '../../views/Demo';
 import DocsSideBar from '../../views/docs/DocsSideBar';
 import MainAppBar from '../../views/MainAppBar';
+import Button from '../../components/Button';
 
 const Docs = () => {
 	const [loading, setLoading] = useState(true);
@@ -94,8 +95,16 @@ Follow [this guide](/docs/setup/providerLogin) for a quick set up.
 					<RenderMarkdown markdownText={architectureMD} />
 					{/* <Image src={architecturalDiagram(theme)} alt="Vibinex Setup" width={800} height={800} className="mx-auto my-4 w-full max-w-screen-md" /> */}
 					<RenderMarkdown markdownText={setupMD} />
+					<div className="text-right mb-2 mr-2">
+						<Button
+							href='/docs/setup/providerLogin'
+							variant="contained"
+							className='px-4 py-2 flex-1 sm:flex-grow-0'
+						>
+							Next &raquo;
+						</Button>
+					</div>
 				</div>
-
 			</div>
 			<Footer />
 		</div>

@@ -31,7 +31,7 @@ export default function Home() {
 	return (
 		<div className='overflow-hidden'>
 			<Navbar transparent={true} />
-			<Hero ctaLink={'/u'} />
+			<Hero ctaLink={'/docs/setup/providerLogin'} />
 			<Customers />
 			<Features />
 			<WhyUs />
