@@ -32,7 +32,7 @@ const WhyUs = () => {
 			transition={{ duration: 0.8 }}
 			viewport={{ once: true }}
 			id='whyus'
-			className='w-full text-center py-12'
+			className='w-full text-center py-12 bg-primary'
 		>
 			<motion.h2
 				initial={{ y: -20, opacity: 0 }}

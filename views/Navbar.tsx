@@ -88,7 +88,7 @@ const Navbar = (props: { transparent: boolean }) => {
 
 	return (
 		<AppBar position='fixed' className='mx-auto p-4 justify-between items-center max-w-7xl'
-			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-background text-foreground' : ' bg-black text-foreground text-primary-light border-b-0')}
+			backdropClassName={'ease-in duration-300' + (scrollDown || !props.transparent ? ' bg-background text-foreground' : ' bg-primary text-foreground border-b-0')}
 		>
 			<Link href='/' className='flex items-center'>
 				<Image src={VibinexDarkLogo} alt="Vibinex logo" className="inline w-10 mr-2" priority></Image>

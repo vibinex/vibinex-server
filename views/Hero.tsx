@@ -7,10 +7,12 @@ import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initi
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
 import ProviderLogo from "../components/ProviderLogo";
 import { motion } from "framer-motion";
+import { getPreferredTheme, Theme } from "../utils/theme";
 
 const Hero = (props: { ctaLink: string }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
 	const session: Session | null = useSession().data;
+	const [currentTheme, setCurrentTheme] = React.useState<Theme>('light');
 
 	React.useEffect(() => {
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage()
@@ -35,14 +37,19 @@ const Hero = (props: { ctaLink: string }) => {
 			bookDemoButton?.removeEventListener('click', handleBookDemo);
 		};
 	}, [rudderEventMethods, session]);
+
+	React.useEffect(() => {
+		setCurrentTheme(getPreferredTheme());
+	}, [])
+
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			transition={{ duration: 0.5 }}
-			className='flex items-center justify-center h-fit bg-black'
+			className='flex items-center justify-center h-fit bg-primary'
 		>
-			<section className='p-5 text-primary-light my-auto pt-1 md:w-2/3 xl:w-1/2 text-center'>
+			<section className='p-5 text-primary-foreground my-auto pt-1 md:w-2/3 xl:w-1/2 text-center'>
 				<motion.h1
 					initial={{ y: -20, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
@@ -63,7 +70,7 @@ const Hero = (props: { ctaLink: string }) => {
 					initial={{ y: 20, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					transition={{ duration: 0.7, delay: 0.7 }}
-					className="text-xl sm:text-2xl text-gray-300"
+					className="text-xl sm:text-2xl"
 				>
 					Navigate file-changes <span className="text-secondary">graphically</span> and see a code review interface <span className="text-secondary">personalized to you</span>.
 				</motion.p>
@@ -76,7 +83,7 @@ const Hero = (props: { ctaLink: string }) => {
 					<Button id="cta-btn" variant="contained" href={props.ctaLink} className='text-center w-[45%] p-3 sm:p-4 px-20 rounded-lg font-bold text-[20px] sm:text-[25px] hover:scale-105 transition-transform'>
 						Get Started
 					</Button>
-					<Button id="book-demo-btn" variant="outlined" href="/demo" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-bold sm:text-[25px] text-[20px] hover:scale-105 transition-transform'>
+					<Button id="book-demo-btn" variant="outlined" href="/demo" className='text-center w-[45%] sm:p-4 p-3 px-20 rounded-lg font-semibold sm:text-[25px] text-[20px] hover:scale-105 transition-transform !border-action-active text-action-active'>
 						Watch Demo
 					</Button>
 				</motion.div>
@@ -84,7 +91,7 @@ const Hero = (props: { ctaLink: string }) => {
 					initial={{ y: 20, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					transition={{ duration: 0.7, delay: 1.1 }}
-					className="text-lg sm:text-lg mb-10 text-gray-300"
+					className="text-lg sm:text-lg mb-10"
 					title="100% privacy & data protection"
 				>
 					Your code <span className="text-secondary">never leaves your systems</span> by design
@@ -95,14 +102,14 @@ const Hero = (props: { ctaLink: string }) => {
 					transition={{ duration: 0.7, delay: 1.3 }}
 					className="my-10 w-full relative"
 				>
-					<div className='absolute bg-black/50 z-10 h-full w-full' />
+					<div className='absolute bg-primary/50 z-10 h-full w-full' />
 					<p>Supported Providers:</p>
 					<div className="flex gap-4 mt-2 justify-center">
 						<motion.div whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-							<ProviderLogo provider="github" theme="dark" className="w-10 h-12" />
+							<ProviderLogo provider="github" theme={currentTheme} className="w-10 h-12 hover:scale-105" />
 						</motion.div>
 						<motion.div whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-							<ProviderLogo provider="bitbucket" theme="light" className="w-10 h-12" />
+							<ProviderLogo provider="bitbucket" theme={currentTheme} className="w-10 h-12 hover:scale-105" />
 						</motion.div>
 					</div>
 				</motion.div>

@@ -35,14 +35,14 @@ const JoinDiscord = () => {
 			transition={{ duration: 0.8 }}
 			viewport={{ once: true }}
 			id='joinDiscord'
-			className='w-full text-center py-12 bg-black'
+			className='w-full text-center py-12 bg-primary'
 		>
 			<motion.h2
 				initial={{ y: -20, opacity: 0 }}
 				whileInView={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.5, delay: 0.2 }}
 				viewport={{ once: true }}
-				className='font-bold text-[2rem] text-white'
+				className='font-bold text-[2rem]'
 			>
 				Discord Community
 			</motion.h2>
@@ -51,7 +51,7 @@ const JoinDiscord = () => {
 				whileInView={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.5, delay: 0.4 }}
 				viewport={{ once: true }}
-				className='w-[100%] mt-1 p-4 text-white'
+				className='w-[100%] mt-1 p-4'
 			>
 				<p className='text-[1.2rem]'>
 					Connect with us for any help or support.<br />Join our Discord community.

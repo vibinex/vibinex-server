@@ -35,7 +35,7 @@ const data = [
 const Customers = () => {
 	const currentTheme = getPreferredTheme();
 	return (
-		<div id='customers' className='w-full text-center py-12 bg-primary'>
+		<div id='customers' className='w-full text-center py-12'>
 			<h2 className='px-4 font-bold text-[2rem] relative'>
 				{'Trusted by '}
 				<span className='relative text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#6f117b]'>
