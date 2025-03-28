@@ -59,13 +59,13 @@ Proceed by choosing one of the options below or adding another login.
 				<div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
 					<div className="pb-16">
 						<RenderMarkdown markdownText={loginExplanationMD} />
-						<Button 
-							variant="contained" 
+						<Button
+							variant="contained"
 							href={
-								getURLWithParams('/auth/signin', 
-									{ callbackUrl: "/docs/setup/providerLogin" })} 
+								getURLWithParams('/auth/signin',
+									{ callbackUrl: "/docs/setup/providerLogin" })}
 							className='px-4 py-2 flex-1 sm:flex-grow-0 mb-4'>
-								Add login
+							Add login
 						</Button>
 						{Object.values(session?.user?.auth_info?.github ?? {}).map((githubAuthInfo) => (
 							<Chip
@@ -90,7 +90,11 @@ Proceed by choosing one of the options below or adding another login.
 							/>
 						))}
 					</div>
-					<div className="absolute bottom-0 right-0 mb-2 mr-2">
+					<div className="flex mb-2 mr-2">
+						<Button href="/docs/" variant="outlined" className="px-4 py-2 flex-1 sm:flex-grow-0">
+							&laquo; Previous
+						</Button>
+						<span className="flex-grow"></span>
 						<Button
 							href={selectedProvider === "bitbucket"
 								? getURLWithParams('/docs/setup/repositories', { provider: selectedProvider, srcSuffix: '/docs/setup/providerLogin' })

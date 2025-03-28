@@ -36,7 +36,7 @@ const ChromeExtension: React.FC = () => {
     }, [rudderEventMethods, session]);
 
     const chromeExtensionExplainedMD = `## Install Chrome Extension
-The chrome extension enables highlights for your pull requests. 
+The chrome extension enables highlights for your pull requests.
 - It can be installed and used by all team members contributing to a repository on which Vibinex is set up. They do not need to set up their own DPU
 - Once you install the extension, click on the extension icon in the top right corner of your browser to verify that you are logged in. If you are not logged in, login using the same credentials you used to login to vibinex.com.
 - Ask all your team mates to set their git name and email in their local dev environment, to track commits consistently.
@@ -47,19 +47,23 @@ The chrome extension enables highlights for your pull requests.
             <MainAppBar />
             {loading ? <LoadingOverlay type='loading' /> : (!session ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null)}
             <div className="flex flex-col sm:flex-row">
-                <DocsSideBar className='w-full sm:w-80' session={session}/>
+                <DocsSideBar className='w-full sm:w-80' session={session} />
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 gap-2'>
                     <RenderMarkdown markdownText={chromeExtensionExplainedMD} />
-                    <div className='flex flex-col items-mid'>
+                    <div className='flex flex-col items-mid pb-16'>
                         <Button
                             variant="contained"
                             href="https://chromewebstore.google.com/detail/vibinex-code-review/jafgelpkkkopeaefadkdjcmnicgpcncc?pli=1"
                             className='px-4 py-2 mt-4'
                         >
-                        Install Vibinex Chrome Extension   
+                            Install Vibinex Chrome Extension
                         </Button>
                     </div>
-                    <div className="absolute bottom-0 right-0 mb-8 mr-2">
+                    <div className="flex mb-8 mr-2">
+                        <Button onClick={() => window.history.back()} variant="outlined" className="px-4 py-2 flex-1 sm:flex-grow-0">
+                            &laquo; Previous
+                        </Button>
+                        <span className="flex-grow"></span>
                         <Button
                             href={getURLWithParams('/u', {})}
                             variant="contained"

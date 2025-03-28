@@ -48,8 +48,8 @@ const Repositories = () => {
 			console.log(`set provider to ${provider}`)
 			setRepoProvider(supportedProviders[providerIndex]);
 		}
-        console.log(`repoProvider state changed: ${repoProvider}`);
-    }, [provider]);
+		console.log(`repoProvider state changed: ${repoProvider}`);
+	}, [provider]);
 
 	const repoSelectionExplanationMD = `## Set up Repositories
 Select the Repositories on which you want to set up Vibinex
@@ -62,20 +62,26 @@ Select the Repositories on which you want to set up Vibinex
 				(!session) ? <LoadingOverlay type='error' text='Could not get session. Please reload' /> : null}
 			<div className="flex flex-col sm:flex-row relative">
 				<DocsSideBar className='w-full sm:w-80' />
-				<div className="dynamic-div pb-16">
-					<RenderMarkdown markdownText={repoSelectionExplanationMD} />
-					{repoProvider && <RepoSelection repoProvider={repoProvider as RepoProvider} />}
-				</div>
-				<div className="absolute bottom-0 right-0 mb-2 mr-2">
-					<Button
-						href={provider === 'github'
-							? getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', installation: 'pat', provider: 'github'})
-							: getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', provider: 'bitbucket' })}
-						variant="contained"
-						className='px-4 py-2 flex-1 sm:flex-grow-0'
-					>
-						Next &raquo;
-					</Button>
+				<div className="dynamic-div sm:w-2/3">
+					<div className=" pb-16">
+						<RenderMarkdown markdownText={repoSelectionExplanationMD} />
+						{repoProvider && <RepoSelection repoProvider={repoProvider as RepoProvider} />}
+					</div>
+					<div className="flex mb-2 mr-2 w-full">
+						<Button onClick={() => window.history.back()} variant="outlined" className="px-4 py-2 flex-1 sm:flex-grow-0">
+							&laquo; Previous
+						</Button>
+						<span className="flex-grow"></span>
+						<Button
+							href={provider === 'github'
+								? getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', installation: 'pat', provider: 'github' })
+								: getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/repositories', provider: 'bitbucket' })}
+							variant="contained"
+							className='px-4 py-2 flex-1 sm:flex-grow-0'
+						>
+							Next &raquo;
+						</Button>
+					</div>
 				</div>
 			</div>
 			<Footer />

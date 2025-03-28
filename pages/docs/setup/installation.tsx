@@ -54,7 +54,7 @@ const InstallationType = () => {
 	const hostingOptionsExplainedMD = `## Installation Mode
 There are two ways of setting up Vibinex
 `;
-	
+
 	return (
 		<div>
 			<MainAppBar />
@@ -63,37 +63,39 @@ There are two ways of setting up Vibinex
 				<DocsSideBar className='w-full sm:w-80' />
 				<div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
 					<RenderMarkdown markdownText={hostingOptionsExplainedMD} />
-					<div className='flex flex-col items-start pb-16'>
-						<div className='space-y-4 my-4'>
-							{installations.map((option) => (
-								<div key={option.value} className='flex items-center gap-2'>
-									<RadioCard
-										key={option.value}
-										value={option.value}
-										label={option.label}
-										selected={selectedInstallation === option.value}
-										onSelect={handleCardSelect}
+					<div className='flex flex-col items-start space-y-4 my-4 pb-16'>
+						{installations.map((option) => (
+							<div key={option.value} className='flex items-center gap-2 w-full'>
+								<RadioCard
+									key={option.value}
+									value={option.value}
+									label={option.label}
+									selected={selectedInstallation === option.value}
+									onSelect={handleCardSelect}
 								/>
-								</div>
-							))}
-						</div>
-						<div className="absolute bottom-0 right-0 mb-2 mr-2">
-							<Button
-								href={selectedInstallation === 'app'
-									? getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/installation', installation: 'app', provider: 'github'})
-									: getURLWithParams('/docs/setup/repositories', { srcSuffix: '/docs/setup/installation', provider: 'github'})}
-								variant="contained"
-								className='px-4 py-2 flex-1 sm:flex-grow-0'
-								disabled={!selectedInstallation}
-							>
-								Next &raquo;
-							</Button>
+							</div>
+						))}
+					</div>
+					<div className="flex mb-2 mr-2 w-full">
+						<Button onClick={() => window.history.back()} variant="outlined" className="px-4 py-2 flex-1 sm:flex-grow-0">
+							&laquo; Previous
+						</Button>
+						<span className="flex-grow"></span>
+						<Button
+							href={selectedInstallation === 'app'
+								? getURLWithParams('/docs/setup/hosting', { srcSuffix: '/docs/setup/installation', installation: 'app', provider: 'github' })
+								: getURLWithParams('/docs/setup/repositories', { srcSuffix: '/docs/setup/installation', provider: 'github' })}
+							variant="contained"
+							className='px-4 py-2 flex-1 sm:flex-grow-0'
+							disabled={!selectedInstallation}
+						>
+							Next &raquo;
+						</Button>
 					</div>
 				</div>
 			</div>
+			<Footer />
 		</div>
-		<Footer />
-	</div>
 	);
 };
 
