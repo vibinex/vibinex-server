@@ -15,6 +15,7 @@ import RevRagLogo from '../public/revrag_logo.png'
 import TagMangoLogo from '../public/tagmango_logo.svg'
 import SimplifyMoneyLogo from '../public/simplifymoney-logo.png'
 import { getPreferredTheme } from '../utils/theme'
+import { useEffect, useState } from 'react'
 
 const data = [
 	{ logo: AbleJobsLogo, heading: 'Able' },
@@ -33,16 +34,21 @@ const data = [
 ]
 
 const Customers = () => {
-	const currentTheme = getPreferredTheme();
+	const [currentTheme, setCurrentTheme] = useState('light');
+
+	useEffect(() => {
+		setCurrentTheme(getPreferredTheme());
+	}, [])
+
 	return (
 		<div id='customers' className='w-full text-center py-12 bg-primary'>
-			<h2 className='px-4 font-bold text-[2rem] relative'>
+			<h4 className='px-4 text-[1rem] relative'>
 				{'Trusted by '}
-				<span className='relative text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#6f117b]'>
+				<span className={currentTheme === 'light' ? 'relative text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#6f117b]' : 'relative text-secondary font-semibold'}>
 					fast-moving
 				</span>
 				{' teams'}
-			</h2>
+			</h4>
 			<div className='w-full mt-8 flex flex-row justify-center items-center place-content-between mx-auto flex-wrap xl:flex-nowrap sm:gap-y-4'>
 				<Carousel opts={{ loop: true }} plugins={[AutoScroll({ playOnInit: true })]} controls='none' itemClassNames="!shrink !min-w-fit">
 					{data.map((item) => (
@@ -53,7 +59,7 @@ const Customers = () => {
 							key={item.heading}
 							title={item.heading}
 							className={`${item.customClass ?? ''} h-16 md:h-12 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit mx-auto
-							${currentTheme === 'dark' ? 'grayscale invert-[0.85] mix-blend-luminosity' : ''}`}
+							${currentTheme === 'dark' ? ' grayscale invert-[0.85] mix-blend-luminosity' : ''}`}
 						/>
 					))}
 				</Carousel>
