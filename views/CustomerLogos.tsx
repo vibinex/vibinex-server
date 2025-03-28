@@ -12,6 +12,9 @@ import BlanceLogo from '../public/blance-full-logo-new.png'
 import BlitzLogo from '../public/blitz_logo_black.png'
 import LifioLogo from '../public/lifio-logo.png'
 import RevRagLogo from '../public/revrag_logo.png'
+import TagMangoLogo from '../public/tagmango_logo.svg'
+import SimplifyMoneyLogo from '../public/simplifymoney-logo.png'
+import { getPreferredTheme } from '../utils/theme'
 
 const data = [
 	{ logo: AbleJobsLogo, heading: 'Able' },
@@ -23,11 +26,14 @@ const data = [
 	{ logo: KhiladiProLogo, heading: 'Khiladi Pro' },
 	{ logo: LifioLogo, heading: 'Lifio' },
 	{ logo: RevRagLogo, heading: 'RevRag' },
+	{ logo: SimplifyMoneyLogo, heading: 'SimplifyMoney' },
 	{ logo: SupplyNoteLogo, heading: 'SupplyNote' },
+	{ logo: TagMangoLogo, heading: 'TagMango' },
 	{ logo: VyapLogo, heading: 'Vyap' },
 ]
 
 const Customers = () => {
+	const currentTheme = getPreferredTheme();
 	return (
 		<div id='customers' className='w-full text-center py-12 bg-primary'>
 			<h2 className='px-4 font-bold text-[2rem] relative'>
@@ -46,7 +52,8 @@ const Customers = () => {
 							alt={item.heading}
 							key={item.heading}
 							title={item.heading}
-							className={`${item.customClass ?? ''} h-16 md:h-12 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit mx-auto`}
+							className={`${item.customClass ?? ''} h-16 md:h-12 object-contain px-4 py-4 sm:py-2 xl:py-1 w-fit mx-auto
+							${currentTheme === 'dark' ? 'grayscale invert-[0.85] mix-blend-luminosity' : ''}`}
 						/>
 					))}
 				</Carousel>
