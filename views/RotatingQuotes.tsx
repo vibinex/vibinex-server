@@ -22,6 +22,7 @@ const RotatingQuotes: React.FC<RotatingQuotesProps> = ({
 	const [currentIndex, setCurrentIndex] = useState(0);
 
 	useEffect(() => {
+		if (quotes.length === 0) return;
 		const timer = setInterval(() => {
 			setCurrentIndex((prevIndex) => (prevIndex + 1) % quotes.length);
 		}, interval);
