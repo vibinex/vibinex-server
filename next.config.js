@@ -1,3 +1,15 @@
+const rawStrapiApiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL?.trim();
+const strapiHostname = (() => {
+	if (!rawStrapiApiUrl) return null;
+	try {
+		return rawStrapiApiUrl.includes('://')
+			? new URL(rawStrapiApiUrl).hostname
+			: rawStrapiApiUrl;
+	} catch {
+		return null;
+	}
+})();
+
 const nextConfig = {
 	reactStrictMode: true,
 	swcMinify: true,
@@ -33,11 +45,11 @@ const nextConfig = {
 				hostname: 'gitlab.com', // GitLab profile images
 				pathname: '/uploads/-/system/user/avatar/**',
 			},
-			{
+			...(strapiHostname ? [{
 				protocol: 'https',
-				hostname: process.env.NEXT_PUBLIC_STRAPI_API_URL, // Blog server
+				hostname: strapiHostname, // Blog server
 				pathname: '/**',
-			},
+			}] : []),
 			{
 				protocol: 'https',
 				hostname: 'github.com', // GitHub README images
