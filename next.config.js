@@ -33,11 +33,11 @@ const nextConfig = {
 				hostname: 'gitlab.com', // GitLab profile images
 				pathname: '/uploads/-/system/user/avatar/**',
 			},
-			{
+			...(process.env.NEXT_PUBLIC_STRAPI_API_URL ? [{
 				protocol: 'https',
 				hostname: process.env.NEXT_PUBLIC_STRAPI_API_URL, // Blog server
 				pathname: '/**',
-			},
+			}] : []),
 			{
 				protocol: 'https',
 				hostname: 'github.com', // GitHub README images
