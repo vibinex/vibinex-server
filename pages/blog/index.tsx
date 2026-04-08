@@ -60,13 +60,15 @@ const Profile: NextPage = () => {
 		}
 	}, []);
 
+	const PAGE_LIMIT = Number(process.env.NEXT_PUBLIC_PAGE_LIMIT) || 10;
+
 	function loadMorePosts(): void {
-		const nextPosts = meta?.pagination.start ?? 0 + (meta?.pagination.limit ?? 0);
-		fetchData(nextPosts, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
+		const nextPosts = (meta?.pagination.start ?? 0) + (meta?.pagination.limit ?? PAGE_LIMIT);
+		fetchData(nextPosts, PAGE_LIMIT);
 	}
 
 	useEffect(() => {
-		fetchData(0, Number(process.env.NEXT_PUBLIC_PAGE_LIMIT));
+		fetchData(0, PAGE_LIMIT);
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
 		rudderEventMethods?.track("absent", "page-visit", { type: "blog-list-page"}, anonymousId);
 	}, [rudderEventMethods, fetchData]);
