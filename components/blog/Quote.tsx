@@ -35,7 +35,7 @@ const Quote = ({ data }: QuoteProps) => {
 				</svg>
 			</div>
 			<span className="w-12 h-1 my-2 rounded-lg dark:bg-violet-400"></span>
-			{author ? <p>{author}</p> : "unknown"}
+			{author && <p>{author}</p>}
 		</div>
 	);
 }
