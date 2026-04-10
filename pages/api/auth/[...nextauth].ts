@@ -55,7 +55,10 @@ export const authOptions = {
 			}
 			if (!dbUser && user.email) {
 				// then search based on aliases: ask if they want to merge accounts
-				const alias_users = await getUserByAlias(user.email);
+				const alias_users = await getUserByAlias(user.email).catch(err => {
+					console.error(`[signIn] getUserByAlias failed for ${user.email}`, err);
+					return undefined;
+				});
 				if (alias_users?.length == 1) dbUser = alias_users[0];
 				else if (alias_users && alias_users?.length > 1) {
 					// FIXME: show user the list of accounts and let them choose
