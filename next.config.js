@@ -73,9 +73,11 @@ const nextConfig = {
 	async headers() {
 		return [
 			{
-				// Auth API routes: CORS headers + never cache (sessions must always be fresh)
+				// Auth API routes: full CORS + never cache (sessions must always be fresh)
+				// Access-Control-Allow-Origin must be explicit (not *) when credentials are true
 				source: "/api/auth/:path*",
 				headers: [
+					{ key: "Access-Control-Allow-Origin", value: "https://vibinex.com" },
 					{ key: "Access-Control-Allow-Credentials", value: "true" },
 					{
 						key: "Access-Control-Allow-Methods",
@@ -90,7 +92,7 @@ const nextConfig = {
 				],
 			},
 			{
-				// Other API routes: CORS headers only, no cache
+				// Other API routes: CORS headers + no cache (API responses are user-specific)
 				source: "/api/:path*",
 				headers: [
 					{ key: "Access-Control-Allow-Credentials", value: "true" },
@@ -114,8 +116,10 @@ const nextConfig = {
 				],
 			},
 			{
-				// Static assets and public pages: cache aggressively at CDN
-				source: "/((?!api|u).*)",
+				// Public pages and static assets: cache aggressively at CDN
+				// Use explicit exclusions rather than negative lookahead on single chars
+				// to avoid accidentally excluding future routes like /users, /updates, etc.
+				source: "/((?!api/)(?!u$).*)",
 				headers: [{
 					key: "Cache-Control",
 					value: "public, max-age=86400, s-maxage=86400, stale-while-revalidate",
