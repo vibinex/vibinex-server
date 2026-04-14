@@ -75,4 +75,4 @@ export default function LoginLogout() {
 			Login/Signup
 		</Button>
 	)
-};
+}

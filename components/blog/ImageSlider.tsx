@@ -1,6 +1,6 @@
 "use client";
 import { Fade } from "react-slideshow-image";
-import Image from "next/image";
+import NextImage from "next/image";
 import { getStrapiMedia } from "../../utils/blog/api-helpers";
 
 interface Image {
@@ -30,7 +30,7 @@ const Slideshow = ({ data }: { data: SlideShowProps }) => {
 		  }
 		  return (
 			<div key={fadeImage.attributes.url}>
-			  {imageUrl && <Image className="w-full h-96 object-cover rounded-lg" height={400} width={600} alt="alt text" src={imageUrl} />}
+			  {imageUrl && <NextImage className="w-full h-96 object-cover rounded-lg" height={400} width={600} alt="alt text" src={imageUrl} />}
 			</div>
 		  );
 		})}
