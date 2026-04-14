@@ -55,13 +55,21 @@ export const authOptions = {
 			}
 			if (!dbUser && user.email) {
 				// then search based on aliases: ask if they want to merge accounts
-				const alias_users = await getUserByAlias(user.email);
+				let aliasLookupFailed = false;
+				const alias_users = await getUserByAlias(user.email).catch(err => {
+					console.error(`[signIn] getUserByAlias failed for ${user.email}`, err);
+					aliasLookupFailed = true;
+					return undefined;
+				});
 				if (alias_users?.length == 1) dbUser = alias_users[0];
 				else if (alias_users && alias_users?.length > 1) {
 					// FIXME: show user the list of accounts and let them choose
 					// Not allowing sign in when this happens
 					return false;
 				}
+				// If the DB lookup itself failed, skip createUser to avoid duplicate accounts.
+				// The sign-in will proceed; session callback will retry the lookup.
+				if (aliasLookupFailed) return true;
 			}
 
 			if (!dbUser) {
