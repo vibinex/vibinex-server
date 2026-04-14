@@ -79,44 +79,39 @@ Create a `.env.local` file in the root directory and add the following in it:
 ```bash
 # NextAuthJS
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=
+NEXTAUTH_SECRET=<any random string, e.g. output of: openssl rand -base64 32>
 
-# Github Login
+# Github Login — uses the "Vibinex Test" OAuth App
+# ⚠️  These are shared test credentials. Do not use them in production.
+#     Contact a maintainer if they stop working.
 GITHUB_CLIENT_ID=78eb181cacd859319797
 GITHUB_CLIENT_SECRET=c6efe816493a0b553ef20364134a3009b724b402
 
-# Bitbucket Login
+# Bitbucket Login (optional — create your own OAuth consumer at bitbucket.org)
 BITBUCKET_CLIENT_ID=
 BITBUCKET_CLIENT_SECRET=
 
 # Bitbucket OAuth consumer
 BITBUCKET_OAUTH_CLIENT_ID=
 
-# GitLab Login
+# GitLab Login (optional — create your own OAuth app at gitlab.com)
 GITLAB_CLIENT_ID=
 GITLAB_CLIENT_SECRET=
 
-# PostGreSQL Connection
-PGSQL_USER=postgres
-PGSQL_PASSWORD=vibi@test-pg
-PGSQL_HOST=127.0.0.1
-PGSQL_PORT=5432
-PGSQL_DATABASE=test-db
+# PostgreSQL Connection — Supabase test database
+# Contact a maintainer for the connection string, or use your own Supabase project.
+PGSQL_USER=
+PGSQL_PASSWORD=
+PGSQL_HOST=aws-0-ap-south-1.pooler.supabase.com
+PGSQL_PORT=6543
+PGSQL_DATABASE=postgres
 ```
 
-(TODO: Add steps for downloading the `cloud-sql-proxy` script)
+> **Note:** The database is hosted on Supabase. You will need the credentials from a maintainer to connect to the shared test database, or you can [create a free Supabase project](https://supabase.com) and run the schema migrations yourself.
 
-Now run the following command is a different terminal:
+The GitHub Client ID and Secret above are for the "Vibinex Test" OAuth App, which has `http://localhost:3000/api/auth/callback/github` registered as a callback URL — so GitHub login will work out of the box locally.
 
-```bash
-./cloud-sql-proxy --port 5432 vibi-test-394606:asia-south1:test-db --gcloud-auth
-```
-
-This will enable you to connect with our test database hosted on your localhost.
-
-The environment file also contains client ID and client secret for the Vibinex-Test OAuth App so that you can use the entire website locally
-by logging in using GitHub.
-You can create your own Bitbucket or GitLab OAuth consumers and add your client-id and client-secrets in the `.env.local` file to test them out.
+You can create your own Bitbucket or GitLab OAuth consumers and add your client-id and client-secrets in the `.env.local` file to test those providers.
 
 ### Running Unit Tests
 
