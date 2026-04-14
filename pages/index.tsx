@@ -13,6 +13,27 @@ import { getAuthUserId, getAuthUserName, getAuthUserEmail } from '../utils/auth'
 import Customers from '../views/CustomerLogos'
 import Testimonials from '../views/Testimonials'
 import JoinDiscord from '../views/JoinDiscord'
+import RotatingQuotes from '../views/RotatingQuotes'
+
+const quotes = [
+	{
+		text: "You are preparing the antidote to vibe coding",
+		author: "Vikas Kumar",
+		title: "Founder, DataviCloud",
+	},
+	{
+		text: "AI adoption for coding boosts perceived productivity but reduces delivery throughput",
+		author: "DORA Research @ Google",
+		title: "October 2024: Accelerate State of DevOps"
+	},
+	{
+		text: "AI agents will bullshit you if you can't call them out",
+		author: "Jared Freidman",
+		title: "Managing Partner, Y Combinator",
+		subtitle: "In the video titled 'Vibe Coding Is The Future'"
+	}
+	// Add more quotes here as needed
+];
 
 export default function Home() {
 	const session: Session | null = useSession().data;
@@ -32,8 +53,9 @@ export default function Home() {
 		<div className='overflow-hidden'>
 			<Navbar transparent={true} />
 			<Hero ctaLink={'/docs/setup/providerLogin'} />
-			<Customers />
+			<RotatingQuotes quotes={quotes} className='!hidden md:!flex' />
 			<Features />
+			<Customers />
 			<WhyUs />
 			<TrustUs />
 			<Testimonials />
