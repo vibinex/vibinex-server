@@ -30,6 +30,8 @@ const RotatingQuotes: React.FC<RotatingQuotesProps> = ({
 		return () => clearInterval(timer);
 	}, [quotes.length, interval]);
 
+	if (quotes.length === 0) return null;
+
 	return (
 		<div className={`w-full bg-primary min-h-60 flex items-center justify-center ${className}`}>
 			<div className="max-w-4xl mx-auto px-4">
