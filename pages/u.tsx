@@ -54,7 +54,7 @@ const Profile: NextPage<ProfileProps> = ({ sessionObj: session }) => {
 export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({ req, res }) => {
 	res.setHeader(
 		'Cache-Control',
-		'public, s-maxage=1, stale-while-revalidate=10'
+		'private, no-store, no-cache, must-revalidate'
 	)
 	// check if user is logged in
 	const session = await getServerSession(req, res, authOptions);

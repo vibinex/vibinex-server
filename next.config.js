@@ -73,7 +73,26 @@ const nextConfig = {
 	async headers() {
 		return [
 			{
-				// Apply these headers to all static assets
+				// Auth API routes: full CORS + never cache (sessions must always be fresh)
+				// Access-Control-Allow-Origin must be explicit (not *) when credentials are true
+				source: "/api/auth/:path*",
+				headers: [
+					{ key: "Access-Control-Allow-Origin", value: "https://vibinex.com" },
+					{ key: "Access-Control-Allow-Credentials", value: "true" },
+					{
+						key: "Access-Control-Allow-Methods",
+						value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+					},
+					{
+						key: "Access-Control-Allow-Headers",
+						value:
+							"X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization",
+					},
+					{ key: "Cache-Control", value: "private, no-store, no-cache, must-revalidate" },
+				],
+			},
+			{
+				// Other API routes: CORS headers + no cache (API responses are user-specific)
 				source: "/api/:path*",
 				headers: [
 					{ key: "Access-Control-Allow-Credentials", value: "true" },
@@ -86,14 +105,25 @@ const nextConfig = {
 						value:
 							"X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization",
 					},
+					{ key: "Cache-Control", value: "private, no-store, no-cache, must-revalidate" },
 				],
-			}, {
-				source: "/(.*)",
+			},
+			{
+				// Auth-gated pages: never cache (login state must be checked fresh every request)
+				source: "/u",
+				headers: [
+					{ key: "Cache-Control", value: "private, no-store, no-cache, must-revalidate" },
+				],
+			},
+			{
+				// Public pages and static assets: cache aggressively at CDN
+				// Use explicit exclusions rather than negative lookahead on single chars
+				// to avoid accidentally excluding future routes like /users, /updates, etc.
+				source: "/((?!api/)(?!u$).*)",
 				headers: [{
 					key: "Cache-Control",
-					value: "max-age=86400, s-maxage=86400, stale-while-revalidate",
-				},
-				],
+					value: "public, max-age=86400, s-maxage=86400, stale-while-revalidate",
+				}],
 			},
 		];
 	},
