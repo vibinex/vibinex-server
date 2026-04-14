@@ -42,14 +42,14 @@ const RotatingQuotes: React.FC<RotatingQuotesProps> = ({
 						transition={{ duration: 0.5 }}
 						className="text-center"
 					>
-						<blockquote className="text-2xl md:text-3xl font-medium text-gray-900 mb-6">
-							"{quotes[currentIndex].text}"
+						<blockquote className="text-2xl md:text-3xl font-medium text-foreground mb-6">
+							&ldquo;{quotes[currentIndex].text}&rdquo;
 						</blockquote>
-						<div className="text-lg text-gray-700">
+						<div className="text-lg text-foreground">
 							<p className="font-semibold">{quotes[currentIndex].author}</p>
-							<p className="text-gray-600">{quotes[currentIndex].title}</p>
+							<p className="text-muted-foreground">{quotes[currentIndex].title}</p>
 							{quotes[currentIndex].subtitle && (
-								<p className="text-gray-500 text-sm mt-1">{quotes[currentIndex].subtitle}</p>
+								<p className="text-muted-foreground text-sm mt-1">{quotes[currentIndex].subtitle}</p>
 							)}
 						</div>
 					</motion.div>
