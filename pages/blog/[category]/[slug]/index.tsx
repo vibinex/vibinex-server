@@ -45,18 +45,30 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 const PostRoute: NextPage = () => {
 	const [articleInfo, setArticleInfo] = useState<Article>();
+	const [viewCount, setViewCount] = useState<number | null>(null);
 	const router = useRouter();
 	const { rudderEventMethods } = useContext(RudderContext);
+
 	useEffect(() => {
-		// TODO: check that router.query.slug is a string
 		const slug = router.query.slug as string;
+		if (!slug) return;
+
 		getPostBySlug(slug).then((data) => {
-			setArticleInfo(data.data[0]);
+			const article = data.data[0];
+			setArticleInfo(article);
+
+			// Increment view count via the Strapi custom endpoint
+			const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
+			fetch(`${apiUrl}/api/articles/${article.id}/view`, { method: 'POST' })
+				.then(r => r.json())
+				.then(d => { if (d.viewCount !== undefined) setViewCount(d.viewCount); })
+				.catch(err => console.error('[PostRoute] Failed to increment view count', err));
 		}).catch((error) => { console.error(
 			`[PostRoute] Unable to get post by slug ${slug}`, error);});
+
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
 		rudderEventMethods?.track("absent", "page-visit",
-			{ type: "blog-article-page", category: router.query.category as string, slug: slug}, anonymousId);
+			{ type: "blog-article-page", category: router.query.category as string, slug }, anonymousId);
 	}, [rudderEventMethods, router]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
@@ -65,7 +77,7 @@ const PostRoute: NextPage = () => {
 			<Navbar transparent={true} />
 			<div className='flex justify-center'>
 				<div className='mx-auto max-w-3xl px-6 lg:px-0'>
-					<Post article={articleInfo.attributes} />
+					<Post article={articleInfo.attributes} viewCount={viewCount} />
 				</div>
 			</div>
 			<Footer />
