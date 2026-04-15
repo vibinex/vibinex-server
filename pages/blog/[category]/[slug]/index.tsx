@@ -5,6 +5,7 @@ import Post, { Article } from '../../../../components/blog/Post';
 import Footer from '../../../../components/Footer';
 import RudderContext from '../../../../components/RudderContext';
 import { fetchAPI } from '../../../../utils/blog/fetch-api';
+import { getStrapiURL } from '../../../../utils/blog/api-helpers';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../../../utils/rudderstack_initialize';
 import Navbar from '../../../../views/Navbar';
 
@@ -45,19 +46,39 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 const PostRoute: NextPage = () => {
 	const [articleInfo, setArticleInfo] = useState<Article>();
+	const [viewCount, setViewCount] = useState<number | null>(null);
 	const router = useRouter();
 	const { rudderEventMethods } = useContext(RudderContext);
+
+	// Increment view count separately — keyed only to the slug so it fires exactly once per page load
 	useEffect(() => {
-		// TODO: check that router.query.slug is a string
 		const slug = router.query.slug as string;
+		if (!slug) return;
+
 		getPostBySlug(slug).then((data) => {
-			setArticleInfo(data.data[0]);
+			const article = data.data[0];
+			setArticleInfo(article);
+
+			// Increment view count — no auth header needed, endpoint is public
+			const viewUrl = getStrapiURL(`/api/articles/${article.id}/view`);
+			if (!viewUrl) return;
+			fetch(viewUrl, { method: 'POST' })
+				.then(r => r.json())
+				.then(d => { if (d.viewCount !== undefined) setViewCount(d.viewCount); })
+				.catch(err => console.error('[PostRoute] Failed to increment view count', err));
 		}).catch((error) => { console.error(
 			`[PostRoute] Unable to get post by slug ${slug}`, error);});
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [router.query.slug]);
+
+	// Track page visit separately — keyed to rudderEventMethods becoming available
+	useEffect(() => {
+		const slug = router.query.slug as string;
+		if (!slug || !rudderEventMethods) return;
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
-		rudderEventMethods?.track("absent", "page-visit",
-			{ type: "blog-article-page", category: router.query.category as string, slug: slug}, anonymousId);
-	}, [rudderEventMethods, router]);
+		rudderEventMethods.track("absent", "page-visit",
+			{ type: "blog-article-page", category: router.query.category as string, slug }, anonymousId);
+	}, [rudderEventMethods, router.query.slug, router.query.category]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
 	return (
@@ -65,7 +86,7 @@ const PostRoute: NextPage = () => {
 			<Navbar transparent={true} />
 			<div className='flex justify-center'>
 				<div className='mx-auto max-w-3xl px-6 lg:px-0'>
-					<Post article={articleInfo.attributes} />
+					<Post article={articleInfo.attributes} viewCount={viewCount} />
 				</div>
 			</div>
 			<Footer />
