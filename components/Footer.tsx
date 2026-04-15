@@ -12,6 +12,7 @@ const legal = [
 const quickLinks = [
 	{ name: "Documentation", link: '/docs' },
 	{ name: "Blog", link: '/blog' },
+	{ name: "About Us", link: '/about-us' },
 	{ name: "Contribute", link: 'https://github.com/vibinex' },
 	{ name: "Pricing", link: '/pricing' },
 ]

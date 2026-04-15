@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -222,4 +223,21 @@
 
 .react-slideshow-container [aria-label="Next Slide"] {
 	margin-right: 1rem;
+}
+/* About Us page — glow effect for principles icons */
+.glow-effect {
+	position: relative;
+}
+
+.glow-effect::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 110%;
+	height: 46%;
+	transform: translate(-50%, -50%);
+	background: rgba(229, 229, 230, 0.6);
+	filter: blur(74px);
+	border-radius: 50%;
 }
