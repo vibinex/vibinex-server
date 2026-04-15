@@ -5,6 +5,7 @@ import Post, { Article } from '../../../../components/blog/Post';
 import Footer from '../../../../components/Footer';
 import RudderContext from '../../../../components/RudderContext';
 import { fetchAPI } from '../../../../utils/blog/fetch-api';
+import { getStrapiURL } from '../../../../utils/blog/api-helpers';
 import { getAndSetAnonymousIdFromLocalStorage } from '../../../../utils/rudderstack_initialize';
 import Navbar from '../../../../views/Navbar';
 
@@ -49,6 +50,7 @@ const PostRoute: NextPage = () => {
 	const router = useRouter();
 	const { rudderEventMethods } = useContext(RudderContext);
 
+	// Increment view count separately — keyed only to the slug so it fires exactly once per page load
 	useEffect(() => {
 		const slug = router.query.slug as string;
 		if (!slug) return;
@@ -57,19 +59,26 @@ const PostRoute: NextPage = () => {
 			const article = data.data[0];
 			setArticleInfo(article);
 
-			// Increment view count via the Strapi custom endpoint
-			const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
-			fetch(`${apiUrl}/api/articles/${article.id}/view`, { method: 'POST' })
+			// Increment view count — no auth header needed, endpoint is public
+			const viewUrl = getStrapiURL(`/api/articles/${article.id}/view`);
+			if (!viewUrl) return;
+			fetch(viewUrl, { method: 'POST' })
 				.then(r => r.json())
 				.then(d => { if (d.viewCount !== undefined) setViewCount(d.viewCount); })
 				.catch(err => console.error('[PostRoute] Failed to increment view count', err));
 		}).catch((error) => { console.error(
 			`[PostRoute] Unable to get post by slug ${slug}`, error);});
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [router.query.slug]);
 
+	// Track page visit separately — keyed to rudderEventMethods becoming available
+	useEffect(() => {
+		const slug = router.query.slug as string;
+		if (!slug || !rudderEventMethods) return;
 		const anonymousId = getAndSetAnonymousIdFromLocalStorage();
-		rudderEventMethods?.track("absent", "page-visit",
+		rudderEventMethods.track("absent", "page-visit",
 			{ type: "blog-article-page", category: router.query.category as string, slug }, anonymousId);
-	}, [rudderEventMethods, router]);
+	}, [rudderEventMethods, router.query.slug, router.query.category]);
 
 	if (!articleInfo) return <h2>Post not found</h2>;
 	return (

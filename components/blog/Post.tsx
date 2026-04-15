@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { useState } from 'react';
-import { getStrapiMedia, formatDate } from '../../utils/blog/api-helpers';
+import { getStrapiMedia, getStrapiURL, formatDate } from '../../utils/blog/api-helpers';
 import { postRenderer } from '../../utils/blog/post-rendered';
 
 export interface Article {
@@ -44,14 +44,12 @@ const SubscribeForm: React.FC = () => {
 		if (!email) return;
 		setStatus('loading');
 		try {
-			const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
-			const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
-			const res = await fetch(`${apiUrl}/api/lead-form-submissions`, {
+			// lead-form-submission has public create permission — no auth header needed
+			const url = getStrapiURL('/api/lead-form-submissions');
+			if (!url) throw new Error('Strapi URL not configured');
+			const res = await fetch(url, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${token}`,
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ data: { email } }),
 			});
 			if (res.ok) {
