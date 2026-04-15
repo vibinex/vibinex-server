@@ -6,7 +6,7 @@ const teamMembers = [
 	{
 		name: "Avikalp Gupta",
 		role: "CEO",
-		image: "https://avatars.githubusercontent.com/u/7858932?v=4",
+		image: "/team/avikalp-gupta.jpg",
 		github: "https://github.com/avikalpg",
 		linkedIn: "https://www.linkedin.com/in/avikalp-gupta",
 		highlights: [
@@ -18,7 +18,7 @@ const teamMembers = [
 	{
 		name: "Tapish Rathore",
 		role: "CTO",
-		image: "https://avatars.githubusercontent.com/u/29672720?v=4",
+		image: "/team/tapish-rathore.jpg",
 		github: "https://github.com/tapishr",
 		linkedIn: "https://www.linkedin.com/in/tapishr",
 		highlights: [
