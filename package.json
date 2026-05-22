@@ -40,7 +40,7 @@
 		"@types/qs": "^6.9.15",
 		"@types/react": "18.0.26",
 		"@types/react-dom": "18.0.9",
-		"axios": "^1.2.2",
+		"axios": "^1.16.1",
 		"class-variance-authority": "^0.7.0",
 		"classnames": "^2.5.1",
 		"embla-carousel-auto-scroll": "^8.0.0",
