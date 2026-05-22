@@ -23,6 +23,8 @@ module.exports = {
           '/settings',
           '/repo',
           '/u',
+          '/chartDemo',
+          '/demo',
         ],
       },
     ],
