@@ -8,9 +8,7 @@ import LoadingOverlay from "../../../components/LoadingOverlay";
 import { RenderMarkdown } from "../../../components/RenderMarkdown";
 import RudderContext from "../../../components/RudderContext";
 import { useToast } from "../../../components/Toast/use-toast";
-import BuildInstruction from "../../../components/setup/BuildInstruction";
 import DockerInstructions from "../../../components/setup/DockerInstructions";
-import InstructionsToGeneratePersonalAccessToken from "../../../components/setup/InstructionsToGeneratePersonalAccessToken";
 import { getAuthUserId, getAuthUserName } from "../../../utils/auth";
 import { RepoProvider } from "../../../utils/providerAPI";
 import { getAndSetAnonymousIdFromLocalStorage } from "../../../utils/rudderstack_initialize";
@@ -69,10 +67,6 @@ Run our docker image locally or in your own cloud infrastructure. It will clone 
 ### Instructions to Setup DPU:
     `;
 
-    const cloudBuildExplainedMD = `## Host on Vibinex
-Too much hassle? Host DPU on Vibinex Cloud. The docker runs on Vibinex's infrastructure.
-We recommend this option for public repositories, it is the fastest way to set up.`;
-
     return (
         <div>
             <MainAppBar />
@@ -83,17 +77,7 @@ We recommend this option for public repositories, it is the fastest way to set u
                 <div className='sm:w-2/3 mx-auto mt-8 px-2 py-2 relative'>
                     <RenderMarkdown markdownText={hostingExplainedMD} />
                     <DockerInstructions selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} installId={installId as string} />
-                    {provider && provider === 'github' ?
-                        <div className='pb-16'>
-                            {installation && installation === 'pat' &&
-                                <InstructionsToGeneratePersonalAccessToken
-                                    selectedProvider={provider as RepoProvider}
-                                    selectedInstallationType={installation as string} />}
-                            <RenderMarkdown markdownText={cloudBuildExplainedMD} />
-                            <BuildInstruction selectedProvider={provider as RepoProvider} selectedInstallationType={installation as string} session={session} />
-                        </div>
-                        :
-                        <div className='pb-16'> </div>}
+                    <div className='pb-16'> </div>
                     <div className="flex mb-2 mr-2">
                         <Button onClick={() => window.history.back()} variant="outlined" className="px-4 py-2 flex-1 sm:flex-grow-0">
                             &laquo; Previous

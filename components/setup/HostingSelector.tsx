@@ -8,7 +8,6 @@ interface HostingSelectorProps {
 
 const HostingSelector: React.FC<HostingSelectorProps> = ({ selectedHosting, setSelectedHosting }) => {
     const hostingOptions = [
-        { value: 'cloud', label: 'Vibinex Cloud' },
         { value: 'selfhosting', label: 'Self-hosting' },
     ];
 

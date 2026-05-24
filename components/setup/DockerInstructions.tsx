@@ -13,19 +13,24 @@ interface DockerInstructionsProps {
 }
 
 const DockerInstructions: React.FC<DockerInstructionsProps> = ({ selectedInstallationType, selectedProvider, installId }) => {
+	const dpuImage = 'ghcr.io/vibinex/dpu:latest';
+	const serverUrl = typeof window === 'undefined' ? '<Vibinex server URL>' : window.location.origin;
 	const selfHostingCode = `
 docker run \\
 -v ~/.config/vibinex:/app/config \\
+-e DPU_QUEUE_TRANSPORT=http \\
 -e INSTALL_ID=${installId} \\
+-e SERVER_URL=${serverUrl} \\
+-e DPU_AUTH_TOKEN=<Your Vibinex DPU auth token> \\
 ${selectedProvider === 'github' && selectedInstallationType === 'pat' ? `-e PROVIDER=github \\
 -e GITHUB_PAT=<Your gh cli token> \\
-` : ''}asia.gcr.io/vibi-prod/dpu/dpu
+` : ''}${dpuImage}
   `;
 
 	const instructions = [
 		{
 			markdown: `1. **Pull the Vibinex DPU image**`,
-			command: `docker pull asia.gcr.io/vibi-prod/dpu/dpu`,
+			command: `docker pull ${dpuImage}`,
 		},
 		{
 			markdown: `2. **Create a config directory. This helps us restart the image from previous state in case of any issues**`,
