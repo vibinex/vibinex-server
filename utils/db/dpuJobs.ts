@@ -41,7 +41,13 @@ let schemaReady: Promise<void> | null = null;
 
 export async function ensureDpuJobsTable(): Promise<void> {
 	if (!schemaReady) {
-		schemaReady = conn.query(DPU_JOBS_SCHEMA_SQL).then(() => undefined);
+		schemaReady = conn.query(DPU_JOBS_SCHEMA_SQL).then(
+			() => undefined,
+			(err) => {
+				schemaReady = null;
+				throw err;
+			}
+		);
 	}
 	return schemaReady;
 }
@@ -97,7 +103,7 @@ export async function claimDpuJobs(
 		console.error('[claimDpuJobs] Failed to claim DPU jobs', { pg_query: query, installationId, limit, leaseSeconds }, err);
 		throw err;
 	});
-	return result.rows;
+	return result.rows.map(row => ({ ...row, id: row.id.toString() }));
 }
 
 export async function ackDpuJob(jobId: string, installationId: string): Promise<boolean> {

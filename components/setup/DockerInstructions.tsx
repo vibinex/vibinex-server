@@ -18,7 +18,7 @@ const DockerInstructions: React.FC<DockerInstructionsProps> = ({ selectedInstall
 	const selfHostingCode = `
 docker run \\
 -v ~/.config/vibinex:/app/config \\
--e DPU_QUEUE_TRANSPORT=http \\
+-e DPU_QUEUE_TRANSPORT=postgres \\
 -e INSTALL_ID=${installId} \\
 -e SERVER_URL=${serverUrl} \\
 -e DPU_AUTH_TOKEN=<Your Vibinex DPU auth token> \\
