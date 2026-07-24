@@ -18,7 +18,7 @@ import DocsSideBar from '../../../views/docs/DocsSideBar';
 const ProviderAppInstall = ({ bitbucket_auth_url }: { bitbucket_auth_url: string }) => {
     const router = useRouter();
     const { provider, installation, ...restQueryParams } = router.query;
-    const hosting = "cloud";
+    const hosting = "selfhosting";
     const [session, setSession] = useState<Session | null>(null);
     const [theme, setTheme] = useState<Theme>('light');
     const [loading, setLoading] = useState(true);
