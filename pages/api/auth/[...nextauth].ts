@@ -265,7 +265,6 @@ const sendSignupEmail = (userEmail: string, userName: string) => {
 </body>
 </html>
 	`;
-	console.debug(`[sendSignupEmail] SENDGRID_API_KEY = ${process.env.SENDGRID_API_KEY}`);
 	console.debug(`[sendSignupEmail] user email = ${userEmail}`);
 	const msg = {
 		to: userEmail, // recipient's email address
