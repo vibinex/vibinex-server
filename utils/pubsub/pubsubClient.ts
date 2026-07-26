@@ -7,7 +7,7 @@ const pubsub = new PubSub({ projectId: process.env.PROJECT_ID });
 
 
 export async function publishMessage(topicName: string, data: PubSubMessage, msgType: string): Promise<string> {
-	if (process.env.DPU_QUEUE_TRANSPORT === 'http') {
+	if (process.env.DPU_QUEUE_TRANSPORT === 'http' || process.env.DPU_QUEUE_TRANSPORT === 'postgres') {
 		return enqueueDpuJob(topicName, msgType, data);
 	}
 	const topic = pubsub.topic(topicName);
@@ -22,7 +22,7 @@ export async function publishMessage(topicName: string, data: PubSubMessage, msg
 }
 
 export async function createTopicNameInGcloud(topicName: string) {  
-	if (process.env.DPU_QUEUE_TRANSPORT === 'http') {
+	if (process.env.DPU_QUEUE_TRANSPORT === 'http' || process.env.DPU_QUEUE_TRANSPORT === 'postgres') {
 		return topicName;
 	}
 	try {
