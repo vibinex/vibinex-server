@@ -274,14 +274,14 @@ const sendSignupEmail = (userEmail: string, userName: string) => {
 	};
 	// Send email
 	if (!process.env.SENDGRID_API_KEY) {
-		console.error("[sendSignupEmail] SENDGRID_API_KEY env var not set, unable to send signup email");
+		console.error(`[sendSignupEmail] SENDGRID_API_KEY env var not set, unable to send signup email to ${userEmail}`);
 		return;
 	}
 	sGrid.setApiKey(process.env.SENDGRID_API_KEY as string);
 	sGrid.send(msg).then((res) => {
-		console.debug(`[sendSignupEmail] Email sent successfully! res = ${JSON.stringify(res)}`);
+		console.debug(`[sendSignupEmail] Email sent successfully to ${userEmail}! res = ${JSON.stringify(res)}`);
 	}).catch((err) => {
-		console.error("[sendSignupEmail] Error sending email:", err);
+		console.error(`[sendSignupEmail] Error sending email to ${userEmail}:`, err);
 	});
 }
 
