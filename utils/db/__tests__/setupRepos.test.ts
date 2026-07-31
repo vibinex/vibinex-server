@@ -16,8 +16,9 @@ describe('removePreviousSelections', () => {
 		await removePreviousSelections('topic-test', 'github');
 
 		expect(queryMock).toHaveBeenCalledTimes(1);
-		const query = queryMock.mock.calls[0][0] as string;
-		expect(query).toContain("SET user_selected = array_remove(user_selected, 'topic-test')");
-		expect(query).not.toContain('array_remove(install_id');
+		const [query, values] = queryMock.mock.calls[0] as [string, string[]];
+		expect(query).toContain('SET user_selected = array_remove(user_selected, $1)');
+		expect(query).toContain('WHERE $1 = ANY (user_selected) AND repo_provider = $2;');
+		expect(values).toEqual(['topic-test', 'github']);
 	});
 });

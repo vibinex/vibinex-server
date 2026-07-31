@@ -89,25 +89,25 @@ export const saveSelectedReposInDb = async (args: SetupReposArgs, userId: string
 
 export const removePreviousInstallations = async (install_id: string, provider: string) => {
 	const query = `UPDATE repos
-	SET install_id = array_remove(install_id, '${install_id}')
-	WHERE '${install_id}' = ANY (install_id) AND repo_provider = '${provider}';
+	SET install_id = array_remove(install_id, $1)
+	WHERE $1 = ANY (install_id) AND repo_provider = $2;
 	`;
-	await conn.query(query).catch(err => {
+	await conn.query(query, [install_id, provider]).catch(err => {
 		console.error(`[removePreviousInstallations] Could not remove previous repos for ${install_id}`);
 		throw new Error('Failed to remove previous repos');
 	});
 	console.debug(`[removePreviousInstallations] Previous installations removed for ${install_id}`);
 }
 
-export const removePreviousSelections = async (install_id: string, provider: string) => {
+export const removePreviousSelections = async (topicId: string, provider: string) => {
 	const query = `UPDATE repos
-	SET user_selected = array_remove(user_selected, '${install_id}')
-	WHERE '${install_id}' = ANY (user_selected) AND repo_provider = '${provider}';
+	SET user_selected = array_remove(user_selected, $1)
+	WHERE $1 = ANY (user_selected) AND repo_provider = $2;
 	`;
-	await conn.query(query).catch(err => {
+	await conn.query(query, [topicId, provider]).catch(err => {
 		console.error(
-			`[removePreviousSelections] Could not remove previous repo selections for ${install_id}`);
+			`[removePreviousSelections] Could not remove previous repo selections for ${topicId}`);
 		throw new Error('Failed to remove previous repos');
 	});
-	console.debug(`[removePreviousSelections] Previous selections removed for ${install_id}`);
+	console.debug(`[removePreviousSelections] Previous selections removed for ${topicId}`);
 }
