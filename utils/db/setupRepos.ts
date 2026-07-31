@@ -101,7 +101,7 @@ export const removePreviousInstallations = async (install_id: string, provider: 
 
 export const removePreviousSelections = async (install_id: string, provider: string) => {
 	const query = `UPDATE repos
-	SET user_selected = array_remove(install_id, '${install_id}')
+	SET user_selected = array_remove(user_selected, '${install_id}')
 	WHERE '${install_id}' = ANY (user_selected) AND repo_provider = '${provider}';
 	`;
 	await conn.query(query).catch(err => {
