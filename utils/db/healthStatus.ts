@@ -43,6 +43,7 @@ export const classifyHealthStatus = (
 	if (!healthStatus || !updatedAt) return "never-seen";
 	const timestamp = new Date(updatedAt);
 	if (Number.isNaN(timestamp.getTime())) return "error";
+	if (healthStatus !== "SUCCESS") return "error";
 	if (now.getTime() - timestamp.getTime() > staleAfterMs) return "stale";
-	return healthStatus === "SUCCESS" ? "healthy" : "error";
+	return "healthy";
 };

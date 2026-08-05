@@ -60,6 +60,18 @@ describe("DPU health handler", () => {
 		}));
 	});
 
+	it("rejects non-ISO client timestamps", async () => {
+		const res = makeResponse();
+		await healthHandler(makeRequest({ body: {
+			status: "SUCCESS",
+			timestamp: new Date().toUTCString(),
+			topic: "topic-installation-1",
+		} }), res);
+		expect(res.status).toHaveBeenCalledWith(400);
+		expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: "INVALID_REQUEST" }));
+		expect(mockedSave).not.toHaveBeenCalled();
+	});
+
 	it.each([
 		[new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString()],
 		[new Date(Date.now() + 6 * 60 * 1000).toISOString()],

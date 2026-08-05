@@ -10,4 +10,8 @@ describe("classifyHealthStatus", () => {
 		expect(classifyHealthStatus("FAILED", "2026-08-05T04:29:00.000Z", now)).toBe("error");
 		expect(classifyHealthStatus("SUCCESS", "invalid", now)).toBe("error");
 	});
+
+	it("classifies an old failed heartbeat as an error", () => {
+		expect(classifyHealthStatus("FAILED", "2026-08-05T04:20:00.000Z", now)).toBe("error");
+	});
 });

@@ -5,6 +5,7 @@ import { validateDpuAuth } from "../../../utils/dpuAuth";
 
 const HEALTH_STATUSES = new Set(["START", "FAILED", "SUCCESS", "INACTIVE"]);
 const TOPIC_PATTERN = /^[A-Za-z0-9._:-]{1,200}$/;
+const ISO_8601_TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 const MAX_HEARTBEAT_AGE_MS = 24 * 60 * 60 * 1000;
 const MAX_FUTURE_SKEW_MS = 5 * 60 * 1000;
 
@@ -51,7 +52,7 @@ const healthHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 			topic: "Must be 1-200 URL-safe identity characters",
 		});
 	}
-	if (typeof timestamp !== "string") {
+	if (typeof timestamp !== "string" || !ISO_8601_TIMESTAMP_PATTERN.test(timestamp)) {
 		return sendError(res, 400, "INVALID_REQUEST", "Invalid heartbeat payload", requestId, {
 			timestamp: "Must be an ISO-8601 string",
 		});
