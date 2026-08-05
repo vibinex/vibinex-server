@@ -8,33 +8,32 @@ interface DpuHealthStates {
 }
 
 const dpuHealthStates: DpuHealthStates = {
-    START: 'yellow',
-    FAILED: 'red',
-    SUCCESS: 'green',
-    INACTIVE: 'grey',
+    healthy: 'green',
+    stale: 'yellow',
+    'never-seen': 'grey',
+    error: 'red',
 };
 
 interface DpuHealthChipWithRefreshProps {
     userId: string;
 }
 const DpuHealthChipWithRefresh: React.FC<DpuHealthChipWithRefreshProps> = ({ userId }) => {
-    const [healthStatus, setHealthStatus] = useState<keyof typeof dpuHealthStates>('INACTIVE');
+    const [healthStatus, setHealthStatus] = useState<keyof typeof dpuHealthStates>('never-seen');
     const [isLoading, setIsLoading] = useState(false);
 
     const fetchDpuHealth = async () => {
         setIsLoading(true);
         try {
             const response = await axios.post('/api/docs/getDpuHealth', { user_id: userId });
-            const { healthStatus, healthTs } = response.data;
-            console.log(`[DpuHealthChipWithRefresh] healthStatus: ${healthStatus}, response.data = ${JSON.stringify(response.data)}`)
-            if (dpuHealthStates[healthStatus]) {
-                setHealthStatus(healthStatus);
+            const { healthState } = response.data;
+            if (dpuHealthStates[healthState]) {
+                setHealthStatus(healthState);
             } else {
-                setHealthStatus('INACTIVE');
+                setHealthStatus('error');
             }
         } catch (error) {
             console.error('Error fetching DPU health status:', error);
-            setHealthStatus('INACTIVE');
+            setHealthStatus('error');
         } finally {
             setIsLoading(false);
         }

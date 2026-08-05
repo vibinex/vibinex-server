@@ -6,11 +6,13 @@ function safeCompare(a: string, b: string): boolean {
 	return timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
-export function validateDpuAuth(req: NextApiRequest, res: NextApiResponse): boolean {
+export function validateDpuAuth(req: NextApiRequest, res: NextApiResponse, requestId?: string): boolean {
 	const configuredToken = process.env.DPU_AUTH_TOKEN;
 	if (!configuredToken) {
 		console.error('[validateDpuAuth] DPU_AUTH_TOKEN is not configured');
-		res.status(500).json({ error: 'DPU auth is not configured' });
+		res.status(500).json(requestId
+			? { code: 'DPU_AUTH_NOT_CONFIGURED', message: 'DPU auth is not configured', requestId }
+			: { error: 'DPU auth is not configured' });
 		return false;
 	}
 	const authHeader = req.headers.authorization;
@@ -18,7 +20,9 @@ export function validateDpuAuth(req: NextApiRequest, res: NextApiResponse): bool
 	const headerToken = req.headers['x-dpu-auth-token'];
 	const providedToken = bearerToken ?? (Array.isArray(headerToken) ? headerToken[0] : headerToken);
 	if (!providedToken || !safeCompare(providedToken, configuredToken)) {
-		res.status(401).json({ error: 'Unauthorized' });
+		res.status(401).json(requestId
+			? { code: 'UNAUTHORIZED', message: 'Unauthorized', requestId }
+			: { error: 'Unauthorized' });
 		return false;
 	}
 	return true;
