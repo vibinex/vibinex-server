@@ -77,8 +77,7 @@ const ChipInput: React.FC<ChipInputProps> = ({
 	};
 
 	return (
-		<button
-			type="button"
+		<div
 			className={`flex items-center gap-0 border border-border rounded-md p-2 bg-input focus-within:outline focus-within:outline-2 focus-within:outline-secondary ${className}`}
 			onClick={handleInputFocus}
 		>
@@ -101,7 +100,7 @@ const ChipInput: React.FC<ChipInputProps> = ({
 				disabled={disabled}
 				className="outline-none flex-grow border-none focus:ring-0 px-1 bg-input"
 			/>
-		</button>
+		</div>
 	);
 };
 
