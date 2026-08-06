@@ -11,9 +11,17 @@ import Chip from './Chip';
 import ChipInput, { ChipData } from './ChipInput';
 import { getProviderLogoSrc } from './ProviderLogo';
 
+export const withPendingHandle = (handles: string[], pendingHandle: string | undefined): string[] => {
+	const normalizedHandle = pendingHandle?.trim();
+	const filteredHandles = handles.filter(handle => handle !== '');
+	if (!normalizedHandle || filteredHandles.includes(normalizedHandle)) return filteredHandles;
+	return [...filteredHandles, normalizedHandle];
+};
+
 const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasMap, setProviderMap: (providerMap: AliasMap) => void }) => {
 	const [editMode, setEditMode] = useState(false);
 	const [inputHandleMap, setInputHandleMap] = useState<HandleMap[]>(providerMap.handleMaps);
+	const [pendingHandles, setPendingHandles] = useState<Partial<Record<RepoProvider, string>>>({});
 	const [loading, setLoading] = useState<boolean>(false);
 	const [errorMsg, setErrorMsg] = useState<string>("");
 	const currentTheme = getPreferredTheme();
@@ -27,7 +35,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 				alias: providerMap.alias,
 				handleMaps: inputHandleMap.map(handleMap => ({
 					provider: handleMap.provider,
-					handles: handleMap.handles.filter(handle => handle !== '') // Remove empty handles,
+					handles: withPendingHandle(handleMap.handles, pendingHandles[handleMap.provider]),
 				}))
 			}
 
@@ -41,6 +49,8 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 			}
 			// success
 			setProviderMap(updatedAliasMap);
+			setInputHandleMap(updatedAliasMap.handleMaps);
+			setPendingHandles({});
 			setEditMode(false);
 		} catch (error) {
 			console.error("Error saving Git aliases:", error);
@@ -51,6 +61,8 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 	};
 
 	const abort = () => {
+		setInputHandleMap(providerMap.handleMaps);
+		setPendingHandles({});
 		setEditMode(false);
 		setErrorMsg("");
 	};
@@ -70,6 +82,10 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 			return { ...handleInputValue, handles: [...handleInputValue.handles, chipData.text] };
 		});
 		setInputHandleMap(updatedHandleInputValues);
+	};
+
+	const handlePendingValueChange = (provider: RepoProvider) => (value: string) => {
+		setPendingHandles(previous => ({ ...previous, [provider]: value }));
 	};
 
 	const handleRemove = (provider: RepoProvider) => (chipData: ChipData) => {
@@ -107,6 +123,7 @@ const GitAliasListItem = ({ providerMap, setProviderMap }: { providerMap: AliasM
 								))}
 								placeholder={`${handleMap.provider} handles`}
 								getAvatarFromValue={(_) => getProviderLogoSrc(handleMap.provider, currentTheme)}
+								onPendingValueChange={handlePendingValueChange(handleMap.provider)}
 								disabled={loading}
 							/>
 							<label htmlFor={`${handleMap.provider}-handles`} className="absolute -top-2 left-2 text-xs px-1 bg-gradient-to-t from-input to-background">

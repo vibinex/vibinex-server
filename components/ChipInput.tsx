@@ -16,6 +16,7 @@ interface ChipInputProps {
 	placeholder?: string;
 	disabled?: boolean;
 	getAvatarFromValue?: (value: string) => string;
+	onPendingValueChange?: (value: string) => void;
 	className?: string;
 }
 
@@ -30,14 +31,20 @@ const ChipInput: React.FC<ChipInputProps> = ({
 	placeholder = '',
 	disabled = false,
 	getAvatarFromValue = defaultGetAvatarFromValue,
+	onPendingValueChange,
 	className = '',
 }) => {
 	const [values, setValues] = useState<ChipData[]>(defaultValues);
 	const [inputValue, setInputValue] = useState('');
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	const updateInputValue = (value: string) => {
+		setInputValue(value);
+		onPendingValueChange?.(value);
+	};
+
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setInputValue(event.target.value);
+		updateInputValue(event.target.value);
 	};
 
 	const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -49,7 +56,7 @@ const ChipInput: React.FC<ChipInputProps> = ({
 			};
 			onAdd(newChipData);
 			setValues([...values, newChipData]);
-			setInputValue('');
+			updateInputValue('');
 		}
 
 		if (DELETION_KEYS.includes(event.key) && inputValue.trim() === '') {
@@ -71,6 +78,7 @@ const ChipInput: React.FC<ChipInputProps> = ({
 
 	return (
 		<button
+			type="button"
 			className={`flex items-center gap-0 border border-border rounded-md p-2 bg-input focus-within:outline focus-within:outline-2 focus-within:outline-secondary ${className}`}
 			onClick={handleInputFocus}
 		>
