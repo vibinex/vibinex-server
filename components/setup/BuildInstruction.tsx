@@ -92,8 +92,8 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, s
 				.then((response) => {
 					console.log('[handleBuildButtonClick] /api/dpu/trigger response:', response.data);
 					setBuildStatus(response.data);
-					setIsTriggerBuildButtonDisabled(false);
 					if (!response.data.success) {
+						setIsTriggerBuildButtonDisabled(false);
 						setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
 					}
 					if (response.data.success) {
