@@ -94,6 +94,7 @@ const BuildInstruction: React.FC<BuildInstructionProps> = ({ selectedProvider, s
 					setBuildStatus(response.data);
 					if (!response.data.success) {
 						setIsTriggerBuildButtonDisabled(false);
+						setIsInputDisabled(false);
 						setErrorMessage('Failed to trigger build: ' + response.data.message); // Handle backend-specific error messages
 					}
 					if (response.data.success) {
