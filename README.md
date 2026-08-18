@@ -72,46 +72,53 @@ You can start editing the page by modifying `pages/index.tsx`. The page auto-upd
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-### Connect to Test environment
+### Configure the local environment
 
-Create a `.env.local` file in the root directory and add the following in it:
+Copy the non-secret template and generate a unique NextAuth secret:
 
 ```bash
-# NextAuthJS
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=<any random string, e.g. output of: openssl rand -base64 32>
-
-# Github Login — uses the "Vibinex Test" OAuth App
-# ⚠️  These are shared test credentials. Do not use them in production.
-#     Contact a maintainer if they stop working.
-GITHUB_CLIENT_ID=78eb181cacd859319797
-GITHUB_CLIENT_SECRET=c6efe816493a0b553ef20364134a3009b724b402
-
-# Bitbucket Login (optional — create your own OAuth consumer at bitbucket.org)
-BITBUCKET_CLIENT_ID=
-BITBUCKET_CLIENT_SECRET=
-
-# Bitbucket OAuth consumer
-BITBUCKET_OAUTH_CLIENT_ID=
-
-# GitLab Login (optional — create your own OAuth app at gitlab.com)
-GITLAB_CLIENT_ID=
-GITLAB_CLIENT_SECRET=
-
-# PostgreSQL Connection — Supabase test database
-# Contact a maintainer for the connection string, or use your own Supabase project.
-PGSQL_USER=
-PGSQL_PASSWORD=
-PGSQL_HOST=aws-0-ap-south-1.pooler.supabase.com
-PGSQL_PORT=6543
-PGSQL_DATABASE=postgres
+cp .env.example .env.local
+openssl rand -base64 32
 ```
 
-> **Note:** The database is hosted on Supabase. You will need the credentials from a maintainer to connect to the shared test database, or you can [create a free Supabase project](https://supabase.com) and run the schema migrations yourself.
+Paste the generated value into `NEXTAUTH_SECRET` in `.env.local`. Never commit
+`.env.local` or share its contents.
 
-The GitHub Client ID and Secret above are for the "Vibinex Test" OAuth App, which has `http://localhost:3000/api/auth/callback/github` registered as a callback URL — so GitHub login will work out of the box locally.
+#### Create a GitHub OAuth app
 
-You can create your own Bitbucket or GitLab OAuth consumers and add your client-id and client-secrets in the `.env.local` file to test those providers.
+Each contributor should use a separate development OAuth app instead of shared
+credentials:
+
+1. Open **GitHub → Settings → Developer settings → OAuth Apps → New OAuth App**.
+2. Set **Homepage URL** to `http://localhost:3000`.
+3. Set **Authorization callback URL** to
+   `http://localhost:3000/api/auth/callback/github`.
+4. Copy the app's Client ID into `GITHUB_CLIENT_ID` in `.env.local`.
+5. Generate a client secret and copy it into `GITHUB_CLIENT_SECRET`. Keep this
+   value only in your untracked `.env.local` file.
+
+The local login requests only `read:user`, `user:email`, and `read:org` scopes.
+`read:org` is needed to discover organization membership; the app does not need
+repository or write permissions.
+
+Bitbucket and GitLab login are optional. Create your own development OAuth
+consumer/app for either provider and fill in the corresponding placeholders in
+`.env.local`. Database values must likewise point to your own development
+PostgreSQL/Supabase instance or be provisioned privately by a maintainer.
+
+### Secret scanning
+
+Pull requests and pushes are scanned by Gitleaks in CI. To scan the current
+working tree locally without printing detected values:
+
+```bash
+docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.28.0 \
+  dir /repo --redact --no-banner
+```
+
+If a secret is detected, revoke or rotate it first, remove it from tracked
+files, and only then push the remediation. Never paste the value into an issue,
+commit message, or CI log.
 
 ### Running Unit Tests
 

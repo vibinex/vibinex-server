@@ -25,9 +25,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
-.env*.local
-.env*.test
+# local env files (the non-secret template is the only tracked exception)
+.env*
+!.env.example
 
 # vercel
 .vercel
