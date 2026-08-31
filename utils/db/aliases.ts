@@ -137,28 +137,6 @@ export const saveGitAliasMapToDB = async (aliasMap: AliasMap) => {
     });
 };
 
-const updateOrInsertAliasInAliasesTable = async (alias: string, provider: string, handle: string) => {
-	if (!handle || handle === '') {
-        console.error(
-            `[updateOrInsertAliasInAliasesTable] Empty handle value for alias: ${alias} and provider: ${provider}`);
-        return;
-    }
-    const query = `
-		INSERT INTO aliases (git_alias, ${provider})
-		VALUES ($1, ARRAY[$2::text])
-		ON CONFLICT (git_alias) DO UPDATE
-		SET ${provider} = ARRAY(
-			SELECT DISTINCT unnest(aliases.${provider} || ARRAY[$2::text])
-		)
-		`;
-	
-	await conn.query(query, [alias, handle]).catch(error => {
-		console.error(`[updateOrInsertAliasInAliasesTable] Error saving entries to the database:`, error);
-	})
-	console.info(`[updateOrInsertAliasInAliasesTable] Successfully updated ${provider} handle for alias ${alias} in aliases table in db.`);
-};
-  
-  
 export const updateAliasesForUser = async (aliases: Array<string>, userId: string) => {
 	const userData: DbUser | null = await getUserById(userId).catch((err) => {
 		console.error(`[updateAliasesForUser/getUserById] Error in getting user data`, err);
@@ -175,21 +153,46 @@ export const updateAliasesForUser = async (aliases: Array<string>, userId: strin
 		return;
 	}
 
-	const tasks = [];
-	for (const alias of aliases) {
-		for (const [provider, accounts] of Object.entries(auth_info)) {
-			for (const account of Object.values(accounts)) {
-				const handle = account.handle;
-				if (handle) {
-					tasks.push(updateOrInsertAliasInAliasesTable(alias, provider, handle));
-				} else {
-					console.info(`[updateAliasesForUser/getUserById] handle is not present for provider: ${provider} for user with id: ${userId}`);
-				}
-			}
-		}
+	const handles = Object.entries(auth_info).flatMap(([provider, accounts]) =>
+		Object.values(accounts)
+			.map(account => account.handle)
+			.filter((handle): handle is string => Boolean(handle))
+			.map(handle => ({ provider, handle }))
+	);
+
+	if (handles.length === 0) {
+		console.info(`[updateAliasesForUser] No provider handles found for user with id: ${userId}`);
+		return;
 	}
-  
-	Promise.all(tasks)
-	.then(() => console.info(`[updateAliasesForUser] All aliases have been updated successfully`))
-	.catch(error => console.error(`[updateAliasesForUser] An error occurred while updating aliases`, error));
+
+	const query = `
+		WITH input_aliases AS (
+			SELECT DISTINCT alias
+			FROM unnest($1::text[]) AS input(alias)
+			WHERE alias <> ''
+		), input_handles AS (
+			SELECT provider, handle
+			FROM jsonb_to_recordset($2::jsonb) AS value(provider text, handle text)
+		), alias_values AS (
+			SELECT
+				alias,
+				array_agg(DISTINCT handle) FILTER (WHERE provider = 'github') AS github,
+				array_agg(DISTINCT handle) FILTER (WHERE provider = 'bitbucket') AS bitbucket
+			FROM input_aliases
+			CROSS JOIN input_handles
+			GROUP BY alias
+		)
+		INSERT INTO aliases (git_alias, github, bitbucket)
+		SELECT alias, github, bitbucket FROM alias_values
+		ON CONFLICT (git_alias) DO UPDATE SET
+			github = CASE WHEN excluded.github IS NULL THEN aliases.github ELSE ARRAY(SELECT DISTINCT unnest(COALESCE(aliases.github, ARRAY[]::text[]) || excluded.github)) END,
+			bitbucket = CASE WHEN excluded.bitbucket IS NULL THEN aliases.bitbucket ELSE ARRAY(SELECT DISTINCT unnest(COALESCE(aliases.bitbucket, ARRAY[]::text[]) || excluded.bitbucket)) END;
+	`;
+
+	try {
+		await conn.query(query, [aliases, JSON.stringify(handles)]);
+		console.info(`[updateAliasesForUser] Updated aliases in a single database query.`);
+	} catch (error) {
+		console.error(`[updateAliasesForUser] An error occurred while updating aliases`, error);
+	}
 };
