@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 export interface RudderstackClientSideEvents {
 	identify: (
 		userId: string,
@@ -105,7 +103,6 @@ export async function rudderEventMethods(): Promise<RudderstackClientSideEvents 
 
 export const getAndSetAnonymousIdFromLocalStorage = () => {
 	const localStorageAnonymousId = localStorage.getItem('AnonymousId');
-	const anonymousId: string = (localStorageAnonymousId && localStorageAnonymousId != null) ? localStorageAnonymousId : uuidv4();
-	localStorage.setItem('AnonymousId', anonymousId);
-	return anonymousId;
+	// TODO: replace this compatibility value with the authenticated user's anonymous ID.
+	return localStorageAnonymousId ?? "";
 }
