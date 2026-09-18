@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { ResponsiveVoronoi, VoronoiDatum } from '@nivo/voronoi'
 import { ContributorVector } from '../../types/contributor';
+import type { RepoIdentifier } from '../../types/repository';
 import { centralLimit, countArrayElements } from "../../utils/data";
+import { supportedProviders } from '../../utils/providerAPI';
 import { Pool } from 'pg';
 
 const Contributors2DView = (props: { repo_data: Array<ContributorVector> }) => {
@@ -28,17 +30,49 @@ const Contributors2DView = (props: { repo_data: Array<ContributorVector> }) => {
 	)
 }
 
-export async function getContri2DProps(conn: Pool, repo_name: string) {
+const repositorySegmentPattern = /^[A-Za-z0-9][A-Za-z0-9_.-]*$/;
+
+export const parseRepoAddress = (repoAddress: string): RepoIdentifier | null => {
+	const [repo_provider, repo_owner, repo_name, ...extraSegments] = repoAddress.split('/');
+	if (
+		extraSegments.length > 0 ||
+		!supportedProviders.includes(repo_provider as typeof supportedProviders[number]) ||
+		!repositorySegmentPattern.test(repo_owner) ||
+		!repositorySegmentPattern.test(repo_name)
+	) {
+		return null;
+	}
+
+	return { repo_provider: repo_provider as RepoIdentifier['repo_provider'], repo_owner, repo_name };
+};
+
+export async function getContri2DProps(conn: Pool, repo: RepoIdentifier, userId: string) {
+	const authorizedRepo = await conn.query(
+		`SELECT 1
+		 FROM repos r
+		 JOIN repo_config rc ON rc.repo_id = r.id
+		 WHERE r.repo_provider = $1
+			AND r.repo_owner = $2
+			AND r.repo_name = $3
+			AND rc.user_id = $4
+		 LIMIT 1`,
+		[repo.repo_provider, repo.repo_owner, repo.repo_name, userId]
+	);
+
+	if (authorizedRepo.rowCount === 0) {
+		return [];
+	}
+
 	const user_agg_commits_q = `SELECT
 		author_email,
 		count(*) as num_commits,
 		min(commit_json ->> 'ts_secs') as first_commit_ts,
 		max(commit_json ->> 'ts_secs') as last_commit_ts
 		FROM commits 
-		WHERE (commit_json ->> 'repo_name')='${repo_name}'
+		WHERE (commit_json ->> 'repo_name') = $1
 		GROUP BY author_email
 		ORDER BY last_commit_ts DESC`;
-	const result = await conn.query(user_agg_commits_q);
+	const result = await conn.query(user_agg_commits_q, [repo.repo_name]);
 
 	const author_vec_q = `SELECT
 			(commit_json -> 'parents') as parents,
@@ -48,8 +82,8 @@ export async function getContri2DProps(conn: Pool, repo_name: string) {
 			((commit_json -> 'diff_info') -> 'file_info') as diff_file_info,
 			author_email
 		FROM commits
-		WHERE (commit_json ->> 'repo_name')='${repo_name}'`;
-	const author_vec_result = await conn.query(author_vec_q);
+		WHERE (commit_json ->> 'repo_name') = $1`;
+	const author_vec_result = await conn.query(author_vec_q, [repo.repo_name]);
 
 	const author_vec: Array<ContributorVector> = []
 	for (const author of result.rows) {

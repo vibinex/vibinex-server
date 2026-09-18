@@ -6,11 +6,10 @@ import Footer from "../components/Footer";
 import RudderContext from "../components/RudderContext";
 import { ContributorVector } from "../types/contributor";
 import { getAuthUserId, getAuthUserName } from "../utils/auth";
-import { renderObjAsTable } from "../utils/data";
 import conn from '../utils/db';
 import { getAndSetAnonymousIdFromLocalStorage } from "../utils/rudderstack_initialize";
 import CommitsPerFile from "../views/Dashboard/commitsPerFile";
-import Contributors2DView, { getContri2DProps } from "../views/Dashboard/contri_2d";
+import Contributors2DView, { getContri2DProps, parseRepoAddress } from "../views/Dashboard/contri_2d";
 import MainAppBar from "../views/MainAppBar";
 import RepoList from "../views/RepoList";
 import { authOptions } from "./api/auth/[...nextauth]";
@@ -20,6 +19,29 @@ type RepoProfileData = {
 	repoName?: string,
 	contributor_2d_data?: Array<ContributorVector>
 }
+
+const formatContributorValue = (value: unknown): string => {
+	if (value === null || value === undefined) return "";
+	return typeof value === "object" ? JSON.stringify(value) : String(value);
+};
+
+const ContributorTable = ({ contributors }: { contributors: ContributorVector[] }) => {
+	if (contributors.length === 0) return null;
+	const columns = Object.keys(contributors[0]) as Array<keyof ContributorVector>;
+
+	return (
+		<table>
+			<thead><tr>{columns.map(column => <th key={column}>{column}</th>)}</tr></thead>
+			<tbody>
+				{contributors.map((contributor, index) => (
+					<tr key={`${contributor.author_email}-${index}`}>
+						{columns.map(column => <td key={column}>{formatContributorValue(contributor[column])}</td>)}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	);
+};
 
 const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repoName: repoAddr, contributor_2d_data }) => {
 	const { rudderEventMethods } = React.useContext(RudderContext);
@@ -43,7 +65,7 @@ const RepoProfile: NextPage<RepoProfileData> = ({ sessionObj: session, repoName:
 					<div className="block w-96 h-96 mx-auto">
 						<Contributors2DView repo_data={contributor_2d_data} />
 					</div>
-					<div dangerouslySetInnerHTML={{ __html: renderObjAsTable(contributor_2d_data) }}></div>
+					<ContributorTable contributors={contributor_2d_data} />
 				</>) : (
 					<div className="max-w-[80%] mx-auto">
 						<RepoList />
@@ -70,17 +92,23 @@ export const getServerSideProps: GetServerSideProps<RepoProfileData> = async ({ 
 	// if info is requested for a specific repository
 	if (query.repo_name) {
 		const repoName = Array.isArray(query.repo_name) ? query.repo_name[0] : query.repo_name;
-		const contributorVector: Array<ContributorVector> = await getContri2DProps(conn, repoName);
-		if (contributorVector.length > 0)
-			return {
-				props: {
-					sessionObj: session,
-					repoName: repoName,
-					contributor_2d_data: contributorVector
+		const repo = parseRepoAddress(repoName);
+		if (repo && session.user?.id) {
+			try {
+				const contributorVector: Array<ContributorVector> = await getContri2DProps(conn, repo, session.user.id);
+				if (contributorVector.length > 0) {
+					return {
+						props: {
+							sessionObj: session,
+							repoName: `${repo.repo_provider}/${repo.repo_owner}/${repo.repo_name}`,
+							contributor_2d_data: contributorVector
+						}
+					}
 				}
+			} catch (error) {
+				console.error("Unable to load authorized repository profile", error);
 			}
-		else
-			console.warn(`No data found for repository named ${repoName}`);
+		}
 	} else {
 		console.debug("No repo name received");
 	}
