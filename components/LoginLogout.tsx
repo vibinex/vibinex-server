@@ -61,7 +61,11 @@ export default function LoginLogout() {
 					<li id='settings-link' className={menuItemClassName}>
 						<Link href='/settings' className='cursor-pointer w-full'>Settings</Link>
 					</li>
-					<li id='logout-link' className={`cursor-pointer ${menuItemClassName}`} onClick={() => (logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods ?? null)))}>
+					<li id='logout-link' className={`cursor-pointer ${menuItemClassName}`} onClick={() => {
+						setShowMenu(false);
+						setSession(null);
+						void logout(getAuthUserId(session), getAuthUserName(session), getAndSetAnonymousIdFromLocalStorage(), (rudderEventMethods ?? null));
+					}}>
 						Logout
 					</li>
 				</ol>
