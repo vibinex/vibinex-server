@@ -9,15 +9,16 @@ export default async function failHandler(req: NextApiRequest, res: NextApiRespo
 	}
 	if (!validateDpuAuth(req, res)) return;
 
-	const { jobId, installationId, error, retry } = req.body;
-	if (!jobId || !installationId) {
-		res.status(400).json({ error: 'jobId and installationId are required' });
+	const { jobId, installationId, claimGeneration, error, retry } = req.body;
+	if (!jobId || !installationId || !claimGeneration) {
+		res.status(400).json({ error: 'jobId, installationId, and claimGeneration are required' });
 		return;
 	}
 
 	const failed = await failDpuJob(
 		jobId.toString(),
 		installationId.toString(),
+		claimGeneration.toString(),
 		typeof error === 'string' ? error : '',
 		retry !== false,
 	).catch((err) => {
@@ -29,7 +30,7 @@ export default async function failHandler(req: NextApiRequest, res: NextApiRespo
 		return;
 	}
 	if (!failed) {
-		res.status(404).json({ error: 'No processing job found' });
+		res.status(409).json({ error: 'Claim lease lost or expired' });
 		return;
 	}
 	res.status(200).json({ ok: true });
