@@ -34,7 +34,7 @@ const Hosting = () => {
             setSession(sessionVal);
             setLoading(true);
             const userId = await getAuthUserId(sessionVal);
-            axios.post('/api/dpu/pubsub', { userId }).then(async (response) => {
+            axios.post('/api/dpu/pubsub').then(async (response) => {
                 if (response.data.installId) {
                     setInstallId(response.data.installId);
                 }
