@@ -1,5 +1,8 @@
 import type { Session } from 'next-auth';
+import type { PoolClient } from 'pg';
 import conn from '.';
+
+type Queryable = Pick<PoolClient, 'query'>;
 import { BitbucketDBRepo } from '../../types/bitbucket';
 import { defaultRepoConfigForIndividuals, defaultRepoConfigForTeams, RepoConfigDbMap, RepoConfigOptions } from '../../types/RepoConfig';
 import type { DbRepo, RepoIdentifier } from '../../types/repository';
@@ -220,7 +223,7 @@ export const getRepoConfigByUserAndRepo = async (provider: string, repoName: str
 	return userRows[0].config;
 }
 
-export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
+export const insertRepoConfig = async (userId: string, repoIds: number[], client?: Queryable) => {
 	const configEntries = Object.entries(RepoConfigDbMap).map(([key, dbName]) => {
 		const defaultValue = defaultRepoConfigForTeams[key as RepoConfigOptions];
 		return [dbName, defaultValue];
@@ -234,7 +237,7 @@ export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 		`;
 	const params = [userId, repoIds];
 
-	const isQuerySuccessful = await conn.query(query, params)
+	const isQuerySuccessful = await (client ?? conn).query(query, params)
 		.then((dbResponse) => {
 			if (dbResponse.rowCount == 0) {
 				console.info(`[db/insertRepoConfig] No new repo config added for user: ${userId}. Either the repo is already configured for the user or the insert query failed`);
@@ -248,7 +251,7 @@ export const insertRepoConfig = async (userId: string, repoIds: number[]) => {
 	return isQuerySuccessful;
 }
 
-export const removeRepoConfigForInstallIdForOwner = async (installId: string, repoNamesToBeRetained: string[], repoOwner: string, repoProvider: string, userId: string) => {
+export const removeRepoConfigForInstallIdForOwner = async (installId: string, repoNamesToBeRetained: string[], repoOwner: string, repoProvider: string, userId: string, client?: Queryable) => {
 	const deleteRepoConfigQuery = `
 		DELETE FROM repo_config
 		WHERE repo_id IN (
@@ -262,7 +265,7 @@ export const removeRepoConfigForInstallIdForOwner = async (installId: string, re
 		AND user_id = $5;
 	`;
 
-	const result = await conn.query(deleteRepoConfigQuery, [installId, repoNamesToBeRetained, repoOwner, repoProvider, userId])
+	const result = await (client ?? conn).query(deleteRepoConfigQuery, [installId, repoNamesToBeRetained, repoOwner, repoProvider, userId])
 		.catch((err) => {
 			console.error(`[removeRepoConfig] Could not remove repo config for: ${userId}, ${repoNamesToBeRetained}`, { pg_query: deleteRepoConfigQuery }, err);
 			throw new Error("Error in running the query on the database", err);

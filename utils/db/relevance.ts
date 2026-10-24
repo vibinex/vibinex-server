@@ -1,7 +1,6 @@
 import conn from '.';
 import { getUserByAlias } from './users';
 import { v4 as uuidv4 } from 'uuid';
-import { convert } from './converter';
 import type { DPUHunkInfo } from '../../pages/api/hunks';
 
 export interface HunkInfo {
@@ -28,19 +27,21 @@ export const saveHunk = async (hunkInfo: DPUHunkInfo) => {
 	for (const prHunk of hunkInfo.prhunkvec) {
 		const hunk_val = JSON.stringify({ "blamevec": prHunk.blamevec });
 		const hunk_query = `
-	  INSERT INTO hunks (repo_provider, repo_owner, 
+	  INSERT INTO hunks (repo_provider, repo_owner,
 		repo_name, review_id, author, hunks
-		) VALUES ('${hunkInfo.repo_provider}',
-			'${hunkInfo.repo_owner}', 
-			'${hunkInfo.repo_name}',
-			'${prHunk.pr_number}',
-			'${prHunk.author}',
-			'${hunk_val}')
-		ON CONFLICT (repo_provider, repo_owner, repo_name, review_id) DO UPDATE SET 
+		) VALUES ($1, $2, $3, $4, $5, $6)
+		ON CONFLICT (repo_provider, repo_owner, repo_name, review_id) DO UPDATE SET
 		hunks = EXCLUDED.hunks
 	`;
-		await conn.query(hunk_query).catch(err => {
-			console.error(`[saveHunk] Failed to insert hunks in the db`, { pg_query: hunk_query }, err);
+		await conn.query(hunk_query, [
+			hunkInfo.repo_provider,
+			hunkInfo.repo_owner,
+			hunkInfo.repo_name,
+			prHunk.pr_number,
+			prHunk.author,
+			hunk_val,
+		]).catch(err => {
+			console.error(`[saveHunk] Failed to insert hunks in the db`, err);
 		});
 	}
 }
@@ -52,25 +53,25 @@ export const saveNewAuthorAliasesFromHunkData = async (hunkInfo: DPUHunkInfo) =>
 	// update the aliases table
 	const insertAliasesQuery = `
 		INSERT INTO aliases (git_alias)
-		VALUES ${authorAliases.map(alias => `(${convert(alias)})`).join(",")}
+		SELECT unnest($1::text[])
 		ON CONFLICT (git_alias) DO NOTHING;
 	`
-	await conn.query(insertAliasesQuery).catch(err => {
-		console.error(`[saveNewAuthorAliases] Failed to insert aliases in the db`, { pg_query: insertAliasesQuery }, err);
+	await conn.query(insertAliasesQuery, [authorAliases]).catch(err => {
+		console.error(`[saveNewAuthorAliases] Failed to insert aliases in the db`, err);
 	});
 
 	// update the aliases in the repos table
 	const updateAliasesInReposQuery = `
 		UPDATE repos
 		SET aliases = array(
-			SELECT DISTINCT unnest(aliases || ${convert(authorAliases)})
+			SELECT DISTINCT unnest(COALESCE(aliases, ARRAY[]::text[]) || $1::text[])
 		)
-		WHERE repo_provider = ${convert(hunkInfo.repo_provider)}
-			AND repo_owner = ${convert(hunkInfo.repo_owner)}
-			AND repo_name = ${convert(hunkInfo.repo_name)};
+		WHERE repo_provider = $2
+			AND repo_owner = $3
+			AND repo_name = $4;
 	`
-	await conn.query(updateAliasesInReposQuery).catch(err => {
-		console.error(`[saveNewAuthorAliases] Failed to update aliases in repos in the db`, { pg_query: updateAliasesInReposQuery }, err);
+	await conn.query(updateAliasesInReposQuery, [authorAliases, hunkInfo.repo_provider, hunkInfo.repo_owner, hunkInfo.repo_name]).catch(err => {
+		console.error(`[saveNewAuthorAliases] Failed to update aliases in repos in the db`, err);
 	});
 }
 
@@ -88,15 +89,15 @@ export const getAuthorAliases = async (alias_email: string) => {
 export const getHunkData = async (provider: string, owner: string, repoName: string,
 	reviewId: string, userEmails: Set<string>) => {
 	const hunk_query = `
-		SELECT hunks 
+		SELECT hunks
 		FROM pr_hunks
-		WHERE repo_provider = '${provider}' 
-		AND repo_owner = '${owner}'
-		AND repo_name = '${repoName}'  
-		AND pr_number = '${reviewId}'
+		WHERE repo_provider = $1
+		AND repo_owner = $2
+		AND repo_name = $3
+		AND pr_number = $4
 	`;
-	const result = await conn.query<DbHunks>(hunk_query).catch(err => {
-		console.error(`[getHunkData] Unable to get author and hunks from db for review-id ${reviewId} in the repository: ${provider}/${owner}/${repoName}`, { pg_query: hunk_query }, err);
+	const result = await conn.query<DbHunks>(hunk_query, [provider, owner, repoName, reviewId]).catch(err => {
+		console.error(`[getHunkData] Unable to get author and hunks from db for review-id ${reviewId} in the repository: ${provider}/${owner}/${repoName}`, err);
 		throw new Error("Unable to proceed without hunk data from db", err);
 	});
 	const filteredBlamevec = result.rows[0]["hunks"]["blamevec"].filter((obj: HunkInfo) => {
@@ -108,14 +109,14 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 
 export const getReviewData = async (provider: string, owner: string, repoName: string, user_emails: Set<string>) => {
 	const review_query = `
-	SELECT pr_number, hunks 
+	SELECT pr_number, hunks
 	FROM pr_hunks
-	WHERE repo_provider = '${provider}' 
-	AND repo_owner = '${owner}'
-	AND repo_name = '${repoName}'  
+	WHERE repo_provider = $1
+	AND repo_owner = $2
+	AND repo_name = $3
   `;
-	const result = await conn.query<DbHunks>(review_query).catch(err => {
-		console.error(`[getReviewData] Could not get hunks for repository: ${provider}/${owner}/${repoName}`, { pg_query: review_query }, err);
+	const result = await conn.query<DbHunks>(review_query, [provider, owner, repoName]).catch(err => {
+		console.error(`[getReviewData] Could not get hunks for repository: ${provider}/${owner}/${repoName}`, err);
 		throw new Error("Error in running the query on the database", err);
 	});
 	const filteredRows = result.rows
@@ -155,12 +156,12 @@ export const getFileData = async (provider: string, owner: string, reponame: str
 export const getTopicNameFromDB = async (provider: string, owner: string, repoName: string): Promise<string[]> => {
 	console.log(`[getTopicNameFromDB] Getting topic name from db ${provider}/${owner}/${repoName}`); //TODO: To be removed
 	const query = `
-    SELECT install_id 
-    FROM repos 
-    WHERE repo_provider = '${provider}' AND repo_owner = '${owner}' AND repo_name = '${repoName}'
+    SELECT install_id
+    FROM repos
+    WHERE repo_provider = $1 AND repo_owner = $2 AND repo_name = $3
   `;
-	const result = await conn.query(query).catch(err => {
-		console.error(`[getTopicNameFromDB] Could not get the install-id for repository: ${provider}/${owner}/${repoName}`, { pg_query: query }, err);
+	const result = await conn.query(query, [provider, owner, repoName]).catch(err => {
+		console.error(`[getTopicNameFromDB] Could not get the install-id for repository: ${provider}/${owner}/${repoName}`, err);
 		throw new Error("Error in running the query on the database", err);
 	});
 	if (result.rows.length === 0) {
@@ -170,15 +171,15 @@ export const getTopicNameFromDB = async (provider: string, owner: string, repoNa
 }
 
 export const saveTopicName = async (owner: string, provider: string, topicName: string, repoNames: string[]) => {
-	const rows = repoNames.map(repo => `('${repo}', '${owner}', '${provider}', '${topicName}')`).join(', ');
 	const query = `
-        INSERT INTO repos (repo_name, repo_owner, repo_provider, install_id) 
-        VALUES ${rows}
-        ON CONFLICT (repo_name, repo_owner, repo_provider) DO UPDATE SET 
+        INSERT INTO repos (repo_name, repo_owner, repo_provider, install_id)
+		SELECT repo_name, $2, $3, ARRAY[$4]
+		FROM unnest($1::text[]) AS repo_name
+        ON CONFLICT (repo_name, repo_owner, repo_provider) DO UPDATE SET
             install_id = EXCLUDED.install_id
     `;
-	await conn.query(query).catch(err => {
-		console.error(`[saveTopicName] Unable to insert topic name in db`, { pg_query: query }, err)
+	await conn.query(query, [repoNames, owner, provider, topicName]).catch(err => {
+		console.error(`[saveTopicName] Unable to insert topic name in db`, err)
 	});
 }
 
@@ -198,7 +199,10 @@ export const saveTopicNameInUsersTable = async (userId: string, topicName: strin
     Update users 
     set topic_name = $1 
     WHERE id = $2`;
-	await conn.query(query, [topicName, userId]).catch(error => {
+	try {
+		await conn.query(query, [topicName, userId]);
+	} catch (error) {
 		console.error(`[saveTopicNameInUsersTable] Unable to insert topic name in db`, { pg_query: query }, error);
-	});
+		throw error;
+	}
 }
