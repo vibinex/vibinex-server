@@ -76,20 +76,32 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(403).json({ error: 'Forbidden' });
 	}
 
+	const groupedInfo: Array<{ owner: string; provider: string; repos: string[] }> = [];
+	for (const ownerInfo of info) {
+		const existingEntry = groupedInfo.find((entry) => entry.owner === ownerInfo.owner && entry.provider === ownerInfo.provider);
+		if (existingEntry) {
+			for (const repo of ownerInfo.repos) {
+				if (!existingEntry.repos.includes(repo)) existingEntry.repos.push(repo);
+			}
+		} else {
+			groupedInfo.push({ ...ownerInfo, repos: Array.from(new Set(ownerInfo.repos)) });
+		}
+	}
+
 	const client = await conn.connect();
 	try {
 		await client.query('BEGIN');
 
 		// Remove stale configuration before clearing the installation ID it uses for lookup.
-		for (const ownerInfo of info) {
+		for (const ownerInfo of groupedInfo) {
 			await removeRepoConfigForInstallIdForOwner(installationId, ownerInfo.repos, ownerInfo.owner, ownerInfo.provider, userId, client);
 		}
 
-		for (const provider of Array.from(new Set(info.map((ownerInfo) => ownerInfo.provider)))) {
+		for (const provider of Array.from(new Set(groupedInfo.map((ownerInfo) => ownerInfo.provider)))) {
 			await removePreviousInstallations(installationId, provider, client);
 		}
 
-		for (const ownerInfo of info) {
+		for (const ownerInfo of groupedInfo) {
 			if (ownerInfo.repos.length === 0) continue;
 			const setupReposArgs: SetupReposArgs = {
 				repo_owner: ownerInfo.owner,
