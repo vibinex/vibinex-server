@@ -1,5 +1,8 @@
+import type { PoolClient } from 'pg';
 import conn from '.';
 import { convert } from './converter';
+
+type Queryable = Pick<PoolClient, 'query'>;
 import { insertRepoConfig } from './repos';
 
 export interface SetupReposArgs {
@@ -9,7 +12,7 @@ export interface SetupReposArgs {
 	install_id: string;
 }
 
-export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): Promise<boolean> => {
+export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string, client?: Queryable): Promise<boolean> => {
 	const { repo_owner, repo_provider, repo_names, install_id } = args;
 	const insertReposQuery = `
 		INSERT INTO repos (repo_name, install_id, repo_owner, repo_provider)
@@ -20,33 +23,34 @@ export const saveSetupReposInDb = async (args: SetupReposArgs, userId: string): 
 			WHERE repos.install_id IS NULL OR NOT (ARRAY[${convert(install_id)}] <@ repos.install_id)
 		RETURNING id AS repo_id;
 	`;
+	const db = client ?? conn;
 	try {
-		await conn.query('BEGIN');
+		if (!client) await db.query('BEGIN');
 		console.debug(`[saveSetupReposInDb] insert query: `, insertReposQuery);
-		const { rowCount: reposRowCount, rows } = await conn.query(insertReposQuery)
+		const { rowCount: reposRowCount, rows } = await db.query(insertReposQuery)
 			.catch(err => {
 				console.error(`[saveSetupReposInDb] Could not insert repos for user (${userId}) in the ${args.repo_owner} workspace on ${args.repo_provider}`, { pg_query: insertReposQuery }, err);
 				throw err;
 			});
 		if (reposRowCount === 0) {
-			await conn.query('ROLLBACK');
+			if (!client) await db.query('ROLLBACK');
 			console.error(`[saveSetupRepos] No repositories were inserted or updated for: ${install_id}, ${repo_names}`);
 			return false;
 		}
 
 		const repoIds = rows.map((row) => row.repo_id);
-		const insertRepoConfigSuccess = await insertRepoConfig(userId, repoIds);
+		const insertRepoConfigSuccess = await insertRepoConfig(userId, repoIds, client);
 
 		if (!insertRepoConfigSuccess) {
-			await conn.query('ROLLBACK');
+			if (!client) await db.query('ROLLBACK');
 			console.error(`[saveSetupRepos] Could not insert repo configs for: ${install_id}, ${repo_names}`);
 			return false;
 		}
-		await conn.query('COMMIT');
+		if (!client) await db.query('COMMIT');
 		console.debug(`[saveSetupRepos] setup repos info saved successfully in db`)
 		return true;
 	} catch (err) {
-		await conn.query('ROLLBACK');
+		if (!client) await db.query('ROLLBACK');
 		console.error(`[saveSetupRepos] Could not save setup repos for: ${install_id}, ${repo_names}`, { pg_query: insertReposQuery }, err);
 		return false;
 	}
@@ -87,12 +91,12 @@ export const saveSelectedReposInDb = async (args: SetupReposArgs, userId: string
 	}
 };
 
-export const removePreviousInstallations = async (install_id: string, provider: string) => {
+export const removePreviousInstallations = async (install_id: string, provider: string, client?: Queryable) => {
 	const query = `UPDATE repos
 	SET install_id = array_remove(install_id, $1)
 	WHERE $1 = ANY (install_id) AND repo_provider = $2;
 	`;
-	await conn.query(query, [install_id, provider]).catch(err => {
+	await (client ?? conn).query(query, [install_id, provider]).catch(err => {
 		console.error(`[removePreviousInstallations] Could not remove previous repos for ${install_id}`);
 		throw new Error('Failed to remove previous repos');
 	});

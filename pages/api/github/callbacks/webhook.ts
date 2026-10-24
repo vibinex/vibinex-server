@@ -11,10 +11,20 @@ export const config = {
 	},
 };
 
+const MAX_WEBHOOK_BODY_BYTES = 25 * 1024 * 1024;
+
+class WebhookBodyTooLargeError extends Error {}
+
 const readRawBody = async (req: NextApiRequest): Promise<Buffer> => {
 	const chunks: Buffer[] = [];
+	let totalBytes = 0;
 	for await (const chunk of req) {
-		chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+		const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+		totalBytes += buffer.length;
+		if (totalBytes > MAX_WEBHOOK_BODY_BYTES) {
+			throw new WebhookBodyTooLargeError('Webhook body exceeds the maximum allowed size');
+		}
+		chunks.push(buffer);
 	}
 	return Buffer.concat(chunks);
 };
@@ -32,11 +42,14 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(500).json({ error: 'Webhook authentication is not configured' });
 	}
 
-	const rawBody = await readRawBody(req).catch((error) => {
+	let rawBody: Buffer;
+	try {
+		rawBody = await readRawBody(req);
+	} catch (error) {
+		if (error instanceof WebhookBodyTooLargeError) {
+			return res.status(413).json({ error: 'Payload Too Large' });
+		}
 		console.error('[webhookHandler] Failed to read request body', error);
-		return null;
-	});
-	if (!rawBody) {
 		return res.status(400).json({ error: 'Bad Request' });
 	}
 

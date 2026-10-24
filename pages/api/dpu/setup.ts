@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
+import conn from '../../../utils/db';
 import { removeRepoConfigForInstallIdForOwner } from '../../../utils/db/repos';
 import { SetupReposArgs, removePreviousInstallations, saveSetupReposInDb } from '../../../utils/db/setupRepos';
 import { getUserIdByTopicName } from '../../../utils/db/users';
@@ -29,7 +30,8 @@ const isSetupRequest = (body: unknown): body is SetupRequest => {
 			&& typeof entry.owner === 'string'
 			&& typeof entry.provider === 'string'
 			&& Array.isArray(entry.repos)
-			&& entry.repos.every((repo) => typeof repo === 'string'));
+			&& entry.repos.every((repo) => typeof repo === 'string'))
+		&& (candidate.isPublish === undefined || typeof candidate.isPublish === 'boolean');
 };
 
 const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -74,27 +76,51 @@ const setupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(403).json({ error: 'Forbidden' });
 	}
 
+	const client = await conn.connect();
 	try {
-		await removePreviousInstallations(installationId, info[0].provider);
+		await client.query('BEGIN');
+
+		// Remove stale configuration before clearing the installation ID it uses for lookup.
 		for (const ownerInfo of info) {
-			await removeRepoConfigForInstallIdForOwner(installationId, ownerInfo.repos, ownerInfo.owner, ownerInfo.provider, userId);
+			await removeRepoConfigForInstallIdForOwner(installationId, ownerInfo.repos, ownerInfo.owner, ownerInfo.provider, userId, client);
+		}
+
+		for (const provider of Array.from(new Set(info.map((ownerInfo) => ownerInfo.provider)))) {
+			await removePreviousInstallations(installationId, provider, client);
+		}
+
+		for (const ownerInfo of info) {
+			if (ownerInfo.repos.length === 0) continue;
 			const setupReposArgs: SetupReposArgs = {
 				repo_owner: ownerInfo.owner,
 				repo_provider: ownerInfo.provider,
 				repo_names: ownerInfo.repos,
 				install_id: installationId,
 			};
-			const saved = await saveSetupReposInDb(setupReposArgs, userId);
+			const saved = await saveSetupReposInDb(setupReposArgs, userId, client);
 			if (!saved) throw new Error('Unable to save repository setup');
 		}
-		if (isPublish) {
-			await publishMessage(installationId, info, 'PATSetup');
-		}
+
+		await client.query('COMMIT');
 	} catch (error) {
+		await client.query('ROLLBACK').catch(() => undefined);
 		console.error('[setupHandler] Unable to save setup information', error);
 		const eventPropertiesWithStatus = { ...eventProperties, response_status: 500 };
 		rudderStackEvents.track(userId, '', 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties: eventPropertiesWithStatus });
 		return res.status(500).json({ error: 'Unable to save setup information' });
+	} finally {
+		client.release();
+	}
+
+	try {
+		if (isPublish) {
+			await publishMessage(installationId, info, 'PATSetup');
+		}
+	} catch (error) {
+		console.error('[setupHandler] Unable to publish setup information', error);
+		const eventPropertiesWithStatus = { ...eventProperties, response_status: 500 };
+		rudderStackEvents.track(userId, '', 'dpu-setup', { type: 'HTTP-500', eventStatusFlag: 0, eventProperties: eventPropertiesWithStatus });
+		return res.status(500).json({ error: 'Unable to publish setup information' });
 	}
 
 	const eventPropertiesWithStatus = { ...eventProperties, response_status: 200 };

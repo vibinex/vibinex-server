@@ -199,7 +199,10 @@ export const saveTopicNameInUsersTable = async (userId: string, topicName: strin
     Update users 
     set topic_name = $1 
     WHERE id = $2`;
-	await conn.query(query, [topicName, userId]).catch(error => {
+	try {
+		await conn.query(query, [topicName, userId]);
+	} catch (error) {
 		console.error(`[saveTopicNameInUsersTable] Unable to insert topic name in db`, { pg_query: query }, error);
-	});
+		throw error;
+	}
 }
