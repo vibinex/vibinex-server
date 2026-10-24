@@ -35,6 +35,7 @@ export default async function claimHandler(req: NextApiRequest, res: NextApiResp
 			msgType: job.msg_type,
 			payload: job.payload,
 			attempts: job.attempts,
+			claimGeneration: job.claim_generation.toString(),
 		})),
 	});
 }

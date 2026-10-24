@@ -9,13 +9,13 @@ export default async function ackHandler(req: NextApiRequest, res: NextApiRespon
 	}
 	if (!validateDpuAuth(req, res)) return;
 
-	const { jobId, installationId } = req.body;
-	if (!jobId || !installationId) {
-		res.status(400).json({ error: 'jobId and installationId are required' });
+	const { jobId, installationId, claimGeneration } = req.body;
+	if (!jobId || !installationId || !claimGeneration) {
+		res.status(400).json({ error: 'jobId, installationId, and claimGeneration are required' });
 		return;
 	}
 
-	const acknowledged = await ackDpuJob(jobId.toString(), installationId.toString()).catch((err) => {
+	const acknowledged = await ackDpuJob(jobId.toString(), installationId.toString(), claimGeneration.toString()).catch((err) => {
 		console.error('[ackHandler] Failed to acknowledge job', err);
 		return null;
 	});
@@ -24,7 +24,7 @@ export default async function ackHandler(req: NextApiRequest, res: NextApiRespon
 		return;
 	}
 	if (!acknowledged) {
-		res.status(404).json({ error: 'No processing job found' });
+		res.status(409).json({ error: 'Claim lease lost or expired' });
 		return;
 	}
 	res.status(200).json({ ok: true });

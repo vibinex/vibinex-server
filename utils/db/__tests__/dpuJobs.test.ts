@@ -30,10 +30,10 @@ describe('dpuJobs queue helpers', () => {
 
 	it('acknowledges only processing jobs for the installation', async () => {
 		const jobId = await enqueueDpuJob(INSTALLATION_ID, 'PATSetup', { provider: 'github' });
-		expect(await ackDpuJob(jobId, INSTALLATION_ID)).toBe(false);
+		expect(await ackDpuJob(jobId, INSTALLATION_ID, '0')).toBe(false);
 
-		await claimDpuJobs(INSTALLATION_ID, 1, 30);
-		expect(await ackDpuJob(jobId, INSTALLATION_ID)).toBe(true);
+		const [job] = await claimDpuJobs(INSTALLATION_ID, 1, 30);
+		expect(await ackDpuJob(jobId, INSTALLATION_ID, job.claim_generation.toString())).toBe(true);
 
 		const result = await conn.query('SELECT status FROM dpu_jobs WHERE id = $1', [jobId]);
 		expect(result.rows[0].status).toBe('completed');
@@ -41,9 +41,9 @@ describe('dpuJobs queue helpers', () => {
 
 	it('returns failed jobs to pending when retrying', async () => {
 		const jobId = await enqueueDpuJob(INSTALLATION_ID, 'install_callback', { installation_code: '123' });
-		await claimDpuJobs(INSTALLATION_ID, 1, 30);
+		const [job] = await claimDpuJobs(INSTALLATION_ID, 1, 30);
 
-		expect(await failDpuJob(jobId, INSTALLATION_ID, 'temporary failure')).toBe(true);
+		expect(await failDpuJob(jobId, INSTALLATION_ID, job.claim_generation.toString(), 'temporary failure')).toBe(true);
 
 		const jobs = await claimDpuJobs(INSTALLATION_ID, 1, 30);
 		expect(jobs).toHaveLength(1);
@@ -53,12 +53,21 @@ describe('dpuJobs queue helpers', () => {
 
 	it('can mark failed jobs as terminal', async () => {
 		const jobId = await enqueueDpuJob(INSTALLATION_ID, 'install_callback', { installation_code: '123' });
-		await claimDpuJobs(INSTALLATION_ID, 1, 30);
+		const [job] = await claimDpuJobs(INSTALLATION_ID, 1, 30);
 
-		expect(await failDpuJob(jobId, INSTALLATION_ID, 'permanent failure', false)).toBe(true);
+		expect(await failDpuJob(jobId, INSTALLATION_ID, job.claim_generation.toString(), 'permanent failure', false)).toBe(true);
 		expect(await claimDpuJobs(INSTALLATION_ID, 1, 30)).toEqual([]);
 
 		const result = await conn.query('SELECT status, last_error FROM dpu_jobs WHERE id = $1', [jobId]);
 		expect(result.rows[0]).toEqual({ status: 'failed', last_error: 'permanent failure' });
+	});
+	it('rejects acknowledgements from an earlier claim generation', async () => {
+		const jobId = await enqueueDpuJob(INSTALLATION_ID, 'manual_trigger', { pr_number: '1' });
+		const [firstClaim] = await claimDpuJobs(INSTALLATION_ID, 1, -1);
+		const [secondClaim] = await claimDpuJobs(INSTALLATION_ID, 1, 30);
+
+		expect(secondClaim.claim_generation).not.toBe(firstClaim.claim_generation);
+		expect(await ackDpuJob(jobId, INSTALLATION_ID, firstClaim.claim_generation.toString())).toBe(false);
+		expect(await ackDpuJob(jobId, INSTALLATION_ID, secondClaim.claim_generation.toString())).toBe(true);
 	});
 });

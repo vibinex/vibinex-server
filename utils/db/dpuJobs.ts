@@ -11,6 +11,7 @@ export interface DpuJob {
 	status: DpuJobStatus;
 	attempts: number;
 	locked_until: Date | null;
+	claim_generation: string;
 	created_at: Date;
 	updated_at: Date;
 }
@@ -23,6 +24,7 @@ CREATE TABLE IF NOT EXISTS dpu_jobs (
 	payload JSONB NOT NULL,
 	status TEXT NOT NULL DEFAULT 'pending',
 	attempts INTEGER NOT NULL DEFAULT 0,
+	claim_generation BIGINT NOT NULL DEFAULT 0,
 	locked_until TIMESTAMPTZ,
 	claimed_at TIMESTAMPTZ,
 	completed_at TIMESTAMPTZ,
@@ -31,6 +33,9 @@ CREATE TABLE IF NOT EXISTS dpu_jobs (
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE dpu_jobs
+	ADD COLUMN IF NOT EXISTS claim_generation BIGINT NOT NULL DEFAULT 0;
 
 CREATE INDEX IF NOT EXISTS dpu_jobs_claim_idx
 	ON dpu_jobs (installation_id, status, created_at)
@@ -93,6 +98,7 @@ export async function claimDpuJobs(
 		SET
 			status = 'processing',
 			attempts = attempts + 1,
+			claim_generation = claim_generation + 1,
 			claimed_at = NOW(),
 			locked_until = NOW() + ($3::TEXT || ' seconds')::INTERVAL,
 			updated_at = NOW()
@@ -106,17 +112,26 @@ export async function claimDpuJobs(
 	return result.rows.map(row => ({ ...row, id: row.id.toString() }));
 }
 
-export async function ackDpuJob(jobId: string, installationId: string): Promise<boolean> {
+export async function ackDpuJob(
+	jobId: string,
+	installationId: string,
+	claimGeneration: string,
+): Promise<boolean> {
 	await ensureDpuJobsTable();
 	const query = `
 		UPDATE dpu_jobs
 		SET status = 'completed',
 			completed_at = NOW(),
 			locked_until = NULL,
+			claim_generation = 0,
 			updated_at = NOW()
-		WHERE id = $1 AND installation_id = $2 AND status = 'processing'
+		WHERE id = $1
+			AND installation_id = $2
+			AND status = 'processing'
+			AND claim_generation = $3
+			AND locked_until > NOW()
 	`;
-	const result = await conn.query(query, [jobId, installationId]).catch((err) => {
+	const result = await conn.query(query, [jobId, installationId, claimGeneration]).catch((err) => {
 		console.error('[ackDpuJob] Failed to acknowledge DPU job', { pg_query: query, jobId, installationId }, err);
 		throw err;
 	});
@@ -126,6 +141,7 @@ export async function ackDpuJob(jobId: string, installationId: string): Promise<
 export async function failDpuJob(
 	jobId: string,
 	installationId: string,
+	claimGeneration: string,
 	error: string,
 	retry = true,
 ): Promise<boolean> {
@@ -135,11 +151,16 @@ export async function failDpuJob(
 		SET status = CASE WHEN $3 THEN 'pending' ELSE 'failed' END,
 			failed_at = CASE WHEN $3 THEN failed_at ELSE NOW() END,
 			locked_until = NULL,
+			claim_generation = CASE WHEN $3 THEN claim_generation ELSE 0 END,
 			last_error = $4,
 			updated_at = NOW()
-		WHERE id = $1 AND installation_id = $2 AND status = 'processing'
+		WHERE id = $1
+			AND installation_id = $2
+			AND status = 'processing'
+			AND claim_generation = $5
+			AND locked_until > NOW()
 	`;
-	const result = await conn.query(query, [jobId, installationId, retry, error]).catch((err) => {
+	const result = await conn.query(query, [jobId, installationId, retry, error, claimGeneration]).catch((err) => {
 		console.error('[failDpuJob] Failed to mark DPU job failed', { pg_query: query, jobId, installationId, retry }, err);
 		throw err;
 	});
