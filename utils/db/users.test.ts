@@ -165,7 +165,7 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 				"bitbucket": {
 					"712020:fd994dba-f921-420b-a9af-8b150ee17d5a": {
 						"type": "oauth",
-						"access_token": "aRandomStringThatIamGeneratingJustforThis1test",
+						"access_token": "test-token-not-a-secret",
 						"expires_at": 1695554248,
 						"handle": "vibitest"
 					}
@@ -188,7 +188,7 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 					"129674663": {
 						"type": "oauth",
 						"scope": "read:user,user:email",
-						"access_token": "gho_AKL890fj3jkaLJF09j34flkjlKJF0uLkjgf9"
+						"access_token": "test-token-not-a-secret"
 					}
 				}
 			}
@@ -212,7 +212,7 @@ describe('unit testing auth-info updates in updateUser object creation', () => {
 					"107703478642721836551": {
 						"type": "oauth",
 						"scope": "https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile",
-						"access_token": "za29.a0AVvZVsopfxREfEB_6VrUuWJ1egdOkxhSc2JC0Zav42oN3haqvwRhCNqeQYxrT2OCQKU5lqTse6rlkLi54nEUK5dekebL8mUaFUNORuYzC4ejOFdhiO_icIV6CMwWgRAYDWxxRe_6RjVm1XCrdhNGGmkSSqQUgwaCgYKAYMSARMSFQGbdwaIQ5HEvtcgb_n-jfztWhRRwg0165",
+						"access_token": "test-token-not-a-secret",
 						"expires_at": 1678082912
 					}
 				}
